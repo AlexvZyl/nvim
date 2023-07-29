@@ -11,13 +11,13 @@ config.shortcut = {
         key = 'n',
     },
     {
-        desc = '   File/path ',
+        desc = ' 󰈔  File/path ',
         action = 'Telescope find_files find_command=rg,--hidden,--files',
         group = '@string',
         key = 'f',
     },
     {
-        desc = '   Update ',
+        desc = '   Update ',
         action = 'Lazy sync',
         group = '@string',
         key = 'u',
@@ -35,7 +35,7 @@ config.shortcut = {
         key = 'p',
     },
     {
-        desc = '   Quit ',
+        desc = '   Quit ',
         action = 'q!',
         group = '@macro',
         key = 'q',

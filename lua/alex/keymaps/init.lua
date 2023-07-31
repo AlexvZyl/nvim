@@ -71,11 +71,6 @@ function M.editing()
     keymap(ex_i, 'd', '"_d', default_settings)
 end
 
-function M.vscode()
-    M.editing()
-    M.windows()
-end
-
 function M.lspsaga()
     keymap(n_v, 'ca', '<Cmd>Lspsaga code_action<CR>', default_settings)
     keymap(n_v, 'RR', '<Cmd>Lspsaga rename<CR>', default_settings)

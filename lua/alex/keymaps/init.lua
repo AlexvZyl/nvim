@@ -67,6 +67,7 @@ function M.editing()
     keymap(n, '<C-a>', 'gg0vG$', default_settings)
     keymap(ex_i, 'dd', '"_dd', default_settings)
     keymap(ex_i, 'dw', '"_dw', default_settings)
+    keymap(ex_i, 'di', '"_di', default_settings)
     keymap(ex_i, 'd', '"_d', default_settings)
 end
 

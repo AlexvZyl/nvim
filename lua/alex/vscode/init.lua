@@ -10,9 +10,9 @@ local default_settings = { noremap = true, silent = true }
 local allow_remap = { noremap = false, silent = true }
 
 -- Utils
-keymap(n, "ff", "<Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>", default_settings)
-keymap(n, "fs", "<Cmd>call VSCodeNotify('workbench.action.findInFiles')<CR>", default_settings)
-keymap(n, "<C-t>", "<Cmd>call VSCodeNotify('workbench.action.openRecent')<CR>", default_settings)
+keymap(n, 'ff', "<Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>", default_settings)
+keymap(n, 'fs', "<Cmd>call VSCodeNotify('workbench.action.findInFiles')<CR>", default_settings)
+keymap(n, '<C-t>', "<Cmd>call VSCodeNotify('workbench.action.openRecent')<CR>", default_settings)
 
 -- UI
 keymap(n, '<space>f', "<Cmd>call VSCodeNotify('workbench.view.explorer')<CR>", default_settings)

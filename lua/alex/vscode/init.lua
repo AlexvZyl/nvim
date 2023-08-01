@@ -13,6 +13,7 @@ local allow_remap = { noremap = false, silent = true }
 keymap(n, 'ff', "<Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>", default_settings)
 keymap(n, 'fs', "<Cmd>call VSCodeNotify('workbench.action.findInFiles')<CR>", default_settings)
 keymap(n, '<C-t>', "<Cmd>call VSCodeNotify('workbench.action.openRecent')<CR>", default_settings)
+keymap(n, '<Esc>', "<Cmd>noh<CR>", default_settings)
 
 -- UI
 keymap(n, '<space>f', "<Cmd>call VSCodeNotify('workbench.view.explorer')<CR>", default_settings)
@@ -20,7 +21,7 @@ keymap(n, '<space>b', "<Cmd>call VSCodeNotify('workbench.action.toggleSidebarVis
 keymap(n, '<space>t', "<Cmd>call VSCodeNotify('workbench.action.terminal.toggleTerminal')<CR>", default_settings)
 keymap(n, '<space>g', "<Cmd>call VSCodeNotify('workbench.view.scm')<CR>", default_settings)
 keymap(n, '<space>p', "<Cmd>call VSCodeNotify('workbench.action.togglePanel')<CR>", default_settings)
-keymap(n, '<space>d', "<Cmd>call VSCodeNotify('workbench.action.closePanel')<CR>", default_settings)
+keymap(n, '<space>d', "<Cmd>call VSCodeNotify('workbench.actions.view.problems')<CR>", default_settings)
 
 -- Windows/Editors
 keymap(n, 'H', "<Cmd>call VSCodeNotify('workbench.action.previousEditor')<CR>", default_settings)

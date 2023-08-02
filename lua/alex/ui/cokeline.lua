@@ -29,10 +29,14 @@ require('cokeline').setup {
                 return ''
             end,
             bg = P.black0,
+            underline = function(buffer) return not buffer.is_focused end,
+            sp = P.black0,
         },
         {
             text = function(buffer) return (buffer.index ~= 1) and '▎  ' or '   ' end,
             fg = P.black0,
+            underline = function(buffer) return not buffer.is_focused end,
+            sp = P.black0,
         },
         {
             text = function(buffer)
@@ -45,12 +49,18 @@ require('cokeline').setup {
                 if buffer.diagnostics.warnings ~= 0 then return P.warn end
                 return buffer.is_focused and buffer.devicon.color
             end,
+            underline = function(buffer) return not buffer.is_focused end,
+            sp = P.black0,
         },
         {
             text = ' ',
+            underline = function(buffer) return not buffer.is_focused end,
+            sp = P.black0,
         },
         {
             text = function(buffer) return buffer.filename .. '  ' end,
+            underline = function(buffer) return not buffer.is_focused end,
+            sp = P.black0,
         },
         {
             text = function(buffer)
@@ -59,9 +69,13 @@ require('cokeline').setup {
                 return ''
             end,
             delete_buffer_on_left_click = true,
+            underline = function(buffer) return not buffer.is_focused end,
+            sp = P.black0,
         },
         {
             text = '   ',
+            underline = function(buffer) return not buffer.is_focused end,
+            sp = P.black0,
         },
     },
 }

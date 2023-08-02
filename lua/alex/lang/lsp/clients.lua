@@ -25,7 +25,7 @@ lsp_config.texlab.setup { default }
 lsp_config.cmake.setup {
     lsp_flags = lsp_flags,
     capabilities = capabilities,
-    root_dir = U.root_pattern('CMakeLists.txt')
+    root_dir = U.root_pattern 'CMakeLists.txt',
 }
 lsp_config.jsonls.setup { default }
 lsp_config.yamlls.setup { default }

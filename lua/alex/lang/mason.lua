@@ -18,6 +18,7 @@ local packages = {
     'cmake-language-server',
     'json-lsp',
     'yaml-language-server',
+    'clangd',
 }
 
 registry.refresh(function()

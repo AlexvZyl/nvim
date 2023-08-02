@@ -1,5 +1,6 @@
 -- Run install-servers.sh to install all the servers used below.
 
+local U = require 'lspconfig/util'
 local lsp_config = require 'lspconfig'
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
@@ -19,9 +20,12 @@ lsp_config.lua_ls.setup { default }
 lsp_config.julials.setup { default }
 lsp_config.bashls.setup { default }
 lsp_config.pyright.setup { default }
---lsp_config.pylsp.setup { default }
 lsp_config.rust_analyzer.setup { default }
 lsp_config.texlab.setup { default }
-lsp_config.cmake.setup { default }
+lsp_config.cmake.setup {
+    lsp_flags = lsp_flags,
+    capabilities = capabilities,
+    root_dir = U.root_pattern('CMakeLists.txt')
+}
 lsp_config.jsonls.setup { default }
 lsp_config.yamlls.setup { default }

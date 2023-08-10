@@ -7,5 +7,9 @@ require('nordic').load {
     },
 }
 
+require 'lualine' .setup {
+    options = { theme = 'nordic' }
+}
+
 local C = require 'nordic.colors'
 vim.cmd('highlight LspSignatureActiveParameter guibg=' .. C.bg_float .. ' guisp=' .. C.white0)

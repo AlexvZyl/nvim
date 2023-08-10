@@ -19,6 +19,8 @@ local packages = {
     'json-lsp',
     'yaml-language-server',
     'clangd',
+    'cpptools',
+    'codelldb',
 }
 
 registry.refresh(function()

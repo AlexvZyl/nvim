@@ -1,7 +1,7 @@
 local P = require 'nordic.colors'
 
 local blend = require('nordic.utils').blend
-local inactive_bg = blend(P.bg, P.black, 0.4)
+local inactive_bg = blend(P.bg, P.black0, 0.4)
 
 require('cokeline').setup {
     default_hl = {

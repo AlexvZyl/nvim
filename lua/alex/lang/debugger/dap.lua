@@ -10,10 +10,10 @@ local cache = require 'alex.lang.debugger.cache'
 
 -- C++
 dap.adapters.codelldb = {
-    command = vim.fn.stdpath('data') .. '/mason/bin/codelldb --port 13000',
+    command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb --port 13000',
     type = 'server',
     host = '127.0.0.1',
-    port = 13000
+    port = 13000,
 }
 dap.configurations.cpp = {
     {

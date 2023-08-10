@@ -192,7 +192,7 @@ return {
         'folke/tokyonight.nvim',
         lazy = true,
         priority = 1000,
-        config = function() require 'alex.themes.tokyonight' end
+        config = function() require 'alex.themes.tokyonight' end,
     },
     { 'sainnhe/gruvbox-material', lazy = true },
     { 'EdenEast/nightfox.nvim', lazy = true },

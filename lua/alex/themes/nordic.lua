@@ -7,8 +7,8 @@ require('nordic').load {
     },
 }
 
-require 'lualine' .setup {
-    options = { theme = 'nordic' }
+require('lualine').setup {
+    options = { theme = 'nordic' },
 }
 
 local C = require 'nordic.colors'

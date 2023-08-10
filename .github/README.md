@@ -1,6 +1,6 @@
 # nvim
 
-Configuration files and custom modules for Neovim.
+Configuration files and custom modules for Neovim.  This is a submodule for my [Linux](https://github.com/AlexvZyl/.dotfiles) and [MacOS](https://github.com/AlexvZyl/.dotfiles-macos) dotfiles.
 
 This config has a decent amount of work and is basically a fully fledged IDE.  Why didn't I use [LunarVim](https://github.com/LunarVim/LunarVim), [NvChad](https://github.com/NvChad/NvChad) or [SpaceVim](https://github.com/liuchengxu/space-vim)?  I like doing things myself.
 

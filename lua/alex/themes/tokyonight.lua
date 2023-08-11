@@ -10,7 +10,7 @@ end
 require('tokyonight').load {
     style = 'night',
     on_highlights = on_highlights,
-    on_colors = function(_) end
+    on_colors = function(_) end,
 }
 
 require('lualine').setup {

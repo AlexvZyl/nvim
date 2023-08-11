@@ -18,18 +18,16 @@ if vim.g.colors_name == 'nordic' then
     title = P.yellow
     error = P.error
     warn = P.warn
-
 elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     local U = require 'tokyonight.util'
-    dark_bg =  C.night.bg_dark
+    dark_bg = C.night.bg_dark
     fg = C.default.fg
     inactive_fg = C.default.fg_gutter
     bg = C.night.bg
     warn = C.default.yellow
     title = C.default.yellow
-    inactive_bg =  U.blend(C.night.bg, C.night.bg_dark, 0.4)
-
+    inactive_bg = U.blend(C.night.bg, C.night.bg_dark, 0.4)
 end
 
 require('cokeline').setup {

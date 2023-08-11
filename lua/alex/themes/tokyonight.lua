@@ -4,6 +4,7 @@ local function on_highlights(H, C)
     H.NvimTreeWinSeparator = { fg = C.bg_dark, bg = C.bg }
     H.DashboardMruTitle = { fg = C.orange, bold = true }
     H.DashboardProjectTitle = { fg = C.orange, bold = true }
+    H.DashboardProjectIcon = { fg = C.magenta, bold = true }
 end
 
 require('tokyonight').load {

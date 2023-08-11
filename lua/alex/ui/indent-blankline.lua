@@ -6,5 +6,5 @@ require('indent_blankline').setup {
     use_treesitter = false,
     use_treesitter_scope = false,
     context_char = '┃',
-    char = '┇',
+    char = '┋',
 }

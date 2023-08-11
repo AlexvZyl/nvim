@@ -73,6 +73,7 @@ return {
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         config = function() require 'alex.ui.tree' end,
     },
+
     -- Language/Tools/LSP/Comp
     {
         'williamboman/mason.nvim',
@@ -185,13 +186,18 @@ return {
         branch = 'dev',
         priority = 1000,
         config = function() require 'alex.themes.nordic' end,
+        --lazy = true,
+    },
+    {
+        'folke/tokyonight.nvim',
+        priority = 1000,
+        lazy = true,
+        config = function() require 'alex.themes.tokyonight' end,
     },
     { 'sainnhe/gruvbox-material', lazy = true },
     { 'EdenEast/nightfox.nvim', lazy = true },
     { 'catppuccin/nvim', lazy = true },
-    { 'folke/tokyonight.nvim', lazy = true },
     { 'sainnhe/everforest', lazy = true },
-    { 'shaunsingh/nord.nvim', lazy = true },
     { 'rebelot/kanagawa.nvim', lazy = true },
     { 'marko-cerovac/material.nvim', lazy = true },
     { 'Mofiqul/vscode.nvim', lazy = true },

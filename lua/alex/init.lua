@@ -3,7 +3,7 @@ if vim.g.vscode then
     return
 end
 
--- This makes the neovim load faster
+-- This makes neovim load faster
 vim.loader.enable()
 
 -- Setup environment

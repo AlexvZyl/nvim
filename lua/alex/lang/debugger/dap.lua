@@ -7,10 +7,18 @@ dap.adapters.cppdbg = {
 }
 
 local cache = require 'alex.lang.debugger.cache'
+
+-- C++
+dap.adapters.codelldb = {
+    command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb --port 13000',
+    type = 'server',
+    host = '127.0.0.1',
+    port = 13000,
+}
 dap.configurations.cpp = {
     {
         name = 'Executable',
-        type = 'cppdbg',
+        type = 'codelldb', -- Technically only for Mac I think?
         request = 'launch',
         program = function()
             local path = cache.check_exe_cache(vim.fn.getcwd())

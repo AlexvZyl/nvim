@@ -18,6 +18,9 @@ local packages = {
     'cmake-language-server',
     'json-lsp',
     'yaml-language-server',
+    'clangd',
+    'cpptools',
+    'codelldb',
 }
 
 registry.refresh(function()

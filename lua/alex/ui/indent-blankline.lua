@@ -5,6 +5,6 @@ require('indent_blankline').setup {
     filetype_exclude = { 'NvimTree', 'startify', 'dashboard', 'help', 'markdown' },
     use_treesitter = false,
     use_treesitter_scope = false,
-    context_char = '│',
-    char = '┆',
+    context_char = '┃',
+    char = '┋',
 }

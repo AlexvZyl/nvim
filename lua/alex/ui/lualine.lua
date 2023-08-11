@@ -129,8 +129,8 @@ local function get_git_compare()
     return string
 end
 
-local text_fg = { link = '@comment' }
-local icon_fg = { link = '@comment' }
+local text_fg = { link = 'comment' }
+local icon_fg = { link = 'comment' }
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {

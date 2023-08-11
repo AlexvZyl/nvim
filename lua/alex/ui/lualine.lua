@@ -129,8 +129,9 @@ local function get_git_compare()
     return string
 end
 
-local text_fg = { link = 'comment' }
-local icon_fg = { link = 'comment' }
+local C = require 'nordic.colors'
+local text_fg = { fg = C.gray3 }
+local icon_fg = { fg = C.gray4 }
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {
@@ -149,7 +150,7 @@ local tree = {
                 get_short_cwd,
                 padding = 0,
                 icon = { '   ', color = icon_fg },
-                color = { fg = text_fg },
+                color = text_fg,
             },
         },
         lualine_x = {},
@@ -220,7 +221,7 @@ require('lualine').setup {
         lualine_c = {
             {
                 parent_folder,
-                color = { fg = text_fg },
+                color = text_fg,
                 icon = { '   ', color = icon_fg },
                 separator = '',
                 padding = 0,

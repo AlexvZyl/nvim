@@ -181,17 +181,17 @@ return {
     },
 
     -- Themes
-    {
-        'AlexvZyl/nordic.nvim',
-        branch = 'dev',
-        priority = 1000,
-        config = function() require 'alex.themes.nordic' end,
-        lazy = false,
-    },
+    --{
+        --'AlexvZyl/nordic.nvim',
+        --branch = 'dev',
+        --priority = 1000,
+        --config = function() require 'alex.themes.nordic' end,
+        --lazy = true,
+    --},
     {
         'folke/tokyonight.nvim',
-        lazy = true,
         priority = 1000,
+        lazy = false,
         config = function() require 'alex.themes.tokyonight' end,
     },
     { 'sainnhe/gruvbox-material', lazy = true },

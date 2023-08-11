@@ -1,4 +1,5 @@
 require('nordic').load {
+    reduced_blue = true,
     cursorline = {
         theme = 'dark',
         bold = false,

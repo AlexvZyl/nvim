@@ -136,7 +136,6 @@ if vim.g.colors_name == 'nordic' then
     text_hl = { fg = C.gray3 }
     icon_hl = { fg = C.gray4 }
 elseif vim.g.colors_name == 'tokyonight' then
-
 end
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end

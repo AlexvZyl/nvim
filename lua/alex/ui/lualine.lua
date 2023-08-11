@@ -131,11 +131,16 @@ end
 
 local text_hl
 local icon_hl
+
 if vim.g.colors_name == 'nordic' then
     local C = require 'nordic.colors'
     text_hl = { fg = C.gray3 }
     icon_hl = { fg = C.gray4 }
+
 elseif vim.g.colors_name == 'tokyonight' then
+    local C = require 'tokyonight.colors'
+    text_hl = { fg = C.default.fg_gutter }
+    icon_hl = { fg = C.default.dark3 }
 
 end
 
@@ -255,7 +260,7 @@ require('lualine').setup {
                 'diff',
                 padding = 0,
                 color = text_hl,
-                icon = { ' ', color = icon_hl },
+                icon = { ' ', color = text_hl },
                 source = diff_source,
                 symbols = { added = ' ', modified = ' ', removed = ' ' },
                 diff_color = { added = icon_hl, modified = icon_hl, removed = icon_hl },

@@ -68,6 +68,7 @@ function M.editing()
     keymap(ex_i, 'dd', '"_dd', default_settings)
     keymap(ex_i, 'dw', '"_dw', default_settings)
     keymap(ex_i, 'd', '"_d', default_settings)
+    keymap(ex_i, 'xx', 'yydd', default_settings)
 end
 
 function M.vscode()

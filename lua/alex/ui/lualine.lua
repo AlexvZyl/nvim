@@ -26,31 +26,6 @@ local function get_current_filename()
     return bufname ~= '' and vim.fn.fnamemodify(bufname, ':t') or ''
 end
 
-local function copilot_normal()
-    local status = require('copilot.api').status.data.status
-    if
-        string.find(status, 'Online')
-        or string.find(status, 'Enabled')
-        or string.find(status, 'Normal')
-        or string.find(status, 'InProgress')
-    then
-        return '  '
-    end
-    return ''
-end
-
-local function copilot_warn()
-    local status = require('copilot.api').status.data.status
-    if string.find(status, 'Warning') then return '  ' end
-    return ''
-end
-
-local function copilot_error()
-    local status = require('copilot.api').status.data.status
-    if string.find(status, 'Error') then return '  ' end
-    return ''
-end
-
 -- Gets the current buffer's filename with the filetype icon supplied
 -- by devicons.
 local M = require('lualine.components.filetype'):extend()
@@ -154,8 +129,8 @@ local function get_git_compare()
     return string
 end
 
--- Required to properly set the colors.
-local c = require 'nordic.colors'
+local text_fg = { link = '@comment' }
+local icon_fg = { link = '@comment' }
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {
@@ -173,8 +148,8 @@ local tree = {
             {
                 get_short_cwd,
                 padding = 0,
-                icon = { '   ', color = { fg = c.gray4 } },
-                color = { fg = c.gray3 },
+                icon = { '   ', color = icon_fg },
+                color = { fg = text_fg },
             },
         },
         lualine_x = {},
@@ -182,11 +157,11 @@ local tree = {
         lualine_z = {
             {
                 'location',
-                icon = { '', align = 'left', color = { fg = c.black } },
+                icon = { '', align = 'left' },
             },
             {
                 'progress',
-                icon = { '', align = 'left', color = { fg = c.black } },
+                icon = { '', align = 'left' },
                 separator = { right = '', left = '' },
             },
         },
@@ -210,8 +185,8 @@ local telescope = {
         lualine_c = {
             {
                 telescope_text,
-                color = { fg = c.gray3 },
-                icon = { '  ', color = { fg = c.gray4 } },
+                color = { fg = text_fg },
+                icon = { '  ', color = icon_fg },
             },
         },
         lualine_x = {},
@@ -219,11 +194,11 @@ local telescope = {
         lualine_z = {
             {
                 'location',
-                icon = { '', align = 'left', color = { fg = c.black } },
+                icon = { '', align = 'left', color = icon_fg },
             },
             {
                 'progress',
-                icon = { '', align = 'left', color = { fg = c.black } },
+                icon = { '', align = 'left', color = icon_fg },
                 separator = { right = '', left = '' },
             },
         },
@@ -245,21 +220,21 @@ require('lualine').setup {
         lualine_c = {
             {
                 parent_folder,
-                color = { fg = c.gray3 },
-                icon = { '   ', color = { fg = c.gray4 } },
+                color = { fg = text_fg },
+                icon = { '   ', color = icon_fg },
                 separator = '',
                 padding = 0,
             },
             {
                 get_current_filename,
-                color = { fg = c.gray3 },
+                color = text_fg,
                 separator = ' ',
                 padding = 0,
             },
             {
                 'branch',
-                color = { fg = c.gray3 },
-                icon = { '   ', color = { fg = c.gray4 } },
+                color = text_fg,
+                icon = { '   ', color = icon_fg },
                 separator = ' ',
                 padding = 0,
             },
@@ -267,20 +242,16 @@ require('lualine').setup {
                 get_git_compare,
                 separator = ' ',
                 padding = 0,
-                color = { fg = c.gray3 },
+                color = text_fg,
             },
             {
                 'diff',
                 padding = 0,
-                color = { fg = c.gray3 },
-                icon = { ' ', color = { fg = c.gray3 } },
+                color = text_fg,
+                icon = { ' ', color = icon_fg },
                 source = diff_source,
                 symbols = { added = ' ', modified = ' ', removed = ' ' },
-                diff_color = {
-                    added = { fg = c.gray4 },
-                    modified = { fg = c.gray4 },
-                    removed = { fg = c.gray4 },
-                },
+                diff_color = { added = icon_fg, modified = icon_fg, removed = icon_fg },
             },
         },
         lualine_x = {
@@ -288,12 +259,6 @@ require('lualine').setup {
                 'diagnostics',
                 sources = { 'nvim_diagnostic' },
                 symbols = { error = ' ', warn = ' ', info = ' ', hint = '󱤅 ', other = '󰠠 ' },
-                diagnostics_color = {
-                    error = { fg = c.error },
-                    warn = { fg = c.warn },
-                    info = { fg = c.info },
-                    hint = { fg = c.hint },
-                },
                 colored = true,
                 padding = 1,
             },
@@ -301,22 +266,19 @@ require('lualine').setup {
                 get_native_lsp,
                 padding = 2,
                 separator = ' ',
-                color = { fg = c.gray3 },
-                icon = { ' ', color = { fg = c.gray4 } },
+                color = text_fg,
+                icon = { ' ', color = icon_fg },
             },
-            { copilot_normal, color = { fg = c.gray4 }, padding = 0 },
-            { copilot_warn, color = { fg = c.yellow.base }, padding = 0 },
-            { copilot_error, color = { fg = c.red.base }, padding = 0 },
         },
         lualine_y = {},
         lualine_z = {
             {
                 'location',
-                icon = { '', align = 'left', color = { fg = c.black } },
+                icon = { '', align = 'left' },
             },
             {
                 'progress',
-                icon = { '', align = 'left', color = { fg = c.black } },
+                icon = { '', align = 'left' },
                 separator = { right = '', left = '' },
             },
         },

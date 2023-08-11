@@ -181,13 +181,14 @@ return {
     },
 
     -- Themes
-    --{
-        --'AlexvZyl/nordic.nvim',
-        --branch = 'dev',
-        --priority = 1000,
+    {
+        'AlexvZyl/nordic.nvim',
+        branch = 'dev',
+        priority = 1000,
         --config = function() require 'alex.themes.nordic' end,
-        --lazy = true,
-    --},
+        config = false,
+        lazy = true,
+    },
     {
         'folke/tokyonight.nvim',
         priority = 1000,

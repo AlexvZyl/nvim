@@ -105,6 +105,9 @@ local Event = api.events.Event
 api.events.subscribe(Event.TreeOpen, function(_)
     vim.cmd [[setlocal statuscolumn=\ ]]
     vim.cmd [[setlocal cursorlineopt=number]]
+    vim.cmd [[setlocal fillchars+=vert:🮇]]
+    vim.cmd [[setlocal fillchars+=horizup:🮇]]
+    vim.cmd [[setlocal fillchars+=vertright:🮇]]
 end)
 
 -- When neovim opens.

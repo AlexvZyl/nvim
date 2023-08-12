@@ -26,6 +26,7 @@ elseif vim.g.colors_name == 'tokyonight' then
     inactive_fg = C.default.fg_gutter
     bg = C.night.bg
     warn = C.default.yellow
+    error = C.default.red1
     title = C.default.yellow
     inactive_bg = U.blend(C.night.bg, C.night.bg_dark, 0.4)
 end

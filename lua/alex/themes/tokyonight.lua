@@ -5,6 +5,7 @@ local function on_highlights(H, C)
     H.DashboardMruTitle = { fg = C.orange, bold = true }
     H.DashboardProjectTitle = { fg = C.orange, bold = true }
     H.DashboardProjectIcon = { fg = C.magenta, bold = true }
+    H.SagaNormal = { bg = C.bg }
 end
 
 require('tokyonight').load {

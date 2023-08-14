@@ -6,6 +6,12 @@ local function on_highlights(H, C)
     H.DashboardProjectTitle = { fg = C.orange, bold = true }
     H.DashboardProjectIcon = { fg = C.magenta, bold = true }
     H.SagaNormal = { bg = C.bg }
+    H.SagaBorder = { bg = C.bg, fg = C.orange }
+    H.SpecialCmpBorder = { bg = C.bg }
+    H.Pmenu = { bg = C.bg }
+    H.LeapBackdrop = { }
+    H.LeapLabelPrimary = { bg = C.bg_dark, fg = C.red1 }
+    H.LeapLabelSecondary = { bg = C.bg_dark, fg = C.red1 }
 end
 
 require('tokyonight').load {

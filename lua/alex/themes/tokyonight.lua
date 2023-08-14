@@ -9,7 +9,7 @@ local function on_highlights(H, C)
     H.SagaBorder = { bg = C.bg, fg = C.orange }
     H.SpecialCmpBorder = { bg = C.bg }
     H.Pmenu = { bg = C.bg }
-    H.LeapBackdrop = { }
+    H.LeapBackdrop = {}
     H.LeapLabelPrimary = { bg = C.bg_dark, fg = C.red1 }
     H.LeapLabelSecondary = { bg = C.bg_dark, fg = C.red1 }
 end

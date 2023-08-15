@@ -27,6 +27,7 @@ local winbar = {
 }
 
 local diagnostic = {
+    max_show_width = 0.5,
     show_code_action = false,
     on_insert = false,
     show_source = false,

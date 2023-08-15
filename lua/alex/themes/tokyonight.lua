@@ -12,6 +12,7 @@ local function on_highlights(H, C)
     H.LeapBackdrop = { }
     H.LeapLabelPrimary = { bg = C.bg_dark, fg = C.red1 }
     H.LeapLabelSecondary = { bg = C.bg_dark, fg = C.red1 }
+    H.IndentBlanklineContextChar = { fg = C.fg_gutter }
 end
 
 require('tokyonight').load {

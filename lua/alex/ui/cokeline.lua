@@ -1,22 +1,48 @@
-local P = require 'nordic.colors'
+local dark_bg
+local inactive_bg
+local bg
+local fg
+local inactive_fg
+local title
+local error
+local warn
 
-local blend = require('nordic.utils').blend
-local inactive_bg = blend(P.bg, P.black0, 0.4)
+if vim.g.colors_name == 'nordic' then
+    local P = require 'nordic.colors'
+    local blend = require('nordic.utils').blend
+    dark_bg = P.black0
+    fg = P.fg
+    bg = P.bg
+    inactive_fg = P.gray4
+    inactive_bg = blend(P.bg, P.black0, 0.4)
+    title = P.yellow
+    error = P.error
+    warn = P.warn
+elseif vim.g.colors_name == 'tokyonight' then
+    local C = require 'tokyonight.colors'
+    local U = require 'tokyonight.util'
+    dark_bg = C.night.bg_dark
+    fg = C.default.fg
+    inactive_fg = C.default.fg_gutter
+    bg = C.night.bg
+    warn = C.default.yellow
+    error = C.default.red1
+    title = C.default.yellow
+    inactive_bg = U.blend(C.night.bg, C.night.bg_dark, 0.4)
+end
 
 require('cokeline').setup {
     default_hl = {
-        fg = function(buffer) return buffer.is_focused and P.fg or P.gray4 end,
-        bg = function(buffer) return buffer.is_focused and P.bg or inactive_bg end,
-        --style = function(buffer) return not buffer.is_focused and 'underline' end,
-        --sp = P.black0,
+        fg = function(buffer) return buffer.is_focused and fg or inactive_fg end,
+        bg = function(buffer) return buffer.is_focused and bg or inactive_bg end,
     },
     sidebar = {
         filetype = 'NvimTree',
         components = {
             {
                 text = ' 󰙅  File Explorer',
-                fg = P.yellow.base,
-                bg = P.black0,
+                fg = title,
+                bg = dark_bg,
                 style = 'bold',
             },
         },
@@ -28,15 +54,15 @@ require('cokeline').setup {
                 if buffer.index == 1 and require('nvim-tree.api').tree.is_visible() then return ' ' end
                 return ''
             end,
-            bg = P.black0,
             underline = function(buffer) return not buffer.is_focused end,
-            sp = P.black0,
+            bg = dark_bg,
+            sp = dark_bg,
         },
         {
             text = function(buffer) return (buffer.index ~= 1) and '▎  ' or '   ' end,
-            fg = P.black0,
             underline = function(buffer) return not buffer.is_focused end,
-            sp = P.black0,
+            fg = dark_bg,
+            sp = dark_bg,
         },
         {
             text = function(buffer)
@@ -45,22 +71,22 @@ require('cokeline').setup {
                 return buffer.devicon.icon
             end,
             fg = function(buffer)
-                if buffer.diagnostics.errors ~= 0 then return P.error end
-                if buffer.diagnostics.warnings ~= 0 then return P.warn end
+                if buffer.diagnostics.errors ~= 0 then return error end
+                if buffer.diagnostics.warnings ~= 0 then return warn end
                 return buffer.is_focused and buffer.devicon.color
             end,
             underline = function(buffer) return not buffer.is_focused end,
-            sp = P.black0,
+            sp = dark_bg,
         },
         {
             text = ' ',
             underline = function(buffer) return not buffer.is_focused end,
-            sp = P.black0,
+            sp = dark_bg,
         },
         {
             text = function(buffer) return buffer.filename .. '  ' end,
             underline = function(buffer) return not buffer.is_focused end,
-            sp = P.black0,
+            sp = dark_bg,
         },
         {
             text = function(buffer)
@@ -70,12 +96,12 @@ require('cokeline').setup {
             end,
             delete_buffer_on_left_click = true,
             underline = function(buffer) return not buffer.is_focused end,
-            sp = P.black0,
+            sp = dark_bg,
         },
         {
             text = '   ',
             underline = function(buffer) return not buffer.is_focused end,
-            sp = P.black0,
+            sp = dark_bg,
         },
     },
 }

@@ -1,7 +1,8 @@
 local u = require 'alex.utils'
 
 local ui = {
-    border = u.border_chars_outer_thin,
+    --border = u.border_chars_outer_thin,
+    border = 'rounded',
     winblend = 0,
     title = false,
     diagnostic = '  ',
@@ -26,6 +27,7 @@ local winbar = {
 }
 
 local diagnostic = {
+    max_show_width = 0.5,
     show_code_action = false,
     on_insert = false,
     show_source = false,

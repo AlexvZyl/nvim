@@ -129,9 +129,18 @@ local function get_git_compare()
     return string
 end
 
-local C = require 'nordic.colors'
-local text_fg = { fg = C.gray3 }
-local icon_fg = { fg = C.gray4 }
+local text_hl
+local icon_hl
+
+if vim.g.colors_name == 'nordic' then
+    local C = require 'nordic.colors'
+    text_hl = { fg = C.gray3 }
+    icon_hl = { fg = C.gray4 }
+elseif vim.g.colors_name == 'tokyonight' then
+    local C = require 'tokyonight.colors'
+    text_hl = { fg = C.default.fg_gutter }
+    icon_hl = { fg = C.default.dark3 }
+end
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {
@@ -149,8 +158,8 @@ local tree = {
             {
                 get_short_cwd,
                 padding = 0,
-                icon = { '   ', color = icon_fg },
-                color = text_fg,
+                icon = { '   ', color = icon_hl },
+                color = text_hl,
             },
         },
         lualine_x = {},
@@ -186,8 +195,8 @@ local telescope = {
         lualine_c = {
             {
                 telescope_text,
-                color = { fg = text_fg },
-                icon = { '  ', color = icon_fg },
+                color = { fg = text_hl },
+                icon = { '  ', color = icon_hl },
             },
         },
         lualine_x = {},
@@ -195,11 +204,11 @@ local telescope = {
         lualine_z = {
             {
                 'location',
-                icon = { '', align = 'left', color = icon_fg },
+                icon = { '', align = 'left', color = icon_hl },
             },
             {
                 'progress',
-                icon = { '', align = 'left', color = icon_fg },
+                icon = { '', align = 'left', color = icon_hl },
                 separator = { right = '', left = '' },
             },
         },
@@ -221,21 +230,21 @@ require('lualine').setup {
         lualine_c = {
             {
                 parent_folder,
-                color = text_fg,
-                icon = { '   ', color = icon_fg },
+                color = text_hl,
+                icon = { '   ', color = icon_hl },
                 separator = '',
                 padding = 0,
             },
             {
                 get_current_filename,
-                color = text_fg,
+                color = text_hl,
                 separator = ' ',
                 padding = 0,
             },
             {
                 'branch',
-                color = text_fg,
-                icon = { '   ', color = icon_fg },
+                color = text_hl,
+                icon = { '   ', color = icon_hl },
                 separator = ' ',
                 padding = 0,
             },
@@ -243,16 +252,16 @@ require('lualine').setup {
                 get_git_compare,
                 separator = ' ',
                 padding = 0,
-                color = text_fg,
+                color = text_hl,
             },
             {
                 'diff',
                 padding = 0,
-                color = text_fg,
-                icon = { ' ', color = icon_fg },
+                color = text_hl,
+                icon = { ' ', color = text_hl },
                 source = diff_source,
                 symbols = { added = ' ', modified = ' ', removed = ' ' },
-                diff_color = { added = icon_fg, modified = icon_fg, removed = icon_fg },
+                diff_color = { added = icon_hl, modified = icon_hl, removed = icon_hl },
             },
         },
         lualine_x = {
@@ -267,8 +276,8 @@ require('lualine').setup {
                 get_native_lsp,
                 padding = 2,
                 separator = ' ',
-                color = text_fg,
-                icon = { ' ', color = icon_fg },
+                color = text_hl,
+                icon = { ' ', color = icon_hl },
             },
         },
         lualine_y = {},

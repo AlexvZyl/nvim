@@ -32,7 +32,8 @@ local window = {
         scrollbar = true,
         winhighlight = 'Normal:Pmenu,FloatBorder:SpecialCmpBorder,CursorLine:PmenuSel,Search:None',
         --border = u.border_chars_outer_thin,
-        border = u.border_chars_cmp_items,
+        --border = u.border_chars_cmp_items,
+        border = 'rounded',
         col_offset = -1,
         side_padding = 0,
     },
@@ -40,7 +41,8 @@ local window = {
         winhighlight = 'Normal:Pmenu,FloatBorder:SpecialCmpBorder,CursorLine:PmenuSel,Search:None',
         scrollbar = true,
         --border = u.border_chars_outer_thin,
-        border = u.border_chars_cmp_doc,
+        --border = u.border_chars_cmp_doc,
+        border = 'rounded',
     },
 }
 

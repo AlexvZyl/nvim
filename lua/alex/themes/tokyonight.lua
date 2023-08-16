@@ -13,6 +13,11 @@ local function on_highlights(H, C)
     H.LeapLabelPrimary = { bg = C.bg_dark, fg = C.red1 }
     H.LeapLabelSecondary = { bg = C.bg_dark, fg = C.red1 }
     H.IndentBlanklineContextChar = { fg = C.fg_gutter }
+    H.TelescopePromptTitle = { fg = C.bg_dark, bg = C.orange }
+    H.TelescopePromptNormal = { bg = C.bg }
+    H.TelescopePromptBorder = { fg = C.bg_dark, bg = C.bg }
+    H.TelescopePreviewTitle = { fg = C.bg_dark, bg = C.orange }
+    H.TelescopeBorder = { fg = C.bg_dark, bg = C.bg_dark }
 end
 
 require('tokyonight').load {

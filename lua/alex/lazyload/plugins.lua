@@ -108,14 +108,13 @@ return {
     {
         'neovim/nvim-lspconfig',
         event = { 'User NvimStartupDone' },
+        config = function() require 'alex.lang.lsp' end,
         dependencies = {
             {
                 'folke/neodev.nvim',
-                event = { 'VeryLazy' },
                 config = function() require 'alex.lang.tools.neodev' end,
             },
         },
-        config = function() require 'alex.lang.lsp' end,
     },
     {
         'glepnir/lspsaga.nvim',
@@ -124,6 +123,8 @@ return {
     },
     {
         'hrsh7th/nvim-cmp',
+        event = { 'User NvimStartupDone' },
+        config = function() require 'alex.lang.completion' end,
         dependencies = {
             'hrsh7th/cmp-omni',
             'hrsh7th/cmp-nvim-lsp',
@@ -137,8 +138,6 @@ return {
                 build = 'make install_jsregexp',
             },
         },
-        event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.completion' end,
     },
     {
         'ray-x/lsp_signature.nvim',
@@ -179,8 +178,7 @@ return {
         'AlexvZyl/nordic.nvim',
         branch = 'dev',
         priority = 1000,
-        --config = function() require 'alex.themes.nordic' end,
-        config = false,
+        config = function() require 'alex.themes.nordic' end,
         lazy = true,
     },
     {

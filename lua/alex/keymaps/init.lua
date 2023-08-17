@@ -65,10 +65,15 @@ function M.editing()
     keymap(n, 'S', function() require('leap').leap { backward = true } end)
     keymap(n, '<leader>v', function() require('alex.keymaps.utils').toggle_diffview() end)
     keymap(n, '<C-a>', 'gg0vG$', default_settings)
-    --keymap(ex_i, 'dd', '"_dd', default_settings)
-    --keymap(ex_i, 'dw', '"_dw', default_settings)
-    --keymap(ex_i, 'di', '"_di', default_settings)
-    --keymap(ex_i, 'd', '"_d', default_settings)
+    keymap(ex_i, 'dd', '"_dd', default_settings)
+    keymap(ex_i, 'dw', '"_dw', default_settings)
+    keymap(ex_i, 'd', '"_d', default_settings)
+    keymap(ex_i, 'xx', 'yydd', default_settings)
+end
+
+function M.vscode()
+    M.editing()
+    M.windows()
 end
 
 function M.lspsaga()

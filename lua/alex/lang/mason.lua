@@ -21,6 +21,8 @@ local packages = {
     'clangd',
     'cpptools',
     'codelldb',
+    'dockerfile-language-server',
+    'docker-compose-language-service'
 }
 
 registry.refresh(function()

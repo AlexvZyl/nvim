@@ -95,11 +95,14 @@ local function get_native_lsp()
     local buf_ft = get_current_filetype()
     local clients = vim.lsp.get_active_clients()
     if next(clients) == nil then return '' end
+    local current_clients = ''
     for _, client in ipairs(clients) do
         local filetypes = client.config.filetypes
-        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 and client.name ~= 'copilot' then return client.name end
+        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+            current_clients = current_clients .. client.name .. ' '
+        end
     end
-    return ''
+    return current_clients
 end
 
 -- Display the difference in commits between local and head.
@@ -270,11 +273,11 @@ require('lualine').setup {
                 sources = { 'nvim_diagnostic' },
                 symbols = { error = ' ', warn = ' ', info = ' ', hint = '󱤅 ', other = '󰠠 ' },
                 colored = true,
-                padding = 1,
+                padding = 2,
             },
             {
                 get_native_lsp,
-                padding = 2,
+                padding = 1,
                 separator = ' ',
                 color = text_hl,
                 icon = { ' ', color = icon_hl },

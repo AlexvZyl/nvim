@@ -29,3 +29,5 @@ lsp_config.cmake.setup {
 }
 lsp_config.jsonls.setup { default }
 lsp_config.yamlls.setup { default }
+lsp_config.docker_compose_language_service.setup { default }
+lsp_config.dockerls.setup { default }

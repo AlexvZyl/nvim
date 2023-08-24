@@ -7,6 +7,7 @@ require('luasnip.loaders.from_vscode').lazy_load()
 local sources = cmp.config.sources {
     { name = 'luasnip' },
     { name = 'nvim_lsp' },
+    { name = 'path' },
 }
 local snippet = {
     expand = function(args) require('luasnip').lsp_expand(args.body) end,

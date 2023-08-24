@@ -1,9 +1,8 @@
 -- I want to keep all of the key bindings in one file so that it is easy to see
 -- what is being used and ensure nothing being overwritten by accident.
 
-local n, i, v, t = 'n', 'i', 'v', 't'
+local n, i, v = 'n', 'i', 'v'
 local ex_t = { n, i, v }
-local ex_i = { n, v, t }
 local n_v = { n, v }
 
 local keymap = vim.keymap.set
@@ -41,19 +40,14 @@ function M.init()
     keymap(n, '<leader>d', '<Cmd>TroubleToggle document_diagnostics<CR>', default_settings)
     keymap(n, '<leader>D', '<Cmd>TroubleToggle workspace_diagnostics<CR>', default_settings)
 
-    M.editing()
-    M.windows()
-end
-
-function M.windows()
+    -- Windows
     keymap(ex_t, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
     keymap(ex_t, '<C-h>', '<Cmd>wincmd h<CR>', default_settings)
     keymap(ex_t, '<C-j>', '<Cmd>wincmd j<CR>', default_settings)
     keymap(ex_t, '<C-k>', '<Cmd>wincmd k<CR>', default_settings)
     keymap(ex_t, '<C-l>', '<Cmd>wincmd l<CR>', default_settings)
-end
 
-function M.editing()
+    -- Editing
     keymap(ex_t, '<C-z>', '<Cmd>undo<CR>', default_settings)
     keymap(ex_t, '<C-y>', '<Cmd>redo<CR>', default_settings)
     keymap(i, '<Esc>', '<Esc>`^', default_settings)
@@ -65,15 +59,6 @@ function M.editing()
     keymap(n, 'S', function() require('leap').leap { backward = true } end)
     keymap(n, '<leader>v', function() require('alex.keymaps.utils').toggle_diffview() end)
     keymap(n, '<C-a>', 'gg0vG$', default_settings)
-    --keymap(ex_i, 'dd', '"_dd', default_settings)
-    --keymap(ex_i, 'dw', '"_dw', default_settings)
-    --keymap(ex_i, 'd', '"_d', default_settings)
-    --keymap(ex_i, 'xx', 'yydd', default_settings)
-end
-
-function M.vscode()
-    M.editing()
-    M.windows()
 end
 
 function M.lspsaga()

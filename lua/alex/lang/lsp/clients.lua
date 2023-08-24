@@ -22,12 +22,30 @@ lsp_config.bashls.setup { default }
 lsp_config.pyright.setup { default }
 lsp_config.rust_analyzer.setup { default }
 lsp_config.texlab.setup { default }
+lsp_config.jsonls.setup { default }
+lsp_config.yamlls.setup { default }
+
 lsp_config.cmake.setup {
     lsp_flags = lsp_flags,
     capabilities = capabilities,
-    root_dir = U.root_pattern 'CMakeLists.txt',
+    root_dir = U.root_pattern('CMakeLists.txt'),
 }
-lsp_config.jsonls.setup { default }
-lsp_config.yamlls.setup { default }
-lsp_config.docker_compose_language_service.setup { default }
-lsp_config.dockerls.setup { default }
+
+lsp_config.dockerls.setup {
+    lsp_flags = lsp_flags,
+    capabilities = capabilities,
+    root_dir = U.root_pattern {
+        'Dockerfile',
+        'DockerFile',
+        'dockerfile'
+    },
+}
+
+lsp_config.docker_compose_language_service.setup {
+    default.lsp_flags,
+    default.capabilities,
+    root_dir = U.root_pattern {
+        'docker-compose.yml',
+        'docker-compose.yaml'
+    }
+}

@@ -76,12 +76,6 @@ return {
 
     -- Language/Tools/LSP/Comp
     {
-        'williamboman/mason.nvim',
-        build = ':MasonUpdate',
-        event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.mason' end,
-    },
-    {
         'mfussenegger/nvim-dap',
         dependencies = { 'rcarriga/nvim-dap-ui' },
         event = { 'User NvimStartupDone' },
@@ -106,10 +100,16 @@ return {
         config = function() require 'alex.lang.treesitter' end,
     },
     {
-        'neovim/nvim-lspconfig',
-        event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.lsp' end,
+        -- This has to not be lazy.  I think  it sometimes miss the FileType event?
+        'williamboman/mason.nvim',
+        build = ':MasonUpdate',
+        config = function() require 'alex.lang.mason' end,
+        lazy = false,
         dependencies = {
+            {
+                'neovim/nvim-lspconfig',
+                config = function() require 'alex.lang.lsp' end,
+            },
             {
                 'folke/neodev.nvim',
                 config = function() require 'alex.lang.tools.neodev' end,

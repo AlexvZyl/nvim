@@ -14,6 +14,8 @@ local packages = {
     'julia-lsp',
     'bash-language-server',
     'pyright',
+    'flake8',
+    'pylint',
     'texlab',
     'cmake-language-server',
     'json-lsp',

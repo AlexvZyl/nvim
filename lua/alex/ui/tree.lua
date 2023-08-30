@@ -3,7 +3,9 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 local function root_label(path)
-    path = path:gsub('/home/alex', ' ') .. '/'
+    path = path:gsub('/home/alex', ' ')
+    path = path:gsub('/Users/alex', ' ')
+    path = path .. '/'
     local path_len = path:len()
     local win_nr = require('nvim-tree.view').get_winnr()
     print(win_nr)
@@ -72,7 +74,6 @@ local function on_attach(bufnr)
         return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
     end
     vim.keymap.set('n', '<C-k>', '', { buffer = bufnr })
-    vim.keymap.del('n', '<C-k>', { buffer = bufnr })
     vim.keymap.set('n', 'i', api.node.show_info_popup, opts 'Info')
     vim.keymap.set('n', '[', api.tree.change_root_to_parent, opts 'Up')
     vim.keymap.set('n', ']', api.tree.change_root_to_node, opts 'CD')
@@ -83,6 +84,7 @@ local function on_attach(bufnr)
     vim.keymap.set('n', 'x', api.fs.cut, opts 'Cut')
     vim.keymap.set('n', 'y', api.fs.copy.filename, opts 'Copy Name')
     vim.keymap.set('n', 'p', api.fs.paste, opts 'Paste')
+    vim.keymap.set('n', 'c', api.fs.copy.node, opts('Copy'))
     vim.keymap.set('n', 'r', api.fs.rename, opts 'Rename')
     vim.keymap.set('n', 'W', api.tree.collapse_all, opts 'Collapse')
     vim.keymap.set('n', 'E', api.tree.expand_all, opts 'Expand All')

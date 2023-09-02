@@ -15,8 +15,7 @@ local default = {
 }
 
 -- Setup LSPs.
---lsp_config.clangd.setup { default }
-LC.ccls.setup { default }
+LC.clangd.setup { default }
 LC.lua_ls.setup { default }
 LC.julials.setup { default }
 LC.bashls.setup { default }

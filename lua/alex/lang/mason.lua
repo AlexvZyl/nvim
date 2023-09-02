@@ -21,6 +21,7 @@ local packages = {
     'json-lsp',
     'yaml-language-server',
     'clangd',
+    'cpplint',
     'cpptools',
     'codelldb',
     'dockerfile-language-server',

@@ -1,8 +1,8 @@
 -- Run install-servers.sh to install all the servers used below.
 
 local U = require 'lspconfig/util'
-local lsp_config = require 'lspconfig'
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local LC = require 'lspconfig'
+local DC = require('cmp_nvim_lsp').default_capabilities()
 
 local lsp_flags = {
     -- Prevent the LSP client from making too many calls.
@@ -11,42 +11,43 @@ local lsp_flags = {
 
 local default = {
     lsp_flags = lsp_flags,
-    capabilities = capabilities,
+    capabilities = DC,
 }
 
 -- Setup LSPs.
 --lsp_config.clangd.setup { default }
-lsp_config.ccls.setup { default }
-lsp_config.lua_ls.setup { default }
-lsp_config.julials.setup { default }
-lsp_config.bashls.setup { default }
-lsp_config.pyright.setup { default }
-lsp_config.rust_analyzer.setup { default }
-lsp_config.texlab.setup { default }
-lsp_config.jsonls.setup { default }
-lsp_config.yamlls.setup { default }
+LC.ccls.setup { default }
+LC.lua_ls.setup { default }
+LC.julials.setup { default }
+LC.bashls.setup { default }
+LC.pyright.setup { default }
+LC.rust_analyzer.setup { default }
+LC.texlab.setup { default }
+LC.jsonls.setup { default }
+LC.yamlls.setup { default }
 
-lsp_config.cmake.setup {
+LC.cmake.setup {
     lsp_flags = lsp_flags,
-    capabilities = capabilities,
+    capabilities = DC,
     root_dir = U.root_pattern 'CMakeLists.txt',
 }
 
-lsp_config.dockerls.setup {
+LC.dockerls.setup {
     lsp_flags = lsp_flags,
-    capabilities = capabilities,
+    capabilities = DC,
     root_dir = U.root_pattern {
         'Dockerfile',
-        'DockerFile',
         'dockerfile',
     },
 }
 
-lsp_config.docker_compose_language_service.setup {
+LC.docker_compose_language_service.setup {
     default.lsp_flags,
     default.capabilities,
     root_dir = U.root_pattern {
         'docker-compose.yml',
-        'docker-compose.yaml',
+        'docker-compose.yml',
+        'compose.yaml',
+        'compose.yml',
     },
 }

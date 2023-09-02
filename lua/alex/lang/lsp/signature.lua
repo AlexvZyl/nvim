@@ -5,7 +5,7 @@ local cfg = {
     doc_lines = 0,
     max_width = 200,
     bind = true,
-    handler_opts = { border = U.border_chars_outer_thin },
+    handler_opts = { border = U.get_border_chars() },
     hint_enable = false,
     floating_window = false,
     toggle_key = '<C-\\>',

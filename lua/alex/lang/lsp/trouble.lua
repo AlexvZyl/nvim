@@ -1,11 +1,11 @@
-local u = require 'alex.utils'
+local U = require 'alex.utils'
 
 require('trouble').setup {
     padding = true,
     height = 11,
     use_diagnostic_signs = false,
     position = 'bottom',
-    signs = u.diagnostic_signs,
+    signs = U.diagnostic_signs,
     auto_preview = false,
 }
 

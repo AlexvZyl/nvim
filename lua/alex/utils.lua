@@ -59,18 +59,12 @@ M.vertical_default = '│'
 M.horizontal_default = '─'
 
 function M.get_border_chars(desc)
-    if desc == 'completion' then
-        return M.border_chars_round
-    end
+    if desc == 'completion' then return M.border_chars_round end
 
     -- Defaults
-    if vim.g.colors_name == 'nordic' then
-        return M.border_chars_outer_thin
-    end
+    if vim.g.colors_name == 'nordic' then return M.border_chars_outer_thin end
 
-    if vim.g.colors_name == 'tokyonight' then
-        return M.border_chars_round
-    end
+    if vim.g.colors_name == 'tokyonight' then return M.border_chars_round end
 end
 
 -- ICONS

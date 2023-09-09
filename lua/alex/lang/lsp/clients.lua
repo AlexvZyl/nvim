@@ -1,6 +1,4 @@
--- Run install-servers.sh to install all the servers used below.
-
-local U = require 'lspconfig/util'
+local U = require 'lspconfig.util'
 local LC = require 'lspconfig'
 local DC = require('cmp_nvim_lsp').default_capabilities()
 
@@ -45,7 +43,7 @@ LC.docker_compose_language_service.setup {
     default.capabilities,
     root_dir = U.root_pattern {
         'docker-compose.yml',
-        'docker-compose.yml',
+        'docker-compose.yaml',
         'compose.yaml',
         'compose.yml',
     },

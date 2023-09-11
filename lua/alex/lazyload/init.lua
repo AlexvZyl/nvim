@@ -12,11 +12,20 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Events
+-- Load events
 vim.api.nvim_create_autocmd('User', {
-    callback = function(_) vim.api.nvim_exec_autocmds('User', { pattern = 'NvimStartupDone' }) end,
+    callback = function(_) vim.api.nvim_exec_autocmds('User', {
+        pattern = 'NvimStartupDone'
+    }) end,
+    pattern = 'DashboardLoaded',
     once = true,
-    pattern = 'VeryLazy',
+})
+-- This will no longer work if Dashboard starts to set the value
+vim.api.nvim_create_autocmd('BufModifiedSet', {
+    callback = function(_) vim.api.nvim_exec_autocmds('User', {
+        pattern = 'NvimStartupDone'
+    }) end,
+    once = true,
 })
 
 -- Load plugins

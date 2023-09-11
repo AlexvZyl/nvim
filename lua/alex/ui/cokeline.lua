@@ -40,7 +40,7 @@ require('cokeline').setup {
         filetype = 'NvimTree',
         components = {
             {
-                text = ' 󰙅  File Explorer',
+                text = ' 󰙅  File Explorer ',
                 fg = title,
                 bg = dark_bg,
                 style = 'bold',

@@ -63,7 +63,6 @@ function M.get_border_chars(desc)
 
     -- Defaults
     if vim.g.colors_name == 'nordic' then return M.border_chars_outer_thin end
-
     if vim.g.colors_name == 'tokyonight' then return M.border_chars_round end
 end
 

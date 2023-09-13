@@ -11,7 +11,5 @@ if vim.version.major == 0 and vim.version.minor < 9 then return end
 --vim.opt.statuscolumn = "%= %{v:virtnum < 1 ? (v:relnum ? v:relnum : v:lnum) : ''}%= %s "
 
 -- First diag signs?
-vim.opt.numberwidth = 7
-vim.opt.statuscolumn = ' %s%=%{v:relnum?v:relnum:v:lnum}   '
-
---alksdhjikf
+vim.opt.numberwidth = 5
+vim.opt.statuscolumn = ' %s%=%{v:relnum?v:relnum:v:lnum}%#WinSeparator#  '

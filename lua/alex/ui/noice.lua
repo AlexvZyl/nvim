@@ -15,7 +15,7 @@ require('noice').setup {
     views = {
         cmdline_popup = {
             border = {
-                style = u.border_chars_outer_thin,
+                style = u.border_chars_round,
                 padding = { 0, 1 },
             },
         },

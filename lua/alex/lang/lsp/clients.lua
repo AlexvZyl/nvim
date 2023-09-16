@@ -13,6 +13,7 @@ local default = {
 }
 
 -- Setup LSPs.
+
 LC.clangd.setup { default }
 LC.lua_ls.setup { default }
 LC.julials.setup { default }

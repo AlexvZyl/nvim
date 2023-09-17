@@ -1,7 +1,7 @@
 local U = require 'alex.utils'
 
 local ui = {
-    border = U.get_border_chars(),
+    border = U.get_border_chars('lsp'),
     winblend = 0,
     title = false,
     diagnostic = '  ',

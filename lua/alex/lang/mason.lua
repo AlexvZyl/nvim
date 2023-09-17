@@ -1,7 +1,7 @@
 local U = require 'alex.utils'
 
 require('mason').setup {
-    ui = { border = U.border_chars_outer_thin },
+    ui = { border = U.get_border_chars('float') },
 }
 
 local registry = require 'mason-registry'

@@ -5,7 +5,7 @@ local U = require 'alex.utils'
 local cmdline_window = {
     completion = CMP.config.window.bordered {
         scrollbar = true,
-        border = U.get_border_chars('cmdline'),
+        border = U.get_border_chars 'cmdline',
         col_offset = -4,
         side_padding = 0,
     },

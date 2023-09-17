@@ -10,5 +10,5 @@ require('trouble').setup {
 }
 
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-    command = 'TroubleRefresh'
+    command = 'TroubleRefresh',
 })

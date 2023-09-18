@@ -27,7 +27,7 @@ local packages = {
     'dockerfile-language-server',
     'docker-compose-language-service',
     'eslint-lsp',
-    'typescript-language-server'
+    'typescript-language-server',
 }
 
 registry.refresh(function()

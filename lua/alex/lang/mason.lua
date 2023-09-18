@@ -26,6 +26,8 @@ local packages = {
     'codelldb',
     'dockerfile-language-server',
     'docker-compose-language-service',
+    'eslint-lsp',
+    'typescript-language-server'
 }
 
 registry.refresh(function()

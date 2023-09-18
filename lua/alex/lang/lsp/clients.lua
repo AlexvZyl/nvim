@@ -24,6 +24,18 @@ LC.texlab.setup { default }
 LC.jsonls.setup { default }
 LC.yamlls.setup { default }
 
+LC.eslint.setup {
+    lsp_flags = lsp_flags,
+    capabilities = DC,
+    root_dir = U.root_pattern '*.js',
+}
+
+LC.tsserver.setup {
+    lsp_flags = lsp_flags,
+    capabilities = DC,
+    root_dir = U.root_pattern '*.js',
+}
+
 LC.cmake.setup {
     lsp_flags = lsp_flags,
     capabilities = DC,
@@ -34,8 +46,8 @@ LC.dockerls.setup {
     lsp_flags = lsp_flags,
     capabilities = DC,
     root_dir = U.root_pattern {
-        'Dockerfile',
-        'dockerfile',
+        '*Dockerfile*',
+        '*dockerfile*',
     },
 }
 

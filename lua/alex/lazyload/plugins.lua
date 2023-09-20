@@ -21,7 +21,7 @@ return {
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        event = { 'BufWinEnter' },
+        event = { 'User NvimStartupDone' },
         config = function() require 'alex.ui.lualine' end,
     },
     {
@@ -31,6 +31,7 @@ return {
             'nvim-tree/nvim-web-devicons',
         },
         config = function() require 'alex.ui.cokeline' end,
+        event = { 'BufWinEnter' }
     },
     {
         'folke/noice.nvim',
@@ -100,19 +101,20 @@ return {
         config = function() require 'alex.lang.treesitter' end,
     },
     {
-        -- This has to not be lazy.  I think  it sometimes miss the FileType event?
-        'williamboman/mason.nvim',
-        build = ':MasonUpdate',
-        config = function() require 'alex.lang.mason' end,
+        'neovim/nvim-lspconfig',
+        config = function() require 'alex.lang.lsp' end,
+        event = { 'VeryLazy', 'User NvimStartupDone' },
+        -- If this is lazy, it seems that the lsp misses the FileType event
         lazy = false,
         dependencies = {
             {
-                'neovim/nvim-lspconfig',
-                config = function() require 'alex.lang.lsp' end,
-            },
-            {
                 'folke/neodev.nvim',
                 config = function() require 'alex.lang.tools.neodev' end,
+            },
+            {
+                'williamboman/mason.nvim',
+                build = ':MasonUpdate',
+                config = function() require 'alex.lang.mason' end,
             },
         },
     },

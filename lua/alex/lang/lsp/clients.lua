@@ -27,13 +27,13 @@ LC.yamlls.setup { default }
 LC.eslint.setup {
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern '*.js',
+    root_dir = U.root_pattern { '*.js', '*.ts' },
 }
 
 LC.tsserver.setup {
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern '*.js',
+    root_dir = U.root_pattern { '*.js', '*.ts' },
 }
 
 LC.cmake.setup {

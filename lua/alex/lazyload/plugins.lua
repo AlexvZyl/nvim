@@ -31,7 +31,7 @@ return {
             'nvim-tree/nvim-web-devicons',
         },
         config = function() require 'alex.ui.cokeline' end,
-        event = { 'BufWinEnter' }
+        event = { 'BufWinEnter' },
     },
     {
         'folke/noice.nvim',

@@ -20,7 +20,7 @@ require('nvim-treesitter.configs').setup {
         'make',
         'go',
         'javascript',
-        'typescript'
+        'typescript',
     },
 
     ignore_install = {},

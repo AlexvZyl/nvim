@@ -29,7 +29,7 @@ local packages = {
     'eslint-lsp',
     'typescript-language-server',
     'golangci-lint',
-    'gopls'
+    'gopls',
 }
 
 registry.refresh(function()

@@ -11,7 +11,7 @@ return {
         -- Required by other packages
         'nvim-tree/nvim-web-devicons',
         config = function() require 'alex.ui.nvim-web-devicons' end,
-        lazy = true
+        lazy = true,
     },
     {
         'NvChad/nvim-colorizer.lua',

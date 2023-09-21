@@ -18,6 +18,9 @@ require('nvim-treesitter.configs').setup {
         'kdl',
         'latex',
         'make',
+        'go',
+        'javascript',
+        'typescript'
     },
 
     ignore_install = {},

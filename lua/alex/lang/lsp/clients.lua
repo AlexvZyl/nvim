@@ -23,6 +23,7 @@ LC.rust_analyzer.setup { default }
 LC.texlab.setup { default }
 LC.jsonls.setup { default }
 LC.yamlls.setup { default }
+LC.gopls.setup { default }
 
 LC.eslint.setup {
     lsp_flags = lsp_flags,

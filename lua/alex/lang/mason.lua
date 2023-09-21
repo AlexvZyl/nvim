@@ -28,6 +28,8 @@ local packages = {
     'docker-compose-language-service',
     'eslint-lsp',
     'typescript-language-server',
+    'golangci-lint',
+    'gopls'
 }
 
 registry.refresh(function()

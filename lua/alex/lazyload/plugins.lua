@@ -187,12 +187,12 @@ return {
         branch = 'dev',
         priority = 1000,
         config = function() require 'alex.themes.nordic' end,
-        lazy = true,
+        lazy = false,
     },
     {
         'folke/tokyonight.nvim',
         priority = 1000,
-        lazy = false,
+        lazy = true,
         config = function() require 'alex.themes.tokyonight' end,
     },
 

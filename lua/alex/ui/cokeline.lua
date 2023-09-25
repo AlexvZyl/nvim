@@ -13,21 +13,21 @@ if vim.g.colors_name == 'nordic' then
     dark_bg = P.black0
     fg = P.fg
     bg = P.bg
-    inactive_fg = P.gray4
-    inactive_bg = blend(P.bg, P.black0, 0.4)
     title = P.yellow
     error = P.error
     warn = P.warn
+    inactive_fg = P.gray4
+    inactive_bg = blend(P.bg, P.black0, 0.4)
 elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     local U = require 'tokyonight.util'
     dark_bg = C.night.bg_dark
     fg = C.default.fg
-    inactive_fg = C.default.fg_gutter
     bg = C.night.bg
     warn = C.default.yellow
     error = C.default.red1
     title = C.default.yellow
+    inactive_fg = C.default.fg_gutter
     inactive_bg = U.blend(C.night.bg, C.night.bg_dark, 0.4)
 end
 

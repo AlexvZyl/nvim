@@ -65,7 +65,7 @@ local view = {
     cursorline = false,
     hide_root_folder = false,
     signcolumn = 'no',
-    width = { max = 38, min = 38, padding = 1 },
+    width = { max = 38, min = 38 },
 }
 
 local function on_attach(bufnr)

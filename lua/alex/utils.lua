@@ -64,9 +64,7 @@ function M.get_border_chars(desc)
     if desc == 'float' then return M.border_chars_outer_thin end
 
     if desc == 'lsp' then
-        if vim.g.colors_name == 'nordic' then
-            return M.border_chars_outer_thin
-        end
+        if vim.g.colors_name == 'nordic' then return M.border_chars_outer_thin end
         return M.border_chars_round
     end
 

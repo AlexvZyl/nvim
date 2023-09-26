@@ -1,4 +1,5 @@
 local n = 'n'
+local i = 'i'
 local keymap = vim.keymap.set
 local default_settings = { noremap = true, silent = true }
 
@@ -7,6 +8,7 @@ keymap(n, 'ff', "<Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>", defa
 keymap(n, 'fs', "<Cmd>call VSCodeNotify('workbench.action.findInFiles')<CR>", default_settings)
 keymap(n, '<C-t>', "<Cmd>call VSCodeNotify('workbench.action.openRecent')<CR>", default_settings)
 keymap(n, '<Esc>', '<Cmd>noh<CR>', default_settings)
+keymap(i, '<Esc>', '<Esc>`^', default_settings)
 
 -- UI
 keymap(n, '<space>f', "<Cmd>call VSCodeNotify('workbench.view.explorer')<CR>", default_settings)

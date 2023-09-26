@@ -9,5 +9,5 @@ require('indent_blankline').setup {
     show_current_context_start = false,
     filetype_exclude = { 'NvimTree', 'startify', 'dashboard', 'help', 'markdown' },
     context_char = context_char,
-    char = char
+    char = char,
 }

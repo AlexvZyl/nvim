@@ -1,5 +1,5 @@
---local git_char = '│'
-local git_char = '┃'
+local git_char = '│'
+--local git_char = '┃'
 require('gitsigns').setup {
     signs = {
         add = { text = git_char },

@@ -19,6 +19,7 @@ local packages = {
     'texlab',
     'cmake-language-server',
     'json-lsp',
+    'shellcheck',
     'yaml-language-server',
     'clangd',
     'cpplint',

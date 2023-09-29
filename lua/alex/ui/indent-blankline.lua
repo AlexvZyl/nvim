@@ -3,11 +3,15 @@
 local context_char = '│'
 local char = '┆'
 
-require('indent_blankline').setup {
-    show_end_of_line = true,
-    show_current_context = true,
-    show_current_context_start = false,
-    filetype_exclude = { 'NvimTree', 'startify', 'dashboard', 'help', 'markdown' },
-    context_char = context_char,
-    char = char,
+require('ibl').setup {
+    exclude = {
+        filetypes = { 'NvimTree', 'startify', 'dashboard', 'help', 'markdown' }
+    },
+    scope = {
+        enabled = true,
+        show_start = false,
+        char = context_char,
+        highlight = 'IndentBlanklineContextChar',
+    },
+    indent = { char = char },
 }

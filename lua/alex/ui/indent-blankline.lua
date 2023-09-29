@@ -5,7 +5,7 @@ local char = '┆'
 
 require('ibl').setup {
     exclude = {
-        filetypes = { 'NvimTree', 'startify', 'dashboard', 'help', 'markdown' }
+        filetypes = { 'NvimTree', 'startify', 'dashboard', 'help', 'markdown' },
     },
     scope = {
         enabled = true,

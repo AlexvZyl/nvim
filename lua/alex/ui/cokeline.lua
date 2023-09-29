@@ -13,7 +13,7 @@ if vim.g.colors_name == 'nordic' then
     dark_bg = P.black0
     fg = P.fg
     bg = P.bg
-    title = P.yellow
+    title = P.yellow.base
     error = P.error
     warn = P.warn
     inactive_fg = P.gray4

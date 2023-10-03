@@ -63,7 +63,6 @@ local system_open = { cmd = 'zathura' }
 
 local view = {
     cursorline = false,
-    hide_root_folder = false,
     signcolumn = 'no',
     width = { max = 38, min = 38 },
 }
@@ -114,9 +113,12 @@ end)
 
 -- When neovim opens.
 local function open_nvim_tree(data)
-    vim.cmd.cd(data.file:match '(.+)/[^/]*$')
-    local directory = vim.fn.isdirectory(data.file) == 1
-    if not directory then return end
-    require('nvim-tree.api').tree.open()
+    local function cd()
+        vim.cmd.cd(data.file:match '(.+)/[^/]*$')
+        local directory = vim.fn.isdirectory(data.file) == 1
+        if not directory then return end
+        require('nvim-tree.api').tree.open()
+    end
+    _ = xpcall(cd, function() return "" end)
 end
 vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = open_nvim_tree })

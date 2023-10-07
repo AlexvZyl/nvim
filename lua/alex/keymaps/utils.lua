@@ -54,7 +54,7 @@ end
 M.DAP_UI_ENABLED = false
 function M.dap_toggle_ui()
     require('dapui').toggle()
-    M.DAP_UI_ENABLED = true
+    M.DAP_UI_ENABLED = not M.DAP_UI_ENABLED
 end
 
 function M.dap_float_scope()

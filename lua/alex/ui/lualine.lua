@@ -198,7 +198,7 @@ local telescope = {
         lualine_c = {
             {
                 telescope_text,
-                color = { fg = text_hl },
+                color = text_hl,
                 icon = { '  ', color = icon_hl },
             },
         },

@@ -14,5 +14,8 @@ require('ibl').setup {
         char = context_char,
         highlight = 'IndentBlanklineContextChar',
     },
-    indent = { char = char },
+    indent = { 
+        char = char,
+        highlight = 'IndentBlanklineChar',
+    },
 }

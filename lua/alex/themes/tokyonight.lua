@@ -12,7 +12,8 @@ local function on_highlights(H, C)
     H.LeapBackdrop = {}
     H.LeapLabelPrimary = { bg = C.bg_dark, fg = C.red1 }
     H.LeapLabelSecondary = { bg = C.bg_dark, fg = C.red1 }
-    H.IndentBlanklineContextChar = { fg = C.fg_gutter }
+    H.IndentBlanklineContextChar = { fg = C.bg_highlight }
+    H.IndentBlanklineChar = { fg = C.bg_highlight }
     H.TelescopePromptTitle = { fg = C.bg_dark, bg = C.orange }
     H.TelescopePromptNormal = { bg = C.bg }
     H.TelescopePromptBorder = { fg = C.bg_dark, bg = C.bg }

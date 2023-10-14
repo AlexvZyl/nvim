@@ -4,9 +4,8 @@ local u = require 'alex.utils'
 -- UI
 local cmdline_window = {
     completion = cmp.config.window.bordered {
-        winhighlight = 'Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None',
         scrollbar = true,
-        border = u.border_chars_outer_thin,
+        border = u.get_border_chars('search'),
         col_offset = -1,
         side_padding = 0,
     },

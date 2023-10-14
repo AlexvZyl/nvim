@@ -19,6 +19,7 @@ local function on_highlights(H, C)
     H.TelescopePromptBorder = { fg = C.bg_dark, bg = C.bg }
     H.TelescopePreviewTitle = { fg = C.bg_dark, bg = C.orange }
     H.TelescopeBorder = { fg = C.bg_dark, bg = C.bg_dark }
+    H.NoiceCmdline = { bg = C.bg_dark }
 end
 
 require('tokyonight').load {

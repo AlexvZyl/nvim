@@ -18,9 +18,9 @@ function M.init()
     keymap(n_v, 'fF', '<Cmd>Telescope find_files cwd=~<CR>', default_settings)
     keymap(n_v, 'fs', '<Cmd>Telescope live_grep<CR>', default_settings)
     keymap(n_v, 'fS', '<Cmd>Telescope live_grep cwd=~<CR>', default_settings)
+    keymap(n, 'fb', '<Cmd>Telescope buffers<CR>', default_settings)
     keymap(n_v, '<C-f>', '<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>', default_settings)
     keymap(ex_t, '<F12>', '<Cmd>Cheatsheet<CR>', default_settings)
-    keymap(n, '<leader>b', '<Cmd>Telescope buffers<CR>', default_settings)
 
     -- Tree
     keymap(n_v, 'gc', function() require('alex.keymaps.utils').cwd_current_buffer() end, default_settings)

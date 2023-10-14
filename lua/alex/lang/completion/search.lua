@@ -5,7 +5,7 @@ local u = require 'alex.utils'
 local cmdline_window = {
     completion = cmp.config.window.bordered {
         scrollbar = true,
-        border = u.get_border_chars('search'),
+        border = u.get_border_chars 'search',
         col_offset = -1,
         side_padding = 0,
     },

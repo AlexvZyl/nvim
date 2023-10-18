@@ -109,7 +109,7 @@ return {
     {
         'neovim/nvim-lspconfig',
         config = function() require 'alex.lang.lsp' end,
-        event = { 'VeryLazy', 'User NvimStartupDone' },
+        --event = { 'User NvimStartupDone' },
         -- If this is lazy, it seems that the lsp misses the FileType event
         lazy = false,
         dependencies = {

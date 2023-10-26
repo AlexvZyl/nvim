@@ -15,10 +15,10 @@ local function on_highlights(H, C)
     H.IndentBlanklineContextChar = { fg = C.bg_highlight }
     H.IndentBlanklineChar = { fg = C.bg_highlight }
     H.TelescopePromptTitle = { fg = C.bg_dark, bg = C.orange }
-    H.TelescopePromptNormal = { bg = C.bg }
-    H.TelescopePromptBorder = { fg = C.bg_dark, bg = C.bg }
     H.TelescopePreviewTitle = { fg = C.bg_dark, bg = C.orange }
-    H.TelescopeBorder = { fg = C.bg_dark, bg = C.bg_dark }
+    H.TelescopeBorder = { fg = C.fg_dark, bg = C.bg_dark }
+    H.TelescopePromptBorder = { fg = C.fg_dark, bg = C.bg }
+    H.TelescopePromptNormal = { bg = C.bg }
     H.NoiceCmdline = { bg = C.bg_dark }
 end
 

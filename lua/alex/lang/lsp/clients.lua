@@ -24,6 +24,7 @@ LC.texlab.setup { default }
 LC.jsonls.setup { default }
 LC.yamlls.setup { default }
 LC.gopls.setup { default }
+LC.hls.setup { default }
 
 LC.eslint.setup {
     lsp_flags = lsp_flags,

@@ -31,6 +31,7 @@ local packages = {
     'typescript-language-server',
     'golangci-lint',
     'gopls',
+    'haskell-language-server'
 }
 
 registry.refresh(function()

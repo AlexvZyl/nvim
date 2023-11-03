@@ -35,6 +35,8 @@ function M.init()
     -- Misc
     keymap(n, 'gl', '<Cmd>VimtexView<CR>', default_settings)
     keymap(n, '<Esc>', '<Cmd>noh<CR>', allow_remap)
+    keymap(n, '<C-e>', 'j<C-e>', default_settings)
+    keymap(n, '<C-y>', 'k<C-y>', default_settings)
 
     -- Trouble
     keymap(n, '<leader>d', '<Cmd>TroubleToggle document_diagnostics<CR>', default_settings)

@@ -1,6 +1,7 @@
 vim.g.vimtex_view_method = 'zathura'
 
 vim.g.vimtex_compiler_method = 'latexmk'
+--vim.g.vimtex_compiler_method = 'latexrun'
 --vim.g.vimtex_compiler_method = 'xetex'
 --vim.g.vimtex_compiler_method = 'tectonic'
 

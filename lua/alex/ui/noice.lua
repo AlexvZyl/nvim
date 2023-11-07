@@ -19,8 +19,8 @@ require('noice').setup {
                 padding = { 0, 2 },
             },
             position = {
-                row = "49%",
-                col = "50%",
+                row = '49%',
+                col = '50%',
             },
         },
     },

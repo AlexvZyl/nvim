@@ -3,11 +3,11 @@ local u = require 'alex.utils'
 require('noice').setup {
     cmdline = {
         format = {
-            cmdline = { title = '', icon = '  ' },
-            lua = { title = '', icon = ' 󰢱 ' },
-            help = { title = '', icon = ' 󰋖 ' },
-            input = { title = '', icon = '  ' },
-            filter = { title = '', icon = '  ' },
+            cmdline = { title = '', icon = ' ' },
+            lua = { title = '', icon = '󰢱 ' },
+            help = { title = '', icon = '󰋖 ' },
+            input = { title = '', icon = ' ' },
+            filter = { title = '', icon = ' ' },
             search_up = { icon = '    ' },
             search_down = { icon = '    ' },
         },
@@ -16,7 +16,11 @@ require('noice').setup {
         cmdline_popup = {
             border = {
                 style = u.border_chars_round,
-                padding = { 0, 1 },
+                padding = { 0, 2 },
+            },
+            position = {
+                row = "49%",
+                col = "50%",
             },
         },
     },

@@ -109,6 +109,8 @@ api.events.subscribe(Event.TreeOpen, function(_)
     vim.cmd [[setlocal fillchars+=vert:🮇]]
     vim.cmd [[setlocal fillchars+=horizup:🮇]]
     vim.cmd [[setlocal fillchars+=vertright:🮇]]
+    vim.cmd [[setlocal fillchars+=vertleft:🮇]]
+    vim.cmd [[setlocal fillchars+=verthoriz:🮇]]
 end)
 
 -- When neovim opens.

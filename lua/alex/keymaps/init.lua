@@ -13,7 +13,7 @@ local M = {}
 
 function M.init()
     -- Telescope
-    keymap(n_v, '<C-t>', '<Cmd>Telescope oldfiles<CR>', default_settings)
+    keymap(n_v, 'fo', '<Cmd>Telescope oldfiles<CR>', default_settings)
     keymap(n_v, 'ff', '<Cmd>Telescope find_files<CR>', default_settings)
     keymap(n_v, 'fF', '<Cmd>Telescope find_files cwd=~<CR>', default_settings)
     keymap(n_v, 'fs', '<Cmd>Telescope live_grep<CR>', default_settings)

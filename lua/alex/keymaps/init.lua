@@ -22,10 +22,6 @@ function M.init()
     keymap(n_v, '<C-f>', '<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>', default_settings)
     keymap(ex_t, '<F12>', '<Cmd>Cheatsheet<CR>', default_settings)
 
-    -- Tree
-    keymap(n_v, 'gc', function() require('alex.keymaps.utils').cwd_current_buffer() end, default_settings)
-    keymap(n_v, '<Leader>f', function() require('alex.keymaps.utils').toggle_tree() end, default_settings)
-
     -- Cokeline
     keymap(n, 'Q', function() require('alex.keymaps.utils').delete_buffer() end, default_settings)
     keymap(n, 'H', '<Plug>(cokeline-focus-prev)', default_settings)
@@ -61,6 +57,11 @@ function M.init()
     keymap(n, 'S', function() require('leap').leap { backward = true } end)
     keymap(n, '<leader>v', function() require('alex.keymaps.utils').toggle_diffview() end)
     keymap(n, '<C-a>', 'gg0vG$', default_settings)
+end
+
+function M.tree()
+    keymap(n_v, 'gc', function() require('alex.keymaps.utils').cwd_current_buffer() end, default_settings)
+    keymap(n_v, '<Leader>f', function() require('alex.keymaps.utils').toggle_tree() end, default_settings)
 end
 
 function M.lspsaga()

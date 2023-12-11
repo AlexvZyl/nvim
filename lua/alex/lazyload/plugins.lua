@@ -79,6 +79,7 @@ return {
         version = '*',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         config = function() require 'alex.ui.tree' end,
+        keys = { '<leader>f' }
     },
 
     -- Language/Tools/LSP/Comp

@@ -113,14 +113,5 @@ api.events.subscribe(Event.TreeOpen, function(_)
     vim.cmd [[setlocal fillchars+=verthoriz:🮇]]
 end)
 
--- When neovim opens.
-local function open_nvim_tree(data)
-    local function cd()
-        vim.cmd.cd(data.file:match '(.+)/[^/]*$')
-        local directory = vim.fn.isdirectory(data.file) == 1
-        if not directory then return end
-        require('nvim-tree.api').tree.open()
-    end
-    _ = xpcall(cd, function() return '' end)
-end
-vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = open_nvim_tree })
+-- Keymaps
+require('alex.keymaps').tree()

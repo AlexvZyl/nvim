@@ -31,8 +31,8 @@ function M.init()
     -- Misc
     keymap(n, 'gl', '<Cmd>VimtexView<CR>', default_settings)
     keymap(n, '<Esc>', '<Cmd>noh<CR>', allow_remap)
-    keymap(n, '<C-e>', 'j<C-e>', default_settings)
-    keymap(n, '<C-y>', 'k<C-y>', default_settings)
+    keymap(n_v, '<C-e>', 'j<C-e>', default_settings)
+    keymap(n_v, '<C-y>', 'k<C-y>', default_settings)
 
     -- Trouble
     keymap(n, '<leader>d', '<Cmd>TroubleToggle document_diagnostics<CR>', default_settings)
@@ -46,8 +46,6 @@ function M.init()
     keymap(ex_t, '<C-l>', '<Cmd>wincmd l<CR>', default_settings)
 
     -- Editing
-    --keymap(ex_t, '<C-z>', '<Cmd>undo<CR>', default_settings)
-    --keymap(ex_t, '<C-y>', '<Cmd>redo<CR>', default_settings)
     keymap(i, '<Esc>', '<Esc>`^', default_settings)
     keymap(ex_t, '<C-s>', function() require('alex.keymaps.utils').save_file() end, default_settings)
     keymap(v, '<Esc>', 'v', default_settings)

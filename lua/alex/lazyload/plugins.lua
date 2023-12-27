@@ -181,6 +181,11 @@ return {
         keys = { 's', 'S' },
         config = function() require 'alex.ui.leap' end,
     },
+    {
+        "m4xshen/hardtime.nvim",
+        dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+        opts = { max_time = 0 }
+    },
 
     -- Themes
     {

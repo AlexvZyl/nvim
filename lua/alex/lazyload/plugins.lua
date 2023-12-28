@@ -160,15 +160,6 @@ return {
         event = { 'User NvimStartupDone' },
         config = function() require('tmux').setup() end,
     },
-    {
-        'fladson/vim-kitty',
-        event = { 'User NvimStartupDone' },
-    },
-    {
-        'lervag/vimtex',
-        ft = { 'tex', 'latex' },
-        config = function() require 'alex.lang.tools.latex' end,
-    },
 
     -- Editing/Modal
     {

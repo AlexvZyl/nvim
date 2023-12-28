@@ -53,7 +53,7 @@ return {
     {
         'RRethy/vim-illuminate',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.ui/illuminate' end,
+        config = function() require 'alex.ui.illuminate' end,
     },
     {
         'lewis6991/gitsigns.nvim',

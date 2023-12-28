@@ -26,4 +26,4 @@ keymap(n, '[e', "<Cmd>call VSCodeNotify('editor.action.marker.prev')<CR>", defau
 keymap(n, 'gr', "<Cmd>call VSCodeNotify('editor.action.goToReferences')<CR>", default_settings)
 
 -- Settings
-vim.cmd 'set clipboard+=unnamedplus'
+vim.opt.clipboard:append 'unnamedplus'

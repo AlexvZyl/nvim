@@ -22,4 +22,4 @@ local cmdline = {
     },
 }
 
-CMP.setup.cmdline({':', ':!'}, cmdline)
+CMP.setup.cmdline({ ':', ':!' }, cmdline)

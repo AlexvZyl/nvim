@@ -1,11 +1,10 @@
 local u = require 'alex.utils'
 
-
 -- Important to place this before loading plugins.
 vim.g.mapleader = ' '
 
 vim.opt.showmode = false
-vim.opt.clipboard:append('unnamedplus')
+vim.opt.clipboard:append 'unnamedplus'
 vim.opt.swapfile = false
 vim.opt.mouse = 'a'
 vim.opt.hlsearch = true
@@ -59,4 +58,4 @@ vim.opt.background = 'dark'
 -- Default new window to vertical split (this messes up debugger windows).
 -- vim.api.nvim_command('autocmd WinNew * wincmd H')
 
-vim.cmd('filetype plugin indent on')
+vim.cmd 'filetype plugin indent on'

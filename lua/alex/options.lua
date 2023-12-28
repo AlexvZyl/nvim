@@ -1,28 +1,27 @@
 local u = require 'alex.utils'
 
-vim.cmd 'filetype plugin indent on'
 
 -- Important to place this before loading plugins.
 vim.g.mapleader = ' '
 
-vim.cmd 'set noshowmode'
-vim.cmd 'set clipboard+=unnamedplus'
-vim.cmd 'set noswapfile'
-vim.cmd 'set mouse=a'
-vim.cmd 'set hlsearch'
+vim.opt.showmode = false
+vim.opt.clipboard:append('unnamedplus')
+vim.opt.swapfile = false
+vim.opt.mouse = 'a'
+vim.opt.hlsearch = true
 
-vim.cmd 'set ignorecase'
-vim.cmd 'set smartcase'
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.textwidth = 0
 
-vim.cmd 'set expandtab'
-vim.cmd 'set autoindent'
-vim.cmd 'set smartindent'
-vim.cmd 'set nowrap'
+vim.opt.expandtab = true
+vim.opt.autoindent = true
+vim.opt.smartindent = true
+vim.opt.wrap = false
 
 vim.opt.cmdheight = 0
 vim.g.VM_set_statusline = 0
@@ -40,21 +39,24 @@ vim.opt.fillchars = {
     diff = '╱',
 }
 
-vim.cmd 'set number'
-vim.cmd 'set relativenumber'
-vim.cmd 'set signcolumn=yes'
+-- Numbers
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.signcolumn = 'yes'
 
-vim.cmd 'set cursorline'
--- vim.cmd 'set cursorlineopt=both'
-vim.cmd 'set cursorlineopt=number'
+-- Cursor
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = 'number'
 
+-- Windows
 vim.opt.winblend = 0
-
 vim.opt.pumblend = 0
 vim.opt.pumheight = 10
 
+-- Theme
 vim.opt.background = 'dark'
 
--- Default new window to vertical split.
--- Messes up debugger windows.
--- vim.cmd ':autocmd WinNew * wincmd H'
+-- Default new window to vertical split (this messes up debugger windows).
+-- vim.api.nvim_command('autocmd WinNew * wincmd H')
+
+vim.cmd('filetype plugin indent on')

@@ -17,5 +17,3 @@ vim.api.nvim_create_autocmd('BufModifiedSet', {
     end,
     once = true,
 })
-
-

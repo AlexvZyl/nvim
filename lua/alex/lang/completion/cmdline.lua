@@ -17,9 +17,9 @@ local cmdline = {
     window = cmdline_window,
     mapping = CMP.mapping.preset.cmdline(),
     sources = CMP.config.sources {
-        { name = 'path' },
         { name = 'cmdline' },
+        { name = 'path' },
     },
 }
 
-CMP.setup.cmdline(':', cmdline)
+CMP.setup.cmdline({':', ':!'}, cmdline)

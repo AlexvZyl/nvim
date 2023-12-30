@@ -1,3 +1,5 @@
+local TC = require 'tokyonight.colors'
+
 local function on_highlights(H, C)
     H.NvimTreeNormal = { bg = C.bg }
     H.NvimTreeNormalNC = { bg = C.bg }
@@ -16,12 +18,15 @@ local function on_highlights(H, C)
     H.IndentBlanklineChar = { fg = C.bg_highlight }
     H.TelescopePromptTitle = { fg = C.bg_dark, bg = C.orange }
     H.TelescopePreviewTitle = { fg = C.bg_dark, bg = C.orange }
-    H.MsgArea = { bg = C.bg_dark, fg = C.fd_dark }
+    H.MsgArea = { bg = C.bg_dark, fg = C.fg_dark }
+
+    H.LspSagaHoverBorder = { fg = C.fg }
+    H.SagaBorder = { fg = C.fg }
 
     --H.TelescopeBorder = { fg = C.fg_dark, bg = C.bg_dark }
-    H.TelescopeBorder = { fg = C.bg_dark, bg = C.bg_dark }
+    H.TelescopeBorder = { fg = TC.default.bg, bg = C.bg_dark }
     --H.TelescopePromptBorder = { fg = C.fg_dark, bg = C.bg }
-    H.TelescopePromptBorder = { fg = C.bg_dark, bg = C.bg }
+    H.TelescopePromptBorder = { fg = TC.default.bg, bg = C.bg }
 
     H.TelescopePromptNormal = { bg = C.bg }
     H.NoiceCmdline = { bg = C.bg_dark }

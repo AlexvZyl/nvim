@@ -145,7 +145,6 @@ end
 
 local text_hl
 local icon_hl
-local red
 local green
 local yellow
 
@@ -153,11 +152,13 @@ if vim.g.colors_name == 'nordic' then
     local C = require 'nordic.colors'
     text_hl = { fg = C.gray3 }
     icon_hl = { fg = C.gray4 }
+    green = C.green.base
+    yellow = C.yellow.base
+
 elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     text_hl = { fg = C.default.fg_gutter }
     icon_hl = { fg = C.default.dark3 }
-    red = C.default.red1
     green = C.default.green1
     yellow = C.default.yellow
 end

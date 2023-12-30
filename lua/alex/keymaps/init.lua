@@ -57,6 +57,11 @@ function M.init()
     keymap(n, '<C-a>', 'gg0vG$', default_settings)
 end
 
+
+function M.copilot()
+    keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>')
+end
+
 function M.tree()
     keymap(n_v, 'gc', function() require('alex.keymaps.utils').cwd_current_buffer() end, default_settings)
     keymap(n_v, '<Leader>f', function() require('alex.keymaps.utils').toggle_tree() end, default_settings)

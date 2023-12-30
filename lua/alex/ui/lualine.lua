@@ -145,6 +145,9 @@ end
 
 local text_hl
 local icon_hl
+local red
+local green
+local yellow
 
 if vim.g.colors_name == 'nordic' then
     local C = require 'nordic.colors'
@@ -154,6 +157,9 @@ elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     text_hl = { fg = C.default.fg_gutter }
     icon_hl = { fg = C.default.dark3 }
+    red = C.default.red1
+    green = C.default.green1
+    yellow = C.default.yellow
 end
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
@@ -293,9 +299,22 @@ require('lualine').setup {
                 icon = { ' ', color = icon_hl },
             },
             {
-                get_copilot_status,
+                'copilot',
                 padding = 1,
                 color = icon_hl,
+                show_colors = true,
+                symbols = {
+                    status = {
+                        hl = {
+                            enabled = green,
+                            disabled = icon_hl.fg,
+                            warning = yellow,
+                            unknown = red
+                        }
+                    },
+                    spinners = { ' ' },
+                    spinner_color = green
+                }
             },
         },
         lualine_y = {},

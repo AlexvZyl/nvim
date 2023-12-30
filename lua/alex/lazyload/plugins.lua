@@ -26,7 +26,10 @@ return {
     },
     {
         'nvim-lualine/lualine.nvim',
-        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        dependencies = {
+            'nvim-tree/nvim-web-devicons',
+            'AndreM222/copilot-lualine'
+        },
         event = { 'User NvimStartupDone' },
         config = function() require 'alex.ui.lualine' end,
     },

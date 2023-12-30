@@ -305,12 +305,18 @@ require('lualine').setup {
                 show_colors = true,
                 symbols = {
                     status = {
+                        icons = {
+                            enabled = " ",
+                            disabled = " ",
+                            warning = " ",
+                            unknown = " "
+                        },
                         hl = {
                             enabled = green,
                             disabled = icon_hl.fg,
                             warning = yellow,
-                            unknown = red,
-                        },
+                            unknown = icon_hl.fg
+                        }
                     },
                     spinners = { ' ' },
                     spinner_color = green,

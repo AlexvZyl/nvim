@@ -309,12 +309,12 @@ require('lualine').setup {
                             enabled = green,
                             disabled = icon_hl.fg,
                             warning = yellow,
-                            unknown = red
-                        }
+                            unknown = red,
+                        },
                     },
                     spinners = { ' ' },
-                    spinner_color = green
-                }
+                    spinner_color = green,
+                },
             },
         },
         lualine_y = {},

@@ -5,14 +5,11 @@ local n, i, v = 'n', 'i', 'v'
 local ex_t = { n, i, v }
 local n_v = { n, v }
 
-
 local keymap = vim.keymap.set
 local default_settings = { noremap = true, silent = true }
 local allow_remap = { noremap = false, silent = true }
 
-
 local M = {}
-
 
 function M.init()
     -- Telescope
@@ -60,17 +57,12 @@ function M.init()
     keymap(n, '<C-a>', 'gg0vG$', default_settings)
 end
 
-
-function M.copilot()
-    keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>')
-end
-
+function M.copilot() keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>') end
 
 function M.tree()
     keymap(n_v, 'gc', function() require('alex.keymaps.utils').cwd_current_buffer() end, default_settings)
     keymap(n_v, '<Leader>f', function() require('alex.keymaps.utils').toggle_tree() end, default_settings)
 end
-
 
 function M.lspsaga()
     keymap(n_v, 'ca', '<Cmd>Lspsaga code_action<CR>', default_settings)
@@ -87,7 +79,6 @@ function M.lspsaga()
     keymap(n, 'gr', '<Cmd>Telescope lsp_references<CR>', default_settings)
 end
 
-
 function M.debugger()
     keymap(n, '<C-b>', '<Cmd>DapToggleBreakpoint<CR>', default_settings)
     keymap(n, '<leader>s', function() require('alex.keymaps.utils').dap_float_scope() end, default_settings)
@@ -98,7 +89,6 @@ function M.debugger()
     keymap(n, '<Left>', '<Cmd>DapStepOut<CR>', default_settings)
     keymap(n, '<Up>', '<Cmd>DapRestartFrame<CR>', default_settings)
 end
-
 
 function M.completion()
     local cmp = require 'cmp'
@@ -131,6 +121,5 @@ function M.completion()
         },
     }
 end
-
 
 return M

@@ -154,7 +154,6 @@ if vim.g.colors_name == 'nordic' then
     icon_hl = { fg = C.gray4 }
     green = C.green.base
     yellow = C.yellow.base
-
 elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     text_hl = { fg = C.default.fg_gutter }

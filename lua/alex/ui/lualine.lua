@@ -14,6 +14,19 @@ local function diff_source()
     if gitsigns then return { added = gitsigns.added, modified = gitsigns.changed, removed = gitsigns.removed } end
 end
 
+
+local get_copilot_status = function()
+    local status = require 'copilot.api'.status.data.status
+    if status == 'Normal' then
+       return ' '
+    elseif status == 'InProgress' then
+        return ' '
+    else
+        return ' '
+    end
+end
+
+
 -- Get the current buffer's filetype.
 local function get_current_filetype() return vim.api.nvim_buf_get_option(0, 'filetype') end
 
@@ -219,6 +232,8 @@ local telescope = {
     filetypes = { 'TelescopePrompt' },
 }
 
+
+
 require('lualine').setup {
     sections = {
         lualine_a = {
@@ -278,10 +293,14 @@ require('lualine').setup {
             {
                 get_native_lsp,
                 padding = 1,
-                separator = ' ',
                 color = text_hl,
                 icon = { ' ', color = icon_hl },
             },
+            {
+                get_copilot_status,
+                padding = 1,
+                color = icon_hl,
+            }
         },
         lualine_y = {},
         lualine_z = {

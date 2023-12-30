@@ -84,6 +84,13 @@ return {
 
     -- Language/Tools/LSP/Comp
     {
+        'zbirenbaum/copilot.lua',
+        config = function() require 'alex.lang.tools.copilot' end,
+        cmd = 'Copilot',
+        event = { 'User NvimStartupDone' },
+        build = ':Copilot auth',
+    },
+    {
         'mfussenegger/nvim-dap',
         dependencies = { 'rcarriga/nvim-dap-ui' },
         event = { 'User NvimStartupDone' },

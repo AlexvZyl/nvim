@@ -306,17 +306,17 @@ require('lualine').setup {
                 symbols = {
                     status = {
                         icons = {
-                            enabled = " ",
-                            disabled = " ",
-                            warning = " ",
-                            unknown = " "
+                            enabled = ' ',
+                            disabled = ' ',
+                            warning = ' ',
+                            unknown = ' ',
                         },
                         hl = {
                             enabled = green,
                             disabled = icon_hl.fg,
                             warning = yellow,
-                            unknown = icon_hl.fg
-                        }
+                            unknown = icon_hl.fg,
+                        },
                     },
                     spinners = { ' ' },
                     spinner_color = green,

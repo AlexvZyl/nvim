@@ -87,7 +87,7 @@ return {
         'zbirenbaum/copilot.lua',
         config = function() require 'alex.lang.tools.copilot' end,
         cmd = 'Copilot',
-        event = { 'User NvimStartupDone' },
+        event = { 'User NvimStartupDone', 'InsertEnter' },
         build = ':Copilot auth',
     },
     {

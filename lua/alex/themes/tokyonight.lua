@@ -25,6 +25,8 @@ local function on_highlights(H, C)
 
     H.TelescopePromptNormal = { bg = C.bg }
     H.NoiceCmdline = { bg = C.bg_dark }
+
+    H.CopilotSuggestion = { fg = C.fg_gutter, italic = false }
 end
 
 require('tokyonight').load {

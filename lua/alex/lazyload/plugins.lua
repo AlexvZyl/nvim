@@ -102,7 +102,7 @@ return {
     {
         'folke/trouble.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        cmd = { 'TroubleToggle' },
+        keys = {'<leader>d', '<leader>D'},
         config = function() require 'alex.lang.lsp.trouble' end,
     },
     {

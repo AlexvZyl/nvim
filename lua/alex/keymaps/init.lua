@@ -34,10 +34,6 @@ function M.init()
     keymap(n_v, '<C-e>', 'j<C-e>', default_settings)
     keymap(n_v, '<C-y>', 'k<C-y>', default_settings)
 
-    -- Trouble
-    keymap(n, '<leader>d', '<Cmd>TroubleToggle document_diagnostics<CR>', default_settings)
-    keymap(n, '<leader>D', '<Cmd>TroubleToggle workspace_diagnostics<CR>', default_settings)
-
     -- Windows
     keymap(ex_t, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
     keymap(ex_t, '<C-h>', '<Cmd>wincmd h<CR>', default_settings)
@@ -55,6 +51,11 @@ function M.init()
     keymap(n, 'S', function() require('leap').leap { backward = true } end)
     keymap(n, '<leader>v', function() require('alex.keymaps.utils').toggle_diffview() end)
     keymap(n, '<C-a>', 'gg0vG$', default_settings)
+end
+
+function M.trouble()
+    keymap(n, '<leader>d', '<Cmd>TroubleToggle document_diagnostics<CR>', default_settings)
+    keymap(n, '<leader>D', '<Cmd>TroubleToggle workspace_diagnostics<CR>', default_settings)
 end
 
 function M.copilot() keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>', default_settings) end

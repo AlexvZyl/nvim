@@ -13,4 +13,4 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
     command = 'TroubleRefresh',
 })
 
-require 'alex.keymaps.init' .trouble()
+require('alex.keymaps.init').trouble()

@@ -1,5 +1,5 @@
 local TC = require 'tokyonight.colors'
-local blend = require 'tokyonight.util'.blend
+local blend = require('tokyonight.util').blend
 
 local function on_highlights(H, C)
     -- Native

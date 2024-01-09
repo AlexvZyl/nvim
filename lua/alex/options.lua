@@ -59,3 +59,9 @@ vim.opt.background = 'dark'
 -- vim.api.nvim_command('autocmd WinNew * wincmd H')
 
 vim.cmd 'filetype plugin indent on'
+
+-- Automatically remove trailing whitespace.
+vim.cmd [[
+    match ExtraWhitespace /\s\+$/
+    autocmd BufWritePre * %s/\s\+$//e
+]]

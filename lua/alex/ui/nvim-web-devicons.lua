@@ -4,9 +4,9 @@ local icons = require 'nvim-web-devicons'
 --local go_icon, go_color = get_icon('main.go', 'go')
 
 local go_icon = {
-     icon = '',
-    color = "#519aba",
-    name = "go"
+    icon = '',
+    color = '#519aba',
+    name = 'go',
 }
 
 -- Why is this not working???

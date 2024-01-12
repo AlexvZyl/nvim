@@ -13,11 +13,11 @@ local M = {}
 
 function M.init()
     -- Telescope
-    keymap(n_v, 'fo', '<Cmd>Telescope oldfiles<CR>', default_settings)
-    keymap(n_v, 'ff', '<Cmd>Telescope find_files<CR>', default_settings)
-    keymap(n_v, 'fF', '<Cmd>Telescope find_files cwd=~<CR>', default_settings)
-    keymap(n_v, 'fs', '<Cmd>Telescope live_grep<CR>', default_settings)
-    keymap(n_v, 'fS', '<Cmd>Telescope live_grep cwd=~<CR>', default_settings)
+    keymap(n, 'fo', '<Cmd>Telescope oldfiles<CR>', default_settings)
+    keymap(n, 'ff', '<Cmd>Telescope find_files<CR>', default_settings)
+    keymap(n, 'fF', '<Cmd>Telescope find_files cwd=~<CR>', default_settings)
+    keymap(n, 'fs', '<Cmd>Telescope live_grep<CR>', default_settings)
+    keymap(n, 'fS', '<Cmd>Telescope live_grep cwd=~<CR>', default_settings)
     keymap(n, 'fb', '<Cmd>Telescope buffers<CR>', default_settings)
     keymap(n_v, '<C-f>', '<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>', default_settings)
     keymap(ex_t, '<F12>', '<Cmd>Cheatsheet<CR>', default_settings)

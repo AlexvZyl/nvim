@@ -4,7 +4,7 @@ function M.cwd_current_buffer()
     local abs_path = vim.api.nvim_buf_get_name(0)
     local dir = abs_path:match '(.*[/\\])'
     if dir == nil then return end
-    vim.cmd('cd ' .. dir)
+    -- vim.cmd('cd ' .. dir)
     vim.cmd 'NvimTreeRefresh'
     vim.cmd 'NvimTreeFindFile'
 end

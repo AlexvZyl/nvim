@@ -58,14 +58,9 @@ M.bottom_left_round = '╰'
 M.vertical_default = '│'
 M.horizontal_default = '─'
 
+function M.is_nordic() return vim.g.colors_name == 'nordic' end
 
-function M.is_nordic()
-    return vim.g.colors_name == 'nordic'
-end
-
-function M.is_tokyonight()
-    return vim.g.colors_name == 'tokyonight'
-end
+function M.is_tokyonight() return vim.g.colors_name == 'tokyonight' end
 
 function M.get_border_chars(desc)
     if desc == 'completion' then return M.border_chars_round end

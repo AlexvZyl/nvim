@@ -58,6 +58,15 @@ M.bottom_left_round = '╰'
 M.vertical_default = '│'
 M.horizontal_default = '─'
 
+
+function M.is_nordic()
+    return vim.g.colors_name == 'nordic'
+end
+
+function M.is_tokyonight()
+    return vim.g.colors_name == 'tokyonight'
+end
+
 function M.get_border_chars(desc)
     if desc == 'completion' then return M.border_chars_round end
     if desc == 'cmdline' then return M.border_chars_round end
@@ -65,13 +74,15 @@ function M.get_border_chars(desc)
     if desc == 'float' then return M.border_chars_outer_thin end
 
     if desc == 'lsp' then
-        if vim.g.colors_name == 'nordic' then return M.border_chars_outer_thin end
+        if M.is_nordic() then return M.border_chars_outer_thin end
         return M.border_chars_round
     end
 
     -- Defaults
-    if vim.g.colors_name == 'nordic' then return M.border_chars_outer_thin end
-    if vim.g.colors_name == 'tokyonight' then return M.border_chars_round end
+    if M.is_nordic() then return M.border_chars_outer_thin end
+    if M.is_tokyonight() then return M.border_chars_round end
+
+    return M.border_chars_round
 end
 
 -- ICONS

@@ -3,6 +3,10 @@ if vim.g.vscode then
     return
 end
 
+if vim.g.neovide then
+    require 'alex.neovide'
+end
+
 -- This makes neovim load faster
 vim.loader.enable()
 

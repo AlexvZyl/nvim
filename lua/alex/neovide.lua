@@ -10,6 +10,5 @@ vim.g.neovide_floating_z_height = 10
 vim.g.neovide_light_angle_degrees = 45
 vim.g.neovide_light_radius = 5
 
-
 -- Other
 vim.g.neovide_refresh_rate = 75

@@ -1,9 +1,10 @@
 -- I want to keep all of the key bindings in one file so that it is easy to see
 -- what is being used and ensure nothing being overwritten by accident.
 
-local n, i, v = 'n', 'i', 'v'
+local n, i, v, t = 'n', 'i', 'v', 't'
 local ex_t = { n, i, v }
 local n_v = { n, v }
+local n_t = { n, t }
 
 local keymap = vim.keymap.set
 local default_settings = { noremap = true, silent = true }
@@ -35,11 +36,17 @@ function M.init()
     keymap(n_v, '<C-y>', 'k<C-y>', default_settings)
 
     -- Windows
-    keymap(ex_t, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
-    keymap(ex_t, '<C-h>', '<Cmd>wincmd h<CR>', default_settings)
-    keymap(ex_t, '<C-j>', '<Cmd>wincmd j<CR>', default_settings)
-    keymap(ex_t, '<C-k>', '<Cmd>wincmd k<CR>', default_settings)
-    keymap(ex_t, '<C-l>', '<Cmd>wincmd l<CR>', default_settings)
+    keymap(n, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
+    keymap(n, '<C-h>', '<Cmd>wincmd h<CR>', default_settings)
+    keymap(n, '<C-j>', '<Cmd>wincmd j<CR>', default_settings)
+    keymap(n, '<C-k>', '<Cmd>wincmd k<CR>', default_settings)
+    keymap(n, '<C-l>', '<Cmd>wincmd l<CR>', default_settings)
+
+    keymap(t, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
+    keymap(t, '<C-h>', '<C-\\><C-n><C-w>h', default_settings)
+    keymap(t, '<C-j>', '<C-\\><C-n><C-w>j', default_settings)
+    keymap(t, '<C-k>', '<C-\\><C-n><C-w>k', default_settings)
+    keymap(t, '<C-l>', '<C-\\><C-n><C-w>l', default_settings)
 
     -- Editing
     keymap(i, '<Esc>', '<Esc>`^', default_settings)

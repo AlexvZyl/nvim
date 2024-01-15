@@ -8,8 +8,8 @@ ts.setup {
         layout_config = { prompt_position = 'top' },
         borderchars = {
             prompt = { '▔', '▕', ' ', '▏', '🭽', '🭾', '▕', '▏' },
-            results = U.get_border_chars('telescope'),
-            preview = U.get_border_chars('telescope')
+            results = U.get_border_chars 'telescope',
+            preview = U.get_border_chars 'telescope',
         },
         border = true,
         multi_icon = '',

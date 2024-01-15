@@ -63,10 +63,15 @@ function M.is_nordic() return vim.g.colors_name == 'nordic' end
 function M.is_tokyonight() return vim.g.colors_name == 'tokyonight' end
 
 function M.get_border_chars(desc)
+    if vim.g.neovide then
+        -- Hmmmm
+    end
+
     if desc == 'completion' then return M.border_chars_round end
     if desc == 'cmdline' then return M.border_chars_round end
     if desc == 'search' then return M.border_chars_round end
     if desc == 'float' then return M.border_chars_outer_thin end
+    if desc == 'telescope' then return M.border_chars_outer_thin_telescope end
 
     if desc == 'lsp' then
         if M.is_nordic() then return M.border_chars_outer_thin end

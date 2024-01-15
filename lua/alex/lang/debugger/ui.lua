@@ -1,6 +1,6 @@
 vim.schedule(function()
     require('dapui').setup {
-
+        force_buffers = true,
         icons = {
             expanded = '',
             collapsed = '',

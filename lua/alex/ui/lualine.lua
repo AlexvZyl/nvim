@@ -154,21 +154,24 @@ elseif vim.g.colors_name == 'tokyonight' then
     red = C.default.red1
 end
 
-local function is_recording() return vim.fn.reg_recording() == '' end
+
+local function is_recording()
+    return vim.fn.reg_recording() ~= ""
+end
 
 local function get_recording_icon()
     if is_recording() then
-        return ''
+        return "  "
     else
-        return '  '
+        return ""
     end
 end
 
 local function get_recording_color()
     if is_recording() then
-        return { fg = text_hl }
-    else
         return { fg = red }
+    else
+        return { fg = text_hl }
     end
 end
 

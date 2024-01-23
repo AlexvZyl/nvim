@@ -1,5 +1,5 @@
 -- Font
-vim.o.guifont = 'JetBrainsMono NF:h8.8'
+vim.o.guifont = 'JetBrainsMono NF:h12.0'
 
 -- Transparency
 vim.g.neovide_transparency = 0.98

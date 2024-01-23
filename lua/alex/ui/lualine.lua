@@ -136,6 +136,7 @@ local text_hl
 local icon_hl
 local green
 local yellow
+local red
 
 if vim.g.colors_name == 'nordic' then
     local C = require 'nordic.colors'
@@ -143,13 +144,38 @@ if vim.g.colors_name == 'nordic' then
     icon_hl = { fg = C.gray4 }
     green = C.green.base
     yellow = C.yellow.base
+    red = C.red.base
+
 elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     text_hl = { fg = C.default.fg_gutter }
     icon_hl = { fg = C.default.dark3 }
     green = C.default.green1
     yellow = C.default.yellow
+    red = C.default.red1
 end
+
+
+local function is_recording()
+    return vim.fn.reg_recording() == ""
+end
+
+local function get_recording_icon()
+    if is_recording() then
+        return ""
+    else
+        return "  "
+    end
+end
+
+local function get_recording_color()
+    if is_recording() then
+        return { fg = text_hl }
+    else
+        return { fg = red }
+    end
+end
+
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {
@@ -271,6 +297,10 @@ require('lualine').setup {
                 source = diff_source,
                 symbols = { added = ' ', modified = ' ', removed = ' ' },
                 diff_color = { added = icon_hl, modified = icon_hl, removed = icon_hl },
+            },
+            {
+                get_recording_icon,
+                color = get_recording_color,
             },
         },
         lualine_x = {

@@ -4,7 +4,6 @@
 local n, i, v, t = 'n', 'i', 'v', 't'
 local ex_t = { n, i, v }
 local n_v = { n, v }
-local n_t = { n, t }
 
 local keymap = vim.keymap.set
 local default_settings = { noremap = true, silent = true }
@@ -78,7 +77,7 @@ function M.lspsaga()
     keymap(n, 'gd', '<Cmd>Lspsaga peek_definition<CR>', default_settings)
     keymap(n, 'gh', '<Cmd>Lspsaga hover_doc<CR>', default_settings)
     keymap(n, 'gf', '<Cmd>Lspsaga goto_definition<CR>zz', default_settings)
-    keymap(n, 'e', '<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>', default_settings)
+    keymap(n, 'ge', '<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>', default_settings)
     keymap(n, '<leader>o', '<Cmd>Lspsaga outline<CR>', default_settings)
     keymap(n, '[e', function() require('alex.keymaps.utils').prev_diag() end, default_settings)
     keymap(n, ']e', function() require('alex.keymaps.utils').next_diag() end, default_settings)

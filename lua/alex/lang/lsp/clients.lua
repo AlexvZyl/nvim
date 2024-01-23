@@ -19,6 +19,7 @@ LC.lua_ls.setup { default }
 LC.julials.setup { default }
 LC.bashls.setup { default }
 LC.pyright.setup { default }
+LC.ruff_lsp.setup { default }
 LC.rust_analyzer.setup { default }
 LC.texlab.setup { default }
 LC.jsonls.setup { default }

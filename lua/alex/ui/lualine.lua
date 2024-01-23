@@ -145,7 +145,6 @@ if vim.g.colors_name == 'nordic' then
     green = C.green.base
     yellow = C.yellow.base
     red = C.red.base
-
 elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     text_hl = { fg = C.default.fg_gutter }
@@ -155,16 +154,13 @@ elseif vim.g.colors_name == 'tokyonight' then
     red = C.default.red1
 end
 
-
-local function is_recording()
-    return vim.fn.reg_recording() == ""
-end
+local function is_recording() return vim.fn.reg_recording() == '' end
 
 local function get_recording_icon()
     if is_recording() then
-        return ""
+        return ''
     else
-        return "  "
+        return '  '
     end
 end
 
@@ -175,7 +171,6 @@ local function get_recording_color()
         return { fg = red }
     end
 end
-
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {

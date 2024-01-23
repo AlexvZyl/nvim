@@ -33,7 +33,7 @@ local packages = {
     'gopls',
     'haskell-language-server',
     'ruff',
-    'ruff-lsp'
+    'ruff-lsp',
 }
 
 registry.refresh(function()

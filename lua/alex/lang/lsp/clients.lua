@@ -65,13 +65,12 @@ LC.docker_compose_language_service.setup {
     },
 }
 
-
 LC.terraform_lsp.setup {
     default.lsp_flags,
     default.capabilities,
     filetypes = {
-        "terraform",
-        "terraform-vars",
-        "tf"
-    }
+        'terraform',
+        'terraform-vars',
+        'tf',
+    },
 }

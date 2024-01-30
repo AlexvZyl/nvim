@@ -21,7 +21,7 @@ require('nvim-treesitter.configs').setup {
         'go',
         'javascript',
         'typescript',
-        'terraform'
+        'terraform',
     },
 
     ignore_install = {},

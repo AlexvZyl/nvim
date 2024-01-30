@@ -32,7 +32,6 @@ local packages = {
     'golangci-lint',
     'gopls',
     'haskell-language-server',
-    'ruff',
     'ruff-lsp',
 }
 

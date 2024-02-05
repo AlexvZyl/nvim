@@ -26,6 +26,8 @@ LC.jsonls.setup { default }
 LC.yamlls.setup { default }
 LC.gopls.setup { default }
 LC.hls.setup { default }
+LC.terraform_lsp.setup { default }
+LC.terraformls.setup { default }
 
 LC.eslint.setup {
     lsp_flags = lsp_flags,
@@ -62,15 +64,5 @@ LC.docker_compose_language_service.setup {
         'docker-compose.yaml',
         'compose.yaml',
         'compose.yml',
-    },
-}
-
-LC.terraform_lsp.setup {
-    default.lsp_flags,
-    default.capabilities,
-    filetypes = {
-        'terraform',
-        'terraform-vars',
-        'tf',
     },
 }

@@ -42,6 +42,8 @@ local function on_highlights(H, C)
     H.CopilotSuggestion = { fg = C.fg_gutter, italic = false }
     -- Debugger
     H.DapUINormal = { bg = C.bg_dark }
+    -- Completion
+    H.CmpItemKindVariable = { fg = C.cyan }
 end
 
 require('tokyonight').load {

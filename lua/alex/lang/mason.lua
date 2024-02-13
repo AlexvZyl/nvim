@@ -33,6 +33,7 @@ local packages = {
     'gopls',
     'haskell-language-server',
     'ruff-lsp',
+    'terraform-ls'
 }
 
 registry.refresh(function()

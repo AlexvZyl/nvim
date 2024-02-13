@@ -26,7 +26,6 @@ LC.jsonls.setup { default }
 LC.yamlls.setup { default }
 LC.gopls.setup { default }
 LC.hls.setup { default }
---LC.terraform_lsp.setup { default }
 LC.terraformls.setup { default }
 
 LC.eslint.setup {

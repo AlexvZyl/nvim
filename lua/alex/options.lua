@@ -65,3 +65,6 @@ vim.cmd [[
     match ExtraWhitespace /\s\+$/
     autocmd BufWritePre * %s/\s\+$//e
 ]]
+
+-- Enable blinking for wezterm
+vim.opt.guicursor = 'i:ver20-blinkon1,a:blinkon1'

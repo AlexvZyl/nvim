@@ -1,9 +1,9 @@
 if vim.g.vscode then
-    require 'alex.vscode'
+    require 'alex.editors.vscode'
     return
 end
 
-if vim.g.neovide then require 'alex.neovide' end
+if vim.g.neovide then require 'alex.editors.neovide' end
 
 -- This makes neovim load faster
 vim.loader.enable()

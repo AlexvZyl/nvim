@@ -9,8 +9,7 @@ This config has a decent amount of work and is basically a fully fledged IDE.  W
 
 > [!NOTE]
 > I try to keep all of the key bindings in [one file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/keymaps/init.lua).
-
-> [!NOTE]
+> 
 > You can add more LSPs to the end of [this file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/lang/lsp/clients.lua).
 
 *Images are outdated.*

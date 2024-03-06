@@ -9,13 +9,13 @@ return {
         config = function() require 'alex.ui.dashboard' end,
     },
     {
-        "folke/todo-comments.nvim",
+        'folke/todo-comments.nvim',
         keys = { 'ft', '<leader>t' },
         dependencies = {
-            "nvim-lua/plenary.nvim",
+            'nvim-lua/plenary.nvim',
             'folke/trouble.nvim',
         },
-        config = function() require 'alex.ui.todo' end
+        config = function() require 'alex.ui.todo' end,
     },
     {
         -- Required by other packages

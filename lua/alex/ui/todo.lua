@@ -1,5 +1,3 @@
-require 'todo-comments' .setup {
+require('todo-comments').setup {}
 
-}
-
-require 'alex.keymaps'.todo()
+require('alex.keymaps').todo()

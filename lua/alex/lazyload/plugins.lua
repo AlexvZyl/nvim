@@ -1,11 +1,21 @@
 return {
     -- General UI/UX
+    --
     {
         'glepnir/dashboard-nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         priority = 999,
         lazy = false,
         config = function() require 'alex.ui.dashboard' end,
+    },
+    {
+        "folke/todo-comments.nvim",
+        keys = { 'ft', '<leader>t' },
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            'folke/trouble.nvim',
+        },
+        config = function() require 'alex.ui.todo' end
     },
     {
         -- Required by other packages
@@ -102,7 +112,7 @@ return {
     {
         'folke/trouble.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        keys = { '<leader>d', '<leader>D' },
+        keys = { '<leader>d', '<leader>D', '<leader>t' },
         config = function() require 'alex.lang.lsp.trouble' end,
     },
     {

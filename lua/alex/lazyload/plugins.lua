@@ -10,12 +10,12 @@ return {
     },
     {
         "folke/todo-comments.nvim",
-        keys = { 'ft', '<leader>t' },
         dependencies = {
             "nvim-lua/plenary.nvim",
             'folke/trouble.nvim',
         },
-        config = function() require 'alex.ui.todo' end
+        config = function() require 'alex.ui.todo' end,
+        event = { 'User NvimStartupDone' },
     },
     {
         -- Required by other packages

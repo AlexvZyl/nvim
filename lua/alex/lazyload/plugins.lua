@@ -9,7 +9,7 @@ return {
         config = function() require 'alex.ui.dashboard' end,
     },
     {
-        "folke/todo-comments.nvim",
+        'folke/todo-comments.nvim',
         dependencies = {
             'nvim-lua/plenary.nvim',
             'folke/trouble.nvim',

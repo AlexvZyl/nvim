@@ -129,11 +129,9 @@ function M.completion()
     }
 end
 
-
 function M.todo()
     keymap(n, 'ft', '<Cmd>TodoTelescope<CR>', default_settings)
     keymap(n, '<leader>t', '<Cmd>TodoTrouble<CR>', default_settings)
 end
-
 
 return M

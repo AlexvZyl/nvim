@@ -9,6 +9,9 @@ require 'todo-comments' .setup {
         NOTE = { icon = "" },
         TEST = { icon = "󰙨" }
     },
+    gui_style = {
+        fg = "BOLD"
+    },
     highlight = {
         keyword = "fg",
         after = "",

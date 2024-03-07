@@ -10,7 +10,7 @@ require('todo-comments').setup {
         TEST = { icon = '󰙨' },
     },
     gui_style = {
-        fg = "BOLD"
+        fg = 'BOLD',
     },
     highlight = {
         keyword = 'fg',

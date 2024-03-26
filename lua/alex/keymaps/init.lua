@@ -33,6 +33,7 @@ function M.init()
     keymap(n, '<Esc>', '<Cmd>noh<CR>', allow_remap)
     keymap(n_v, '<C-e>', 'j<C-e>', default_settings)
     keymap(n_v, '<C-y>', 'k<C-y>', default_settings)
+    keymap(n, 'K', '<nop>', default_settings)
 
     -- Windows
     keymap(n, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)

@@ -1,6 +1,6 @@
 require('lint').linters_by_ft = {
     --lua = { 'luacheck' },
-    --python = { 'flake8' },
+    python = { 'flake8' },
     --cpp = { 'cpplint' },
     go = { 'golangcilint' },
 }

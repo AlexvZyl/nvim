@@ -1,6 +1,6 @@
 require('which-key').setup {
     window = {
-        border = { '', '▔', '', '', '', ' ', '', '' },
+        border = { '', ' ', '', '', '', ' ', '', '' },
         margin = { 0, 0, 1, 0 },
         padding = { 0, 0, 0, 0 },
     },

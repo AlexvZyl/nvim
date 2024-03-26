@@ -19,7 +19,7 @@ LC.lua_ls.setup { default }
 LC.julials.setup { default }
 LC.bashls.setup { default }
 LC.pyright.setup { default }
-LC.ruff_lsp.setup { default }
+--LC.ruff_lsp.setup { default }
 LC.rust_analyzer.setup { default }
 LC.texlab.setup { default }
 LC.jsonls.setup { default }
@@ -27,6 +27,9 @@ LC.yamlls.setup { default }
 LC.gopls.setup { default }
 LC.hls.setup { default }
 LC.terraformls.setup { default }
+LC.powershell_es.setup {
+    bundle_path = '~/.local/share/nvim/mason/packages/powershell-editor-services',
+}
 
 LC.eslint.setup {
     lsp_flags = lsp_flags,

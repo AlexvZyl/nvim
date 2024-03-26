@@ -105,7 +105,10 @@ return {
     },
     {
         'mfussenegger/nvim-dap',
-        dependencies = { 'rcarriga/nvim-dap-ui' },
+        dependencies = {
+            'rcarriga/nvim-dap-ui',
+            'nvim-neotest/nvim-nio'
+        },
         event = { 'User NvimStartupDone' },
         config = function() require 'alex.lang.debugger' end,
     },

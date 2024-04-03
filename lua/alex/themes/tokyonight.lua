@@ -49,12 +49,12 @@ local function on_highlights(H, C)
 
     if transparent then
         H.LspSagaHoverBorder.bg = 'NONE'
-        H.SagaBorder.bg = "NONE"
-        H.SagaNormal.bg = "NONE"
-        H.SagaBorder.bg = "NONE"
-        H.Pmenu.bg = "NONE"
-        H.SpecialCmpBorder.bg = "NONE"
-        H.HoverNormal = { bg = "NONE" }
+        H.SagaBorder.bg = 'NONE'
+        H.SagaNormal.bg = 'NONE'
+        H.SagaBorder.bg = 'NONE'
+        H.Pmenu.bg = 'NONE'
+        H.SpecialCmpBorder.bg = 'NONE'
+        H.HoverNormal = { bg = 'NONE' }
         H.TroubleNormal = { bg = C.bg }
     end
 end
@@ -63,7 +63,7 @@ require('tokyonight').load {
     style = 'night',
     on_highlights = on_highlights,
     on_colors = function(_) end,
-    transparent = transparent
+    transparent = transparent,
 }
 
 require('lualine').setup {

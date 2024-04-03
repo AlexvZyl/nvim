@@ -18,7 +18,6 @@ if vim.g.colors_name == 'nordic' then
     warn = P.warn
     inactive_fg = P.gray4
     inactive_bg = blend(P.bg, P.black0, 0.4)
-
 elseif vim.g.colors_name == 'tokyonight' then
     local C = require 'tokyonight.colors'
     local U = require 'tokyonight.util'

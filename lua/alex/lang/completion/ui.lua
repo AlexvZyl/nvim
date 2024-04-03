@@ -50,6 +50,6 @@ cmp.setup {
     formatting = formatting,
     window = window,
     performance = {
-        debounce = 50
-    }
+        debounce = 50,
+    },
 }

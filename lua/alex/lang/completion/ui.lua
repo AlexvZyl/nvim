@@ -49,4 +49,7 @@ window.documentation.side_padding = 1
 cmp.setup {
     formatting = formatting,
     window = window,
+    performance = {
+        debounce = 50
+    }
 }

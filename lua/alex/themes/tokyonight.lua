@@ -1,6 +1,8 @@
 local TC = require 'tokyonight.colors'
 local blend = require('tokyonight.util').blend
 
+local transparent = true
+
 local function on_highlights(H, C)
     -- Native
     H.MsgArea = { bg = C.bg_dark, fg = C.fg_dark }
@@ -44,12 +46,24 @@ local function on_highlights(H, C)
     H.DapUINormal = { bg = C.bg_dark }
     -- Completion
     H.CmpItemKindVariable = { fg = C.cyan }
+
+    if transparent then
+        H.LspSagaHoverBorder.bg = 'NONE'
+        H.SagaBorder.bg = "NONE"
+        H.SagaNormal.bg = "NONE"
+        H.SagaBorder.bg = "NONE"
+        H.Pmenu.bg = "NONE"
+        H.SpecialCmpBorder.bg = "NONE"
+        H.HoverNormal = { bg = "NONE" }
+        H.TroubleNormal = { bg = C.bg }
+    end
 end
 
 require('tokyonight').load {
     style = 'night',
     on_highlights = on_highlights,
     on_colors = function(_) end,
+    transparent = transparent
 }
 
 require('lualine').setup {

@@ -56,6 +56,8 @@ local function on_highlights(H, C)
         H.SpecialCmpBorder.bg = 'NONE'
         H.HoverNormal = { bg = 'NONE' }
         H.TroubleNormal = { bg = C.bg }
+        H.WhichKeyFloat = { bg = C.bg }
+        H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }
     end
 end
 

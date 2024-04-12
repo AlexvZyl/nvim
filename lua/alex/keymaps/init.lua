@@ -75,7 +75,7 @@ end
 function M.lspsaga()
     keymap(n_v, 'ca', '<Cmd>Lspsaga code_action<CR>', default_settings)
     keymap(n_v, 'RR', '<Cmd>Lspsaga rename<CR>', default_settings)
-    keymap(n, 'gd', '<Cmd>Lspsaga peek_definition<CR>', default_settings)
+    keymap(n, 'gd', '<Cmd>Lspsaga peek_definition<CR>zz', default_settings)
     keymap(n, 'gh', '<Cmd>Lspsaga hover_doc<CR>', default_settings)
     keymap(n, 'gf', '<Cmd>Lspsaga goto_definition<CR>zz', default_settings)
     keymap(n, 'ge', '<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>', default_settings)

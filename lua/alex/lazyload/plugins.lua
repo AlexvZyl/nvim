@@ -144,7 +144,8 @@ return {
             {
                 'williamboman/mason.nvim',
                 build = ':MasonUpdate',
-                config = function() require 'alex.lang.mason' end,
+                dependencies = { "williamboman/mason-lspconfig.nvim" },
+                config = function() require 'alex.lang.lsp.mason' end,
             },
         },
     },

@@ -69,7 +69,6 @@ vim.cmd [[
 -- Enable blinking for wezterm
 vim.opt.guicursor = 'i:ver20-blinkon1,a:blinkon1'
 
-
 -- Statuscolumn was added in 0.9.
 if vim.version.major == 0 and vim.version.minor < 9 then return end
 

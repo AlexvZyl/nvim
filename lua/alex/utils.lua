@@ -42,6 +42,8 @@ M.top_thin = '▔'
 M.left_thin = '▏'
 M.right_thin = '▕'
 
+M.border_chars_top_only = { '', M.top_thin, '', '', '', ' ', '', '' }
+
 M.left_thick = '▎'
 M.right_thick = '🮇'
 M.full_block = '█'

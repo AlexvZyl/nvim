@@ -16,5 +16,4 @@ vim.loader.enable()
 -- Order is important
 require 'alex.options'
 require 'alex.lazyload'
-require 'alex.ui'
 require('alex.keymaps').init()

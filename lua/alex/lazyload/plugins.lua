@@ -140,7 +140,7 @@ return {
             {
                 'folke/neodev.nvim',
                 config = function() require 'alex.lang.tools.neodev' end,
-            }
+            },
         },
     },
     {

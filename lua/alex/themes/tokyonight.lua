@@ -59,6 +59,9 @@ local function on_highlights(H, C)
         H.WhichKeyFloat = { bg = C.bg }
         H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }
     end
+
+    -- Custom highlights.
+    H.TroubleWinBar = { bg = C.bg_dark, fg = C.yellow }
 end
 
 require('tokyonight').load {

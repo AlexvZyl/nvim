@@ -20,6 +20,10 @@ function M.length(table)
     return count
 end
 
+function M.link_hl(target, link)
+    vim.api.nvim_set_hl(0, target, { link = link })
+end
+
 -- BORDERS
 
 M.border_chars_round = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }

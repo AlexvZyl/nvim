@@ -140,13 +140,7 @@ return {
             {
                 'folke/neodev.nvim',
                 config = function() require 'alex.lang.tools.neodev' end,
-            },
-            {
-                'williamboman/mason.nvim',
-                build = ':MasonUpdate',
-                dependencies = { 'williamboman/mason-lspconfig.nvim' },
-                config = function() require 'alex.lang.lsp.mason' end,
-            },
+            }
         },
     },
     {

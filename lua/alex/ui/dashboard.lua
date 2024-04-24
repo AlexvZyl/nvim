@@ -22,12 +22,12 @@ config.shortcut = {
         group = '@string',
         key = 'u',
     },
-    {
-        desc = '   Mason ',
-        action = 'Mason',
-        group = '@string',
-        key = 'm',
-    },
+    --{
+    --    desc = '   Mason ',
+    --    action = 'Mason',
+    --    group = '@string',
+    --    key = 'm',
+    --},
     {
         desc = ' 󰓅  Profile ',
         action = 'Lazy profile',

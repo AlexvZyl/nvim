@@ -46,6 +46,6 @@ local notify = require 'notify'
 notify.setup {
     fps = 60,
     level = 'ERROR',
-    max_width = 50,
+    max_width = 75,
 }
 vim.notify = notify

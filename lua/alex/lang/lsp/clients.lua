@@ -69,3 +69,10 @@ LC.docker_compose_language_service.setup {
         'compose.yml',
     },
 }
+
+
+LC.html.setup{
+    capabilities = DC,
+    lsp_flags = lsp_flags,
+    cmd = { "html-languageserver" }
+}

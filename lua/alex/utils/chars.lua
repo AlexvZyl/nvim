@@ -1,28 +1,5 @@
 local M = {}
 
--- LUA UTILS
-
-function M.file_exists(file)
-    local f = io.open(file, 'r')
-    if f then
-        io.close(f)
-        return true
-    else
-        return false
-    end
-end
-
-function M.length(table)
-    local count = 0
-    for _, _ in ipairs(table) do
-        count = count + 1
-    end
-    return count
-end
-
-function M.link_hl(target, link) vim.api.nvim_set_hl(0, target, { link = link }) end
-
--- BORDERS
 
 M.border_chars_round = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
 M.border_chars_none = { '', '', '', '', '', '', '', '' }
@@ -32,65 +9,30 @@ M.border_chars_outer_thick = { '▛', '▀', '▜', '▐', '▟', '▄', '▙', 
 M.border_chars_cmp_items = { '▛', '▀', '▀', ' ', '▄', '▄', '▙', '▌' }
 M.border_chars_cmp_doc = { '▀', '▀', '▀', ' ', '▄', '▄', '▄', '▏' }
 M.border_chars_outer_thin = { '🭽', '▔', '🭾', '▕', '🭿', '▁', '🭼', '▏' }
-
 M.border_chars_inner_thin = { ' ', '▁', ' ', '▏', ' ', '▔', ' ', '▕' }
 M.border_chars_outer_thin_telescope = { '▔', '▕', '▁', '▏', '🭽', '🭾', '🭿', '🭼' }
 M.border_chars_outer_thick_telescope = { '▀', '▐', '▄', '▌', '▛', '▜', '▟', '▙' }
+M.border_chars_top_only = { '', M.top_thin, '', '', '', ' ', '', '' }
 
-M.top_and_bottom = '🮀'
 
 M.bottom_thin = '▁'
 M.top_thin = '▔'
 M.left_thin = '▏'
 M.right_thin = '▕'
-
-M.border_chars_top_only = { '', M.top_thin, '', '', '', ' ', '', '' }
-
 M.left_thick = '▎'
 M.right_thick = '🮇'
 M.full_block = '█'
-
 M.top_right_thin = '🭾'
 M.top_left_thin = '🭽'
 M.bottom_left_thin = '🭼'
 M.bottom_right_thin = '🭿'
-
 M.top_left_round = '╭'
 M.top_right_round = '╮'
 M.bottom_right_round = '╯'
 M.bottom_left_round = '╰'
-
 M.vertical_default = '│'
 M.horizontal_default = '─'
 
-function M.is_nordic() return vim.g.colors_name == 'nordic' end
-
-function M.is_tokyonight() return vim.g.colors_name == 'tokyonight' end
-
-function M.get_border_chars(desc)
-    if vim.g.neovide then
-        -- Hmmmm
-    end
-
-    if desc == 'completion' then return M.border_chars_round end
-    if desc == 'cmdline' then return M.border_chars_round end
-    if desc == 'search' then return M.border_chars_round end
-    if desc == 'float' then return M.border_chars_outer_thin end
-    if desc == 'telescope' then return M.border_chars_outer_thin_telescope end
-
-    if desc == 'lsp' then
-        if M.is_nordic() then return M.border_chars_outer_thin end
-        return M.border_chars_round
-    end
-
-    -- Defaults
-    if M.is_nordic() then return M.border_chars_outer_thin end
-    if M.is_tokyonight() then return M.border_chars_round end
-
-    return M.border_chars_round
-end
-
--- ICONS
 
 M.diagnostic_signs = {
     error = ' ',
@@ -101,7 +43,6 @@ M.diagnostic_signs = {
     hint = '󱤅 ',
     other = '󰠠 ',
 }
-
 M.kind_icons = {
     Text = ' ',
     Method = ' ',
@@ -132,5 +73,32 @@ M.kind_icons = {
     Copilot = ' ',
     Unknown = ' ',
 }
+
+
+function M.get_border_chars(desc)
+    local T = require 'alex.utils.theme'
+
+    if vim.g.neovide then
+        -- Hmmmm
+    end
+
+    if desc == 'completion' then return M.border_chars_round end
+    if desc == 'cmdline' then return M.border_chars_round end
+    if desc == 'search' then return M.border_chars_round end
+    if desc == 'float' then return M.border_chars_outer_thin end
+    if desc == 'telescope' then return M.border_chars_outer_thin_telescope end
+
+    if desc == 'lsp' then
+        if T.is_nordic() then return M.border_chars_outer_thin end
+        return M.border_chars_round
+    end
+
+    -- Defaults
+    if T.is_nordic() then return M.border_chars_outer_thin end
+    if T.is_tokyonight() then return M.border_chars_round end
+
+    return M.border_chars_round
+end
+
 
 return M

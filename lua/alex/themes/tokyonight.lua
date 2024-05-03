@@ -46,6 +46,9 @@ local function on_highlights(H, C)
     H.DapUINormal = { bg = C.bg_dark }
     -- Completion
     H.CmpItemKindVariable = { fg = C.cyan }
+    -- Winbar.
+    H.WinBar = { bg = C.bg_dark }
+    H.WinBarNC = { bg = C.bg_dark }
 
     if transparent then
         H.LspSagaHoverBorder.bg = 'NONE'

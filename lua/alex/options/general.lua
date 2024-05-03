@@ -1,4 +1,4 @@
-local u = require 'alex.utils'
+local C = require 'alex.utils.chars'
 
 -- Important to place this before loading plugins.
 vim.g.mapleader = ' '
@@ -27,13 +27,13 @@ vim.g.VM_set_statusline = 0
 vim.g.VM_silent_exit = 1
 
 vim.opt.fillchars = {
-    horiz = u.bottom_thin,
-    horizup = u.bottom_thin,
-    horizdown = ' ',
-    vert = u.right_thick,
-    vertleft = u.right_thick,
-    vertright = u.right_thick,
-    verthoriz = u.right_thick,
+    horiz = C.bottom_thin,
+    horizup = C.bottom_thin,
+    horizdown = C.right_thick,
+    vert = C.right_thick,
+    vertleft = C.right_thick,
+    vertright = C.right_thick,
+    verthoriz = C.right_thick,
     eob = ' ',
     diff = '╱',
 }
@@ -68,29 +68,3 @@ vim.cmd [[
 
 -- Enable blinking for wezterm
 vim.opt.guicursor = 'i:ver20-blinkon1,a:blinkon1'
-
--- Statuscolumn was added in 0.9.
-if vim.version.major == 0 and vim.version.minor < 9 then return end
-
---No separator.
---vim.opt.numberwidth = 4
---vim.opt.statuscolumn = "%= %{v:virtnum < 1 ? (v:relnum ? v:relnum : v:lnum) : ''}%=%s"
-
--- With sepaartor.
---vim.opt.numberwidth = 6
---vim.opt.statuscolumn = "%= %{v:virtnum < 1 ? (v:relnum ? v:relnum : v:lnum) : ''}%=%s▎ "
-
--- Signs first, right aligned relative number
-vim.opt.numberwidth = 5
-vim.opt.statuscolumn = ' %s%=%{v:relnum?v:relnum:v:lnum}%#WinSeparator#  '
---No separator.
---vim.opt.numberwidth = 4
---vim.opt.statuscolumn = "%= %{v:virtnum < 1 ? (v:relnum ? v:relnum : v:lnum) : ''}%=%s"
-
--- With sepaartor.
---vim.opt.numberwidth = 6
---vim.opt.statuscolumn = "%= %{v:virtnum < 1 ? (v:relnum ? v:relnum : v:lnum) : ''}%=%s▎ "
-
--- Signs first, right aligned relative number
-vim.opt.numberwidth = 5
-vim.opt.statuscolumn = ' %s%=%{v:relnum?v:relnum:v:lnum}%#WinSeparator#  '

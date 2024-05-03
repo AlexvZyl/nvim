@@ -2,7 +2,7 @@ require 'alex.lazyload.bootstrap'
 require 'alex.lazyload.events'
 
 -- Load plugins
-local U = require 'alex.utils'
+local U = require 'alex.utils.chars'
 local plugins = require 'alex.lazyload.plugins'
 local opts = {
     ui = { border = U.border_chars_outer_thin },

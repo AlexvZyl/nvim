@@ -66,13 +66,13 @@ function F:get_current_filetype_icon()
     -- Set colors.
     --local highlight_color = modules.utils.extract_highlight_colors(icon_highlight_group, 'fg')
     --if highlight_color then
-        ---- local default_highlight = self:get_default_hl()
-        --local icon_highlight = Icon_hl_cache[highlight_color]
-        --if not icon_highlight or not modules.highlight.highlight_exists(icon_highlight.name .. '_normal') then
-            --icon_highlight = self:create_hl({ fg = highlight_color }, icon_highlight_group)
-            --Icon_hl_cache[highlight_color] = icon_highlight
-        --end
-        ---- icon = self:format_hl(icon_highlight) .. icon .. default_highlight
+    ---- local default_highlight = self:get_default_hl()
+    --local icon_highlight = Icon_hl_cache[highlight_color]
+    --if not icon_highlight or not modules.highlight.highlight_exists(icon_highlight.name .. '_normal') then
+    --icon_highlight = self:create_hl({ fg = highlight_color }, icon_highlight_group)
+    --Icon_hl_cache[highlight_color] = icon_highlight
+    --end
+    ---- icon = self:format_hl(icon_highlight) .. icon .. default_highlight
     --end
 
     -- Return the formatted string.

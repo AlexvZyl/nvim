@@ -53,10 +53,10 @@ local tree = {
         lualine_b = {},
         lualine_c = {
             --{
-                --get_short_cwd,
-                --padding = 0,
-                --icon = { '   ', color = icon_hl },
-                --color = text_hl,
+            --get_short_cwd,
+            --padding = 0,
+            --icon = { '   ', color = icon_hl },
+            --color = text_hl,
             --},
         },
         lualine_x = {},
@@ -126,17 +126,17 @@ require('lualine').setup {
         lualine_b = {},
         lualine_c = {
             --{
-                --U.parent_folder,
-                --color = text_hl,
-                --icon = { '   ', color = icon_hl },
-                --separator = '',
-                --padding = 0,
+            --U.parent_folder,
+            --color = text_hl,
+            --icon = { '   ', color = icon_hl },
+            --separator = '',
+            --padding = 0,
             --},
             --{
-                --U.get_current_filename,
-                --color = text_hl,
-                --separator = ' ',
-                --padding = 0,
+            --U.get_current_filename,
+            --color = text_hl,
+            --separator = ' ',
+            --padding = 0,
             --},
             {
                 'branch',

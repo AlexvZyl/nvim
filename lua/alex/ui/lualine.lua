@@ -93,7 +93,7 @@ local telescope = {
             {
                 telescope_text,
                 color = text_hl,
-                icon = { '  ', color = icon_hl },
+                icon = { ' ', color = icon_hl },
             },
         },
         lualine_x = {},

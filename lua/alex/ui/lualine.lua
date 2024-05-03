@@ -31,7 +31,6 @@ elseif vim.g.colors_name == 'tokyonight' then
     red = C.default.red1
 end
 
-
 local function get_recording_color()
     if U.is_recording() then
         return { fg = red }
@@ -39,7 +38,6 @@ local function get_recording_color()
         return { fg = text_hl }
     end
 end
-
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {

@@ -1,6 +1,5 @@
 local M = {}
 
-
 function M.merge(table1, table2)
     if table1 == table2 == nil then return {} end
     if table1 == nil then
@@ -10,10 +9,9 @@ function M.merge(table1, table2)
     end
     return vim.tbl_deep_extend('force', table1, table2)
 end
-M = M.merge(M, require('alex.utils.chars'))
-M = M.merge(M, require('alex.utils.filesystem'))
-M = M.merge(M, require('alex.utils.theme'))
-
+M = M.merge(M, require 'alex.utils.chars')
+M = M.merge(M, require 'alex.utils.filesystem')
+M = M.merge(M, require 'alex.utils.theme')
 
 function M.length(table)
     local count = 0
@@ -23,28 +21,23 @@ function M.length(table)
     return count
 end
 
-
 -- Show git status.
 function M.diff_source()
     local gitsigns = vim.b.gitsigns_status_dict
     if gitsigns then return { added = gitsigns.added, modified = gitsigns.changed, removed = gitsigns.removed } end
 end
 
-
 -- Get the current buffer's filetype.
 function M.get_current_filetype() return vim.api.nvim_buf_get_option(0, 'filetype') end
 
-
 -- Get the current buffer's type.
 function M.get_current_buftype() return vim.api.nvim_buf_get_option(0, 'buftype') end
-
 
 -- Get the buffer's filename.
 function M.get_current_filename()
     local bufname = vim.api.nvim_buf_get_name(0)
     return bufname ~= '' and vim.fn.fnamemodify(bufname, ':t') or ''
 end
-
 
 -- Gets the current buffer's filename with the filetype icon supplied
 -- by devicons.
@@ -103,11 +96,7 @@ function F:get_current_filename_with_icon()
     return icon .. ' ' .. f_name .. suffix
 end
 
-
-function M.get_current_filename_with_icon()
-    return F:get_current_filename_with_icon()
-end
-
+function M.get_current_filename_with_icon() return F:get_current_filename_with_icon() end
 
 function M.parent_folder()
     local current_buffer = vim.api.nvim_get_current_buf()
@@ -116,7 +105,6 @@ function M.parent_folder()
     if parent == '.' then return '' end
     return parent .. '/'
 end
-
 
 function M.get_native_lsp()
     local buf_ft = M.get_current_filetype()
@@ -131,7 +119,6 @@ function M.get_native_lsp()
     end
     return current_clients
 end
-
 
 -- Display the difference in commits between local and head.
 local Job = require 'plenary.job'
@@ -160,9 +147,7 @@ function M.get_git_compare()
     return string
 end
 
-
 function M.is_recording() return vim.fn.reg_recording() ~= '' end
-
 
 function M.get_recording_icon()
     if M.is_recording() then
@@ -171,6 +156,5 @@ function M.get_recording_icon()
         return ''
     end
 end
-
 
 return M

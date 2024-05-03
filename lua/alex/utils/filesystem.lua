@@ -1,6 +1,5 @@
 local M = {}
 
-
 function M.file_exists(file)
     local f = io.open(file, 'r')
     if f then
@@ -10,6 +9,5 @@ function M.file_exists(file)
         return false
     end
 end
-
 
 return M

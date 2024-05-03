@@ -51,7 +51,7 @@ return {
         },
         config = function() require 'alex.ui.cokeline' end,
         --event = { 'BufWinEnter' },
-        lazy = true
+        lazy = true,
     },
     {
         'folke/noice.nvim',

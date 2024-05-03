@@ -70,9 +70,8 @@ LC.docker_compose_language_service.setup {
     },
 }
 
-
-LC.html.setup{
+LC.html.setup {
     capabilities = DC,
     lsp_flags = lsp_flags,
-    cmd = { "html-languageserver" }
+    cmd = { 'html-languageserver' },
 }

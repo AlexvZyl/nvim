@@ -1,6 +1,5 @@
 local M = {}
 
-
 M.border_chars_round = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
 M.border_chars_none = { '', '', '', '', '', '', '', '' }
 M.border_chars_empty = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' }
@@ -13,7 +12,6 @@ M.border_chars_inner_thin = { ' ', '▁', ' ', '▏', ' ', '▔', ' ', '▕' }
 M.border_chars_outer_thin_telescope = { '▔', '▕', '▁', '▏', '🭽', '🭾', '🭿', '🭼' }
 M.border_chars_outer_thick_telescope = { '▀', '▐', '▄', '▌', '▛', '▜', '▟', '▙' }
 M.border_chars_top_only = { '', M.top_thin, '', '', '', ' ', '', '' }
-
 
 M.bottom_thin = '▁'
 M.top_thin = '▔'
@@ -32,7 +30,6 @@ M.bottom_right_round = '╯'
 M.bottom_left_round = '╰'
 M.vertical_default = '│'
 M.horizontal_default = '─'
-
 
 M.diagnostic_signs = {
     error = ' ',
@@ -74,7 +71,6 @@ M.kind_icons = {
     Unknown = ' ',
 }
 
-
 function M.get_border_chars(desc)
     local T = require 'alex.utils.theme'
 
@@ -99,6 +95,5 @@ function M.get_border_chars(desc)
 
     return M.border_chars_round
 end
-
 
 return M

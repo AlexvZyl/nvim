@@ -44,16 +44,6 @@ return {
         config = function() require 'alex.ui.lualine' end,
     },
     {
-        'willothy/nvim-cokeline',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-            'nvim-tree/nvim-web-devicons',
-        },
-        config = function() require 'alex.ui.cokeline' end,
-        --event = { 'BufWinEnter' },
-        lazy = true,
-    },
-    {
         'folke/noice.nvim',
         dependencies = { 'MunifTanjim/nui.nvim', 'rcarriga/nvim-notify' },
         event = { 'User NvimStartupDone' },

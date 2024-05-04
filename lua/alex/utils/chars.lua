@@ -31,8 +31,6 @@ M.border_chars_outer_thin_telescope = { '▔', '▕', '▁', '▏', '🭽', '�
 M.border_chars_outer_thick_telescope = { '▀', '▐', '▄', '▌', '▛', '▜', '▟', '▙' }
 M.border_chars_top_only = { '', M.top_thin, '', '', '', ' ', '', '' }
 
-
-
 M.diagnostic_signs = {
     error = ' ',
     warning = ' ',

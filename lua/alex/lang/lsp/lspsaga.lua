@@ -6,8 +6,8 @@ local ui = {
     title = false,
     diagnostic = '  ',
     kind = {
-        Folder = { " " }
-    }
+        Folder = { ' ' },
+    },
 }
 
 local lightbulb = {
@@ -27,7 +27,7 @@ local winbar = {
     show_file = true,
     separator = '  ',
     color_mode = true,
-    hide_keyword = true
+    hide_keyword = true,
 }
 
 local diagnostic = {

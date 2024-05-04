@@ -28,6 +28,7 @@ local function on_highlights(H, C)
     H.SagaBorder = { fg = C.fg }
     H.SagaNormal = { bg = C.bg }
     H.SagaBorder = { bg = C.bg, fg = C.orange }
+    H.SagaWinbarFolder = { fg = C.dark3 }
     -- Telescope
     H.TelescopePromptTitle = { fg = C.bg_dark, bg = C.orange }
     H.TelescopePreviewTitle = { fg = C.bg_dark, bg = C.orange }

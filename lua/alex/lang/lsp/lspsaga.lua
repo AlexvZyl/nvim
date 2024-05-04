@@ -6,8 +6,8 @@ local ui = {
     title = false,
     diagnostic = '  ',
     kind = {
-        Folder = { ' ' },
-    },
+        Folder = { "  ", "SagaWinbarFolder" }
+    }
 }
 
 local lightbulb = {

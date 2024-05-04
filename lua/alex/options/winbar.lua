@@ -1,3 +1,5 @@
+-- Not using, keeping as reference for now.
+
 vim.opt.winbar = [[%{%v:lua.require('alex.options.winbar').winbar()%}]]
 
 local M = {}

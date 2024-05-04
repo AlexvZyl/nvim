@@ -21,12 +21,6 @@ function M.length(table)
     return count
 end
 
--- Show git status.
-function M.diff_source()
-    local gitsigns = vim.b.gitsigns_status_dict
-    if gitsigns then return { added = gitsigns.added, modified = gitsigns.changed, removed = gitsigns.removed } end
-end
-
 -- Get the current buffer's filetype.
 function M.get_current_filetype() return vim.api.nvim_buf_get_option(0, 'filetype') end
 
@@ -39,68 +33,12 @@ function M.get_current_filename()
     return bufname ~= '' and vim.fn.fnamemodify(bufname, ':t') or ''
 end
 
--- Gets the current buffer's filename with the filetype icon supplied
--- by devicons.
-local F = require('lualine.components.filetype'):extend()
-Icon_hl_cache = {}
-local lualine_require = require 'lualine_require'
-local modules = lualine_require.lazy_require {
-    highlight = 'lualine.highlight',
-    utils = 'lualine.utils.utils',
-}
-
-function F:get_current_filetype_icon()
-    -- Get setup.
-    local icon, icon_highlight_group
-    local _, devicons = pcall(require, 'nvim-web-devicons')
-    local f_name, f_extension = vim.fn.expand '%:t', vim.fn.expand '%:e'
-    f_extension = f_extension ~= '' and f_extension or vim.bo.filetype
-    icon, icon_highlight_group = devicons.get_icon(f_name, f_extension)
-
-    -- Fallback settings.
-    if icon == nil and icon_highlight_group == nil then
-        icon = ''
-        icon_highlight_group = 'DevIconDefault'
-    end
-
-    -- Set colors.
-    --local highlight_color = modules.utils.extract_highlight_colors(icon_highlight_group, 'fg')
-    --if highlight_color then
-    ---- local default_highlight = self:get_default_hl()
-    --local icon_highlight = Icon_hl_cache[highlight_color]
-    --if not icon_highlight or not modules.highlight.highlight_exists(icon_highlight.name .. '_normal') then
-    --icon_highlight = self:create_hl({ fg = highlight_color }, icon_highlight_group)
-    --Icon_hl_cache[highlight_color] = icon_highlight
-    --end
-    ---- icon = self:format_hl(icon_highlight) .. icon .. default_highlight
-    --end
-
-    -- Return the formatted string.
-    return icon
-end
-
-function F:get_current_filename_with_icon()
-    local suffix = ''
-
-    -- Get icon and filename.
-    local icon = F.get_current_filetype_icon(self)
-    local f_name = M.get_current_filename()
-
-    -- Add readonly icon.
-    local readonly = vim.api.nvim_buf_get_option(0, 'readonly')
-    local modifiable = vim.api.nvim_buf_get_option(0, 'modifiable')
-    local nofile = M.get_current_buftype() == 'nofile'
-    if readonly or nofile or not modifiable then suffix = ' ' end
-
-    -- Return the formatted string.
-    return icon .. ' ' .. f_name .. suffix
-end
-
-function M.get_current_filename_with_icon() return F:get_current_filename_with_icon() end
-
 function M.get_current_icon()
+    local ft = M.get_current_filetype()
     local I = require 'nvim-web-devicons'
-    return I.get_icon_by_filetype(M.get_current_filetype())
+    -- local color = I.get_icon_color_by_filetype(ft)
+    local icon = I.get_icon_by_filetype(ft)
+    return icon
 end
 
 function M.parent_folder()

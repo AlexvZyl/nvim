@@ -39,6 +39,11 @@ local function get_recording_color()
     end
 end
 
+local function diff_source()
+    local gitsigns = vim.b.gitsigns_status_dict
+    if gitsigns then return { added = gitsigns.added, modified = gitsigns.changed, removed = gitsigns.removed } end
+end
+
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
 local tree = {
     sections = {
@@ -52,12 +57,12 @@ local tree = {
         },
         lualine_b = {},
         lualine_c = {
-            --{
-            --get_short_cwd,
-            --padding = 0,
-            --icon = { '   ', color = icon_hl },
-            --color = text_hl,
-            --},
+            {
+                get_short_cwd,
+                padding = 0,
+                icon = { '  ', color = icon_hl },
+                color = text_hl,
+            },
         },
         lualine_x = {},
         lualine_y = {},
@@ -125,19 +130,6 @@ require('lualine').setup {
         },
         lualine_b = {},
         lualine_c = {
-            --{
-            --U.parent_folder,
-            --color = text_hl,
-            --icon = { '   ', color = icon_hl },
-            --separator = '',
-            --padding = 0,
-            --},
-            --{
-            --U.get_current_filename,
-            --color = text_hl,
-            --separator = ' ',
-            --padding = 0,
-            --},
             {
                 'branch',
                 color = text_hl,
@@ -156,7 +148,7 @@ require('lualine').setup {
                 padding = 0,
                 color = text_hl,
                 icon = { ' ', color = text_hl },
-                source = U.diff_source,
+                source = diff_source,
                 symbols = { added = ' ', modified = ' ', removed = ' ' },
                 diff_color = { added = icon_hl, modified = icon_hl, removed = icon_hl },
             },

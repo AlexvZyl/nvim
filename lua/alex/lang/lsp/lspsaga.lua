@@ -5,6 +5,9 @@ local ui = {
     winblend = 0,
     title = false,
     diagnostic = '  ',
+    kind = {
+        Folder = { " " }
+    }
 }
 
 local lightbulb = {
@@ -19,10 +22,12 @@ local definition = {
 }
 
 local winbar = {
-    enable = false,
+    enable = true,
     folder_level = 1,
     show_file = true,
     separator = '  ',
+    color_mode = true,
+    hide_keyword = true
 }
 
 local diagnostic = {

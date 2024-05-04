@@ -47,8 +47,8 @@ local function on_highlights(H, C)
     -- Completion
     H.CmpItemKindVariable = { fg = C.cyan }
     -- Winbar.
-    H.WinBar = { fg = C.dark3, bg = C.bg_dark, underline = true, sp = TC.default.bg_highlight }
-    H.WinBarNC = { fg = C.dark3, bg = C.bg_dark, underline = true, sp = TC.default.bg_dark }
+    H.WinBar = { fg = C.yellow, bg = C.bg_dark }
+    H.WinBarNC = { fg = C.yellow, bg = C.bg_dark }
 
     if transparent then
         H.LspSagaHoverBorder.bg = 'NONE'

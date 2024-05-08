@@ -6,12 +6,8 @@ This config has a decent amount of work and is basically a fully fledged IDE.  W
 
 > [!NOTE]
 > I am not setting up my packages in the way that is described by `lazy.nvim`.  I am trying to keep my configs "package-manager-agnostic" as far as possible.
-
-> [!WARNING]
-> Currently I am running tokyonight, so just do `colorscheme nordic` if you rather want nordic.
-
-> [!NOTE]
-> I try to keep all of the key bindings in [one file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/keymaps/init.lua).
+>
+> I try to keep all of the key bindings in [one file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/keymaps/init.lua) so that it is easier to keep track of everything and prevent conflicts.
 >
 > You can add more LSPs to the end of [this file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/lang/lsp/clients.lua).
 

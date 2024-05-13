@@ -1,7 +1,5 @@
 -- Order is important
-if not require 'alex.environments' then
-    return
-end
+if not require 'alex.environments' then return end
 
 require 'alex.options'
 require 'alex.lazyload'

@@ -65,4 +65,3 @@ vim.cmd [[
     match ExtraWhitespace /\s\+$/
     autocmd BufWritePre * %s/\s\+$//e
 ]]
-

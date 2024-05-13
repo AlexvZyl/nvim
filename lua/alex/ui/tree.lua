@@ -65,7 +65,7 @@ local view = {
     cursorline = false,
     signcolumn = 'no',
     width = { max = 40, min = 40 },
-    side = "left"
+    side = 'left',
 }
 
 local function on_attach(bufnr)

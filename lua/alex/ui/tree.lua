@@ -64,7 +64,8 @@ local system_open = { cmd = 'zathura' }
 local view = {
     cursorline = false,
     signcolumn = 'no',
-    width = { max = 38, min = 38 },
+    width = { max = 40, min = 40 },
+    side = "left"
 }
 
 local function on_attach(bufnr)

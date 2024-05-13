@@ -86,6 +86,7 @@ function M.lspsaga()
     keymap(n, '[E', function() require('alex.keymaps.utils').prev_error() end, default_settings)
     keymap(n, ']E', function() require('alex.keymaps.utils').next_error() end, default_settings)
     keymap(n, 'gr', '<Cmd>Telescope lsp_references<CR>', default_settings)
+    keymap(n, 'gR', '<Cmd>Lspsaga finder<CR>', default_settings)
 end
 
 function M.debugger()

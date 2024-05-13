@@ -60,7 +60,7 @@ local tree = {
             {
                 get_short_cwd,
                 padding = 0,
-                icon = { '  ', color = icon_hl },
+                icon = { '   ', color = icon_hl },
                 color = text_hl,
             },
         },
@@ -98,7 +98,7 @@ local telescope = {
             {
                 telescope_text,
                 color = text_hl,
-                icon = { ' ', color = icon_hl },
+                icon = { '  ', color = icon_hl },
             },
         },
         lualine_x = {},
@@ -133,7 +133,7 @@ require('lualine').setup {
             {
                 'branch',
                 color = text_hl,
-                icon = { '  ', color = icon_hl },
+                icon = { '   ', color = icon_hl },
                 separator = '',
                 padding = 0,
             },
@@ -147,7 +147,7 @@ require('lualine').setup {
                 'diff',
                 padding = 0,
                 color = text_hl,
-                icon = { ' ', color = text_hl },
+                icon = { '  ', color = text_hl },
                 source = diff_source,
                 symbols = { added = ' ', modified = ' ', removed = ' ' },
                 diff_color = { added = icon_hl, modified = icon_hl, removed = icon_hl },

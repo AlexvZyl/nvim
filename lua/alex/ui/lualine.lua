@@ -6,6 +6,7 @@ local mode_map = {
     ['V-BLOCK'] = 'VBLOCK',
     ['TERMINAL'] = 'TERMNL',
     ['V-REPLACE'] = 'VREPLC',
+    ['O-PENDING'] = '0PNDNG',
 }
 local function fmt_mode(s) return mode_map[s] or s end
 
@@ -151,6 +152,7 @@ require('lualine').setup {
                 source = diff_source,
                 symbols = { added = ' ', modified = ' ', removed = ' ' },
                 diff_color = { added = icon_hl, modified = icon_hl, removed = icon_hl },
+                separator = ' ',
             },
             {
                 U.get_recording_icon,

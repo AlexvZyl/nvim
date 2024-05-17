@@ -53,7 +53,7 @@ return {
         'lukas-reineke/indent-blankline.nvim',
         -- event = { 'VeryLazy' },
         config = function() require 'alex.ui.indent-blankline' end,
-        lazy = true
+        lazy = true,
     },
     {
         'RRethy/vim-illuminate',

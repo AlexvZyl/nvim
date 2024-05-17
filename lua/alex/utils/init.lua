@@ -27,9 +27,7 @@ function M.get_current_filetype() return vim.api.nvim_buf_get_option(0, 'filetyp
 -- Get the current buffer's type.
 function M.get_current_buftype() return vim.api.nvim_buf_get_option(0, 'buftype') end
 
-function M.current_buffer_modified()
-    return vim.api.nvim_buf_get_option(0, 'modified')
-end
+function M.current_buffer_modified() return vim.api.nvim_buf_get_option(0, 'modified') end
 
 function M.current_buffer_modifiable()
     local buftype = vim.api.nvim_buf_get_option(0, 'buftype')

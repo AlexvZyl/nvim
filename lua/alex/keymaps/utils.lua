@@ -72,9 +72,8 @@ function M.toggle_diffview()
 end
 
 function M.delete_buffer()
-    local buftype = vim.api.nvim_buf_get_option(0, 'buftype')
-    if buftype == 'nofile' or buftype == 'prompt' then return end
-    if vim.api.nvim_buf_get_option(0, 'modified') then return end
+    local U = require 'alex.utils'
+    if not U.current_buffer_modifiable() then return end
     vim.cmd [[:bp | bdelete #]]
 end
 

@@ -51,8 +51,9 @@ return {
     },
     {
         'lukas-reineke/indent-blankline.nvim',
-        event = { 'VeryLazy' },
+        -- event = { 'VeryLazy' },
         config = function() require 'alex.ui.indent-blankline' end,
+        lazy = true
     },
     {
         'RRethy/vim-illuminate',
@@ -91,7 +92,6 @@ return {
         'zbirenbaum/copilot.lua',
         config = function() require 'alex.lang.tools.copilot' end,
         cmd = 'Copilot',
-        event = { 'User NvimStartupDone', 'InsertEnter' },
         build = ':Copilot auth',
     },
     {

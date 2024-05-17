@@ -27,6 +27,17 @@ function M.get_current_filetype() return vim.api.nvim_buf_get_option(0, 'filetyp
 -- Get the current buffer's type.
 function M.get_current_buftype() return vim.api.nvim_buf_get_option(0, 'buftype') end
 
+function M.current_buffer_modified()
+    return vim.api.nvim_buf_get_option(0, 'modified')
+end
+
+function M.current_buffer_modifiable()
+    local buftype = vim.api.nvim_buf_get_option(0, 'buftype')
+    if buftype == 'nofile' or buftype == 'prompt' then return false end
+    if vim.api.nvim_buf_get_option(0, 'modified') then return false end
+    return true
+end
+
 -- Get the buffer's filename.
 function M.get_current_filename()
     local bufname = vim.api.nvim_buf_get_name(0)

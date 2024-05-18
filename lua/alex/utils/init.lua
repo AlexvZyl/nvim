@@ -29,6 +29,10 @@ function M.get_current_buftype() return vim.api.nvim_buf_get_option(0, 'buftype'
 
 function M.current_buffer_modified() return vim.api.nvim_buf_get_option(0, 'modified') end
 
+function M.current_window_floating()
+    return vim.api.nvim_win_get_config(0).relative ~= ''
+end
+
 function M.current_buffer_modifiable()
     local buftype = vim.api.nvim_buf_get_option(0, 'buftype')
     if buftype == 'nofile' or buftype == 'prompt' then return false end

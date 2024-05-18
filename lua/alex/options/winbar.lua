@@ -1,31 +1,38 @@
 vim.opt.winbar = nil
 
-local M = {}
-
-M.winbar_filetype_exclude = {
-    --"help",
-    'dashboard',
-    'NvimTree',
-    'Trouble',
-    'Outline',
+local winbar_filetype_exclude = {
+  "dashboard",
+  "NvimTree",
+  "Trouble",
+  "Outline",
 }
 
 local excludes = function()
-    if vim.tbl_contains(M.winbar_filetype_exclude, vim.bo.filetype) then return true end
-    return false
+  if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then
+    return true
+  end
+  return false
 end
+
+local M = {}
 
 function M.get_winbar()
     if excludes() then return end
 
     local U = require 'alex.utils'
+
+    -- Skip floating window.
+    if U.current_window_floating() then
+        return
+    end
+
     local icon = U.get_current_icon()
     if icon == nil then icon = '' end
 
     local mod_icon = ''
     if U.current_buffer_modified() then
         mod_icon = ' ●'
-    elseif U.current_buffer_modifiable() then
+    elseif not U.current_buffer_modifiable() then
         mod_icon = ' '
     end
 

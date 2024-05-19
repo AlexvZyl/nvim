@@ -2,9 +2,9 @@ vim.opt.winbar = nil
 
 local winbar_filetype_exclude = {
     'dashboard',
-    'NvimTree',
     'Trouble',
     'Outline',
+    'NvimTree'
 }
 
 local excludes = function()
@@ -32,7 +32,7 @@ function M.get_winbar()
         mod_icon = ' '
     end
 
-    vim.opt_local.winbar = '  ' .. icon .. ' ' .. U.parent_folder() .. U.get_current_filename() .. mod_icon
+    vim.opt_local.winbar = '  ' .. icon .. ' ' .. U.parent_folder() .. U.current_buffer_filename() .. mod_icon
 end
 
 vim.api.nvim_create_autocmd({ 'BufModifiedSet', 'BufWinEnter', 'BufFilePost', 'BufWritePost' }, {

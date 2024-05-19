@@ -74,6 +74,8 @@ end
 function M.delete_buffer()
     local U = require 'alex.utils'
     if not U.current_buffer_modifiable() then return end
+    if U.current_buffer_modified() then return end
+
     vim.cmd [[:bp | bdelete #]]
 end
 

@@ -3,22 +3,23 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 local function root_label(path)
-    path = path:gsub('/home/alex', ' ')
-    path = path:gsub('/Users/alex', ' ')
-    path = path .. '/'
+    path = path:gsub('/home/alex', '~')
+
     local path_len = path:len()
     local win_nr = require('nvim-tree.view').get_winnr()
-    print(win_nr)
-    local win_width = vim.fn.winwidth(win_nr)
-    if path_len > (win_width - 2) then
-        local max_str = path:sub(path_len - win_width + 5)
-        local pos = max_str:find '/'
-        if pos then
-            return '󰉒 ' .. max_str:sub(pos)
-        else
-            return '󰉒 ' .. max_str
+    if win_nr ~= nil then
+        local win_width = vim.fn.winwidth(win_nr)
+        if path_len > (win_width - 2) then
+            local max_str = path:sub(path_len - win_width + 5)
+            local pos = max_str:find '/'
+            if pos then
+                return '󰉒 ' .. max_str:sub(pos)
+            else
+                return '󰉒 ' .. max_str
+            end
         end
     end
+
     return path
 end
 

@@ -1,0 +1,56 @@
+local M = {}
+
+function M.current_buffer_filetype() return vim.bo.filetype end
+
+function M.current_buffer_type() return vim.bo.buftype end
+
+function M.current_buffer_modified() return vim.bo.modified end
+
+function M.current_window_floating() return vim.api.nvim_win_get_config(0).relative ~= '' end
+
+function M.current_buffer_modifiable()
+    local buftype = M.current_buffer_type()
+    if buftype == 'nofile' or buftype == 'prompt' then
+        return false
+    end
+    return true
+end
+
+function M.current_buffer_filename()
+    local bufname = vim.api.nvim_buf_get_name(0)
+    return bufname ~= '' and vim.fn.fnamemodify(bufname, ':t') or ''
+end
+
+function M.get_current_icon()
+    local ft = M.current_buffer_filetype()
+    local I = require 'nvim-web-devicons'
+    -- local color = I.get_icon_color_by_filetype(ft)
+    local icon = I.get_icon_by_filetype(ft)
+    return icon
+end
+
+function M.parent_folder()
+    local current_buffer = vim.api.nvim_get_current_buf()
+    local current_file = vim.api.nvim_buf_get_name(current_buffer)
+    local parent = vim.fn.fnamemodify(current_file, ':h:t')
+    if parent == '.' then return '' end
+    return parent .. '/'
+end
+
+function M.get_native_lsp()
+    local buf_ft = M.current_buffer_filetype()
+    local clients = vim.lsp.get_active_clients()
+    if next(clients) == nil then return '' end
+    local current_clients = ''
+
+    for _, client in ipairs(clients) do
+        local filetypes = client.config.filetypes
+        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+            current_clients = current_clients .. client.name .. ' '
+        end
+    end
+
+    return current_clients
+end
+
+return M

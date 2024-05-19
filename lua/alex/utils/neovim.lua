@@ -19,7 +19,9 @@ end
 
 function M.current_buffer_modifiable()
     local buftype = M.current_buffer_type()
-    if buftype == 'nofile' or buftype == 'prompt' then return false end
+    if buftype == 'nofile' or buftype == 'prompt'  or buftype == 'help' then
+        return false
+    end
     return true
 end
 

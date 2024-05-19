@@ -4,7 +4,7 @@ local winbar_filetype_exclude = {
     'dashboard',
     'Trouble',
     'Outline',
-    'NvimTree'
+    'NvimTree',
 }
 
 local excludes = function()

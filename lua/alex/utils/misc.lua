@@ -3,9 +3,7 @@ local M = {}
 -- Display the difference in commits between local and head.
 local Job = require 'plenary.job'
 function M.get_git_compare()
-    if M.current_window_floating() then
-        return ''
-    end
+    if M.current_window_floating() then return '' end
     if M.get_current_buftype() == 'nofile' then return '' end
 
     -- Get the path of the current directory.

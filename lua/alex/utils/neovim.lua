@@ -8,6 +8,10 @@ function M.current_buffer_modified() return vim.bo.modified end
 
 function M.current_window_floating() return vim.api.nvim_win_get_config(0).relative ~= '' end
 
+function M.current_buffer_dir()
+    return vim.api.nvim_buf_get_name(0):match('(.*' .. '/' .. ')')
+end
+
 function M.current_buffer_modifiable()
     local buftype = M.current_buffer_type()
     if buftype == 'nofile' or buftype == 'prompt' then return false end
@@ -22,12 +26,11 @@ end
 function M.get_current_icon()
     local ft = M.current_buffer_filetype()
     local I = require 'nvim-web-devicons'
-    -- local color = I.get_icon_color_by_filetype(ft)
     local icon = I.get_icon_by_filetype(ft)
     return icon
 end
 
-function M.parent_folder()
+function M.current_buffer_parent()
     local current_buffer = vim.api.nvim_get_current_buf()
     local current_file = vim.api.nvim_buf_get_name(current_buffer)
     local parent = vim.fn.fnamemodify(current_file, ':h:t')
@@ -35,7 +38,7 @@ function M.parent_folder()
     return parent .. '/'
 end
 
-function M.get_native_lsp()
+function M.current_buffer_lsp()
     local buf_ft = M.current_buffer_filetype()
     local clients = vim.lsp.get_active_clients()
     if next(clients) == nil then return '' end
@@ -49,6 +52,16 @@ function M.get_native_lsp()
     end
 
     return current_clients
+end
+
+function M.is_recording() return vim.fn.reg_recording() ~= '' end
+
+function M.get_recording_icon()
+    if M.is_recording() then
+        return '  '
+    else
+        return ''
+    end
 end
 
 return M

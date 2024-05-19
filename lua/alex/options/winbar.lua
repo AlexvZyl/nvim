@@ -32,7 +32,7 @@ function M.get_winbar()
         mod_icon = ' '
     end
 
-    vim.opt_local.winbar = '  ' .. icon .. ' ' .. U.parent_folder() .. U.current_buffer_filename() .. mod_icon
+    vim.opt_local.winbar = '  ' .. icon .. ' ' .. U.current_buffer_parent() .. U.current_buffer_filename() .. mod_icon
 end
 
 vim.api.nvim_create_autocmd({ 'BufModifiedSet', 'BufWinEnter', 'BufFilePost', 'BufWritePost' }, {

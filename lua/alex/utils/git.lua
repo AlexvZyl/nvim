@@ -1,13 +1,14 @@
 local M = {}
 
+local U = require 'alex.utils.neovim'
+
 -- Display the difference in commits between local and head.
 local Job = require 'plenary.job'
 function M.get_git_compare()
-    if M.current_window_floating() then return '' end
-    if M.get_current_buftype() == 'nofile' then return '' end
+    if U.current_window_floating() then return '' end
+    if U.current_buffer_type() == 'nofile' then return '' end
 
-    -- Get the path of the current directory.
-    local curr_dir = vim.api.nvim_buf_get_name(0):match('(.*' .. '/' .. ')')
+    local curr_dir = U.current_buffer_dir()
 
     if false then
         -- Run job to get git.
@@ -30,16 +31,6 @@ function M.get_git_compare()
     end
 
     return ''
-end
-
-function M.is_recording() return vim.fn.reg_recording() ~= '' end
-
-function M.get_recording_icon()
-    if M.is_recording() then
-        return '  '
-    else
-        return ''
-    end
 end
 
 return M

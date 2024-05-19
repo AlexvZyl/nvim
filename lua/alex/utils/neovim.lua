@@ -21,10 +21,10 @@ function M.current_buffer_filename()
     return bufname ~= '' and vim.fn.fnamemodify(bufname, ':t') or ''
 end
 
-function M.get_current_icon()
-    local ft = M.current_buffer_filetype()
+function M.current_buffer_icon()
+    local c = M.current_buffer_filetype()
     local I = require 'nvim-web-devicons'
-    local icon = I.get_icon_by_filetype(ft)
+    local icon = I.get_icon_by_filetype(c)
     return icon
 end
 
@@ -61,5 +61,11 @@ function M.get_recording_icon()
         return ''
     end
 end
+
+function M.link_hl(target, link) vim.api.nvim_set_hl(0, target, { link = link }) end
+
+function M.is_nordic() return vim.g.colors_name == 'nordic' end
+
+function M.is_tokyonight() return vim.g.colors_name == 'tokyonight' end
 
 return M

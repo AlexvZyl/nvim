@@ -72,7 +72,7 @@ M.kind_icons = {
 }
 
 function M.get_border_chars(desc)
-    local T = require 'alex.utils.theme'
+    local U = require 'alex.utils.neovim'
 
     if vim.g.neovide then
         -- Hmmmm
@@ -85,13 +85,13 @@ function M.get_border_chars(desc)
     if desc == 'telescope' then return M.border_chars_outer_thin_telescope end
 
     if desc == 'lsp' then
-        if T.is_nordic() then return M.border_chars_outer_thin end
+        if U.is_nordic() then return M.border_chars_outer_thin end
         return M.border_chars_round
     end
 
     -- Defaults
-    if T.is_nordic() then return M.border_chars_outer_thin end
-    if T.is_tokyonight() then return M.border_chars_round end
+    if U.is_nordic() then return M.border_chars_outer_thin end
+    if U.is_tokyonight() then return M.border_chars_round end
 
     return M.border_chars_round
 end

@@ -19,10 +19,9 @@ function M.get_winbar()
 
     local U = require 'alex.utils'
 
-    -- Skip floating window.
     if U.current_window_floating() then return end
 
-    local icon = U.get_current_icon()
+    local icon = U.current_buffer_icon()
     if icon == nil then icon = '' end
 
     local mod_icon = ''

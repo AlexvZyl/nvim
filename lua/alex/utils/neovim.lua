@@ -8,9 +8,7 @@ function M.current_buffer_modified() return vim.bo.modified end
 
 function M.current_window_floating() return vim.api.nvim_win_get_config(0).relative ~= '' end
 
-function M.current_buffer_dir()
-    return vim.api.nvim_buf_get_name(0):match('(.*' .. '/' .. ')')
-end
+function M.current_buffer_dir() return vim.api.nvim_buf_get_name(0):match('(.*' .. '/' .. ')') end
 
 function M.current_buffer_modifiable()
     local buftype = M.current_buffer_type()

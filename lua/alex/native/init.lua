@@ -1,3 +1,3 @@
-require 'alex.options.general'
-require 'alex.options.statuscolumn'
-require 'alex.options.winbar'
+require 'alex.native.general'
+require 'alex.native.statuscolumn'
+require 'alex.native.winbar'

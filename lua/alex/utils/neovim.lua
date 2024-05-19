@@ -10,6 +10,17 @@ function M.current_window_floating() return vim.api.nvim_win_get_config(0).relat
 
 function M.current_buffer_dir() return vim.api.nvim_buf_get_name(0):match('(.*' .. '/' .. ')') end
 
+function M.current_window()
+    return vim.api.nvim_get_current_win()
+end
+
+function M.current_window_hl(hl)
+    local win = M.current_window()
+    vim.api.nvim_win_set_option(
+        win, 'winhl', hl
+    )
+end
+
 function M.current_buffer_modifiable()
     local buftype = M.current_buffer_type()
     if buftype == 'nofile' or buftype == 'prompt' then return false end

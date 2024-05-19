@@ -1,3 +1,5 @@
+local U = require 'alex.utils.neovim'
+
 vim.opt.winbar = nil
 
 local winbar_filetype_exclude = {
@@ -16,10 +18,9 @@ local M = {}
 
 function M.get_winbar()
     if excludes() then return end
-
-    local U = require 'alex.utils'
-
     if U.current_window_floating() then return end
+
+    U.current_window_hl("WinBar:CustomWinBar,WinBarNC:CustomWinBarNC")
 
     local icon = U.current_buffer_icon()
     if icon == nil then icon = '' end
@@ -35,7 +36,7 @@ function M.get_winbar()
 end
 
 vim.api.nvim_create_autocmd({ 'BufModifiedSet', 'BufWinEnter', 'BufFilePost', 'BufWritePost' }, {
-    callback = function() require('alex.options.winbar').get_winbar() end,
+    callback = function() require('alex.native.winbar').get_winbar() end,
 })
 
 return M

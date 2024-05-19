@@ -49,7 +49,7 @@ local function on_highlights(H, C)
     H.CmpItemKindVariable = { fg = C.cyan }
     -- Winbar.
     H.WinBar = { bg = C.bg_dark, fg = C.yellow }
-    H.WinBarNC = { bg = C.bg_dark, fg = C.yellow}
+    H.WinBarNC = { bg = C.bg_dark, fg = C.yellow }
     H.CustomWinBar = { fg = C.dark3 }
     H.CustomWinBarNC = { fg = C.dark3 }
 

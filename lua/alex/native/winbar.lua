@@ -20,7 +20,7 @@ function M.get_winbar()
     if excludes() then return end
     if U.current_window_floating() then return end
 
-    U.current_window_hl("WinBar:CustomWinBar,WinBarNC:CustomWinBarNC")
+    U.current_window_hl 'WinBar:CustomWinBar,WinBarNC:CustomWinBarNC'
 
     local icon = U.current_buffer_icon()
     if icon == nil then icon = '' end

@@ -168,7 +168,7 @@ require('lualine').setup {
                 padding = 2,
             },
             {
-                U.get_native_lsp,
+                U.current_buffer_lsp,
                 padding = 1,
                 color = text_hl,
                 icon = { ' ', color = icon_hl },

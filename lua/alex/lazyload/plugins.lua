@@ -171,10 +171,6 @@ return {
 
     -- Editing/Modal
     {
-        'preservim/nerdcommenter',
-        event = { 'User NvimStartupDone' },
-    },
-    {
         'ggandor/leap.nvim',
         dependencies = 'tpope/vim-repeat',
         keys = { 's', 'S' },

@@ -1,6 +1,5 @@
 return {
     -- General UI/UX
-    --
     {
         'glepnir/dashboard-nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -30,7 +29,10 @@ return {
     },
     {
         'nvim-telescope/telescope.nvim',
-        dependencies = { 'nvim-lua/plenary.nvim', 'nvim-lua/popup.nvim' },
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'nvim-lua/popup.nvim'
+        },
         cmd = 'Telescope',
         config = function() require 'alex.ui.telescope' end,
     },
@@ -83,7 +85,7 @@ return {
         version = '*',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         config = function() require 'alex.ui.tree' end,
-        keys = { '<leader>f', 'gc' },
+        keys = { '<leader>f' },
     },
 
     -- Language/Tools/LSP/Comp

@@ -29,7 +29,7 @@ function M.init()
     keymap(n, 'gb', '<Plug>(cokeline-focus-pick)', default_settings)
 
     -- Misc
-    keymap(n, 'gl', '<Cmd>VimtexView<CR>', default_settings)
+    --keymap(n, 'gl', '<Cmd>VimtexView<CR>', default_settings)
     keymap(n, '<Esc>', '<Cmd>noh<CR>', allow_remap)
     keymap(n_v, '<C-e>', 'j<C-e>', default_settings)
     keymap(n_v, '<C-y>', 'k<C-y>', default_settings)
@@ -58,7 +58,7 @@ function M.init()
     keymap(n, 's', function() require('leap').leap {} end)
     keymap(n, 'S', function() require('leap').leap { backward = true } end)
     keymap(n, '<leader>v', function() require('alex.keymaps.utils').toggle_diffview() end)
-    keymap(n, '<C-a>', 'gg0vG$', default_settings)
+    --keymap(n, '<C-a>', 'gg0vG$', default_settings)
 end
 
 function M.trouble()

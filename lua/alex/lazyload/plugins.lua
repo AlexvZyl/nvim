@@ -31,7 +31,7 @@ return {
         'nvim-telescope/telescope.nvim',
         dependencies = {
             'nvim-lua/plenary.nvim',
-            'nvim-lua/popup.nvim'
+            'nvim-lua/popup.nvim',
         },
         cmd = 'Telescope',
         config = function() require 'alex.ui.telescope' end,

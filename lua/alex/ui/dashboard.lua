@@ -37,7 +37,7 @@ config.shortcut = {
     {
         desc = '   Quit ',
         action = 'q!',
-        group = '@macro',
+        group = '@variable.builtin',
         key = 'q',
     },
 }

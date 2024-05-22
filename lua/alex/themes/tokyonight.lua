@@ -24,11 +24,10 @@ local function on_highlights(H, C)
     H.IndentBlanklineContextChar = { fg = C.bg_highlight }
     H.IndentBlanklineChar = { fg = C.bg_highlight }
     -- LSP Saga
-    H.LspSagaHoverBorder = { fg = C.fg }
-    H.SagaBorder = { fg = C.fg }
+    H.LspSagaHoverBorder = { bg = C.bg }
     H.SagaNormal = { bg = C.bg }
     H.SagaBorder = { bg = C.bg, fg = C.orange }
-    H.SagaWinbarFolder = { fg = C.dark3 }
+    H.LspSagaRenameBorder = { fg = C.cyan, bg = C.bg }
     -- Telescope
     H.TelescopePromptTitle = { fg = C.bg_dark, bg = C.orange }
     H.TelescopePreviewTitle = { fg = C.bg_dark, bg = C.orange }
@@ -41,6 +40,9 @@ local function on_highlights(H, C)
     H.TelescopeBorder = { fg = C.bg_dark, bg = preview }
     -- Noice
     H.NoiceCmdline = { bg = C.bg_dark }
+    H.NoiceLspProgressTitle = { bg = C.bg }
+    H.NoiceLspProgressClient = { bg = C.bg }
+    H.NoiceLspProgressSpinner = { bg = C.bg }
     -- Copilot
     H.CopilotSuggestion = { fg = C.fg_gutter, italic = false }
     -- Debugger
@@ -54,13 +56,9 @@ local function on_highlights(H, C)
     H.CustomWinBarNC = { fg = C.dark3 }
 
     if transparent then
-        H.LspSagaHoverBorder.bg = 'NONE'
-        H.SagaBorder.bg = 'NONE'
-        H.SagaNormal.bg = 'NONE'
-        H.SagaBorder.bg = 'NONE'
+        H.LspSagaRenameBorder = { fg = C.cyan, bg = 'NONE' }
         H.Pmenu.bg = 'NONE'
         H.SpecialCmpBorder.bg = 'NONE'
-        H.HoverNormal = { bg = 'NONE' }
         H.TroubleNormal = { bg = C.bg }
         H.WhichKeyFloat = { bg = C.bg }
         H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }

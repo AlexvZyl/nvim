@@ -3,7 +3,7 @@ return {
     {
         'glepnir/dashboard-nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        priority = 999,
+        event = 'VimEnter',
         lazy = false,
         config = function() require 'alex.ui.dashboard' end,
     },
@@ -85,7 +85,7 @@ return {
         version = '*',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         config = function() require 'alex.ui.tree' end,
-        keys = { '<leader>f' },
+        keys = { '<leader>f', 'gf' },
     },
 
     -- Language/Tools/LSP/Comp

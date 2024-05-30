@@ -11,7 +11,7 @@ end
 
 function M.toggle_tree()
     local tree = require('nvim-tree.api').tree
-    tree.toggle({ focus = false })
+    tree.toggle { focus = false }
 end
 
 function M.save_file()

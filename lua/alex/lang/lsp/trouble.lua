@@ -9,8 +9,8 @@ require('trouble').setup {
     auto_preview = false,
 }
 
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-    command = 'TroubleRefresh',
-})
+-- vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+--     command = 'TroubleRefresh',
+-- })
 
 require('alex.keymaps.init').trouble()

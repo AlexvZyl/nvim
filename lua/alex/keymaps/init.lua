@@ -12,7 +12,8 @@ local allow_remap = { noremap = false, silent = true }
 local M = {}
 
 function M.init()
-    -- Telescope
+    -- Telescope commands have to be here since we rely on them to lazyload it.
+    keymap(n, 'fh', '<Cmd>Telescope help_tags<CR>', default_settings)
     keymap(n, 'fo', '<Cmd>Telescope oldfiles<CR>', default_settings)
     keymap(n, 'ff', '<Cmd>Telescope find_files<CR>', default_settings)
     keymap(n, 'fF', '<Cmd>Telescope find_files cwd=~<CR>', default_settings)
@@ -20,15 +21,9 @@ function M.init()
     keymap(n, 'fS', '<Cmd>Telescope live_grep cwd=~<CR>', default_settings)
     keymap(n, 'fb', '<Cmd>Telescope buffers<CR>', default_settings)
     keymap(n_v, '<C-f>', '<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>', default_settings)
-    keymap(ex_t, '<F12>', '<Cmd>Cheatsheet<CR>', default_settings)
-
-    -- Cokeline
-    keymap(n, 'Q', function() require('alex.keymaps.utils').delete_buffer() end, default_settings)
-    keymap(n, 'H', '<Plug>(cokeline-focus-prev)', default_settings)
-    keymap(n, 'L', '<Plug>(cokeline-focus-next)', default_settings)
-    keymap(n, 'gb', '<Plug>(cokeline-focus-pick)', default_settings)
 
     -- Misc
+    keymap(ex_t, '<F12>', '<Cmd>Cheatsheet<CR>', default_settings)
     --keymap(n, 'gl', '<Cmd>VimtexView<CR>', default_settings)
     keymap(n, '<Esc>', '<Cmd>noh<CR>', allow_remap)
     keymap(n_v, '<C-e>', 'j<C-e>', default_settings)
@@ -42,12 +37,14 @@ function M.init()
     keymap(n, '<C-j>', '<Cmd>wincmd j<CR>', default_settings)
     keymap(n, '<C-k>', '<Cmd>wincmd k<CR>', default_settings)
     keymap(n, '<C-l>', '<Cmd>wincmd l<CR>', default_settings)
-
     keymap(t, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
     keymap(t, '<C-h>', '<C-\\><C-n><C-w>h', default_settings)
     keymap(t, '<C-j>', '<C-\\><C-n><C-w>j', default_settings)
     keymap(t, '<C-k>', '<C-\\><C-n><C-w>k', default_settings)
     keymap(t, '<C-l>', '<C-\\><C-n><C-w>l', default_settings)
+
+    -- Buffers.
+    keymap(n, 'Q', function() require('alex.keymaps.utils').delete_buffer() end, default_settings)
 
     -- Editing
     keymap(i, '<Esc>', '<Esc>`^', default_settings)

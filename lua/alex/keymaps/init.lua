@@ -59,8 +59,8 @@ function M.init()
 end
 
 function M.trouble()
-    keymap(n, '<leader>d', '<Cmd>TroubleToggle document_diagnostics<CR>', default_settings)
-    keymap(n, '<leader>D', '<Cmd>TroubleToggle workspace_diagnostics<CR>', default_settings)
+    keymap(n, '<leader>d', '<Cmd>Trouble diagnostics toggle filter.buf=0<CR>', default_settings)
+    keymap(n, '<leader>D', '<Cmd>Trouble diagnostics toggle<CR>', default_settings)
 end
 
 function M.copilot() keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>', default_settings) end

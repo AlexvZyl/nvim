@@ -39,13 +39,9 @@ require('noice').setup {
         inc_rename = false, -- enables an input dialog for inc-rename.nvim
         lsp_doc_border = false, -- add a border to hover docs and signature help
     },
+    notify = {
+        fps = 60,
+        max_width = 75,
+        level = 'ERROR',
+    }
 }
-
--- Notifiactions
-local notify = require 'notify'
-notify.setup {
-    fps = 60,
-    level = 'ERROR',
-    max_width = 75,
-}
-vim.notify = notify

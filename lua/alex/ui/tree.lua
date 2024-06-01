@@ -69,6 +69,11 @@ local view = {
     side = 'left',
 }
 
+local notify = {
+    threshold = vim.log.levels.WARN,
+    absolute_path = true,
+}
+
 local function on_attach(bufnr)
     local api = require 'nvim-tree.api'
     local function opts(desc)
@@ -100,6 +105,7 @@ require('nvim-tree').setup {
     git = { ignore = false },
     diagnostics = { enable = true },
     on_attach = on_attach,
+    notify = notify,
 }
 
 -- Set window local options.

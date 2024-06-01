@@ -2,10 +2,12 @@ local u = require 'alex.utils'
 
 local function routes_config()
     local msgs = {
-        'written',
-        'fewer lines',
-        'line less;',
-        'Already at',
+        "written",
+        "fewer lines",
+        "line less;",
+        "Already at",
+        "lines yanked",
+        "more line"
     }
 
     local routes = {}

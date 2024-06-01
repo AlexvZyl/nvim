@@ -43,5 +43,5 @@ require('noice').setup {
         fps = 60,
         max_width = 75,
         level = 'ERROR',
-    }
+    },
 }

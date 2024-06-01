@@ -44,4 +44,14 @@ require('noice').setup {
         max_width = 75,
         level = 'ERROR',
     },
+    routes = {
+        {
+            filter = {
+                event = "msg_show",
+                kind = "",
+                find = "written",
+            },
+            opts = { skip = true },
+        },
+    },
 }

@@ -1,5 +1,25 @@
 local u = require 'alex.utils'
 
+local function routes_config()
+    local msgs = {
+        "written",
+        "fewer lines",
+        "line less;",
+        "Already at",
+    }
+
+    local routes = {}
+    for _, msg in ipairs(msgs) do
+        print(msg)
+        local route = {
+            filter = { event = "msg_show", find = msg },
+            opts = { skip = true }
+        }
+        table.insert(routes, route)
+    end
+    return routes
+end
+
 require('noice').setup {
     cmdline = {
         format = {
@@ -44,14 +64,5 @@ require('noice').setup {
         max_width = 75,
         level = 'ERROR',
     },
-    routes = {
-        {
-            filter = {
-                event = 'msg_show',
-                kind = '',
-                find = 'written',
-            },
-            opts = { skip = true },
-        },
-    },
+    routes = routes_config()
 }

@@ -11,13 +11,15 @@ local function routes_config()
         'change;',
         'E486',
         'No results',
-        'telescope.builtin',
+        'Nothing currently selected',
+        'changes;',
+        'No information available',
     }
 
     local routes = {}
     for _, msg in ipairs(msgs) do
         local route = {
-            filter = { event = 'msg_show', find = msg },
+            filter = { find = msg },
             opts = { skip = true },
         }
         table.insert(routes, route)

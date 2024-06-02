@@ -1,9 +1,9 @@
-require 'alex.lazyload.bootstrap'
-require 'alex.lazyload.events'
+require 'alex.managers.lazy.bootstrap'
+require 'alex.managers.lazy.events'
 
--- Load plugins
 local U = require 'alex.utils.chars'
-local plugins = require 'alex.lazyload.plugins'
+local plugins = require 'alex.managers.lazy.plugins'
+
 local opts = {
     ui = { border = U.border_chars_outer_thin },
     defaults = { lazy = false },
@@ -12,4 +12,5 @@ local opts = {
         enabled = true,
     },
 }
+
 require('lazy').setup(plugins, opts)

@@ -108,7 +108,7 @@ return {
         'folke/trouble.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         keys = { '<leader>d', '<leader>D', '<leader>t' },
-        config = function() require 'alex.lang.lsp.trouble' end,
+        config = function() require 'alex.ui.trouble' end,
     },
     {
         'mfussenegger/nvim-lint',
@@ -120,7 +120,7 @@ return {
         dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects', 'nvim-treesitter/playground' },
         event = { 'User NvimStartupDone' },
         build = { ':TSUpdate' },
-        config = function() require 'alex.lang.treesitter' end,
+        config = function() require 'alex.ui.treesitter' end,
     },
     {
         'neovim/nvim-lspconfig',

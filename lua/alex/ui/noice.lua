@@ -8,11 +8,12 @@ local function routes_config()
         'Already at',
         'lines yanked',
         'more line',
+        'change;',
+        'E486'
     }
 
     local routes = {}
     for _, msg in ipairs(msgs) do
-        print(msg)
         local route = {
             filter = { event = 'msg_show', find = msg },
             opts = { skip = true },

@@ -1,7 +1,13 @@
 local config = {}
 
-config.mru = { limit = 10 }
-config.project = { limit = 10 }
+config.mru = {
+    label = " Recent Files",
+    limit = 10,
+}
+config.project = {
+    label = " Recent Projects",
+    limit = 10
+}
 
 config.shortcut = {
     {
@@ -14,7 +20,7 @@ config.shortcut = {
         desc = ' 󰈔  File/path ',
         action = 'Telescope find_files find_command=rg,--hidden,--files',
         group = '@string',
-        key = 'f',
+        key = 'fF',
     },
     {
         desc = '   Update ',
@@ -22,12 +28,6 @@ config.shortcut = {
         group = '@string',
         key = 'u',
     },
-    --{
-    --    desc = '   Mason ',
-    --    action = 'Mason',
-    --    group = '@string',
-    --    key = 'm',
-    --},
     {
         desc = ' 󰓅  Profile ',
         action = 'Lazy profile',

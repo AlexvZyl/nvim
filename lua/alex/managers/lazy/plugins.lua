@@ -117,7 +117,10 @@ return {
     },
     {
         'nvim-treesitter/nvim-treesitter',
-        dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects', 'nvim-treesitter/playground' },
+        dependencies = {
+            'nvim-treesitter/nvim-treesitter-textobjects',
+            'nvim-treesitter/playground',
+        },
         event = { 'User NvimStartupDone' },
         build = { ':TSUpdate' },
         config = function() require 'alex.plugins.ui.treesitter' end,

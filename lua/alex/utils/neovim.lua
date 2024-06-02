@@ -6,9 +6,13 @@ function M.current_buffer_type() return vim.bo.buftype end
 
 function M.current_buffer_modified() return vim.bo.modified end
 
-function M.current_window_floating() return vim.api.nvim_win_get_config(0).relative ~= '' end
+function M.current_window_floating()
+    return vim.api.nvim_win_get_config(0).relative ~= ''
+end
 
-function M.current_buffer_dir() return vim.api.nvim_buf_get_name(0):match('(.*' .. '/' .. ')') end
+function M.current_buffer_dir()
+    return vim.api.nvim_buf_get_name(0):match('(.*' .. '/' .. ')')
+end
 
 function M.current_window() return vim.api.nvim_get_current_win() end
 
@@ -19,7 +23,9 @@ end
 
 function M.current_buffer_modifiable()
     local buftype = M.current_buffer_type()
-    if buftype == 'nofile' or buftype == 'prompt' or buftype == 'help' then return false end
+    if buftype == 'nofile' or buftype == 'prompt' or buftype == 'help' then
+        return false
+    end
     return true
 end
 

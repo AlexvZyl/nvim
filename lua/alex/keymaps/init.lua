@@ -20,7 +20,12 @@ function M.init()
     keymap(n, 'fs', '<Cmd>Telescope live_grep<CR>', default_settings)
     keymap(n, 'fS', '<Cmd>Telescope live_grep cwd=~<CR>', default_settings)
     keymap(n, 'fb', '<Cmd>Telescope buffers<CR>', default_settings)
-    keymap(n_v, '<C-f>', '<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>', default_settings)
+    keymap(
+        n_v,
+        '<C-f>',
+        '<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>',
+        default_settings
+    )
 
     -- Misc
     keymap(ex_t, '<F12>', '<Cmd>Cheatsheet<CR>', default_settings)
@@ -44,30 +49,66 @@ function M.init()
     keymap(t, '<C-l>', '<C-\\><C-n><C-w>l', default_settings)
 
     -- Buffers.
-    keymap(n, 'Q', function() require('alex.keymaps.utils').delete_buffer() end, default_settings)
+    keymap(
+        n,
+        'Q',
+        function() require('alex.keymaps.utils').delete_buffer() end,
+        default_settings
+    )
 
     -- Editing
     keymap(i, '<Esc>', '<Esc>`^', default_settings)
-    keymap(ex_t, '<C-s>', function() require('alex.keymaps.utils').save_file() end, default_settings)
+    keymap(
+        ex_t,
+        '<C-s>',
+        function() require('alex.keymaps.utils').save_file() end,
+        default_settings
+    )
     keymap(v, '<Esc>', 'v', default_settings)
     keymap(v, 'i', 'I', default_settings)
     keymap(n_v, '<C-c>', '<plug>NERDCommenterToggle', default_settings)
     keymap(n, 's', function() require('leap').leap {} end)
     keymap(n, 'S', function() require('leap').leap { backward = true } end)
-    keymap(n, '<leader>v', function() require('alex.keymaps.utils').toggle_diffview() end)
+    keymap(
+        n,
+        '<leader>v',
+        function() require('alex.keymaps.utils').toggle_diffview() end
+    )
     --keymap(n, '<C-a>', 'gg0vG$', default_settings)
 end
 
 function M.trouble()
-    keymap(n, '<leader>d', '<Cmd>Trouble diagnostics toggle filter={buf=0}<CR>', default_settings)
-    keymap(n, '<leader>D', '<Cmd>Trouble diagnostics toggle<CR>', default_settings)
+    keymap(
+        n,
+        '<leader>d',
+        '<Cmd>Trouble diagnostics toggle filter={buf=0}<CR>',
+        default_settings
+    )
+    keymap(
+        n,
+        '<leader>D',
+        '<Cmd>Trouble diagnostics toggle<CR>',
+        default_settings
+    )
 end
 
-function M.copilot() keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>', default_settings) end
+function M.copilot()
+    keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>', default_settings)
+end
 
 function M.tree()
-    keymap(n_v, 'gf', function() require('alex.keymaps.utils').cwd_current_buffer() end, default_settings)
-    keymap(n_v, '<Leader>f', function() require('alex.keymaps.utils').toggle_tree() end, default_settings)
+    keymap(
+        n_v,
+        'gf',
+        function() require('alex.keymaps.utils').cwd_current_buffer() end,
+        default_settings
+    )
+    keymap(
+        n_v,
+        '<Leader>f',
+        function() require('alex.keymaps.utils').toggle_tree() end,
+        default_settings
+    )
 end
 
 function M.lspsaga()
@@ -77,20 +118,55 @@ function M.lspsaga()
     keymap(n, 'gd', '<Cmd>Lspsaga goto_definition<CR>', default_settings)
     keymap(n, 'gh', '<Cmd>Lspsaga hover_doc<CR>', default_settings)
     --keymap(n, 'gf', '<Cmd>Lspsaga goto_definition<CR>zz', default_settings)
-    keymap(n, 'ge', '<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>', default_settings)
+    keymap(
+        n,
+        'ge',
+        '<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>',
+        default_settings
+    )
     keymap(n, '<leader>o', '<Cmd>Lspsaga outline<CR>', default_settings)
-    keymap(n, '[e', function() require('alex.keymaps.utils').prev_diag() end, default_settings)
-    keymap(n, ']e', function() require('alex.keymaps.utils').next_diag() end, default_settings)
-    keymap(n, '[E', function() require('alex.keymaps.utils').prev_error() end, default_settings)
-    keymap(n, ']E', function() require('alex.keymaps.utils').next_error() end, default_settings)
+    keymap(
+        n,
+        '[e',
+        function() require('alex.keymaps.utils').prev_diag() end,
+        default_settings
+    )
+    keymap(
+        n,
+        ']e',
+        function() require('alex.keymaps.utils').next_diag() end,
+        default_settings
+    )
+    keymap(
+        n,
+        '[E',
+        function() require('alex.keymaps.utils').prev_error() end,
+        default_settings
+    )
+    keymap(
+        n,
+        ']E',
+        function() require('alex.keymaps.utils').next_error() end,
+        default_settings
+    )
     keymap(n, 'gr', '<Cmd>Telescope lsp_references<CR>', default_settings)
     keymap(n, 'gR', '<Cmd>Lspsaga finder<CR>', default_settings)
 end
 
 function M.debugger()
     keymap(n, '<C-b>', '<Cmd>DapToggleBreakpoint<CR>', default_settings)
-    keymap(n, '<leader>s', function() require('alex.keymaps.utils').dap_float_scope() end, default_settings)
-    keymap(n, '<F1>', function() require('alex.keymaps.utils').dap_toggle_ui() end, default_settings)
+    keymap(
+        n,
+        '<leader>s',
+        function() require('alex.keymaps.utils').dap_float_scope() end,
+        default_settings
+    )
+    keymap(
+        n,
+        '<F1>',
+        function() require('alex.keymaps.utils').dap_toggle_ui() end,
+        default_settings
+    )
     keymap(n, '<F2>', '<Cmd>DapContinue<CR>', default_settings)
     keymap(n, '<Right>', '<Cmd>DapStepInto<CR>', default_settings)
     keymap(n, '<Down>', '<Cmd>DapStepOver<CR>', default_settings)

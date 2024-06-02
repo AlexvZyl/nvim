@@ -10,7 +10,9 @@ local winbar_filetype_exclude = {
 }
 
 local excludes = function()
-    if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then return true end
+    if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then
+        return true
+    end
     return false
 end
 
@@ -32,11 +34,19 @@ function M.get_winbar()
         mod_icon = ' '
     end
 
-    vim.opt_local.winbar = '  ' .. icon .. ' ' .. U.current_buffer_parent() .. U.current_buffer_filename() .. mod_icon
+    vim.opt_local.winbar = '  '
+        .. icon
+        .. ' '
+        .. U.current_buffer_parent()
+        .. U.current_buffer_filename()
+        .. mod_icon
 end
 
-vim.api.nvim_create_autocmd({ 'BufModifiedSet', 'BufWinEnter', 'BufFilePost', 'BufWritePost' }, {
-    callback = function() require('alex.native.winbar').get_winbar() end,
-})
+vim.api.nvim_create_autocmd(
+    { 'BufModifiedSet', 'BufWinEnter', 'BufFilePost', 'BufWritePost' },
+    {
+        callback = function() require('alex.native.winbar').get_winbar() end,
+    }
+)
 
 return M

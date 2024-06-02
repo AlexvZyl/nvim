@@ -15,7 +15,12 @@ function M.get_git_compare()
         local result = Job:new({
             command = 'git',
             cwd = curr_dir,
-            args = { 'rev-list', '--left-right', '--count', 'HEAD...@{upstream}' },
+            args = {
+                'rev-list',
+                '--left-right',
+                '--count',
+                'HEAD...@{upstream}',
+            },
         })
             :sync(100)[1]
 

@@ -42,7 +42,13 @@ end
 
 local function diff_source()
     local gitsigns = vim.b.gitsigns_status_dict
-    if gitsigns then return { added = gitsigns.added, modified = gitsigns.changed, removed = gitsigns.removed } end
+    if gitsigns then
+        return {
+            added = gitsigns.added,
+            modified = gitsigns.changed,
+            removed = gitsigns.removed,
+        }
+    end
 end
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
@@ -150,8 +156,16 @@ require('lualine').setup {
                 color = text_hl,
                 icon = { '  ', color = text_hl },
                 source = diff_source,
-                symbols = { added = ' ', modified = ' ', removed = ' ' },
-                diff_color = { added = icon_hl, modified = icon_hl, removed = icon_hl },
+                symbols = {
+                    added = ' ',
+                    modified = ' ',
+                    removed = ' ',
+                },
+                diff_color = {
+                    added = icon_hl,
+                    modified = icon_hl,
+                    removed = icon_hl,
+                },
                 separator = ' ',
             },
             {
@@ -163,7 +177,13 @@ require('lualine').setup {
             {
                 'diagnostics',
                 sources = { 'nvim_diagnostic' },
-                symbols = { error = ' ', warn = ' ', info = ' ', hint = '󱤅 ', other = '󰠠 ' },
+                symbols = {
+                    error = ' ',
+                    warn = ' ',
+                    info = ' ',
+                    hint = '󱤅 ',
+                    other = '󰠠 ',
+                },
                 colored = true,
                 padding = 2,
             },

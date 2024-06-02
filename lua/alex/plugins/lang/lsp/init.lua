@@ -15,6 +15,7 @@ local config = {
 
 vim.diagnostic.config(config)
 
-require('lspconfig.ui.windows').default_options.border = U.get_border_chars 'float'
+require('lspconfig.ui.windows').default_options.border =
+    U.get_border_chars 'float'
 
 require 'alex.lang.lsp.clients'

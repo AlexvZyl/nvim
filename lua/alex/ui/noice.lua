@@ -11,7 +11,7 @@ local function routes_config()
         'change;',
         'E486',
         'No results',
-        'telescope.builtin'
+        'telescope.builtin',
     }
 
     local routes = {}

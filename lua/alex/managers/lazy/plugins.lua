@@ -14,7 +14,7 @@ return {
             "folke/trouble.nvim",
         },
         config = function() require("alex.plugins.ui.todo") end,
-        event = { "User NvimStartupDone" },
+        cmd = "TodoTrouble"
     },
     {
         -- Required by other packages

@@ -1,9 +1,9 @@
 local M = {}
 
-local U = require 'alex.utils.neovim'
+local U = require('alex.utils.neovim')
 
 -- Display the difference in commits between local and head.
-local Job = require 'plenary.job'
+local Job = require('plenary.job')
 function M.get_git_compare()
     if U.current_window_floating() then return '' end
     if U.current_buffer_type() == 'nofile' then return '' end

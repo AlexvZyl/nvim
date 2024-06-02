@@ -1,4 +1,4 @@
-require('copilot').setup {
+require('copilot').setup({
     panel = { enabled = false },
     suggestion = {
         enabled = true,
@@ -7,10 +7,10 @@ require('copilot').setup {
         debounce = 200,
         keymap = { accept = '<C-a>', dismiss = '<C-d>' },
     },
-}
+})
 
 -- Hide copilot suggestions when cmp menu is open to prevent odd behavior/garbled up suggestions.
-local cmp = require 'cmp'
+local cmp = require('cmp')
 cmp.event:on(
     'menu_opened',
     function() vim.b.copilot_suggestion_hidden = true end
@@ -22,4 +22,4 @@ cmp.event:on(
 
 require('alex.keymaps').copilot()
 
-vim.cmd 'Copilot disable'
+vim.cmd('Copilot disable')

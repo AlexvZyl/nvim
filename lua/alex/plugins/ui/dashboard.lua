@@ -46,7 +46,7 @@ config.week_header = { enable = true }
 config.footer = { '', '󰛨  Dala what you must' }
 config.packages = { enable = true }
 
-require('dashboard').setup {
+require('dashboard').setup({
     theme = 'hyper',
     config = config,
-}
+})

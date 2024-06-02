@@ -79,7 +79,7 @@ M.kind_icons = {
 }
 
 function M.get_border_chars(desc)
-    local U = require 'alex.utils.neovim'
+    local U = require('alex.utils.neovim')
 
     if vim.g.neovide then
         -- Hmmmm

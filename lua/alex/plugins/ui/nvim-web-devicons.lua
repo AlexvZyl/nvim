@@ -1,4 +1,4 @@
-local icons = require 'nvim-web-devicons'
+local icons = require('nvim-web-devicons')
 
 local go_icon = {
     icon = '',
@@ -6,10 +6,10 @@ local go_icon = {
     name = 'go',
 }
 
-icons.setup {
+icons.setup({
     strict = true,
     override_by_filename = {
         ['go.mod'] = go_icon,
         ['go.sum'] = go_icon,
     },
-}
+})

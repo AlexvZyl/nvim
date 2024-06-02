@@ -1,15 +1,15 @@
-local ts = require 'telescope'
-local U = require 'alex.utils'
+local ts = require('telescope')
+local U = require('alex.utils')
 
-ts.setup {
+ts.setup({
     defaults = {
         sort_mru = true,
         sorting_strategy = 'ascending',
         layout_config = { prompt_position = 'top' },
         borderchars = {
             prompt = { '▔', '▕', ' ', '▏', '🭽', '🭾', '▕', '▏' },
-            results = U.get_border_chars 'telescope',
-            preview = U.get_border_chars 'telescope',
+            results = U.get_border_chars('telescope'),
+            preview = U.get_border_chars('telescope'),
         },
         border = true,
         multi_icon = '',
@@ -22,6 +22,6 @@ ts.setup {
         wrap_results = false,
         mappings = { i = { ['<Esc>'] = require('telescope.actions').close } },
     },
-}
+})
 
-ts.load_extension 'notify'
+ts.load_extension('notify')

@@ -1,4 +1,4 @@
-local TC = require 'tokyonight.colors'
+local TC = require('tokyonight.colors')
 local blend = require('tokyonight.util').blend
 
 local transparent = true
@@ -69,13 +69,13 @@ local function on_highlights(H, C)
     H.TroubleWinBar = { bg = C.bg_dark, fg = C.yellow }
 end
 
-require('tokyonight').load {
+require('tokyonight').load({
     style = 'night',
     on_highlights = on_highlights,
     on_colors = function(_) end,
     transparent = transparent,
-}
+})
 
-require('lualine').setup {
+require('lualine').setup({
     options = { theme = 'tokyonight' },
-}
+})

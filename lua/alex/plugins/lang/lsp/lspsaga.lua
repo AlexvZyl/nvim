@@ -1,7 +1,7 @@
-local U = require 'alex.utils'
+local U = require('alex.utils')
 
 local ui = {
-    border = U.get_border_chars 'lsp',
+    border = U.get_border_chars('lsp'),
     winblend = 0,
     title = false,
     diagnostic = '  ',
@@ -44,13 +44,13 @@ local hover = {
     max_width = 0.5,
 }
 
-require('lspsaga').setup {
+require('lspsaga').setup({
     lightbulb = lightbulb,
     ui = ui,
     definition = definition,
     symbol_in_winbar = winbar,
     diagnostic = diagnostic,
     hover = hover,
-}
+})
 
 require('alex.keymaps').lspsaga()

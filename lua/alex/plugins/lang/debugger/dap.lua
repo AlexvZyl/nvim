@@ -1,4 +1,4 @@
-local dap = require 'dap'
+local dap = require('dap')
 
 dap.adapters.cppdbg = {
     id = 'cppdbg',
@@ -6,11 +6,11 @@ dap.adapters.cppdbg = {
     command = '/home/alex/.config/nvim/lua/alex/plugins/lang/debugger/tools/vscode-cpptools/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
-local cache = require 'alex.plugins.lang.debugger.cache'
+local cache = require('alex.plugins.lang.debugger.cache')
 
 -- C++
 dap.adapters.codelldb = {
-    command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb --port 13000',
+    command = vim.fn.stdpath('data') .. '/mason/bin/codelldb --port 13000',
     type = 'server',
     host = '127.0.0.1',
     port = 13000,

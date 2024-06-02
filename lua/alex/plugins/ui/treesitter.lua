@@ -1,4 +1,4 @@
-require('nvim-treesitter.configs').setup {
+require('nvim-treesitter.configs').setup({
 
     ensure_installed = {
         'c',
@@ -66,4 +66,4 @@ require('nvim-treesitter.configs').setup {
         updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
         persist_queries = false, -- Whether the query persists across vim sessions
     },
-}
+})

@@ -1,5 +1,5 @@
 vim.schedule(function()
-    require('dapui').setup {
+    require('dapui').setup({
         force_buffers = true,
         icons = {
             expanded = '',
@@ -27,7 +27,7 @@ vim.schedule(function()
         },
         -- Expand lines larger than the window
         -- Requires >= 0.7
-        expand_lines = vim.fn.has 'nvim-0.7' == 1,
+        expand_lines = vim.fn.has('nvim-0.7') == 1,
         -- Layouts define sections of the screen to place windows.
         -- The position can be "left", "right", "top" or "bottom".
         -- The size specifies the height/width depending on position. It can be an Int
@@ -93,7 +93,7 @@ vim.schedule(function()
             max_type_length = nil, -- Can be integer or nil.
             max_value_lines = 100, -- Can be integer or nil.
         },
-    }
+    })
 end)
 
 require('alex.keymaps').debugger()

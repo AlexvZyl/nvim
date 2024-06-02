@@ -39,7 +39,7 @@ function M.current_buffer_icon()
 
     if c == 'help' then return '󰞋' end
 
-    local I = require 'nvim-web-devicons'
+    local I = require('nvim-web-devicons')
     local icon = I.get_icon_by_filetype(c)
     return icon
 end

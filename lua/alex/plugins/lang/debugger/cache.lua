@@ -1,7 +1,7 @@
 -- Cache exe locations based on the dir.
 local M = {}
 
-M._cache_location = os.getenv 'HOME'
+M._cache_location = os.getenv('HOME')
     .. '/.config/nvim/lua/alex/plugins/lang/debugger/.cache.json'
 
 function M._get_cache_file(desc)
@@ -16,9 +16,9 @@ function M._get_cache_file(desc)
 end
 
 function M._get_cache_tab()
-    local cache_file = M._get_cache_file 'rb'
+    local cache_file = M._get_cache_file('rb')
     if cache_file == nil then return {} end
-    local file_string = cache_file:read 'a'
+    local file_string = cache_file:read('a')
     cache_file:close()
     if file_string == nil or file_string:len() == 0 then return {} end
     return vim.json.decode(file_string)
@@ -32,7 +32,7 @@ end
 
 function M.update_exe_cache(path, exe_path)
     local json_tab = M._get_cache_tab()
-    local cache_file = M._get_cache_file 'w'
+    local cache_file = M._get_cache_file('w')
     if cache_file == nil then return end
     json_tab[path] = exe_path
     -- Write to the file.

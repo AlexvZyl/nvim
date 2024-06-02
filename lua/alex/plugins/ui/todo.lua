@@ -1,4 +1,4 @@
-require('todo-comments').setup {
+require('todo-comments').setup({
     signs = false,
     keywords = {
         FIX = { icon = '' },
@@ -23,6 +23,6 @@ require('todo-comments').setup {
     search = {
         pattern = [[\b(KEYWORDS)(\(\S+\))?:]],
     },
-}
+})
 
 require('alex.keymaps').todo()

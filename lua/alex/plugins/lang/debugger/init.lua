@@ -1,5 +1,5 @@
-require 'alex.plugins.lang.debugger.dap'
-require 'alex.plugins.lang.debugger.ui'
+require('alex.plugins.lang.debugger.dap')
+require('alex.plugins.lang.debugger.ui')
 
 -- AFTER dap was loaded.
 local sign = vim.fn.sign_define

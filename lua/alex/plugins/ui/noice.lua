@@ -1,4 +1,4 @@
-local u = require 'alex.utils'
+local u = require('alex.utils')
 
 local function routes_config()
     local msgs = {
@@ -27,7 +27,7 @@ local function routes_config()
     return routes
 end
 
-require('noice').setup {
+require('noice').setup({
     cmdline = {
         format = {
             cmdline = { title = '', icon = ' ' },
@@ -72,4 +72,4 @@ require('noice').setup {
         level = 'ERROR',
     },
     routes = routes_config(),
-}
+})

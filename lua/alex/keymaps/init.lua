@@ -67,8 +67,8 @@ function M.init()
     keymap(v, '<Esc>', 'v', default_settings)
     keymap(v, 'i', 'I', default_settings)
     keymap(n_v, '<C-c>', '<plug>NERDCommenterToggle', default_settings)
-    keymap(n, 's', function() require('leap').leap {} end)
-    keymap(n, 'S', function() require('leap').leap { backward = true } end)
+    keymap(n, 's', function() require('leap').leap({}) end)
+    keymap(n, 'S', function() require('leap').leap({ backward = true }) end)
     keymap(
         n,
         '<leader>v',
@@ -175,15 +175,15 @@ function M.debugger()
 end
 
 function M.completion()
-    local cmp = require 'cmp'
-    local luasnip = require 'luasnip'
-    cmp.setup {
-        mapping = cmp.mapping.preset.insert {
+    local cmp = require('cmp')
+    local luasnip = require('luasnip')
+    cmp.setup({
+        mapping = cmp.mapping.preset.insert({
             ['<C-u>'] = cmp.mapping.scroll_docs(-4),
             ['<C-d>'] = cmp.mapping.scroll_docs(4),
             ['<C-Space>'] = cmp.mapping.complete(),
             ['<C-e>'] = cmp.mapping.abort(),
-            ['<CR>'] = cmp.mapping.confirm { select = false },
+            ['<CR>'] = cmp.mapping.confirm({ select = false }),
             ['<Tab>'] = cmp.mapping(function(fallback)
                 if cmp.visible() then
                     cmp.select_next_item()
@@ -202,8 +202,8 @@ function M.completion()
                     fallback()
                 end
             end, { 'i', 's' }),
-        },
-    }
+        }),
+    })
 end
 
 function M.todo()

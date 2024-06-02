@@ -1,4 +1,4 @@
-local U = require 'alex.utils'
+local U = require('alex.utils')
 
 -- Custom mode names.
 local mode_map = {
@@ -17,14 +17,14 @@ local yellow
 local red
 
 if vim.g.colors_name == 'nordic' then
-    local C = require 'nordic.colors'
+    local C = require('nordic.colors')
     text_hl = { fg = C.gray3 }
     icon_hl = { fg = C.gray4 }
     green = C.green.base
     yellow = C.yellow.base
     red = C.red.base
 elseif vim.g.colors_name == 'tokyonight' then
-    local C = require 'tokyonight.colors'
+    local C = require('tokyonight.colors')
     text_hl = { fg = C.default.fg_gutter }
     icon_hl = { fg = C.default.dark3 }
     green = C.default.green1
@@ -125,7 +125,7 @@ local telescope = {
     filetypes = { 'TelescopePrompt' },
 }
 
-require('lualine').setup {
+require('lualine').setup({
     sections = {
         lualine_a = {
             {
@@ -241,11 +241,11 @@ require('lualine').setup {
         telescope,
         ['nvim-tree'] = tree,
     },
-}
+})
 
 -- Ensure correct backgrond for lualine.
 vim.api.nvim_create_autocmd({ 'BufWinEnter', 'WinEnter' }, {
-    callback = function(_) require('lualine').setup {} end,
+    callback = function(_) require('lualine').setup({}) end,
     pattern = { '*.*' },
     once = true,
 })

@@ -1,5 +1,5 @@
-local U = require 'lspconfig.util'
-local LC = require 'lspconfig'
+local U = require('lspconfig.util')
+local LC = require('lspconfig')
 local DC = require('cmp_nvim_lsp').default_capabilities()
 
 local lsp_flags = {
@@ -14,64 +14,64 @@ local default = {
 
 -- Setup LSPs.
 
-LC.clangd.setup { default }
-LC.nixd.setup { default }
-LC.lua_ls.setup { default }
-LC.julials.setup { default }
-LC.bashls.setup { default }
-LC.pyright.setup { default }
+LC.clangd.setup({ default })
+LC.nixd.setup({ default })
+LC.lua_ls.setup({ default })
+LC.julials.setup({ default })
+LC.bashls.setup({ default })
+LC.pyright.setup({ default })
 --LC.ruff_lsp.setup { default }
-LC.rust_analyzer.setup { default }
-LC.texlab.setup { default }
-LC.jsonls.setup { default }
-LC.yamlls.setup { default }
-LC.gopls.setup { default }
+LC.rust_analyzer.setup({ default })
+LC.texlab.setup({ default })
+LC.jsonls.setup({ default })
+LC.yamlls.setup({ default })
+LC.gopls.setup({ default })
 --LC.hls.setup { default }
-LC.terraformls.setup { default }
-LC.powershell_es.setup {
+LC.terraformls.setup({ default })
+LC.powershell_es.setup({
     bundle_path = '~/.local/share/nvim/mason/packages/powershell-editor-services',
-}
+})
 
-LC.eslint.setup {
+LC.eslint.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern { '*.js', '*.ts' },
-}
+    root_dir = U.root_pattern({ '*.js', '*.ts' }),
+})
 
-LC.tsserver.setup {
+LC.tsserver.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern { '*.js', '*.ts' },
-}
+    root_dir = U.root_pattern({ '*.js', '*.ts' }),
+})
 
-LC.cmake.setup {
+LC.cmake.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern 'CMakeLists.txt',
-}
+    root_dir = U.root_pattern('CMakeLists.txt'),
+})
 
-LC.dockerls.setup {
+LC.dockerls.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern {
+    root_dir = U.root_pattern({
         '*Dockerfile*',
         '*dockerfile*',
-    },
-}
+    }),
+})
 
-LC.docker_compose_language_service.setup {
+LC.docker_compose_language_service.setup({
     default.lsp_flags,
     default.capabilities,
-    root_dir = U.root_pattern {
+    root_dir = U.root_pattern({
         'docker-compose.yml',
         'docker-compose.yaml',
         'compose.yaml',
         'compose.yml',
-    },
-}
+    }),
+})
 
-LC.html.setup {
+LC.html.setup({
     capabilities = DC,
     lsp_flags = lsp_flags,
     cmd = { 'html-languageserver' },
-}
+})

@@ -3,7 +3,7 @@
 local context_char = '│'
 local char = '┆'
 
-require('ibl').setup {
+require('ibl').setup({
     exclude = {
         filetypes = { 'NvimTree', 'startify', 'dashboard', 'help', 'markdown' },
     },
@@ -18,4 +18,4 @@ require('ibl').setup {
         char = char,
         highlight = 'IndentBlanklineChar',
     },
-}
+})

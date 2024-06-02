@@ -1,4 +1,4 @@
-require('colorizer').setup {
+require('colorizer').setup({
     user_default_options = {
         mode = 'virtualtext',
         RRGGBB = true,
@@ -7,4 +7,4 @@ require('colorizer').setup {
         RGB = false,
         virtualtext = ' ',
     },
-}
+})

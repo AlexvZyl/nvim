@@ -1,6 +1,6 @@
 local git_char = '│'
 --local git_char = '┃'
-require('gitsigns').setup {
+require('gitsigns').setup({
     signs = {
         add = { text = git_char },
         change = { text = git_char },
@@ -11,4 +11,4 @@ require('gitsigns').setup {
     },
     signcolumn = true,
     numhl = false,
-}
+})

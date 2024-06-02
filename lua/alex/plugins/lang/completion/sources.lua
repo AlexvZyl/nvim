@@ -1,21 +1,21 @@
-local cmp = require 'cmp'
+local cmp = require('cmp')
 
 -- Extensions.
 require('luasnip.loaders.from_vscode').lazy_load()
 
 -- Default sources.
-local sources = cmp.config.sources {
+local sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
     { name = 'path' },
-}
+})
 local snippet = {
     expand = function(args) require('luasnip').lsp_expand(args.body) end,
 }
-cmp.setup {
+cmp.setup({
     sources = sources,
     snippet = snippet,
-}
+})
 
 -- Tex.
 local tex = {

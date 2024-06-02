@@ -1,5 +1,5 @@
-local cmp = require 'cmp'
-local u = require 'alex.utils'
+local cmp = require('cmp')
+local u = require('alex.utils')
 
 -- Format the completion menu. Yes, I am that pedantic.
 local function format(_, item)
@@ -30,28 +30,28 @@ local formatting = {
 }
 
 local window = {
-    completion = cmp.config.window.bordered {
+    completion = cmp.config.window.bordered({
         winhighlight = 'Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None',
         scrollbar = true,
         border = 'rounded',
         col_offset = -1,
         side_padding = 0,
-    },
-    documentation = cmp.config.window.bordered {
+    }),
+    documentation = cmp.config.window.bordered({
         winhighlight = 'Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None',
         scrollbar = true,
         border = 'rounded',
-    },
+    }),
 }
 
 window.documentation.max_height = 18
 window.documentation.max_width = 80
 window.documentation.side_padding = 1
 
-cmp.setup {
+cmp.setup({
     formatting = formatting,
     window = window,
     performance = {
         debounce = 50,
     },
-}
+})

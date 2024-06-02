@@ -5,7 +5,7 @@ return {
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         event = 'VimEnter',
         lazy = false,
-        config = function() require 'alex.ui.dashboard' end,
+        config = function() require 'alex.plugins.ui.dashboard' end,
     },
     {
         'folke/todo-comments.nvim',
@@ -13,19 +13,19 @@ return {
             'nvim-lua/plenary.nvim',
             'folke/trouble.nvim',
         },
-        config = function() require 'alex.ui.todo' end,
+        config = function() require 'alex.plugins.ui.todo' end,
         event = { 'User NvimStartupDone' },
     },
     {
         -- Required by other packages
         'nvim-tree/nvim-web-devicons',
-        config = function() require 'alex.ui.nvim-web-devicons' end,
+        config = function() require 'alex.plugins.ui.nvim-web-devicons' end,
         lazy = true,
     },
     {
         'NvChad/nvim-colorizer.lua',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.ui.colorizer' end,
+        config = function() require 'alex.plugins.ui.colorizer' end,
     },
     {
         'nvim-telescope/telescope.nvim',
@@ -34,7 +34,7 @@ return {
             'nvim-lua/popup.nvim',
         },
         cmd = 'Telescope',
-        config = function() require 'alex.ui.telescope' end,
+        config = function() require 'alex.plugins.ui.telescope' end,
     },
     {
         'nvim-lualine/lualine.nvim',
@@ -43,38 +43,38 @@ return {
             'AndreM222/copilot-lualine',
         },
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.ui.lualine' end,
+        config = function() require 'alex.plugins.ui.lualine' end,
     },
     {
         'folke/noice.nvim',
         dependencies = { 'MunifTanjim/nui.nvim', 'rcarriga/nvim-notify' },
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.ui.noice' end,
+        config = function() require 'alex.plugins.ui.noice' end,
     },
     {
         'lukas-reineke/indent-blankline.nvim',
         event = { 'VeryLazy' },
-        config = function() require 'alex.ui.indent-blankline' end,
+        config = function() require 'alex.plugins.ui.indent-blankline' end,
     },
     {
         'RRethy/vim-illuminate',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.ui.illuminate' end,
+        config = function() require 'alex.plugins.ui.illuminate' end,
     },
     {
         'lewis6991/gitsigns.nvim',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.ui.gitsigns' end,
+        config = function() require 'alex.plugins.ui.gitsigns' end,
     },
     {
         'sindrets/diffview.nvim',
         cmd = { 'DiffviewClose', 'DiffviewOpen' },
-        config = function() require 'alex.ui.diffview' end,
+        config = function() require 'alex.plugins.ui.diffview' end,
     },
     {
         'folke/which-key.nvim',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.ui.which-key' end,
+        config = function() require 'alex.plugins.ui.which-key' end,
     },
     {
         'sudormrfbin/cheatsheet.nvim',
@@ -84,14 +84,14 @@ return {
         'nvim-tree/nvim-tree.lua',
         version = '*',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        config = function() require 'alex.ui.tree' end,
+        config = function() require 'alex.plugins.ui.tree' end,
         keys = { '<leader>f', 'gf' },
     },
 
     -- Language/Tools/LSP/Comp
     {
         'zbirenbaum/copilot.lua',
-        config = function() require 'alex.lang.tools.copilot' end,
+        config = function() require 'alex.plugins.lang.tools.copilot' end,
         cmd = 'Copilot',
         build = ':Copilot auth',
     },
@@ -102,29 +102,29 @@ return {
             'nvim-neotest/nvim-nio',
         },
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.debugger' end,
+        config = function() require 'alex.plugins.lang.debugger' end,
     },
     {
         'folke/trouble.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         keys = { '<leader>d', '<leader>D', '<leader>t' },
-        config = function() require 'alex.ui.trouble' end,
+        config = function() require 'alex.plugins.ui.trouble' end,
     },
     {
         'mfussenegger/nvim-lint',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.linter' end,
+        config = function() require 'alex.plugins.lang.linter' end,
     },
     {
         'nvim-treesitter/nvim-treesitter',
         dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects', 'nvim-treesitter/playground' },
         event = { 'User NvimStartupDone' },
         build = { ':TSUpdate' },
-        config = function() require 'alex.ui.treesitter' end,
+        config = function() require 'alex.plugins.ui.treesitter' end,
     },
     {
         'neovim/nvim-lspconfig',
-        config = function() require 'alex.lang.lsp' end,
+        config = function() require 'alex.plugins.lang.lsp' end,
         -- If this is lazy, it seems that the lsp misses the FileType event
         lazy = false,
     },
@@ -136,12 +136,12 @@ return {
     {
         'glepnir/lspsaga.nvim',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.lsp.lspsaga' end,
+        config = function() require 'alex.plugins.lang.lsp.lspsaga' end,
     },
     {
         'hrsh7th/nvim-cmp',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.completion' end,
+        config = function() require 'alex.plugins.lang.completion' end,
         dependencies = {
             'hrsh7th/cmp-omni',
             'hrsh7th/cmp-nvim-lsp',
@@ -159,7 +159,7 @@ return {
     {
         'ray-x/lsp_signature.nvim',
         event = { 'User NvimStartupDone' },
-        config = function() require 'alex.lang.lsp.signature' end,
+        config = function() require 'alex.plugins.lang.lsp.signature' end,
     },
 
     -- Compatibility/Support/Language tools
@@ -174,7 +174,7 @@ return {
         'ggandor/leap.nvim',
         dependencies = 'tpope/vim-repeat',
         keys = { 's', 'S' },
-        config = function() require 'alex.ui.leap' end,
+        config = function() require 'alex.plugins.ui.leap' end,
     },
 
     -- Themes
@@ -182,14 +182,14 @@ return {
         'AlexvZyl/nordic.nvim',
         branch = 'dev',
         priority = 1000,
-        config = function() require 'alex.themes.nordic' end,
+        config = function() require 'alex.plugins.themes.nordic' end,
         lazy = true,
     },
     {
         'folke/tokyonight.nvim',
         priority = 1000,
         lazy = false,
-        config = function() require 'alex.themes.tokyonight' end,
+        config = function() require 'alex.plugins.themes.tokyonight' end,
     },
 
     -- Nice themes

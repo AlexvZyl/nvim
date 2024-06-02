@@ -9,7 +9,7 @@ local function routes_config()
         'lines yanked',
         'more line',
         'change;',
-        'E486'
+        'E486',
     }
 
     local routes = {}

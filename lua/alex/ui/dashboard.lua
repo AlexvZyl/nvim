@@ -1,12 +1,12 @@
 local config = {}
 
 config.mru = {
-    label = " Recent Files",
+    label = ' Recent Files',
     limit = 10,
 }
 config.project = {
-    label = " Recent Projects",
-    limit = 10
+    label = ' Recent Projects',
+    limit = 10,
 }
 
 config.shortcut = {

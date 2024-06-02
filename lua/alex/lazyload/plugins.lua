@@ -129,9 +129,9 @@ return {
         lazy = false,
     },
     {
-        "folke/lazydev.nvim",
-        ft = "lua",
-        dependencies = { "Bilal2453/luvit-meta" },
+        'folke/lazydev.nvim',
+        ft = 'lua',
+        dependencies = { 'Bilal2453/luvit-meta' },
     },
     {
         'glepnir/lspsaga.nvim',

@@ -1,19 +1,19 @@
-local u = require('alex.utils')
+local u = require("alex.utils")
 
 local function routes_config()
     local msgs = {
-        'written',
-        'fewer lines',
-        'line less;',
-        'Already at',
-        'lines yanked',
-        'more line',
-        'change;',
-        'E486',
-        'No results',
-        'Nothing currently selected',
-        'changes;',
-        'No information available',
+        "written",
+        "fewer lines",
+        "line less;",
+        "Already at",
+        "lines yanked",
+        "more line",
+        "change;",
+        "E486",
+        "No results",
+        "Nothing currently selected",
+        "changes;",
+        "No information available",
     }
 
     local routes = {}
@@ -27,16 +27,16 @@ local function routes_config()
     return routes
 end
 
-require('noice').setup({
+require("noice").setup({
     cmdline = {
         format = {
-            cmdline = { title = '', icon = ' ' },
-            lua = { title = '', icon = '󰢱 ' },
-            help = { title = '', icon = '󰋖 ' },
-            input = { title = '', icon = ' ' },
-            filter = { title = '', icon = ' ' },
-            search_up = { icon = '    ' },
-            search_down = { icon = '    ' },
+            cmdline = { title = "", icon = " " },
+            lua = { title = "", icon = "󰢱 " },
+            help = { title = "", icon = "󰋖 " },
+            input = { title = "", icon = " " },
+            filter = { title = "", icon = " " },
+            search_up = { icon = "    " },
+            search_down = { icon = "    " },
         },
     },
     views = {
@@ -46,18 +46,18 @@ require('noice').setup({
                 padding = { 0, 2 },
             },
             position = {
-                row = '49%',
-                col = '50%',
+                row = "49%",
+                col = "50%",
             },
         },
     },
     lsp = {
         override = {
-            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
-            ['vim.lsp.util.stylize_markdown'] = true,
-            ['cmp.entry.get_documentation'] = true,
+            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+            ["vim.lsp.util.stylize_markdown"] = true,
+            ["cmp.entry.get_documentation"] = true,
         },
-        signature = { enabled = false, view = 'virtualtext' },
+        signature = { enabled = false, view = "virtualtext" },
     },
     presets = {
         bottom_search = true, -- use a classic bottom cmdline for search
@@ -69,7 +69,7 @@ require('noice').setup({
     notify = {
         fps = 60,
         max_width = 75,
-        level = 'ERROR',
+        level = "ERROR",
     },
     routes = routes_config(),
 })

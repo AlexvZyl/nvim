@@ -1,9 +1,9 @@
-require('nordic').load({
+require("nordic").load({
     cursorline = {
-        theme = 'dark',
+        theme = "dark",
     },
 })
 
-require('lualine').setup({
-    options = { theme = 'nordic' },
+require("lualine").setup({
+    options = { theme = "nordic" },
 })

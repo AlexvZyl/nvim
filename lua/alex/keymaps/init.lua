@@ -1,7 +1,7 @@
 -- I want to keep all of the key bindings in one file so that it is easy to see
 -- what is being used and ensure nothing being overwritten by accident.
 
-local n, i, v, t = 'n', 'i', 'v', 't'
+local n, i, v, t = "n", "i", "v", "t"
 local ex_t = { n, i, v }
 local n_v = { n, v }
 
@@ -13,66 +13,66 @@ local M = {}
 
 function M.init()
     -- Telescope commands have to be here since we rely on them to lazyload it.
-    keymap(n, 'fh', '<Cmd>Telescope help_tags<CR>', default_settings)
-    keymap(n, 'fo', '<Cmd>Telescope oldfiles<CR>', default_settings)
-    keymap(n, 'ff', '<Cmd>Telescope find_files<CR>', default_settings)
-    keymap(n, 'fF', '<Cmd>Telescope find_files cwd=~<CR>', default_settings)
-    keymap(n, 'fs', '<Cmd>Telescope live_grep<CR>', default_settings)
-    keymap(n, 'fS', '<Cmd>Telescope live_grep cwd=~<CR>', default_settings)
-    keymap(n, 'fb', '<Cmd>Telescope buffers<CR>', default_settings)
+    keymap(n, "fh", "<Cmd>Telescope help_tags<CR>", default_settings)
+    keymap(n, "fo", "<Cmd>Telescope oldfiles<CR>", default_settings)
+    keymap(n, "ff", "<Cmd>Telescope find_files<CR>", default_settings)
+    keymap(n, "fF", "<Cmd>Telescope find_files cwd=~<CR>", default_settings)
+    keymap(n, "fs", "<Cmd>Telescope live_grep<CR>", default_settings)
+    keymap(n, "fS", "<Cmd>Telescope live_grep cwd=~<CR>", default_settings)
+    keymap(n, "fb", "<Cmd>Telescope buffers<CR>", default_settings)
     keymap(
         n_v,
-        '<C-f>',
-        '<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>',
+        "<C-f>",
+        "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
         default_settings
     )
 
     -- Misc
-    keymap(ex_t, '<F12>', '<Cmd>Cheatsheet<CR>', default_settings)
+    keymap(ex_t, "<F12>", "<Cmd>Cheatsheet<CR>", default_settings)
     --keymap(n, 'gl', '<Cmd>VimtexView<CR>', default_settings)
-    keymap(n, '<Esc>', '<Cmd>noh<CR>', allow_remap)
-    keymap(n_v, '<C-e>', 'j<C-e>', default_settings)
-    keymap(n_v, '<C-y>', 'k<C-y>', default_settings)
-    keymap(n, 'K', '<nop>', default_settings)
-    keymap(n, '<leader>e', '<Cmd>Explore<CR>', default_settings)
+    keymap(n, "<Esc>", "<Cmd>noh<CR>", allow_remap)
+    keymap(n_v, "<C-e>", "j<C-e>", default_settings)
+    keymap(n_v, "<C-y>", "k<C-y>", default_settings)
+    keymap(n, "K", "<nop>", default_settings)
+    keymap(n, "<leader>e", "<Cmd>Explore<CR>", default_settings)
 
     -- Windows
-    keymap(n, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
-    keymap(n, '<C-h>', '<Cmd>wincmd h<CR>', default_settings)
-    keymap(n, '<C-j>', '<Cmd>wincmd j<CR>', default_settings)
-    keymap(n, '<C-k>', '<Cmd>wincmd k<CR>', default_settings)
-    keymap(n, '<C-l>', '<Cmd>wincmd l<CR>', default_settings)
-    keymap(t, '<C-w><C-c>', '<Cmd>wincmd c<CR>', default_settings)
-    keymap(t, '<C-h>', '<C-\\><C-n><C-w>h', default_settings)
-    keymap(t, '<C-j>', '<C-\\><C-n><C-w>j', default_settings)
-    keymap(t, '<C-k>', '<C-\\><C-n><C-w>k', default_settings)
-    keymap(t, '<C-l>', '<C-\\><C-n><C-w>l', default_settings)
+    keymap(n, "<C-w><C-c>", "<Cmd>wincmd c<CR>", default_settings)
+    keymap(n, "<C-h>", "<Cmd>wincmd h<CR>", default_settings)
+    keymap(n, "<C-j>", "<Cmd>wincmd j<CR>", default_settings)
+    keymap(n, "<C-k>", "<Cmd>wincmd k<CR>", default_settings)
+    keymap(n, "<C-l>", "<Cmd>wincmd l<CR>", default_settings)
+    keymap(t, "<C-w><C-c>", "<Cmd>wincmd c<CR>", default_settings)
+    keymap(t, "<C-h>", "<C-\\><C-n><C-w>h", default_settings)
+    keymap(t, "<C-j>", "<C-\\><C-n><C-w>j", default_settings)
+    keymap(t, "<C-k>", "<C-\\><C-n><C-w>k", default_settings)
+    keymap(t, "<C-l>", "<C-\\><C-n><C-w>l", default_settings)
 
     -- Buffers.
     keymap(
         n,
-        'Q',
-        function() require('alex.keymaps.utils').delete_buffer() end,
+        "Q",
+        function() require("alex.keymaps.utils").delete_buffer() end,
         default_settings
     )
 
     -- Editing
-    keymap(i, '<Esc>', '<Esc>`^', default_settings)
+    keymap(i, "<Esc>", "<Esc>`^", default_settings)
     keymap(
         ex_t,
-        '<C-s>',
-        function() require('alex.keymaps.utils').save_file() end,
+        "<C-s>",
+        function() require("alex.keymaps.utils").save_file() end,
         default_settings
     )
-    keymap(v, '<Esc>', 'v', default_settings)
-    keymap(v, 'i', 'I', default_settings)
-    keymap(n_v, '<C-c>', '<plug>NERDCommenterToggle', default_settings)
-    keymap(n, 's', function() require('leap').leap({}) end)
-    keymap(n, 'S', function() require('leap').leap({ backward = true }) end)
+    keymap(v, "<Esc>", "v", default_settings)
+    keymap(v, "i", "I", default_settings)
+    keymap(n_v, "<C-c>", "<plug>NERDCommenterToggle", default_settings)
+    keymap(n, "s", function() require("leap").leap({}) end)
+    keymap(n, "S", function() require("leap").leap({ backward = true }) end)
     keymap(
         n,
-        '<leader>v',
-        function() require('alex.keymaps.utils').toggle_diffview() end
+        "<leader>v",
+        function() require("alex.keymaps.utils").toggle_diffview() end
     )
     --keymap(n, '<C-a>', 'gg0vG$', default_settings)
 end
@@ -80,111 +80,111 @@ end
 function M.trouble()
     keymap(
         n,
-        '<leader>d',
-        '<Cmd>Trouble diagnostics toggle filter={buf=0}<CR>',
+        "<leader>d",
+        "<Cmd>Trouble diagnostics toggle filter={buf=0}<CR>",
         default_settings
     )
     keymap(
         n,
-        '<leader>D',
-        '<Cmd>Trouble diagnostics toggle<CR>',
+        "<leader>D",
+        "<Cmd>Trouble diagnostics toggle<CR>",
         default_settings
     )
 end
 
 function M.copilot()
-    keymap(n, '<leader>c', '<Cmd>Copilot panel<CR>', default_settings)
+    keymap(n, "<leader>c", "<Cmd>Copilot panel<CR>", default_settings)
 end
 
 function M.tree()
     keymap(
         n_v,
-        'gf',
-        function() require('alex.keymaps.utils').cwd_current_buffer() end,
+        "gf",
+        function() require("alex.keymaps.utils").cwd_current_buffer() end,
         default_settings
     )
     keymap(
         n_v,
-        '<Leader>f',
-        function() require('alex.keymaps.utils').toggle_tree() end,
+        "<Leader>f",
+        function() require("alex.keymaps.utils").toggle_tree() end,
         default_settings
     )
 end
 
 function M.lspsaga()
-    keymap(n_v, 'ca', '<Cmd>Lspsaga code_action<CR>', default_settings)
-    keymap(n_v, 'RR', '<Cmd>Lspsaga rename<CR>', default_settings)
-    keymap(n, 'gD', '<Cmd>Lspsaga peek_definition<CR>zz', default_settings)
-    keymap(n, 'gd', '<Cmd>Lspsaga goto_definition<CR>', default_settings)
-    keymap(n, 'gh', '<Cmd>Lspsaga hover_doc<CR>', default_settings)
+    keymap(n_v, "ca", "<Cmd>Lspsaga code_action<CR>", default_settings)
+    keymap(n_v, "RR", "<Cmd>Lspsaga rename<CR>", default_settings)
+    keymap(n, "gD", "<Cmd>Lspsaga peek_definition<CR>zz", default_settings)
+    keymap(n, "gd", "<Cmd>Lspsaga goto_definition<CR>", default_settings)
+    keymap(n, "gh", "<Cmd>Lspsaga hover_doc<CR>", default_settings)
     --keymap(n, 'gf', '<Cmd>Lspsaga goto_definition<CR>zz', default_settings)
     keymap(
         n,
-        'ge',
-        '<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>',
+        "ge",
+        "<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>",
         default_settings
     )
-    keymap(n, '<leader>o', '<Cmd>Lspsaga outline<CR>', default_settings)
+    keymap(n, "<leader>o", "<Cmd>Lspsaga outline<CR>", default_settings)
     keymap(
         n,
-        '[e',
-        function() require('alex.keymaps.utils').prev_diag() end,
-        default_settings
-    )
-    keymap(
-        n,
-        ']e',
-        function() require('alex.keymaps.utils').next_diag() end,
+        "[e",
+        function() require("alex.keymaps.utils").prev_diag() end,
         default_settings
     )
     keymap(
         n,
-        '[E',
-        function() require('alex.keymaps.utils').prev_error() end,
+        "]e",
+        function() require("alex.keymaps.utils").next_diag() end,
         default_settings
     )
     keymap(
         n,
-        ']E',
-        function() require('alex.keymaps.utils').next_error() end,
+        "[E",
+        function() require("alex.keymaps.utils").prev_error() end,
         default_settings
     )
-    keymap(n, 'gr', '<Cmd>Telescope lsp_references<CR>', default_settings)
-    keymap(n, 'gR', '<Cmd>Lspsaga finder<CR>', default_settings)
+    keymap(
+        n,
+        "]E",
+        function() require("alex.keymaps.utils").next_error() end,
+        default_settings
+    )
+    keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
+    keymap(n, "gR", "<Cmd>Lspsaga finder<CR>", default_settings)
 end
 
 function M.debugger()
-    keymap(n, '<C-b>', '<Cmd>DapToggleBreakpoint<CR>', default_settings)
+    keymap(n, "<C-b>", "<Cmd>DapToggleBreakpoint<CR>", default_settings)
     keymap(
         n,
-        '<leader>s',
-        function() require('alex.keymaps.utils').dap_float_scope() end,
+        "<leader>s",
+        function() require("alex.keymaps.utils").dap_float_scope() end,
         default_settings
     )
     keymap(
         n,
-        '<F1>',
-        function() require('alex.keymaps.utils').dap_toggle_ui() end,
+        "<F1>",
+        function() require("alex.keymaps.utils").dap_toggle_ui() end,
         default_settings
     )
-    keymap(n, '<F2>', '<Cmd>DapContinue<CR>', default_settings)
-    keymap(n, '<Right>', '<Cmd>DapStepInto<CR>', default_settings)
-    keymap(n, '<Down>', '<Cmd>DapStepOver<CR>', default_settings)
-    keymap(n, '<Left>', '<Cmd>DapStepOut<CR>', default_settings)
-    keymap(n, '<Up>', '<Cmd>DapRestartFrame<CR>', default_settings)
+    keymap(n, "<F2>", "<Cmd>DapContinue<CR>", default_settings)
+    keymap(n, "<Right>", "<Cmd>DapStepInto<CR>", default_settings)
+    keymap(n, "<Down>", "<Cmd>DapStepOver<CR>", default_settings)
+    keymap(n, "<Left>", "<Cmd>DapStepOut<CR>", default_settings)
+    keymap(n, "<Up>", "<Cmd>DapRestartFrame<CR>", default_settings)
 end
 
 function M.completion()
-    local cmp = require('cmp')
-    local luasnip = require('luasnip')
+    local cmp = require("cmp")
+    local luasnip = require("luasnip")
     cmp.setup({
         mapping = cmp.mapping.preset.insert({
-            ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-            ['<C-d>'] = cmp.mapping.scroll_docs(4),
-            ['<C-Space>'] = cmp.mapping.complete(),
-            ['<C-e>'] = cmp.mapping.abort(),
-            ['<CR>'] = cmp.mapping.confirm({ select = false }),
-            ['<Tab>'] = cmp.mapping(function(fallback)
+            ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+            ["<C-d>"] = cmp.mapping.scroll_docs(4),
+            ["<C-Space>"] = cmp.mapping.complete(),
+            ["<C-e>"] = cmp.mapping.abort(),
+            ["<CR>"] = cmp.mapping.confirm({ select = false }),
+            ["<Tab>"] = cmp.mapping(function(fallback)
                 if cmp.visible() then
                     cmp.select_next_item()
                 elseif luasnip.expand_or_locally_jumpable() then
@@ -192,8 +192,8 @@ function M.completion()
                 else
                     fallback()
                 end
-            end, { 'i', 's' }),
-            ['<S-Tab>'] = cmp.mapping(function(fallback)
+            end, { "i", "s" }),
+            ["<S-Tab>"] = cmp.mapping(function(fallback)
                 if cmp.visible() then
                     cmp.select_prev_item()
                 elseif luasnip.jumpable(-1) then
@@ -201,14 +201,14 @@ function M.completion()
                 else
                     fallback()
                 end
-            end, { 'i', 's' }),
+            end, { "i", "s" }),
         }),
     })
 end
 
 function M.todo()
-    keymap(n, 'ft', '<Cmd>TodoTelescope<CR>', default_settings)
-    keymap(n, '<leader>t', '<Cmd>TodoTrouble<CR>', default_settings)
+    keymap(n, "ft", "<Cmd>TodoTelescope<CR>", default_settings)
+    keymap(n, "<leader>t", "<Cmd>TodoTrouble<CR>", default_settings)
 end
 
 return M

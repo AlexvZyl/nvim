@@ -1,20 +1,20 @@
-require('todo-comments').setup({
+require("todo-comments").setup({
     signs = false,
     keywords = {
-        FIX = { icon = '' },
-        HACK = { icon = '󱠇' },
-        TODO = { icon = '' },
-        WARN = { icon = '' },
-        PERF = { icon = '󱑂' },
-        NOTE = { icon = '' },
-        TEST = { icon = '󰙨' },
+        FIX = { icon = "" },
+        HACK = { icon = "󱠇" },
+        TODO = { icon = "" },
+        WARN = { icon = "" },
+        PERF = { icon = "󱑂" },
+        NOTE = { icon = "" },
+        TEST = { icon = "󰙨" },
     },
     gui_style = {
-        fg = 'BOLD',
+        fg = "BOLD",
     },
     highlight = {
-        keyword = 'fg',
-        after = '',
+        keyword = "fg",
+        after = "",
         pattern = {
             [[.*<(KEYWORDS)\s*:]], -- default
             [[.*<(KEYWORDS)(\(\S+\))?:]],
@@ -25,4 +25,4 @@ require('todo-comments').setup({
     },
 })
 
-require('alex.keymaps').todo()
+require("alex.keymaps").todo()

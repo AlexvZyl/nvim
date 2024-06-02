@@ -1,5 +1,5 @@
-local TC = require('tokyonight.colors')
-local blend = require('tokyonight.util').blend
+local TC = require("tokyonight.colors")
+local blend = require("tokyonight.util").blend
 
 local transparent = true
 
@@ -57,9 +57,9 @@ local function on_highlights(H, C)
     H.CustomWinBarNC = { fg = C.dark3 }
 
     if transparent then
-        H.LspSagaRenameBorder = { fg = C.cyan, bg = 'NONE' }
-        H.Pmenu.bg = 'NONE'
-        H.SpecialCmpBorder.bg = 'NONE'
+        H.LspSagaRenameBorder = { fg = C.cyan, bg = "NONE" }
+        H.Pmenu.bg = "NONE"
+        H.SpecialCmpBorder.bg = "NONE"
         H.TroubleNormal = { bg = C.bg }
         H.WhichKeyFloat = { bg = C.bg }
         H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }
@@ -69,13 +69,13 @@ local function on_highlights(H, C)
     H.TroubleWinBar = { bg = C.bg_dark, fg = C.yellow }
 end
 
-require('tokyonight').load({
-    style = 'night',
+require("tokyonight").load({
+    style = "night",
     on_highlights = on_highlights,
     on_colors = function(_) end,
     transparent = transparent,
 })
 
-require('lualine').setup({
-    options = { theme = 'tokyonight' },
+require("lualine").setup({
+    options = { theme = "tokyonight" },
 })

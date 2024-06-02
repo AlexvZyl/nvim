@@ -1,12 +1,12 @@
-local U = require('alex.utils.neovim')
+local U = require("alex.utils.neovim")
 
 vim.opt.winbar = nil
 
 local winbar_filetype_exclude = {
-    'dashboard',
-    'Trouble',
-    'Outline',
-    'NvimTree',
+    "dashboard",
+    "Trouble",
+    "Outline",
+    "NvimTree",
 }
 
 local excludes = function()
@@ -22,30 +22,30 @@ function M.get_winbar()
     if excludes() then return end
     if U.current_window_floating() then return end
 
-    U.current_window_hl('WinBar:CustomWinBar,WinBarNC:CustomWinBarNC')
+    U.current_window_hl("WinBar:CustomWinBar,WinBarNC:CustomWinBarNC")
 
     local icon = U.current_buffer_icon()
-    if icon == nil then icon = '' end
+    if icon == nil then icon = "" end
 
-    local mod_icon = ''
+    local mod_icon = ""
     if U.current_buffer_modified() then
-        mod_icon = ' ●'
+        mod_icon = " ●"
     elseif not U.current_buffer_modifiable() then
-        mod_icon = ' '
+        mod_icon = " "
     end
 
-    vim.opt_local.winbar = '  '
+    vim.opt_local.winbar = "  "
         .. icon
-        .. ' '
+        .. " "
         .. U.current_buffer_parent()
         .. U.current_buffer_filename()
         .. mod_icon
 end
 
 vim.api.nvim_create_autocmd(
-    { 'BufModifiedSet', 'BufWinEnter', 'BufFilePost', 'BufWritePost' },
+    { "BufModifiedSet", "BufWinEnter", "BufFilePost", "BufWritePost" },
     {
-        callback = function() require('alex.native.winbar').get_winbar() end,
+        callback = function() require("alex.native.winbar").get_winbar() end,
     }
 )
 

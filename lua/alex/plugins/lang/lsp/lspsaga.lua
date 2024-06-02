@@ -1,12 +1,12 @@
-local U = require('alex.utils')
+local U = require("alex.utils")
 
 local ui = {
-    border = U.get_border_chars('lsp'),
+    border = U.get_border_chars("lsp"),
     winblend = 0,
     title = false,
-    diagnostic = '  ',
+    diagnostic = "  ",
     kind = {
-        Folder = { '  ', 'SagaWinbarFolder' },
+        Folder = { "  ", "SagaWinbarFolder" },
     },
 }
 
@@ -15,17 +15,17 @@ local lightbulb = {
 }
 
 local definition = {
-    edit = '<C-e>',
-    vsplit = '<C-v>',
-    split = '<C-h>',
-    quit = '<C-q>',
+    edit = "<C-e>",
+    vsplit = "<C-v>",
+    split = "<C-h>",
+    quit = "<C-q>",
 }
 
 local winbar = {
     enable = false,
     folder_level = 1,
     show_file = true,
-    separator = '  ',
+    separator = "  ",
     color_mode = true,
     hide_keyword = true,
 }
@@ -44,7 +44,7 @@ local hover = {
     max_width = 0.5,
 }
 
-require('lspsaga').setup({
+require("lspsaga").setup({
     lightbulb = lightbulb,
     ui = ui,
     definition = definition,
@@ -53,4 +53,4 @@ require('lspsaga').setup({
     hover = hover,
 })
 
-require('alex.keymaps').lspsaga()
+require("alex.keymaps").lspsaga()

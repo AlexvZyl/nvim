@@ -1,12 +1,12 @@
-local cmp = require('cmp')
-local u = require('alex.utils')
+local cmp = require("cmp")
+local u = require("alex.utils")
 
 -- UI
 local cmdline_window = {
     completion = cmp.config.window.bordered({
-        winhighlight = 'Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None',
+        winhighlight = "Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None",
         scrollbar = true,
-        border = u.get_border_chars('search'),
+        border = u.get_border_chars("search"),
         col_offset = -1,
         side_padding = 0,
     }),
@@ -17,8 +17,8 @@ local search = {
     window = cmdline_window,
     mapping = cmp.mapping.preset.cmdline(),
     sources = cmp.config.sources({
-        { name = 'buffer' },
+        { name = "buffer" },
     }),
 }
 
-cmp.setup.cmdline({ '/', '?' }, search)
+cmp.setup.cmdline({ "/", "?" }, search)

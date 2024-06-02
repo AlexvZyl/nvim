@@ -1,12 +1,12 @@
-local U = require('alex.utils')
+local U = require("alex.utils")
 
 -- Custom mode names.
 local mode_map = {
-    ['COMMAND'] = 'COMMND',
-    ['V-BLOCK'] = 'VBLOCK',
-    ['TERMINAL'] = 'TERMNL',
-    ['V-REPLACE'] = 'VREPLC',
-    ['O-PENDING'] = '0PNDNG',
+    ["COMMAND"] = "COMMND",
+    ["V-BLOCK"] = "VBLOCK",
+    ["TERMINAL"] = "TERMNL",
+    ["V-REPLACE"] = "VREPLC",
+    ["O-PENDING"] = "0PNDNG",
 }
 local function fmt_mode(s) return mode_map[s] or s end
 
@@ -16,15 +16,15 @@ local green
 local yellow
 local red
 
-if vim.g.colors_name == 'nordic' then
-    local C = require('nordic.colors')
+if vim.g.colors_name == "nordic" then
+    local C = require("nordic.colors")
     text_hl = { fg = C.gray3 }
     icon_hl = { fg = C.gray4 }
     green = C.green.base
     yellow = C.yellow.base
     red = C.red.base
-elseif vim.g.colors_name == 'tokyonight' then
-    local C = require('tokyonight.colors')
+elseif vim.g.colors_name == "tokyonight" then
+    local C = require("tokyonight.colors")
     text_hl = { fg = C.default.fg_gutter }
     icon_hl = { fg = C.default.dark3 }
     green = C.default.green1
@@ -51,15 +51,15 @@ local function diff_source()
     end
 end
 
-local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ':~') end
+local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ":~") end
 local tree = {
     sections = {
         lualine_a = {
             {
-                'mode',
+                "mode",
                 fmt = fmt_mode,
-                icon = { '' },
-                separator = { right = ' ', left = '' },
+                icon = { "" },
+                separator = { right = " ", left = "" },
             },
         },
         lualine_b = {},
@@ -67,7 +67,7 @@ local tree = {
             {
                 get_short_cwd,
                 padding = 0,
-                icon = { '   ', color = icon_hl },
+                icon = { "   ", color = icon_hl },
                 color = text_hl,
             },
         },
@@ -75,29 +75,29 @@ local tree = {
         lualine_y = {},
         lualine_z = {
             {
-                'location',
-                icon = { '', align = 'left' },
+                "location",
+                icon = { "", align = "left" },
             },
             {
-                'progress',
-                icon = { '', align = 'left' },
-                separator = { right = '', left = '' },
+                "progress",
+                icon = { "", align = "left" },
+                separator = { right = "", left = "" },
             },
         },
     },
-    filetypes = { 'NvimTree' },
+    filetypes = { "NvimTree" },
 }
 
-local function telescope_text() return 'Telescope' end
+local function telescope_text() return "Telescope" end
 
 local telescope = {
     sections = {
         lualine_a = {
             {
-                'mode',
+                "mode",
                 fmt = fmt_mode,
-                icon = { '' },
-                separator = { right = ' ', left = '' },
+                icon = { "" },
+                separator = { right = " ", left = "" },
             },
         },
         lualine_b = {},
@@ -105,68 +105,68 @@ local telescope = {
             {
                 telescope_text,
                 color = text_hl,
-                icon = { '  ', color = icon_hl },
+                icon = { "  ", color = icon_hl },
             },
         },
         lualine_x = {},
         lualine_y = {},
         lualine_z = {
             {
-                'location',
-                icon = { '', align = 'left', color = icon_hl },
+                "location",
+                icon = { "", align = "left", color = icon_hl },
             },
             {
-                'progress',
-                icon = { '', align = 'left', color = icon_hl },
-                separator = { right = '', left = '' },
+                "progress",
+                icon = { "", align = "left", color = icon_hl },
+                separator = { right = "", left = "" },
             },
         },
     },
-    filetypes = { 'TelescopePrompt' },
+    filetypes = { "TelescopePrompt" },
 }
 
-require('lualine').setup({
+require("lualine").setup({
     sections = {
         lualine_a = {
             {
-                'mode',
+                "mode",
                 fmt = fmt_mode,
-                icon = { '' },
-                separator = { right = ' ', left = '' },
+                icon = { "" },
+                separator = { right = " ", left = "" },
             },
         },
         lualine_b = {},
         lualine_c = {
             {
-                'branch',
+                "branch",
                 color = text_hl,
-                icon = { '   ', color = icon_hl },
-                separator = '',
+                icon = { "   ", color = icon_hl },
+                separator = "",
                 padding = 0,
             },
             {
                 U.get_git_compare,
-                separator = ' ',
+                separator = " ",
                 padding = 0,
                 color = text_hl,
             },
             {
-                'diff',
+                "diff",
                 padding = 0,
                 color = text_hl,
-                icon = { '  ', color = text_hl },
+                icon = { "  ", color = text_hl },
                 source = diff_source,
                 symbols = {
-                    added = ' ',
-                    modified = ' ',
-                    removed = ' ',
+                    added = " ",
+                    modified = " ",
+                    removed = " ",
                 },
                 diff_color = {
                     added = icon_hl,
                     modified = icon_hl,
                     removed = icon_hl,
                 },
-                separator = ' ',
+                separator = " ",
             },
             {
                 U.get_recording_icon,
@@ -175,14 +175,14 @@ require('lualine').setup({
         },
         lualine_x = {
             {
-                'diagnostics',
-                sources = { 'nvim_diagnostic' },
+                "diagnostics",
+                sources = { "nvim_diagnostic" },
                 symbols = {
-                    error = ' ',
-                    warn = ' ',
-                    info = ' ',
-                    hint = '󱤅 ',
-                    other = '󰠠 ',
+                    error = " ",
+                    warn = " ",
+                    info = " ",
+                    hint = "󱤅 ",
+                    other = "󰠠 ",
                 },
                 colored = true,
                 padding = 2,
@@ -191,20 +191,20 @@ require('lualine').setup({
                 U.current_buffer_lsp,
                 padding = 1,
                 color = text_hl,
-                icon = { ' ', color = icon_hl },
+                icon = { " ", color = icon_hl },
             },
             {
-                'copilot',
+                "copilot",
                 padding = 1,
                 color = icon_hl,
                 show_colors = true,
                 symbols = {
                     status = {
                         icons = {
-                            enabled = ' ',
-                            disabled = ' ',
-                            warning = ' ',
-                            unknown = ' ',
+                            enabled = " ",
+                            disabled = " ",
+                            warning = " ",
+                            unknown = " ",
                         },
                         hl = {
                             enabled = green,
@@ -213,7 +213,7 @@ require('lualine').setup({
                             unknown = icon_hl.fg,
                         },
                     },
-                    spinners = { ' ' },
+                    spinners = { " " },
                     spinner_color = green,
                 },
             },
@@ -221,31 +221,31 @@ require('lualine').setup({
         lualine_y = {},
         lualine_z = {
             {
-                'location',
-                icon = { '', align = 'left' },
+                "location",
+                icon = { "", align = "left" },
             },
             {
-                'progress',
-                icon = { '', align = 'left' },
-                separator = { right = '', left = '' },
+                "progress",
+                icon = { "", align = "left" },
+                separator = { right = "", left = "" },
             },
         },
     },
     options = {
-        disabled_filetypes = { 'dashboard' },
+        disabled_filetypes = { "dashboard" },
         globalstatus = true,
-        section_separators = { left = ' ', right = ' ' },
-        component_separators = { left = '', right = '' },
+        section_separators = { left = " ", right = " " },
+        component_separators = { left = "", right = "" },
     },
     extensions = {
         telescope,
-        ['nvim-tree'] = tree,
+        ["nvim-tree"] = tree,
     },
 })
 
 -- Ensure correct backgrond for lualine.
-vim.api.nvim_create_autocmd({ 'BufWinEnter', 'WinEnter' }, {
-    callback = function(_) require('lualine').setup({}) end,
-    pattern = { '*.*' },
+vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
+    callback = function(_) require("lualine").setup({}) end,
+    pattern = { "*.*" },
     once = true,
 })

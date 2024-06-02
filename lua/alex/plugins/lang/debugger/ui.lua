@@ -1,21 +1,21 @@
 vim.schedule(function()
-    require('dapui').setup({
+    require("dapui").setup({
         force_buffers = true,
         icons = {
-            expanded = '',
-            collapsed = '',
-            current_frame = '',
+            expanded = "",
+            collapsed = "",
+            current_frame = "",
         },
         mappings = {
             expand = {
-                '<Tab>',
-                '<2-LeftMouse>',
+                "<Tab>",
+                "<2-LeftMouse>",
             },
-            open = 'o',
-            remove = 'd',
-            edit = 'e',
-            repl = 'r',
-            toggle = 't',
+            open = "o",
+            remove = "d",
+            edit = "e",
+            repl = "r",
+            toggle = "t",
         },
         -- Use this to override mappings for specific elements
         element_mappings = {
@@ -27,7 +27,7 @@ vim.schedule(function()
         },
         -- Expand lines larger than the window
         -- Requires >= 0.7
-        expand_lines = vim.fn.has('nvim-0.7') == 1,
+        expand_lines = vim.fn.has("nvim-0.7") == 1,
         -- Layouts define sections of the screen to place windows.
         -- The position can be "left", "right", "top" or "bottom".
         -- The size specifies the height/width depending on position. It can be an Int
@@ -40,50 +40,50 @@ vim.schedule(function()
             {
                 elements = {
                     {
-                        id = 'stacks',
+                        id = "stacks",
                         size = 0.40,
                     },
                     {
-                        id = 'watches',
+                        id = "watches",
                         size = 0.5,
                     },
                     {
-                        id = 'console',
+                        id = "console",
                         size = 0.10,
                     },
                 },
                 size = 0.3,
-                position = 'right',
+                position = "right",
             },
             -- Horizontal bar.
             {
                 elements = {
-                    'repl',
+                    "repl",
                 },
                 size = 0.2,
-                position = 'bottom',
+                position = "bottom",
             },
         },
         controls = {
             enabled = true,
-            element = 'console',
+            element = "console",
             icons = {
-                pause = '',
-                play = '',
-                step_into = '',
-                step_over = '',
-                step_out = '',
-                step_back = '',
-                run_last = '',
-                terminate = '',
+                pause = "",
+                play = "",
+                step_into = "",
+                step_over = "",
+                step_out = "",
+                step_back = "",
+                run_last = "",
+                terminate = "",
             },
         },
         floating = {
             max_height = nil, -- These can be integers or a float between 0 and 1.
             max_width = nil, -- Floats will be treated as percentage of your screen.
-            border = 'rounded',
+            border = "rounded",
             mappings = {
-                close = { 'q', '<Esc>' },
+                close = { "q", "<Esc>" },
             },
         },
         windows = {
@@ -96,4 +96,4 @@ vim.schedule(function()
     })
 end)
 
-require('alex.keymaps').debugger()
+require("alex.keymaps").debugger()

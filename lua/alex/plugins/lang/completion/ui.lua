@@ -1,23 +1,23 @@
-local cmp = require('cmp')
-local u = require('alex.utils')
+local cmp = require("cmp")
+local u = require("alex.utils")
 
 -- Format the completion menu. Yes, I am that pedantic.
 local function format(_, item)
     local MAX_LABEL_WIDTH = 55
-    local function whitespace(max, len) return (' '):rep(max - len) end
+    local function whitespace(max, len) return (" "):rep(max - len) end
 
     -- Limit content width.
     local content = item.abbr
     if #content > MAX_LABEL_WIDTH then
-        item.abbr = vim.fn.strcharpart(content, 0, MAX_LABEL_WIDTH) .. '…'
+        item.abbr = vim.fn.strcharpart(content, 0, MAX_LABEL_WIDTH) .. "…"
     else
         item.abbr = content .. whitespace(MAX_LABEL_WIDTH, #content)
     end
 
     -- Replace kind with icons.
-    item.kind = ' '
+    item.kind = " "
         .. (u.kind_icons[item.kind] or u.kind_icons.Unknown)
-        .. '│'
+        .. "│"
 
     -- Remove gibberish.
     item.menu = nil
@@ -25,22 +25,22 @@ local function format(_, item)
 end
 
 local formatting = {
-    fields = { 'kind', 'abbr' },
+    fields = { "kind", "abbr" },
     format = format,
 }
 
 local window = {
     completion = cmp.config.window.bordered({
-        winhighlight = 'Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None',
+        winhighlight = "Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None",
         scrollbar = true,
-        border = 'rounded',
+        border = "rounded",
         col_offset = -1,
         side_padding = 0,
     }),
     documentation = cmp.config.window.bordered({
-        winhighlight = 'Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None',
+        winhighlight = "Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None",
         scrollbar = true,
-        border = 'rounded',
+        border = "rounded",
     }),
 }
 

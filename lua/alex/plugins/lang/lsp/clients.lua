@@ -1,6 +1,6 @@
-local U = require('lspconfig.util')
-local LC = require('lspconfig')
-local DC = require('cmp_nvim_lsp').default_capabilities()
+local U = require("lspconfig.util")
+local LC = require("lspconfig")
+local DC = require("cmp_nvim_lsp").default_capabilities()
 
 local lsp_flags = {
     -- Prevent the LSP client from making too many calls.
@@ -29,33 +29,33 @@ LC.gopls.setup({ default })
 --LC.hls.setup { default }
 LC.terraformls.setup({ default })
 LC.powershell_es.setup({
-    bundle_path = '~/.local/share/nvim/mason/packages/powershell-editor-services',
+    bundle_path = "~/.local/share/nvim/mason/packages/powershell-editor-services",
 })
 
 LC.eslint.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern({ '*.js', '*.ts' }),
+    root_dir = U.root_pattern({ "*.js", "*.ts" }),
 })
 
 LC.tsserver.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern({ '*.js', '*.ts' }),
+    root_dir = U.root_pattern({ "*.js", "*.ts" }),
 })
 
 LC.cmake.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern('CMakeLists.txt'),
+    root_dir = U.root_pattern("CMakeLists.txt"),
 })
 
 LC.dockerls.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
     root_dir = U.root_pattern({
-        '*Dockerfile*',
-        '*dockerfile*',
+        "*Dockerfile*",
+        "*dockerfile*",
     }),
 })
 
@@ -63,15 +63,15 @@ LC.docker_compose_language_service.setup({
     default.lsp_flags,
     default.capabilities,
     root_dir = U.root_pattern({
-        'docker-compose.yml',
-        'docker-compose.yaml',
-        'compose.yaml',
-        'compose.yml',
+        "docker-compose.yml",
+        "docker-compose.yaml",
+        "compose.yaml",
+        "compose.yml",
     }),
 })
 
 LC.html.setup({
     capabilities = DC,
     lsp_flags = lsp_flags,
-    cmd = { 'html-languageserver' },
+    cmd = { "html-languageserver" },
 })

@@ -1,10 +1,10 @@
-require('lint').linters_by_ft = {
+require("lint").linters_by_ft = {
     --lua = { 'luacheck' },
-    python = { 'flake8' },
+    python = { "flake8" },
     --cpp = { 'cpplint' },
-    go = { 'golangcilint' },
+    go = { "golangcilint" },
 }
 
-vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
-    callback = function() require('lint').try_lint() end,
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+    callback = function() require("lint").try_lint() end,
 })

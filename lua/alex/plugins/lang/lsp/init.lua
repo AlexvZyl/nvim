@@ -1,4 +1,4 @@
-local U = require('alex.utils')
+local U = require("alex.utils")
 
 vim.cmd([[
     sign define DiagnosticSignError text= texthl= linehl= numhl=DiagnosticSignError
@@ -15,7 +15,7 @@ local config = {
 
 vim.diagnostic.config(config)
 
-require('lspconfig.ui.windows').default_options.border =
-    U.get_border_chars('float')
+require("lspconfig.ui.windows").default_options.border =
+    U.get_border_chars("float")
 
-require('alex.plugins.lang.lsp.clients')
+require("alex.plugins.lang.lsp.clients")

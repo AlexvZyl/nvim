@@ -7,7 +7,7 @@ function M.merge(table1, table2)
     elseif table2 == nil then
         return table1
     end
-    return vim.tbl_deep_extend('force', table1, table2)
+    return vim.tbl_deep_extend("force", table1, table2)
 end
 
 function M.length(table)

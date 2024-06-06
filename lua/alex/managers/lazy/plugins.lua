@@ -11,10 +11,10 @@ return {
         "folke/todo-comments.nvim",
         dependencies = {
             "nvim-lua/plenary.nvim",
-            "folke/trouble.nvim",
+            "nvim-telescope/telescope.nvim",
         },
         config = function() require("alex.plugins.ui.todo") end,
-        cmd = "TodoTrouble",
+        cmd = { "TodoTelescope" },
     },
     {
         -- Required by other packages
@@ -107,7 +107,7 @@ return {
     {
         "folke/trouble.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        keys = { "<leader>d", "<leader>D", "<leader>t" },
+        keys = { "<leader>d", "<leader>D" },
         config = function() require("alex.plugins.ui.trouble") end,
     },
     {

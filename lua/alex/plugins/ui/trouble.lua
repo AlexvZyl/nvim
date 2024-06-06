@@ -8,6 +8,7 @@ require("trouble").setup({
     use_diagnostic_signs = true,
     signs = U.diagnostic_signs,
     auto_preview = false,
+    focus = false,
 })
 
 require("alex.keymaps").trouble()

@@ -27,6 +27,9 @@ function M.init()
         default_settings
     )
 
+    -- Needed for lazyloading.
+    keymap(n, "ft", "<Cmd>TodoTelescope<CR>", default_settings)
+
     -- Misc
     keymap(ex_t, "<F12>", "<Cmd>Cheatsheet<CR>", default_settings)
     --keymap(n, 'gl', '<Cmd>VimtexView<CR>', default_settings)
@@ -35,6 +38,7 @@ function M.init()
     keymap(n_v, "<C-y>", "k<C-y>", default_settings)
     keymap(n, "K", "<nop>", default_settings)
     keymap(n, "<leader>e", "<Cmd>Explore<CR>", default_settings)
+    keymap(n, "\\", function() require 'alex.keymaps.utils'.format_bufer() end, default_settings)
 
     -- Windows
     keymap(n, "<C-w><C-c>", "<Cmd>wincmd c<CR>", default_settings)
@@ -204,11 +208,6 @@ function M.completion()
             end, { "i", "s" }),
         }),
     })
-end
-
-function M.todo()
-    keymap(n, "ft", "<Cmd>TodoTelescope<CR>", default_settings)
-    keymap(n, "<leader>t", "<Cmd>TodoTrouble<CR>", default_settings)
 end
 
 return M

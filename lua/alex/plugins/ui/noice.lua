@@ -1,6 +1,7 @@
 local u = require("alex.utils")
 
 local function routes_config()
+    -- TODO(alex): Will this slow things down?
     local msgs = {
         "written",
         "fewer lines",
@@ -14,6 +15,11 @@ local function routes_config()
         "Nothing currently selected",
         "changes;",
         "No information available",
+        "has already been sent, please wait",
+        "is not supported by any of the servers",
+        "hover is not supported",
+        "response of request method",
+        "not found:",
     }
 
     local routes = {}
@@ -67,7 +73,7 @@ require("noice").setup({
         lsp_doc_border = false, -- add a border to hover docs and signature help
     },
     notify = {
-        fps = 60,
+        fps = 75,
         max_width = 75,
         level = "ERROR",
     },

@@ -4,7 +4,7 @@ vim.opt.winbar = nil
 
 local winbar_filetype_exclude = {
     "dashboard",
-    "Trouble",
+    "trouble",
     "Outline",
     "NvimTree",
 }

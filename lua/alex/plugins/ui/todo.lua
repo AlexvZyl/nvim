@@ -24,5 +24,3 @@ require("todo-comments").setup({
         pattern = [[\b(KEYWORDS)(\(\S+\))?:]],
     },
 })
-
-require("alex.keymaps").todo()

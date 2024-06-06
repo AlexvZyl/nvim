@@ -118,8 +118,8 @@ require("nvim-tree").setup({
 local api = require("nvim-tree.api")
 local Event = api.events.Event
 api.events.subscribe(Event.TreeOpen, function(_)
-    vim.cmd([[setlocal statuscolumn=\ ]])
-    vim.cmd([[setlocal cursorlineopt=number]])
+    vim.wo.statuscolumn = " "
+    vim.wo.cursorlineopt = "line"
     vim.cmd([[setlocal fillchars+=vert:🮇]])
     vim.cmd([[setlocal fillchars+=horizup:🮇]])
     vim.cmd([[setlocal fillchars+=vertright:🮇]])

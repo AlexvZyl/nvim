@@ -38,7 +38,12 @@ function M.init()
     keymap(n_v, "<C-y>", "k<C-y>", default_settings)
     keymap(n, "K", "<nop>", default_settings)
     keymap(n, "<leader>e", "<Cmd>Explore<CR>", default_settings)
-    keymap(n, "\\", function() require 'alex.keymaps.utils'.format_bufer() end, default_settings)
+    keymap(
+        n,
+        "\\",
+        function() require("alex.keymaps.utils").format_bufer() end,
+        default_settings
+    )
 
     -- Windows
     keymap(n, "<C-w><C-c>", "<Cmd>wincmd c<CR>", default_settings)

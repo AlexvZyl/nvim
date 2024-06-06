@@ -79,8 +79,6 @@ function M.delete_buffer()
     vim.cmd([[:bp | bdelete #]])
 end
 
-function M.format_bufer()
-    pcall(vim.lsp.buf.format)
-end
+function M.format_bufer() pcall(vim.lsp.buf.format) end
 
 return M

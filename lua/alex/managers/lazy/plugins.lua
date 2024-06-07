@@ -14,13 +14,11 @@ return {
             "nvim-telescope/telescope.nvim",
         },
         config = function() require("alex.plugins.ui.todo") end,
-        cmd = { "TodoTelescope" },
+        cmd = { "Telescope todo-comments" },
     },
     {
-        -- Required by other packages
         "nvim-tree/nvim-web-devicons",
         config = function() require("alex.plugins.ui.nvim-web-devicons") end,
-        lazy = true,
     },
     {
         "NvChad/nvim-colorizer.lua",

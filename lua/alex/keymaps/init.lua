@@ -79,10 +79,11 @@ function M.telescope()
     keymap(n, "fo", "<Cmd>Telescope oldfiles<CR>", default_settings)
     keymap(n, "ff", "<Cmd>Telescope find_files<CR>", default_settings)
     keymap(n, "fF", "<Cmd>Telescope find_files cwd=~<CR>", default_settings)
-    keymap(n, "fs", "<Cmd>Telescope live_grep<CR>", default_settings)
-    keymap(n, "fS", "<Cmd>Telescope live_grep cwd=~<CR>", default_settings)
+    keymap(n, "fg", "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>", default_settings)
+    keymap(n, "fG", "<Cmd>Telescope live_grep<CR>", default_settings)
     keymap(n, "fb", "<Cmd>Telescope buffers<CR>", default_settings)
     keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
+    keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)
     keymap(
         n,
         "ft",
@@ -92,19 +93,13 @@ function M.telescope()
     keymap(
         n,
         "fd",
-        "<Cmd>Telescope diagnostics previewer=false line_width=full bufnr=0<CR>",
+        "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>",
         default_settings
     )
     keymap(
         n,
         "fD",
-        "<Cmd>Telescope diagnostics previewer=false line_width=full<CR>",
-        default_settings
-    )
-    keymap(
-        n_v,
-        "<C-f>",
-        "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
+        "<Cmd>Telescope diagnostics line_width=full<CR>",
         default_settings
     )
 end
@@ -134,7 +129,6 @@ function M.lspsaga()
     keymap(n, "gD", "<Cmd>Lspsaga peek_definition<CR>zz", default_settings)
     keymap(n, "gd", "<Cmd>Lspsaga goto_definition<CR>", default_settings)
     keymap(n, "gh", "<Cmd>Lspsaga hover_doc<CR>", default_settings)
-    keymap(n, "gR", "<Cmd>Lspsaga finder<CR>", default_settings)
     keymap(
         n,
         "ge",

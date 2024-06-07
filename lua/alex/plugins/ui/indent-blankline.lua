@@ -1,5 +1,3 @@
---local context_char = '┃'
---local char = '┋'
 local context_char = "│"
 local char = "┆"
 

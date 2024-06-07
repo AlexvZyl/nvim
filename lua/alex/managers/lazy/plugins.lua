@@ -105,12 +105,6 @@ return {
         config = function() require("alex.plugins.lang.debugger") end,
     },
     {
-        "folke/trouble.nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        keys = { "<leader>d", "<leader>D" },
-        config = function() require("alex.plugins.ui.trouble") end,
-    },
-    {
         "mfussenegger/nvim-lint",
         event = { "User NvimStartupDone" },
         config = function() require("alex.plugins.lang.linter") end,

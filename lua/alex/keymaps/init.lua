@@ -20,6 +20,7 @@ function M.init()
     keymap(n, "fs", "<Cmd>Telescope live_grep<CR>", default_settings)
     keymap(n, "fS", "<Cmd>Telescope live_grep cwd=~<CR>", default_settings)
     keymap(n, "fb", "<Cmd>Telescope buffers<CR>", default_settings)
+    keymap(n, "fd", "<Cmd>Telescope diagnostics previewer=false line_width=full<CR>", default_settings)
     keymap(
         n_v,
         "<C-f>",
@@ -84,21 +85,6 @@ function M.init()
         function() require("alex.keymaps.utils").toggle_diffview() end
     )
     --keymap(n, '<C-a>', 'gg0vG$', default_settings)
-end
-
-function M.trouble()
-    keymap(
-        n,
-        "<leader>d",
-        "<Cmd>Trouble diagnostics toggle filter={buf=0}<CR>",
-        default_settings
-    )
-    keymap(
-        n,
-        "<leader>D",
-        "<Cmd>Trouble diagnostics toggle<CR>",
-        default_settings
-    )
 end
 
 function M.copilot()

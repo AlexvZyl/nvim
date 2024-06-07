@@ -79,7 +79,12 @@ function M.telescope()
     keymap(n, "fo", "<Cmd>Telescope oldfiles<CR>", default_settings)
     keymap(n, "ff", "<Cmd>Telescope find_files<CR>", default_settings)
     keymap(n, "fF", "<Cmd>Telescope find_files cwd=~<CR>", default_settings)
-    keymap(n, "fg", "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>", default_settings)
+    keymap(
+        n,
+        "fg",
+        "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
+        default_settings
+    )
     keymap(n, "fG", "<Cmd>Telescope live_grep<CR>", default_settings)
     keymap(n, "fb", "<Cmd>Telescope buffers<CR>", default_settings)
     keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)

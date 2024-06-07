@@ -2,7 +2,8 @@ local ts = require("telescope")
 local U = require("alex.utils")
 
 local prompt_chars = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
-local vert_preview_chars = { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
+local vert_preview_chars =
+    { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
 
 local vertical_laout = {
     layout_strategy = "vertical",
@@ -12,7 +13,7 @@ local vertical_laout = {
         prompt = prompt_chars,
         preview = vert_preview_chars,
         results = U.get_border_chars("telescope"),
-    }
+    },
 }
 
 ts.setup({
@@ -35,20 +36,20 @@ ts.setup({
         winblend = 0,
         wrap_results = false,
         mappings = { i = { ["<Esc>"] = require("telescope.actions").close } },
-        preview = { treesitter = true }
+        preview = { treesitter = true },
     },
     pickers = {
         lsp_references = vertical_laout,
         diagnostics = vertical_laout,
         lsp_document_symbols = vertical_laout,
-        live_grep = vertical_laout
-    }
+        live_grep = vertical_laout,
+    },
 })
 
 ts.load_extension("notify")
 
-vim.api.nvim_create_autocmd('User', {
-    pattern = 'TelescopePreviewerLoaded',
+vim.api.nvim_create_autocmd("User", {
+    pattern = "TelescopePreviewerLoaded",
     callback = function()
         vim.opt_local.number = true
         require("ibl").setup_buffer(0, { enabled = true })

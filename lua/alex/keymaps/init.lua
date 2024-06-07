@@ -20,7 +20,12 @@ function M.init()
     keymap(n, "fs", "<Cmd>Telescope live_grep<CR>", default_settings)
     keymap(n, "fS", "<Cmd>Telescope live_grep cwd=~<CR>", default_settings)
     keymap(n, "fb", "<Cmd>Telescope buffers<CR>", default_settings)
-    keymap(n, "ft", "<Cmd>Telescope todo-comments previewer=false<CR>", default_settings)
+    keymap(
+        n,
+        "ft",
+        "<Cmd>Telescope todo-comments previewer=false<CR>",
+        default_settings
+    )
     keymap(
         n,
         "fd",

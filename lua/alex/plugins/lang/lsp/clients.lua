@@ -14,7 +14,19 @@ local default = {
 
 -- Setup LSPs.
 
-LC.clangd.setup({ default })
+LC.clangd.setup({
+    default,
+    root_dir = U.root_pattern(
+        '.clangd',
+        '.clang-tidy',
+        '.clang-format',
+        'compile_commands.json',
+        'compile_flags.txt',
+        'configure.ac',
+        '.git'
+    )
+})
+
 LC.nixd.setup({ default })
 LC.lua_ls.setup({ default })
 LC.julials.setup({ default })
@@ -23,7 +35,6 @@ LC.pyright.setup({ default })
 --LC.ruff_lsp.setup { default }
 LC.rust_analyzer.setup({ default })
 LC.texlab.setup({ default })
-LC.jsonls.setup({ default })
 LC.yamlls.setup({ default })
 LC.gopls.setup({ default })
 --LC.hls.setup { default }
@@ -74,4 +85,11 @@ LC.html.setup({
     capabilities = DC,
     lsp_flags = lsp_flags,
     cmd = { "html-languageserver" },
+})
+
+
+LC.jsonls.setup({
+    capabilities = DC,
+    lsp_flags = lsp_flags,
+    cmd = { "json-languageserver", "--stdio" },
 })

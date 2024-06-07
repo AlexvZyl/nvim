@@ -20,7 +20,6 @@ local function routes_config()
         "hover is not supported",
         "response of request method",
         "not found:",
-        "No diagnostics found",
     }
 
     local routes = {}

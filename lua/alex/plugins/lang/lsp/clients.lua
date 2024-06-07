@@ -17,14 +17,14 @@ local default = {
 LC.clangd.setup({
     default,
     root_dir = U.root_pattern(
-        '.clangd',
-        '.clang-tidy',
-        '.clang-format',
-        'compile_commands.json',
-        'compile_flags.txt',
-        'configure.ac',
-        '.git'
-    )
+        ".clangd",
+        ".clang-tidy",
+        ".clang-format",
+        "compile_commands.json",
+        "compile_flags.txt",
+        "configure.ac",
+        ".git"
+    ),
 })
 
 LC.nixd.setup({ default })
@@ -86,7 +86,6 @@ LC.html.setup({
     lsp_flags = lsp_flags,
     cmd = { "html-languageserver" },
 })
-
 
 LC.jsonls.setup({
     capabilities = DC,

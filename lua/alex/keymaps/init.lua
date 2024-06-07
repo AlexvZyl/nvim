@@ -20,9 +20,16 @@ function M.init()
     keymap(n, "fs", "<Cmd>Telescope live_grep<CR>", default_settings)
     keymap(n, "fS", "<Cmd>Telescope live_grep cwd=~<CR>", default_settings)
     keymap(n, "fb", "<Cmd>Telescope buffers<CR>", default_settings)
+    keymap(n, "ft", "<Cmd>Telescope todo-comments previewer=false<CR>", default_settings)
     keymap(
         n,
         "fd",
+        "<Cmd>Telescope diagnostics previewer=false line_width=full bufnr=0<CR>",
+        default_settings
+    )
+    keymap(
+        n,
+        "fD",
         "<Cmd>Telescope diagnostics previewer=false line_width=full<CR>",
         default_settings
     )
@@ -32,9 +39,6 @@ function M.init()
         "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
         default_settings
     )
-
-    -- Needed for lazyloading.
-    keymap(n, "ft", "<Cmd>TodoTelescope<CR>", default_settings)
 
     -- Misc
     keymap(ex_t, "<F12>", "<Cmd>Cheatsheet<CR>", default_settings)

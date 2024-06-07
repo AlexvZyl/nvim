@@ -77,10 +77,6 @@ return {
         config = function() require("alex.plugins.ui.which-key") end,
     },
     {
-        "sudormrfbin/cheatsheet.nvim",
-        cmd = { "Cheatsheet" },
-    },
-    {
         "nvim-tree/nvim-tree.lua",
         version = "*",
         dependencies = { "nvim-tree/nvim-web-devicons" },

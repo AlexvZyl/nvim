@@ -17,11 +17,6 @@ function M.init()
 
     -- Lazyload dependents:
     M.telescope()
-    M.cheatsheet()
-end
-
-function M.cheatsheet()
-    keymap(ex_t, "<F12>", "<Cmd>Cheatsheet<CR>", default_settings)
 end
 
 function M.native()
@@ -80,6 +75,7 @@ end
 
 function M.telescope()
     keymap(n, "fh", "<Cmd>Telescope help_tags<CR>", default_settings)
+    keymap(n, "fk", "<Cmd>Telescope keymaps<CR>", default_settings)
     keymap(n, "fo", "<Cmd>Telescope oldfiles<CR>", default_settings)
     keymap(n, "ff", "<Cmd>Telescope find_files<CR>", default_settings)
     keymap(n, "fF", "<Cmd>Telescope find_files cwd=~<CR>", default_settings)

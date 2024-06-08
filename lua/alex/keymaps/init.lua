@@ -85,8 +85,9 @@ function M.telescope()
         "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
         default_settings
     )
-    keymap(n, "fG", "<Cmd>Telescope live_grep<CR>", default_settings)
-    keymap(n, "fb", "<Cmd>Telescope buffers<CR>", default_settings)
+    keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
+    keymap(n, "fb", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
+    keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)
     keymap(

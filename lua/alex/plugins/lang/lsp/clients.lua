@@ -27,6 +27,7 @@ LC.clangd.setup({
     ),
 })
 
+LC.cssls.setup({ default })
 LC.nixd.setup({ default })
 LC.lua_ls.setup({ default })
 LC.julials.setup({ default })

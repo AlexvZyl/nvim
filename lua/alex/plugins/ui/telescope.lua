@@ -3,9 +3,9 @@ local U = require("alex.utils")
 
 local prompt_chars = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
 local vert_preview_chars =
-    { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
+{ " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
 
-local vertical_laout = {
+local vertical_layout = {
     layout_strategy = "vertical",
     preview_title = "",
     layout_config = {
@@ -26,7 +26,15 @@ local horizontal_layout = {
         results = U.get_border_chars("telescope"),
         preview = U.get_border_chars("telescope"),
     },
-    layout_config = { preview_width = 0.6 },
+    layout_config = { preview_width = 0.57 }
+}
+
+local small_layout = {
+    preview = false,
+    layout_config = {
+        height = 0.45,
+        width = 0.45
+    }
 }
 
 ts.setup({
@@ -36,7 +44,7 @@ ts.setup({
         layout_config = {
             prompt_position = "top",
             height = 0.9,
-            width = 0.9,
+            width = 0.8,
         },
         border = true,
         borderchars = {
@@ -51,19 +59,19 @@ ts.setup({
         hl_result_eol = true,
         results_title = "",
         winblend = 0,
-        wrap_results = false,
+        wrap_results = true,
         mappings = { i = { ["<Esc>"] = require("telescope.actions").close } },
         preview = { treesitter = true },
     },
     pickers = {
-        lsp_references = vertical_laout,
-        diagnostics = vertical_laout,
-        live_grep = vertical_laout,
+        lsp_references = vertical_layout,
+        diagnostics = vertical_layout,
+        live_grep = horizontal_layout,
         help_tags = horizontal_layout,
         find_files = horizontal_layout,
-        buffers = horizontal_layout,
         lsp_document_symbols = horizontal_layout,
-    },
+        buffers = small_layout
+    }
 })
 
 vim.api.nvim_create_autocmd("User", {

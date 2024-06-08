@@ -20,6 +20,7 @@ local vertical_layout = {
 
 local horizontal_layout = {
     layout_strategy = "horizontal",
+    wrap_results = false,
     preview_title = "",
     borderchars = {
         prompt = prompt_chars,

@@ -9,7 +9,7 @@ local vertical_laout = {
     layout_strategy = "vertical",
     preview_title = "",
     layout_config = {
-        mirror = true
+        mirror = true,
     },
     borderchars = {
         prompt = prompt_chars,
@@ -26,7 +26,7 @@ local horizontal_layout = {
         results = U.get_border_chars("telescope"),
         preview = U.get_border_chars("telescope"),
     },
-    layout_config = { preview_width = 0.6 }
+    layout_config = { preview_width = 0.6 },
 }
 
 ts.setup({
@@ -63,11 +63,11 @@ ts.setup({
         find_files = horizontal_layout,
         buffers = horizontal_layout,
         lsp_document_symbols = horizontal_layout,
-    }
+    },
 })
 
-vim.api.nvim_create_autocmd('User', {
-    pattern = 'TelescopePreviewerLoaded',
+vim.api.nvim_create_autocmd("User", {
+    pattern = "TelescopePreviewerLoaded",
     callback = function()
         vim.opt_local.number = true
         require("ibl").setup_buffer(0, { enabled = true })

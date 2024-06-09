@@ -3,7 +3,7 @@ local U = require("alex.utils")
 
 local prompt_chars = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
 local vert_preview_chars =
-{ " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
+    { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
 
 local vertical_layout = {
     layout_strategy = "vertical",
@@ -38,7 +38,7 @@ local picker_buffer = {
     },
     sort_mru = true,
     ignore_current_buffer = true,
-    file_ignore_patters = { "\\." }
+    file_ignore_patters = { "\\." },
 }
 
 local defaults = {
@@ -65,7 +65,6 @@ local defaults = {
     wrap_results = true,
     mappings = { i = { ["<Esc>"] = require("telescope.actions").close } },
     preview = { treesitter = true },
-
 }
 
 ts.setup({

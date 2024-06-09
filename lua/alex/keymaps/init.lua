@@ -81,10 +81,11 @@ function M.telescope()
     keymap(n, "fF", "<Cmd>Telescope find_files cwd=~<CR>", default_settings)
     keymap(
         n,
-        "fg",
+        "<C-f>",
         "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
         default_settings
     )
+    keymap(n, "fg", "<C-f>", default_settings)
     keymap(
         n,
         "fG",

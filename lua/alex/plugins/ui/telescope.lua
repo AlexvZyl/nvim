@@ -3,7 +3,7 @@ local U = require("alex.utils")
 
 local prompt_chars = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
 local vert_preview_chars =
-    { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
+{ " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
 
 local vertical_layout = {
     layout_strategy = "vertical",
@@ -30,40 +30,46 @@ local horizontal_layout = {
     layout_config = { preview_width = 0.57 },
 }
 
-local small_layout = {
+local picker_buffer = {
     preview = false,
     layout_config = {
-        height = 0.45,
-        width = 0.45,
+        height = 0.4,
+        width = 0.4,
     },
+    sort_mru = true,
+    ignore_current_buffer = true,
+    file_ignore_patters = { "\\." }
+}
+
+local defaults = {
+    sort_mru = true,
+    sorting_strategy = "ascending",
+    layout_config = {
+        prompt_position = "top",
+        height = 0.9,
+        width = 0.8,
+    },
+    border = true,
+    borderchars = {
+        prompt = prompt_chars,
+        results = U.get_border_chars("telescope"),
+        preview = U.get_border_chars("telescope"),
+    },
+    multi_icon = "",
+    entry_prefix = "   ",
+    prompt_prefix = "   ",
+    selection_caret = "  ",
+    hl_result_eol = true,
+    results_title = "",
+    winblend = 0,
+    wrap_results = true,
+    mappings = { i = { ["<Esc>"] = require("telescope.actions").close } },
+    preview = { treesitter = true },
+
 }
 
 ts.setup({
-    defaults = {
-        sort_mru = true,
-        sorting_strategy = "ascending",
-        layout_config = {
-            prompt_position = "top",
-            height = 0.9,
-            width = 0.8,
-        },
-        border = true,
-        borderchars = {
-            prompt = prompt_chars,
-            results = U.get_border_chars("telescope"),
-            preview = U.get_border_chars("telescope"),
-        },
-        multi_icon = "",
-        entry_prefix = "   ",
-        prompt_prefix = "   ",
-        selection_caret = "  ",
-        hl_result_eol = true,
-        results_title = "",
-        winblend = 0,
-        wrap_results = true,
-        mappings = { i = { ["<Esc>"] = require("telescope.actions").close } },
-        preview = { treesitter = true },
-    },
+    defaults = defaults,
     pickers = {
         lsp_references = vertical_layout,
         diagnostics = vertical_layout,
@@ -71,7 +77,7 @@ ts.setup({
         help_tags = horizontal_layout,
         find_files = horizontal_layout,
         lsp_document_symbols = horizontal_layout,
-        buffers = small_layout,
+        buffers = picker_buffer,
     },
 })
 

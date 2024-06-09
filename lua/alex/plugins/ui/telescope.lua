@@ -1,4 +1,4 @@
-local ts = require("telescope")
+local TS = require("telescope")
 local U = require("alex.utils")
 
 local prompt_chars = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
@@ -67,7 +67,7 @@ local defaults = {
     preview = { treesitter = true },
 }
 
-ts.setup({
+TS.setup({
     defaults = defaults,
     pickers = {
         lsp_references = vertical_layout,
@@ -89,4 +89,4 @@ vim.api.nvim_create_autocmd("User", {
 })
 
 -- Extensions.
-ts.load_extension("notify")
+TS.load_extension("notify")

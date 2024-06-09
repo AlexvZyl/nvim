@@ -84,7 +84,6 @@ vim.api.nvim_create_autocmd("User", {
     pattern = "TelescopePreviewerLoaded",
     callback = function()
         vim.opt_local.number = true
-        require("ibl").setup_buffer(0, { enabled = true })
     end,
 })
 

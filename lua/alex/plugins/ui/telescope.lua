@@ -82,9 +82,7 @@ TS.setup({
 
 vim.api.nvim_create_autocmd("User", {
     pattern = "TelescopePreviewerLoaded",
-    callback = function()
-        vim.opt_local.number = true
-    end,
+    callback = function() vim.opt_local.number = true end,
 })
 
 -- Extensions.

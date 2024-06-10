@@ -43,7 +43,7 @@ function M.open_diagnostics_float() vim.diagnostic.open_float(float_options) end
 function M.next_error()
     vim.diagnostic.goto_next({
         severity = vim.diagnostic.severity.ERROR,
-        float = float_options
+        float = float_options,
     })
     M.open_diagnostics_float()
 end
@@ -51,16 +51,12 @@ end
 function M.prev_error()
     vim.diagnostic.goto_prev({
         severity = vim.diagnostic.severity.ERROR,
-        float = float_options
+        float = float_options,
     })
 end
 
-function M.next_diag()
-    vim.diagnostic.goto_next({ float = float_options })
-end
+function M.next_diag() vim.diagnostic.goto_next({ float = float_options }) end
 
-function M.prev_diag()
-    vim.diagnostic.goto_prev({ float = float_options })
-end
+function M.prev_diag() vim.diagnostic.goto_prev({ float = float_options }) end
 
 return M

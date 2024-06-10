@@ -3,6 +3,7 @@
 
 local n, i, v, t = "n", "i", "v", "t"
 local ex_t = { n, i, v }
+local n_i = { n, i }
 local n_v = { n, v }
 
 local keymap = vim.keymap.set
@@ -44,11 +45,11 @@ function M.native()
     keymap(n, "Q", function() require("alex.keymaps.utils").delete_buffer() end, default_settings)
 
     -- LSP.
-    keymap(n_v, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
-    keymap(n_v, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
-    keymap(n_v, "gd", function() pcall(vim.lsp.buf.definition) end, default_settings)
-    keymap(n_v, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
-    keymap(n_v, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
+    keymap(n, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
+    keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
+    keymap(n, "gd", function() pcall(vim.lsp.buf.definition) end, default_settings)
+    keymap(n, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
+    keymap(n_i, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
     keymap(
         n,
         "ge",

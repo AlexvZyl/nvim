@@ -115,7 +115,7 @@ return {
     },
     {
         "neovim/nvim-lspconfig",
-        config = function() require("alex.plugins.lang.lsp") end,
+        config = function() require("alex.plugins.lang.lspconfig") end,
         -- If this is lazy, it seems that the lsp misses the FileType event
         lazy = false,
     },
@@ -141,11 +141,6 @@ return {
                 build = "make install_jsregexp",
             },
         },
-    },
-    {
-        "ray-x/lsp_signature.nvim",
-        event = { "User NvimStartupDone" },
-        config = function() require("alex.plugins.lang.lsp.signature") end,
     },
 
     -- Compatibility/Support/Language tools

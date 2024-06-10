@@ -1,10 +1,13 @@
 local M = {}
 
-function M.should_setup()
+M.should_setup = true
+
+function M.init()
     -- Editor specific configs.
     if vim.g.vscode then
         require("alex.environments.vscode")
-        return false
+        M.should_setup = false
+        return
     end
 
     -- Setup environment variables.
@@ -17,12 +20,13 @@ function M.should_setup()
 
     if vim.g.neovide then
         require("alex.environments.neovide")
-        return true
+        return
     end
 
     -- TODO: Check if we are in wezterm specifically.
     require("alex.environments.wezterm")
-    return true
 end
+
+M.init()
 
 return M

@@ -3,9 +3,9 @@ return {
     {
         "glepnir/dashboard-nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        event = "VimEnter",
-        lazy = false,
         config = function() require("alex.plugins.ui.dashboard") end,
+        lazy = false,
+        priority = 999,
     },
     {
         "folke/todo-comments.nvim",

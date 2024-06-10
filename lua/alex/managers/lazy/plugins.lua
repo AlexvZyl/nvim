@@ -85,7 +85,7 @@ return {
     -- Language/Tools/LSP/Comp
     {
         "zbirenbaum/copilot.lua",
-        config = function() require("alex.plugins.lang.tools.copilot") end,
+        config = function() require("alex.plugins.lang.copilot") end,
         cmd = "Copilot",
         build = ":Copilot auth",
     },

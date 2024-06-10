@@ -125,11 +125,6 @@ return {
         dependencies = { "Bilal2453/luvit-meta" },
     },
     {
-        "glepnir/lspsaga.nvim",
-        event = { "User NvimStartupDone" },
-        config = function() require("alex.plugins.lang.lsp.lspsaga") end,
-    },
-    {
         "hrsh7th/nvim-cmp",
         event = { "User NvimStartupDone" },
         config = function() require("alex.plugins.lang.completion") end,

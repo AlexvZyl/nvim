@@ -52,6 +52,15 @@ function M.native()
         function() require("alex.keymaps.utils").delete_buffer() end,
         default_settings
     )
+
+    -- LSP.
+    keymap(n_v, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
+    keymap(n_v, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
+    keymap(n_v, "gd", function() pcall(vim.lsp.buf.definition) end, default_settings)
+    keymap(n, "[e", function() require("alex.keymaps.utils").prev_diag() end, default_settings)
+    keymap(n, "]e", function() require("alex.keymaps.utils").next_diag() end, default_settings)
+    keymap(n, "[E", function() require("alex.keymaps.utils").prev_error() end, default_settings)
+    keymap(n, "]E", function() require("alex.keymaps.utils").next_error() end, default_settings)
 end
 
 function M.editing()
@@ -85,7 +94,7 @@ function M.telescope()
         "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
         default_settings
     )
-    keymap(n, "fg", "<C-f>", default_settings)
+    keymap(n, "fg", "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>", default_settings)
     keymap(
         n,
         "fG",
@@ -143,45 +152,7 @@ function M.tree()
         function() require("alex.keymaps.utils").toggle_tree() end,
         default_settings
     )
-end
-
-function M.lspsaga()
-    keymap(n_v, "ca", "<Cmd>Lspsaga code_action<CR>", default_settings)
-    keymap(n_v, "RR", "<Cmd>Lspsaga rename<CR>", default_settings)
-    keymap(n, "gD", "<Cmd>Lspsaga peek_definition<CR>zz", default_settings)
-    keymap(n, "gd", "<Cmd>Lspsaga goto_definition<CR>", default_settings)
-    keymap(n, "gh", "<Cmd>Lspsaga hover_doc<CR>", default_settings)
-    keymap(
-        n,
-        "ge",
-        "<Cmd>Lspsaga show_line_diagnostics ++unfocus<CR>",
-        default_settings
-    )
-    keymap(n, "<leader>o", "<Cmd>Lspsaga outline<CR>", default_settings)
-    keymap(
-        n,
-        "[e",
-        function() require("alex.keymaps.utils").prev_diag() end,
-        default_settings
-    )
-    keymap(
-        n,
-        "]e",
-        function() require("alex.keymaps.utils").next_diag() end,
-        default_settings
-    )
-    keymap(
-        n,
-        "[E",
-        function() require("alex.keymaps.utils").prev_error() end,
-        default_settings
-    )
-    keymap(
-        n,
-        "]E",
-        function() require("alex.keymaps.utils").next_error() end,
-        default_settings
-    )
+    keymap(n, "ge", function() require 'alex.keymaps.utils'.open_diagnostics_float() end, default_settings)
 end
 
 function M.debugger()

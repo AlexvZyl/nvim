@@ -14,7 +14,7 @@ return {
             "nvim-telescope/telescope.nvim",
         },
         config = function() require("alex.plugins.ui.todo") end,
-        cmd = { "Telescope todo-comments" },
+        event = { "User NvimStartupDone" },
     },
     {
         "nvim-tree/nvim-web-devicons",

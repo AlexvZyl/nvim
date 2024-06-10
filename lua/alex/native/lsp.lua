@@ -2,10 +2,22 @@ local M = {}
 
 -- Signs
 
-vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignError" })
-vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignWarn" })
-vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignInfo" })
-vim.fn.sign_define("DiagnosticSignHint", { text = "󱤅", texthl = "", linehl = "", numhl = "DiagnosticSignHint" })
+vim.fn.sign_define(
+    "DiagnosticSignError",
+    { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignError" }
+)
+vim.fn.sign_define(
+    "DiagnosticSignWarn",
+    { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignWarn" }
+)
+vim.fn.sign_define(
+    "DiagnosticSignInfo",
+    { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignInfo" }
+)
+vim.fn.sign_define(
+    "DiagnosticSignHint",
+    { text = "󱤅", texthl = "", linehl = "", numhl = "DiagnosticSignHint" }
+)
 
 -- LSP config.
 

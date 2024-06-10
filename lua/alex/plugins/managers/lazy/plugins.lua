@@ -55,11 +55,6 @@ return {
         config = function() require("alex.plugins.ui.indent-blankline") end,
     },
     {
-        "RRethy/vim-illuminate",
-        event = { "User NvimStartupDone" },
-        config = function() require("alex.plugins.ui.illuminate") end,
-    },
-    {
         "lewis6991/gitsigns.nvim",
         event = { "User NvimStartupDone" },
         config = function() require("alex.plugins.ui.gitsigns") end,

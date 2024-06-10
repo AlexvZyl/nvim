@@ -28,12 +28,8 @@ function M.prev_error()
     })
 end
 
-function M.next_diag()
-    vim.diagnostic.goto_next()
-end
+function M.next_diag() vim.diagnostic.goto_next() end
 
-function M.prev_diag()
-    vim.diagnostic.goto_prev()
-end
+function M.prev_diag() vim.diagnostic.goto_prev() end
 
 return M

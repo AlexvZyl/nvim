@@ -21,7 +21,6 @@ function M.save_file()
     if vim.api.nvim_buf_get_option(0, "modifiable") then vim.cmd("w!") end
 end
 
-
 M.DAP_UI_ENABLED = false
 function M.dap_toggle_ui()
     require("dapui").toggle()

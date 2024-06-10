@@ -15,9 +15,28 @@ local M = {}
 function M.init()
     M.native()
     M.editing()
+    M.lsp()
 
     -- Lazyload dependents:
     M.telescope()
+end
+
+function M.lsp()
+    keymap(n, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
+    keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
+    keymap(n, "gd", function() pcall(vim.lsp.buf.definition) end, default_settings)
+    keymap(n, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
+    keymap(n_i, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
+    keymap(
+        n,
+        "ge",
+        function() require("alex.native.lsp").open_diagnostics_float() end,
+        default_settings
+    )
+    keymap(n, "[e", function() require("alex.native.lsp").prev_diag() end, default_settings)
+    keymap(n, "]e", function() require("alex.native.lsp").next_diag() end, default_settings)
+    keymap(n, "[E", function() require("alex.native.lsp").prev_error() end, default_settings)
+    keymap(n, "]E", function() require("alex.native.lsp").next_error() end, default_settings)
 end
 
 function M.native()
@@ -43,23 +62,6 @@ function M.native()
 
     -- Buffers
     keymap(n, "Q", function() require("alex.keymaps.utils").delete_buffer() end, default_settings)
-
-    -- LSP.
-    keymap(n, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
-    keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
-    keymap(n, "gd", function() pcall(vim.lsp.buf.definition) end, default_settings)
-    keymap(n, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
-    keymap(n_i, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
-    keymap(
-        n,
-        "ge",
-        function() require("alex.native.lsp").open_diagnostics_float() end,
-        default_settings
-    )
-    keymap(n, "[e", function() require("alex.native.lsp").prev_diag() end, default_settings)
-    keymap(n, "]e", function() require("alex.native.lsp").next_diag() end, default_settings)
-    keymap(n, "[E", function() require("alex.native.lsp").prev_error() end, default_settings)
-    keymap(n, "]E", function() require("alex.native.lsp").next_error() end, default_settings)
 end
 
 function M.editing()

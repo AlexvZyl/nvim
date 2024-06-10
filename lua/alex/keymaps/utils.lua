@@ -21,10 +21,7 @@ function M.save_file()
     if vim.api.nvim_buf_get_option(0, "modifiable") then vim.cmd("w!") end
 end
 
-
-function M.open_diagnostics_float()
-    vim.diagnostic.open_float()
-end
+function M.open_diagnostics_float() vim.diagnostic.open_float() end
 
 function M.next_error()
     vim.diagnostic.goto_next({

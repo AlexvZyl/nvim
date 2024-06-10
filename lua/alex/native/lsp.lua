@@ -45,7 +45,6 @@ function M.next_error()
         severity = vim.diagnostic.severity.ERROR,
         float = float_options,
     })
-    M.open_diagnostics_float()
 end
 
 function M.prev_error()

@@ -18,24 +18,17 @@ M.bottom_left_round = "╰"
 M.vertical_default = "│"
 M.horizontal_default = "─"
 
-M.border_chars_round =
-    { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
+M.border_chars_round = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
 M.border_chars_none = { "", "", "", "", "", "", "", "" }
 M.border_chars_empty = { " ", " ", " ", " ", " ", " ", " ", " " }
 M.border_chars_inner_thick = { " ", "▄", " ", "▌", " ", "▀", " ", "▐" }
-M.border_chars_outer_thick =
-    { "▛", "▀", "▜", "▐", "▟", "▄", "▙", "▌" }
-M.border_chars_cmp_items =
-    { "▛", "▀", "▀", " ", "▄", "▄", "▙", "▌" }
-M.border_chars_cmp_doc =
-    { "▀", "▀", "▀", " ", "▄", "▄", "▄", "▏" }
-M.border_chars_outer_thin =
-    { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
+M.border_chars_outer_thick = { "▛", "▀", "▜", "▐", "▟", "▄", "▙", "▌" }
+M.border_chars_cmp_items = { "▛", "▀", "▀", " ", "▄", "▄", "▙", "▌" }
+M.border_chars_cmp_doc = { "▀", "▀", "▀", " ", "▄", "▄", "▄", "▏" }
+M.border_chars_outer_thin = { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
 M.border_chars_inner_thin = { " ", "▁", " ", "▏", " ", "▔", " ", "▕" }
-M.border_chars_outer_thin_telescope =
-    { "▔", "▕", "▁", "▏", "🭽", "🭾", "🭿", "🭼" }
-M.border_chars_outer_thick_telescope =
-    { "▀", "▐", "▄", "▌", "▛", "▜", "▟", "▙" }
+M.border_chars_outer_thin_telescope = { "▔", "▕", "▁", "▏", "🭽", "🭾", "🭿", "🭼" }
+M.border_chars_outer_thick_telescope = { "▀", "▐", "▄", "▌", "▛", "▜", "▟", "▙" }
 M.border_chars_top_only = { "", M.top_thin, "", "", "", " ", "", "" }
 
 M.diagnostic_signs = {

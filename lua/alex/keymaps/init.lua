@@ -38,65 +38,25 @@ function M.native()
     keymap(n_v, "<C-y>", "k<C-y>", default_settings)
     keymap(n, "K", "<nop>", default_settings)
     keymap(n, "<leader>e", "<Cmd>Explore<CR>", default_settings)
-    keymap(
-        n,
-        "\\",
-        function() require("alex.keymaps.utils").format_bufer() end,
-        default_settings
-    )
+    keymap(n, "\\", function() require("alex.keymaps.utils").format_bufer() end, default_settings)
 
     -- Buffers
-    keymap(
-        n,
-        "Q",
-        function() require("alex.keymaps.utils").delete_buffer() end,
-        default_settings
-    )
+    keymap(n, "Q", function() require("alex.keymaps.utils").delete_buffer() end, default_settings)
 
     -- LSP.
-    keymap(
-        n_v,
-        "RR",
-        function() pcall(vim.lsp.buf.rename) end,
-        default_settings
-    )
+    keymap(n_v, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
     keymap(n_v, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
-    keymap(
-        n_v,
-        "gd",
-        function() pcall(vim.lsp.buf.definition) end,
-        default_settings
-    )
+    keymap(n_v, "gd", function() pcall(vim.lsp.buf.definition) end, default_settings)
     keymap(
         n,
         "ge",
         function() require("alex.keymaps.utils").open_diagnostics_float() end,
         default_settings
     )
-    keymap(
-        n,
-        "[e",
-        function() require("alex.keymaps.utils").prev_diag() end,
-        default_settings
-    )
-    keymap(
-        n,
-        "]e",
-        function() require("alex.keymaps.utils").next_diag() end,
-        default_settings
-    )
-    keymap(
-        n,
-        "[E",
-        function() require("alex.keymaps.utils").prev_error() end,
-        default_settings
-    )
-    keymap(
-        n,
-        "]E",
-        function() require("alex.keymaps.utils").next_error() end,
-        default_settings
-    )
+    keymap(n, "[e", function() require("alex.keymaps.utils").prev_diag() end, default_settings)
+    keymap(n, "]e", function() require("alex.keymaps.utils").next_diag() end, default_settings)
+    keymap(n, "[E", function() require("alex.keymaps.utils").prev_error() end, default_settings)
+    keymap(n, "]E", function() require("alex.keymaps.utils").next_error() end, default_settings)
 end
 
 function M.editing()
@@ -111,11 +71,7 @@ function M.editing()
     keymap(v, "i", "I", default_settings)
     keymap(n, "s", function() require("leap").leap({}) end)
     keymap(n, "S", function() require("leap").leap({ backward = true }) end)
-    keymap(
-        n,
-        "<leader>v",
-        function() require("alex.keymaps.utils").toggle_diffview() end
-    )
+    keymap(n, "<leader>v", function() require("alex.keymaps.utils").toggle_diffview() end)
 end
 
 function M.telescope()
@@ -136,49 +92,17 @@ function M.telescope()
         "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
         default_settings
     )
-    keymap(
-        n,
-        "fG",
-        "<Cmd>Telescope live_grep disable_coordinates=true<CR>",
-        default_settings
-    )
-    keymap(
-        n,
-        "fb",
-        "<Cmd>Telescope buffers previewer=false<CR>",
-        default_settings
-    )
-    keymap(
-        n,
-        "<C-n>",
-        "<Cmd>Telescope buffers previewer=false<CR>",
-        default_settings
-    )
+    keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
+    keymap(n, "fb", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
+    keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)
-    keymap(
-        n,
-        "ft",
-        "<Cmd>Telescope todo-comments previewer=false<CR>",
-        default_settings
-    )
-    keymap(
-        n,
-        "fd",
-        "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>",
-        default_settings
-    )
-    keymap(
-        n,
-        "fD",
-        "<Cmd>Telescope diagnostics line_width=full<CR>",
-        default_settings
-    )
+    keymap(n, "ft", "<Cmd>Telescope todo-comments previewer=false<CR>", default_settings)
+    keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
+    keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
 end
 
-function M.copilot()
-    keymap(n, "<leader>c", "<Cmd>Copilot panel<CR>", default_settings)
-end
+function M.copilot() keymap(n, "<leader>c", "<Cmd>Copilot panel<CR>", default_settings) end
 
 function M.tree()
     keymap(

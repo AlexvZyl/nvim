@@ -40,6 +40,22 @@ local picker_buffer = {
     file_ignore_patters = { "\\." },
 }
 
+local small_lsp_layout = {
+    layout_strategy = "vertical",
+    preview_title = "",
+    preview = true,
+    layout_config = {
+        height = 0.6,
+        width = 0.55,
+        mirror = true,
+    },
+    borderchars = {
+        prompt = prompt_chars,
+        preview = vert_preview_chars,
+        results = U.get_border_chars("telescope"),
+    },
+}
+
 local defaults = {
     sort_mru = true,
     sorting_strategy = "ascending",
@@ -69,13 +85,14 @@ local defaults = {
 TS.setup({
     defaults = defaults,
     pickers = {
-        lsp_references = vertical_layout,
         diagnostics = vertical_layout,
         live_grep = horizontal_layout,
         help_tags = horizontal_layout,
         find_files = horizontal_layout,
-        lsp_document_symbols = horizontal_layout,
         buffers = picker_buffer,
+        lsp_document_symbols = horizontal_layout,
+        lsp_definitions = small_lsp_layout,
+        lsp_references = small_lsp_layout,
     },
 })
 

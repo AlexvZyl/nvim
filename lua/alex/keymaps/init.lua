@@ -24,7 +24,6 @@ end
 function M.lsp()
     keymap(n, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
     keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
-    keymap(n, "gd", function() pcall(vim.lsp.buf.definition) end, default_settings)
     keymap(n, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
     keymap(n_i, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
     keymap(
@@ -100,11 +99,14 @@ function M.telescope()
     keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
     keymap(n, "fb", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
-    keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
-    keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)
     keymap(n, "ft", "<Cmd>Telescope todo-comments previewer=false<CR>", default_settings)
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
     keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
+
+    -- For LSP.
+    keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)
+    keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
+    keymap(n, "gd", "<Cmd>Telescope lsp_definitions<CR>", default_settings)
 end
 
 function M.copilot() keymap(n, "<leader>c", "<Cmd>Copilot panel<CR>", default_settings) end

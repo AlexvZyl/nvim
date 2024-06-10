@@ -21,37 +21,6 @@ function M.save_file()
     if vim.api.nvim_buf_get_option(0, "modifiable") then vim.cmd("w!") end
 end
 
-function M.open_diagnostics_float() vim.diagnostic.open_float() end
-
-function M.next_error()
-    vim.diagnostic.goto_next({
-        severity = vim.diagnostic.severity.ERROR,
-        float = false,
-    })
-    M.open_diagnostics_float()
-end
-
-function M.prev_error()
-    vim.diagnostic.goto_prev({
-        severity = vim.diagnostic.severity.ERROR,
-        float = false,
-    })
-    M.open_diagnostics_float()
-end
-
-function M.next_diag()
-    vim.diagnostic.goto_next({
-        float = false,
-    })
-    M.open_diagnostics_float()
-end
-
-function M.prev_diag()
-    vim.diagnostic.goto_prev({
-        float = false,
-    })
-    M.open_diagnostics_float()
-end
 
 M.DAP_UI_ENABLED = false
 function M.dap_toggle_ui()

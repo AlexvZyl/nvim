@@ -50,13 +50,13 @@ function M.native()
     keymap(
         n,
         "ge",
-        function() require("alex.keymaps.utils").open_diagnostics_float() end,
+        function() require("alex.native.lsp").open_diagnostics_float() end,
         default_settings
     )
-    keymap(n, "[e", function() require("alex.keymaps.utils").prev_diag() end, default_settings)
-    keymap(n, "]e", function() require("alex.keymaps.utils").next_diag() end, default_settings)
-    keymap(n, "[E", function() require("alex.keymaps.utils").prev_error() end, default_settings)
-    keymap(n, "]E", function() require("alex.keymaps.utils").next_error() end, default_settings)
+    keymap(n, "[e", function() require("alex.native.lsp").prev_diag() end, default_settings)
+    keymap(n, "]e", function() require("alex.native.lsp").next_diag() end, default_settings)
+    keymap(n, "[E", function() require("alex.native.lsp").prev_error() end, default_settings)
+    keymap(n, "]E", function() require("alex.native.lsp").next_error() end, default_settings)
 end
 
 function M.editing()

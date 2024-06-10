@@ -2,7 +2,8 @@ local U = require("lspconfig.util")
 local LC = require("lspconfig")
 local DC = require("cmp_nvim_lsp").default_capabilities()
 
-require("lspconfig.ui.windows").default_options.border = require("alex.utils").get_border_chars("float")
+require("lspconfig.ui.windows").default_options.border =
+    require("alex.utils").get_border_chars("float")
 
 local lsp_flags = {
     debounce_text_changes = 250, -- ms

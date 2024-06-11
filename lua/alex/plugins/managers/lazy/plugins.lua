@@ -91,11 +91,14 @@ return {
     {
         "mfussenegger/nvim-dap",
         dependencies = {
-            "rcarriga/nvim-dap-ui",
             "nvim-neotest/nvim-nio",
+            {
+                "rcarriga/nvim-dap-ui",
+                config = function() require("alex.plugins.ui.dapui") end
+            },
         },
         event = { "User NvimStartupDone" },
-        config = function() require("alex.plugins.lang.debugger") end,
+        config = function() require("alex.plugins.lang.dap") end,
     },
     {
         "mfussenegger/nvim-lint",

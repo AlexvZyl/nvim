@@ -6,7 +6,7 @@ dap.adapters.cppdbg = {
     command = "/home/alex/.config/nvim/lua/alex/plugins/lang/debugger/tools/vscode-cpptools/extension/debugAdapters/bin/OpenDebugAD7",
 }
 
-local cache = require("alex.plugins.lang.debugger.cache")
+local cache = require("alex.custom.cache")
 
 -- C++
 dap.adapters.codelldb = {
@@ -33,3 +33,12 @@ dap.configurations.cpp = {
 
 dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = dap.configurations.cpp
+
+-- AFTER dap was loaded.
+local sign = vim.fn.sign_define
+sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+sign(
+    "DapBreakpointCondition",
+    { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" }
+)
+sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })

@@ -1,7 +1,7 @@
 -- Cache exe locations based on the dir.
 local M = {}
 
-M._cache_location = os.getenv("HOME") .. "/.config/nvim/lua/alex/plugins/lang/debugger/.cache.json"
+M._cache_location = os.getenv("HOME") .. "/.config/nvim/lua/alex/custom/cache/.cache.json"
 
 function M._get_cache_file(desc)
     local cache_file = io.open(M._cache_location, desc)

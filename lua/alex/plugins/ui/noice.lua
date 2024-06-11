@@ -73,6 +73,7 @@ local lsp = {
 }
 
 local notify = {
+    enabled = true,
     fps = 75,
     max_width = 75,
     level = "ERROR",

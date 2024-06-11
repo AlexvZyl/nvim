@@ -83,8 +83,8 @@ local defaults = {
     mappings = {
         i = {
             ["<Esc>"] = require("telescope.actions").close,
-            ["<C-Esc>"] = require("telescope.actions").close
-        }
+            ["<C-Esc>"] = require("telescope.actions").close,
+        },
     },
     preview = { treesitter = true },
 }

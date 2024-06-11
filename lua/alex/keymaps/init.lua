@@ -39,10 +39,7 @@ function M.lsp()
     keymap(n, "]E", function() require("alex.native.lsp").next_error() end, default_settings)
 end
 
-
-function M.blame()
-    keymap(n, "gb", "<CMD>GitBlameToggle<CR>", default_settings)
-end
+function M.blame() keymap(n, "gb", "<CMD>GitBlameToggle<CR>", default_settings) end
 
 function M.native()
     -- Windows

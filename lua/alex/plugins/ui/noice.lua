@@ -21,7 +21,7 @@ local function routes_config()
         "response of request method",
         "not found:",
         "No buffers found with",
-        "no client attached"
+        "no client attached",
     }
 
     local routes = {}

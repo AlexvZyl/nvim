@@ -94,7 +94,7 @@ return {
             "nvim-neotest/nvim-nio",
             {
                 "rcarriga/nvim-dap-ui",
-                config = function() require("alex.plugins.ui.dapui") end
+                config = function() require("alex.plugins.ui.dapui") end,
             },
         },
         event = { "User NvimStartupDone" },

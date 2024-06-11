@@ -59,6 +59,8 @@ local views = {
         },
     },
     hover = { border = { style = "rounded" } },
+    float = { border = { style = "rounded" } },
+    popup = { border = { style = "rounded" } },
 }
 
 local lsp = {

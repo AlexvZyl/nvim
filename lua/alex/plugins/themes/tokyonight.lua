@@ -70,7 +70,7 @@ local function on_highlights(H, C)
     end
 
     -- Custom highlights.
-    H.CustomWinBar = { fg = TC.moon().fg_dark }
+    H.CustomWinBar = { fg = C.comment }
     H.CustomWinBarNC = { fg = C.comment }
 end
 

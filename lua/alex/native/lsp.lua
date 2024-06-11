@@ -32,7 +32,7 @@ vim.diagnostic.config(config)
 
 local U = require("alex.utils.chars")
 local float_options = {
-    border = U.border_chars_empty,
+    border = U.border_chars_round,
     prefix = "  ",
     header = "",
     suffix = "",
@@ -57,11 +57,5 @@ end
 function M.next_diag() vim.diagnostic.goto_next({ float = float_options }) end
 
 function M.prev_diag() vim.diagnostic.goto_prev({ float = float_options }) end
-
--- UI stuff.
-
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-    border = U.border_chars_round,
-})
 
 return M

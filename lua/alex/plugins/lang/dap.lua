@@ -6,7 +6,7 @@ dap.adapters.cppdbg = {
     command = "/home/alex/.config/nvim/lua/alex/plugins/lang/debugger/tools/vscode-cpptools/extension/debugAdapters/bin/OpenDebugAD7",
 }
 
-local cache = require("alex.custom.cache")
+local cache = require("alex.plugins.custom.cache")
 
 -- C++
 dap.adapters.codelldb = {

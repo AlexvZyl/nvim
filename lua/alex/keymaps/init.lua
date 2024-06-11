@@ -19,6 +19,7 @@ function M.init()
 
     -- Lazyload dependents:
     M.telescope()
+    M.blame()
 end
 
 function M.lsp()
@@ -36,6 +37,11 @@ function M.lsp()
     keymap(n, "]e", function() require("alex.native.lsp").next_diag() end, default_settings)
     keymap(n, "[E", function() require("alex.native.lsp").prev_error() end, default_settings)
     keymap(n, "]E", function() require("alex.native.lsp").next_error() end, default_settings)
+end
+
+
+function M.blame()
+    keymap(n, "gb", "<CMD>GitBlameToggle<CR>", default_settings)
 end
 
 function M.native()
@@ -97,7 +103,6 @@ function M.telescope()
         default_settings
     )
     keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
-    keymap(n, "fb", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "ft", "<Cmd>Telescope todo-comments previewer=false<CR>", default_settings)
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)

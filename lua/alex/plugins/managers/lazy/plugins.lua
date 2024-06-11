@@ -76,13 +76,17 @@ return {
         config = function() require("alex.plugins.ui.tree") end,
         keys = { "<leader>f", "gf" },
     },
+    {
+        'f-person/git-blame.nvim',
+        cmd = { "GitBlameToggle" },
+    },
 
-    -- Language/Tools/LSP/Comp
+    -- Language.
     {
         "zbirenbaum/copilot.lua",
         config = function() require("alex.plugins.lang.copilot") end,
         cmd = "Copilot",
-        build = ":Copilot auth",
+        build = "Copilot auth",
     },
     {
         "mfussenegger/nvim-dap",
@@ -138,14 +142,12 @@ return {
         },
     },
 
-    -- Compatibility/Support/Language tools
+    -- Other.
     {
         "aserowy/tmux.nvim",
         event = { "User NvimStartupDone" },
         config = function() require("tmux").setup() end,
     },
-
-    -- Editing/Modal
     {
         "ggandor/leap.nvim",
         dependencies = "tpope/vim-repeat",
@@ -168,7 +170,7 @@ return {
         config = function() require("alex.plugins.themes.tokyonight") end,
     },
 
-    -- Nice themes
+    -- Nice themes.
     --{ 'sainnhe/gruvbox-material', lazy = true },
     --{ 'EdenEast/nightfox.nvim', lazy = true },
     --{ 'catppuccin/nvim', lazy = true },

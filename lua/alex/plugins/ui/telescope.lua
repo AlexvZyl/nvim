@@ -31,6 +31,7 @@ local horizontal_layout = {
 
 local picker_buffer = {
     preview = false,
+    wrap_results = false,
     layout_config = {
         height = 0.35,
         width = 0.4,
@@ -44,9 +45,10 @@ local small_lsp_layout = {
     layout_strategy = "vertical",
     preview_title = "",
     preview = true,
+    wrap_results = false,
     layout_config = {
         height = 0.6,
-        width = 0.55,
+        width = 0.6,
         mirror = true,
     },
     borderchars = {
@@ -78,7 +80,12 @@ local defaults = {
     results_title = "",
     winblend = 0,
     wrap_results = true,
-    mappings = { i = { ["<Esc>"] = require("telescope.actions").close } },
+    mappings = {
+        i = {
+            ["<Esc>"] = require("telescope.actions").close,
+            ["<C-Esc>"] = require("telescope.actions").close
+        }
+    },
     preview = { treesitter = true },
 }
 

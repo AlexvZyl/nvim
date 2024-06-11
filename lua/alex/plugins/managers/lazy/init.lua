@@ -5,7 +5,7 @@ local U = require("alex.utils.chars")
 local plugins = require("alex.plugins.managers.lazy.plugins")
 
 local opts = {
-    ui = { border = U.border_chars_outer_thin },
+    ui = { border = U.border_chars_inner_thin },
     defaults = { lazy = false },
     checker = {
         notify = false,

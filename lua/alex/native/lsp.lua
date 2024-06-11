@@ -58,4 +58,12 @@ function M.next_diag() vim.diagnostic.goto_next({ float = float_options }) end
 
 function M.prev_diag() vim.diagnostic.goto_prev({ float = float_options }) end
 
+-- UI stuff.
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+    vim.lsp.handlers.hover, {
+        border = U.border_chars_round
+    }
+)
+
 return M

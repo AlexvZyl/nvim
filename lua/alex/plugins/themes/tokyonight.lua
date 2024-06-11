@@ -5,6 +5,9 @@ local transparent = true
 if vim.g.neovide then transparent = false end
 
 local function on_highlights(H, C)
+    -- Lazy
+    H.LazyNormal = { bg = C.bg_dark }
+    H.LazyBorder = { bg = C.bg_dark }
     -- Native
     H.MsgArea = { bg = C.bg_dark, fg = C.fg_dark }
     H.SpecialCmpBorder = { bg = C.bg }
@@ -32,8 +35,9 @@ local function on_highlights(H, C)
     local prompt = TC.default.bg_dark
     H.TelescopePromptBorder = { fg = C.bg_dark, bg = prompt }
     H.TelescopePromptNormal = { bg = prompt }
-    H.TelescopeSelectionCaret = { fg = C.yellow, bg = TC.default.bg }
-    H.TelescopeSelection = { bg = TC.default.bg }
+    local default = "#283457"
+    H.TelescopeSelectionCaret = { fg = C.yellow, bg = default }
+    H.TelescopeSelection = { bg = default }
     local preview = blend(C.bg_dark, C.bg, 0.15)
     H.TelescopeNormal = { bg = preview }
     H.TelescopeBorder = { fg = C.bg_dark, bg = preview }
@@ -43,6 +47,7 @@ local function on_highlights(H, C)
     H.NoiceLspProgressTitle = { bg = C.bg }
     H.NoiceLspProgressClient = { bg = C.bg }
     H.NoiceLspProgressSpinner = { bg = C.bg }
+
     -- Copilot
     H.CopilotSuggestion = { fg = C.fg_gutter, italic = false }
     -- Debugger
@@ -56,13 +61,17 @@ local function on_highlights(H, C)
     if transparent then
         H.Pmenu.bg = "NONE"
         H.SpecialCmpBorder.bg = "NONE"
+        H.NormalFloat = { bg = "NONE" }
+        H.FloatBorder = { bg = "NONE", fg = C.blue2 }
+        H.NoicePopup = { bg = "NONE" }
+        H.NoicePopupBorder = { bg = "NONE" }
         H.WhichKeyFloat = { bg = C.bg }
         H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }
     end
 
     -- Custom highlights.
-    H.CustomWinBar = { fg = C.comment }
-    H.CustomWinBarNC = { fg = C.dark3 }
+    H.CustomWinBar = { fg = TC.moon().fg_dark }
+    H.CustomWinBarNC = { fg = C.comment }
 end
 
 require("tokyonight").load({

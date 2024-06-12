@@ -32,9 +32,6 @@ local function on_highlights(H, C)
     local prompt = TC.default.bg_dark
     H.TelescopePromptBorder = { fg = C.bg_dark, bg = prompt }
     H.TelescopePromptNormal = { bg = prompt }
-    local default = "#283457"
-    H.TelescopeSelectionCaret = { fg = C.yellow, bg = default }
-    H.TelescopeSelection = { bg = default }
     local preview = blend(C.bg_dark, C.bg, 0.15)
     H.TelescopeNormal = { bg = preview }
     H.TelescopeBorder = { fg = C.bg_dark, bg = preview }
@@ -51,9 +48,11 @@ local function on_highlights(H, C)
     H.DapUINormal = { bg = C.bg_dark }
     -- Completion
     H.CmpItemKindVariable = { fg = C.cyan }
-    -- Winbar.
 
     if transparent then
+        H.NormalFloat = { bg = C.bg }
+        H.FloatBorder = { fg = C.blue1, bg = C.bg }
+        H.LspInfoBorder = { fg = C.blue1, bg = C.bg }
         H.Pmenu.bg = "NONE"
         H.SpecialCmpBorder.bg = "NONE"
         H.NoicePopup = { bg = "NONE" }
@@ -62,7 +61,7 @@ local function on_highlights(H, C)
         H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }
     end
 
-    -- Custom highlights.
+    -- Winbar.
     H.CustomWinBar = { fg = C.comment }
     H.CustomWinBarNC = { fg = C.comment }
     H.WinBar = { fg = C.comment }

@@ -54,6 +54,7 @@ local function diff_source()
 end
 
 local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ":~") end
+
 local tree = {
     sections = {
         lualine_a = {

@@ -27,6 +27,7 @@ function M.lsp()
     keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
     keymap(n, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
     keymap(n_i, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
+
     keymap(
         n,
         "ge",
@@ -37,9 +38,25 @@ function M.lsp()
     keymap(n, "]e", function() require("alex.native.lsp").next_diag() end, default_settings)
     keymap(n, "[E", function() require("alex.native.lsp").prev_error() end, default_settings)
     keymap(n, "]E", function() require("alex.native.lsp").next_error() end, default_settings)
+
+    keymap(n, "<leader>l", "<Cmd>LspInfo<CR>", default_settings)
 end
 
 function M.blame() keymap(n, "gb", "<CMD>GitBlameToggle<CR>", default_settings) end
+
+function M.noice()
+    vim.keymap.set({ "n", "i", "s" }, "<C-d>", function()
+        if not require("noice.lsp").scroll(4) then
+            return "<C-d>"
+        end
+    end, { silent = true, expr = true })
+
+    vim.keymap.set({ "n", "i", "s" }, "<C-u>", function()
+        if not require("noice.lsp").scroll(-4) then
+            return "<C-u>"
+        end
+    end, { silent = true, expr = true })
+end
 
 function M.native()
     -- Windows

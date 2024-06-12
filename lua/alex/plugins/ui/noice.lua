@@ -70,12 +70,12 @@ local lsp = {
         ["cmp.entry.get_documentation"] = true,
     },
     signature = { enabled = false, view = "virtualtext" },
+    progress = { enabled = false, view = "mini" }
 }
 
 local notify = {
     enabled = true,
     fps = 75,
-    max_width = 75,
     level = "ERROR",
 }
 
@@ -94,4 +94,11 @@ require("noice").setup({
     presets = presets,
     notify = notify,
     routes = routes_config(),
+})
+
+require("alex.keymaps").noice()
+
+require("notify").setup({
+    max_width = 70,
+    min_width = 70
 })

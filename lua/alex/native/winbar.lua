@@ -4,8 +4,6 @@ vim.opt.winbar = nil
 
 local winbar_filetype_exclude = {
     "dashboard",
-    "trouble",
-    "Outline",
     "NvimTree",
 }
 
@@ -17,13 +15,8 @@ end
 local M = {}
 
 function M.get_winbar()
-    if excludes() then return end
-    if U.current_window_floating() then return end
-
-    U.current_window_hl("WinBar:CustomWinBar,WinBarNC:CustomWinBarNC")
-
-    local icon = U.current_buffer_icon()
-    if icon == nil then icon = "" end
+    local file_icon = U.current_buffer_icon()
+    if file_icon == nil then file_icon = "" end
 
     local mod_icon = ""
     if U.current_buffer_modified() then
@@ -32,16 +25,31 @@ function M.get_winbar()
         mod_icon = " "
     end
 
-    vim.opt_local.winbar = "  "
-        .. icon
+    local filename = U.current_buffer_filename()
+    if filename == "" then
+        filename = "[No Name]"
+        file_icon = " "
+    end
+
+    return "  "
+        .. file_icon
         .. " "
         .. U.current_buffer_parent()
-        .. U.current_buffer_filename()
+        .. filename
         .. mod_icon
 end
 
+function M.set_winbar(force)
+    if not force then
+        if excludes() then return end
+        if U.current_window_floating() then return end
+    end
+
+    vim.opt_local.winbar = M.get_winbar()
+end
+
 vim.api.nvim_create_autocmd({ "BufModifiedSet", "BufWinEnter", "BufFilePost", "BufWritePost" }, {
-    callback = function() require("alex.native.winbar").get_winbar() end,
+    callback = function() require("alex.native.winbar").set_winbar() end,
 })
 
 return M

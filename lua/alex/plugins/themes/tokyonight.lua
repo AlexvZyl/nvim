@@ -5,9 +5,6 @@ local transparent = true
 if vim.g.neovide then transparent = false end
 
 local function on_highlights(H, C)
-    -- Lazy
-    H.LazyNormal = { bg = C.bg_dark }
-    H.LazyBorder = { bg = C.bg_dark }
     -- Native
     H.MsgArea = { bg = C.bg_dark, fg = C.fg_dark }
     H.SpecialCmpBorder = { bg = C.bg }
@@ -55,14 +52,10 @@ local function on_highlights(H, C)
     -- Completion
     H.CmpItemKindVariable = { fg = C.cyan }
     -- Winbar.
-    H.WinBar = { bg = C.bg_dark, fg = C.yellow }
-    H.WinBarNC = { bg = C.bg_dark, fg = C.yellow }
 
     if transparent then
         H.Pmenu.bg = "NONE"
         H.SpecialCmpBorder.bg = "NONE"
-        H.NormalFloat = { bg = "NONE" }
-        H.FloatBorder = { bg = "NONE", fg = C.blue2 }
         H.NoicePopup = { bg = "NONE" }
         H.NoicePopupBorder = { bg = "NONE" }
         H.WhichKeyFloat = { bg = C.bg }
@@ -72,6 +65,8 @@ local function on_highlights(H, C)
     -- Custom highlights.
     H.CustomWinBar = { fg = C.comment }
     H.CustomWinBarNC = { fg = C.comment }
+    H.WinBar = { fg = C.comment }
+    H.WinBarNC = { fg = C.comment }
 end
 
 require("tokyonight").load({

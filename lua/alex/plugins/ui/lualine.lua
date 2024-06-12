@@ -1,14 +1,16 @@
 local U = require("alex.utils")
 
 -- Custom mode names.
-local mode_map = {
-    ["COMMAND"] = "COMMND",
-    ["V-BLOCK"] = "VBLOCK",
-    ["TERMINAL"] = "TERMNL",
-    ["V-REPLACE"] = "VREPLC",
-    ["O-PENDING"] = "0PNDNG",
-}
-local function fmt_mode(s) return mode_map[s] or s end
+local function fmt_mode(s)
+    local mode_map = {
+        ["COMMAND"] = "COMMND",
+        ["V-BLOCK"] = "VBLOCK",
+        ["TERMINAL"] = "TERMNL",
+        ["V-REPLACE"] = "VREPLC",
+        ["O-PENDING"] = "0PNDNG",
+    }
+    return mode_map[s] or s
+end
 
 local text_hl
 local icon_hl

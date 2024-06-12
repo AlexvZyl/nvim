@@ -46,15 +46,11 @@ function M.blame() keymap(n, "gb", "<CMD>GitBlameToggle<CR>", default_settings) 
 
 function M.noice()
     vim.keymap.set({ "n", "i", "s" }, "<C-d>", function()
-        if not require("noice.lsp").scroll(4) then
-            return "<C-d>"
-        end
+        if not require("noice.lsp").scroll(4) then return "<C-d>" end
     end, { silent = true, expr = true })
 
     vim.keymap.set({ "n", "i", "s" }, "<C-u>", function()
-        if not require("noice.lsp").scroll(-4) then
-            return "<C-u>"
-        end
+        if not require("noice.lsp").scroll(-4) then return "<C-u>" end
     end, { silent = true, expr = true })
 end
 

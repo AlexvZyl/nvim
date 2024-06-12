@@ -31,12 +31,7 @@ function M.get_winbar()
         file_icon = " "
     end
 
-    return "  "
-        .. file_icon
-        .. " "
-        .. U.current_buffer_parent()
-        .. filename
-        .. mod_icon
+    return "  " .. file_icon .. " " .. U.current_buffer_parent() .. filename .. mod_icon
 end
 
 function M.set_winbar(force)

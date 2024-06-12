@@ -70,7 +70,7 @@ local lsp = {
         ["cmp.entry.get_documentation"] = true,
     },
     signature = { enabled = false, view = "virtualtext" },
-    progress = { enabled = false, view = "mini" }
+    progress = { enabled = false, view = "mini" },
 }
 
 local notify = {
@@ -100,5 +100,5 @@ require("alex.keymaps").noice()
 
 require("notify").setup({
     max_width = 70,
-    min_width = 70
+    min_width = 70,
 })

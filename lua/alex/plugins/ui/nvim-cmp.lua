@@ -1,5 +1,5 @@
-local cmp = require("cmp")
-local u = require("alex.utils")
+local CMP = require("cmp")
+local U = require("alex.utils")
 
 -- Format the completion menu. Yes, I am that pedantic.
 local function format(_, item)
@@ -15,7 +15,7 @@ local function format(_, item)
     end
 
     -- Replace kind with icons.
-    item.kind = " " .. (u.kind_icons[item.kind] or u.kind_icons.Unknown) .. "│"
+    item.kind = " " .. (U.kind_icons[item.kind] or U.kind_icons.Unknown) .. "│"
 
     -- Remove gibberish.
     item.menu = nil
@@ -28,14 +28,14 @@ local formatting = {
 }
 
 local window = {
-    completion = cmp.config.window.bordered({
+    completion = CMP.config.window.bordered({
         winhighlight = "Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None",
         scrollbar = true,
         border = "rounded",
         col_offset = -1,
         side_padding = 0,
     }),
-    documentation = cmp.config.window.bordered({
+    documentation = CMP.config.window.bordered({
         winhighlight = "Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None",
         scrollbar = true,
         border = "rounded",
@@ -46,7 +46,7 @@ window.documentation.max_height = 18
 window.documentation.max_width = 80
 window.documentation.side_padding = 1
 
-cmp.setup({
+CMP.setup({
     formatting = formatting,
     window = window,
     performance = {

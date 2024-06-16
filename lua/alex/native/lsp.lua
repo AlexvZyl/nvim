@@ -35,7 +35,6 @@ local float_options = {
     border = U.border_chars_round,
     prefix = "  ",
     header = "",
-    suffix = "",
 }
 
 function M.open_diagnostics_float() vim.diagnostic.open_float(float_options) end

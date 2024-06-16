@@ -1,10 +1,8 @@
 local CMP = require("cmp")
 local U = require("alex.utils")
 
-
 require("alex.plugins.ui.nvim-cmp")
 require("luasnip.loaders.from_vscode").lazy_load()
-
 
 -- Main.
 local sources = CMP.config.sources({
@@ -20,7 +18,6 @@ CMP.setup({
     snippet = snippet,
 })
 
-
 -- Tex.
 local tex = {
     sources = {
@@ -30,7 +27,6 @@ local tex = {
     },
 }
 CMP.setup.filetype({ "tex", "latex" }, tex)
-
 
 -- Cmdline.
 local cmdline_window = {
@@ -52,7 +48,6 @@ local cmdline = {
 }
 CMP.setup.cmdline({ ":", ":!" }, cmdline)
 
-
 -- Search.
 local search_window = {
     completion = CMP.config.window.bordered({
@@ -66,9 +61,8 @@ local search_window = {
 local search = {
     window = search_window,
     mapping = CMP.mapping.preset.cmdline(),
-    sources = CMP.config.sources({ { name = "buffer" }, }),
+    sources = CMP.config.sources({ { name = "buffer" } }),
 }
 CMP.setup.cmdline({ "/", "?" }, search)
-
 
 require("alex.keymaps").completion()

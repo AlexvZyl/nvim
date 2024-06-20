@@ -23,7 +23,7 @@ local function routes_config()
         "No buffers found with",
         "no client attached",
         "E21",
-        "E382"
+        "E382",
     }
 
     local routes = {}

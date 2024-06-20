@@ -68,8 +68,7 @@ LC.dockerls.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
     root_dir = U.root_pattern({
-        "*Dockerfile*",
-        "*dockerfile*",
+        "*[dD]ockerfile*",
     }),
 })
 
@@ -77,10 +76,8 @@ LC.docker_compose_language_service.setup({
     default.lsp_flags,
     default.capabilities,
     root_dir = U.root_pattern({
-        "docker-compose.yml",
-        "docker-compose.yaml",
-        "compose.yaml",
-        "compose.yml",
+        "docker-compose.ya?ml",
+        "compose.ya?ml",
     }),
 })
 

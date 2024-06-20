@@ -150,7 +150,7 @@ require("lualine").setup({
             {
                 U.get_git_compare,
                 separator = " ",
-                padding = 0,
+                padding = 1,
                 color = text_hl,
             },
             {
@@ -174,6 +174,7 @@ require("lualine").setup({
             {
                 U.get_recording_icon,
                 color = get_recording_color,
+                padding = 0
             },
         },
         lualine_x = {

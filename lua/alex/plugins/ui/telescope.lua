@@ -95,6 +95,7 @@ TS.setup({
         diagnostics = vertical_layout,
         live_grep = horizontal_layout,
         help_tags = horizontal_layout,
+        oldfiles = horizontal_layout,
         find_files = horizontal_layout,
         buffers = picker_buffer,
         lsp_document_symbols = horizontal_layout,

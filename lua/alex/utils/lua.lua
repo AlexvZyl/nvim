@@ -31,9 +31,7 @@ end
 function M.in_home_dir(subdir)
     local cwd = vim.loop.cwd()
     local path = vim.loop.os_homedir()
-    if subdir ~= nil then
-        path = path .. "/" .. subdir
-    end
+    if subdir ~= nil then path = path .. "/" .. subdir end
 
     return string.sub(cwd, 1, #path) == path
 end

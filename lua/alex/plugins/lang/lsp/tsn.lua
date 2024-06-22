@@ -1,7 +1,5 @@
 local U = require("alex.utils.lua")
-if not U.in_home_dir("TSN") then
-    return
-end
+if not U.in_home_dir("TSN") then return end
 
 local LU = require("lspconfig.util")
 local LC = require("lspconfig")

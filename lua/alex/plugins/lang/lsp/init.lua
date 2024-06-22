@@ -94,6 +94,5 @@ LC.jsonls.setup({
     cmd = { "json-languageserver", "--stdio" },
 })
 
-
 -- Extensions.
 require("alex.plugins.lang.lsp.tsn")

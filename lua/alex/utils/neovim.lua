@@ -66,9 +66,9 @@ function M.is_recording() return vim.fn.reg_recording() ~= "" end
 
 function M.get_recording_icon()
     if M.is_recording() then
-        return "  "
+        return " "
     else
-        return ""
+        return "  "
     end
 end
 

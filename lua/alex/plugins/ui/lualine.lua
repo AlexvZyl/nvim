@@ -141,21 +141,26 @@ require("lualine").setup({
         lualine_b = {},
         lualine_c = {
             {
+                U.get_recording_icon,
+                color = get_recording_color,
+                padding = 0,
+                separator = ""
+            },
+            {
                 "branch",
                 color = text_hl,
-                icon = { "   ", color = icon_hl },
+                icon = { " ", color = icon_hl },
                 separator = "",
                 padding = 0,
             },
             {
                 U.get_git_compare,
-                separator = " ",
-                padding = 1,
-                color = text_hl,
+                padding   = { left = 1 },
+                color     = text_hl,
+                separator = ""
             },
             {
                 "diff",
-                padding = 0,
                 color = text_hl,
                 icon = { "  ", color = text_hl },
                 source = diff_source,
@@ -169,12 +174,7 @@ require("lualine").setup({
                     modified = icon_hl,
                     removed = icon_hl,
                 },
-                separator = " ",
-            },
-            {
-                U.get_recording_icon,
-                color = get_recording_color,
-                padding = 0,
+                padding = 0
             },
         },
         lualine_x = {

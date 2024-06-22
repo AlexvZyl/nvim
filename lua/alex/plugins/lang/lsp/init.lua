@@ -1,4 +1,4 @@
-local U = require("lspconfig.util")
+local LU = require("lspconfig.util")
 local LC = require("lspconfig")
 local DC = require("cmp_nvim_lsp").default_capabilities()
 
@@ -17,12 +17,13 @@ local default = {
 -- Setup LSPs.
 
 LC.clangd.setup({
-    default,
-    root_dir = U.root_pattern(
+    lsp_flags = lsp_flags,
+    capabilities = DC,
+    root_dir = LU.root_pattern(
         ".clangd",
         ".clang-tidy",
         ".clang-format",
-        "compile_commands.json",
+        "*compile_commands.json",
         "compile_flags.txt",
         "configure.ac",
         ".git"
@@ -49,33 +50,33 @@ LC.powershell_es.setup({
 LC.eslint.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern({ "*.js", "*.ts" }),
+    root_dir = LU.root_pattern({ "*.js", "*.ts" }),
 })
 
 LC.tsserver.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern({ "*.js", "*.ts" }),
+    root_dir = LU.root_pattern({ "*.js", "*.ts" }),
 })
 
 LC.cmake.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern("CMakeLists.txt"),
+    root_dir = LU.root_pattern("CMakeLists.txt"),
 })
 
 LC.dockerls.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
-    root_dir = U.root_pattern({
-        "*[dD]ockerfile*",
+    root_dir = LU.root_pattern({
+        "[dD]ockerfile*",
     }),
 })
 
 LC.docker_compose_language_service.setup({
     default.lsp_flags,
     default.capabilities,
-    root_dir = U.root_pattern({
+    root_dir = LU.root_pattern({
         "docker-compose.ya?ml",
         "compose.ya?ml",
     }),
@@ -92,3 +93,7 @@ LC.jsonls.setup({
     lsp_flags = lsp_flags,
     cmd = { "json-languageserver", "--stdio" },
 })
+
+
+-- Extensions.
+require("alex.plugins.lang.lsp.tsn")

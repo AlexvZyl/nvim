@@ -23,7 +23,7 @@ LC.clangd.setup({
         ".clangd",
         ".clang-tidy",
         ".clang-format",
-        "*compile_commands.json",
+        "compile_commands.json",
         "compile_flags.txt",
         "configure.ac",
         ".git"

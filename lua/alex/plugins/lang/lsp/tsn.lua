@@ -1,5 +1,5 @@
 local U = require("alex.utils.lua")
-if not U.in_home_dir("TSN") then return end
+if not U.in_home_dir("TSN") and not U.in_dir("/app") then return end
 
 local LU = require("lspconfig.util")
 local LC = require("lspconfig")
@@ -9,22 +9,21 @@ local lsp_flags = {
     debounce_text_changes = 250, -- ms
 }
 
-local home = vim.loop.os_homedir()
-
 LC.clangd.setup({
     lsp_flags = lsp_flags,
     capabilities = DC,
     cmd = {
-        home .. "/TSN/Repos/analysis/docker/docker_image_runner.sh",
-        home .. "/TSN/Repos/analysis/docker/Dockerfile.box4dev",
+        "/app/dev/analysis/docker/docker_image_runner.sh",
+        "/app/dev/analysis/docker/Dockerfile.box4dev",
         "--lsp",
         "clangd",
+        "--background-index",
     },
     root_dir = LU.root_pattern(
         ".clangd",
         ".clang-tidy",
         ".clang-format",
-        "*compile_commands.json",
+        "compile_commands.json",
         "compile_flags.txt",
         "configure.ac",
         ".git"

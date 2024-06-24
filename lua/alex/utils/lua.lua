@@ -28,12 +28,15 @@ function M.file_exists(file)
     end
 end
 
-function M.in_home_dir(subdir)
+function M.in_dir(dir)
     local cwd = vim.loop.cwd()
+    return string.sub(cwd, 1, #dir) == dir
+end
+
+function M.in_home_dir(subdir)
     local path = vim.loop.os_homedir()
     if subdir ~= nil then path = path .. "/" .. subdir end
-
-    return string.sub(cwd, 1, #path) == path
+    return M.in_dir(path)
 end
 
 return M

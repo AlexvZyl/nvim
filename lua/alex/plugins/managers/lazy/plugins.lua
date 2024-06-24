@@ -164,7 +164,7 @@ return {
         branch = "dev",
         priority = 1000,
         config = function() require("alex.plugins.themes.nordic") end,
-        lazy = true
+        lazy = true,
     },
     {
         "folke/tokyonight.nvim",
@@ -173,7 +173,7 @@ return {
         config = function() require("alex.plugins.themes.tokyonight") end,
     },
     {
-        'sainnhe/gruvbox-material',
+        "sainnhe/gruvbox-material",
         lazy = true,
         priority = 1000,
         config = function() require("alex.plugins.themes.gruvbox") end,

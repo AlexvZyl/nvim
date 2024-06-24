@@ -85,7 +85,7 @@ return {
     {
         "zbirenbaum/copilot.lua",
         config = function() require("alex.plugins.lang.copilot") end,
-        cmd = "Copilot",
+        cmd = { "Copilot" },
         build = "Copilot auth",
     },
     {
@@ -164,7 +164,7 @@ return {
         branch = "dev",
         priority = 1000,
         config = function() require("alex.plugins.themes.nordic") end,
-        lazy = true,
+        lazy = true
     },
     {
         "folke/tokyonight.nvim",
@@ -172,9 +172,14 @@ return {
         lazy = false,
         config = function() require("alex.plugins.themes.tokyonight") end,
     },
+    {
+        'sainnhe/gruvbox-material',
+        lazy = true,
+        priority = 1000,
+        config = function() require("alex.plugins.themes.gruvbox") end,
+    },
 
     -- Nice themes.
-    --{ 'sainnhe/gruvbox-material', lazy = true },
     --{ 'EdenEast/nightfox.nvim', lazy = true },
     --{ 'catppuccin/nvim', lazy = true },
     --{ 'sainnhe/everforest', lazy = true },

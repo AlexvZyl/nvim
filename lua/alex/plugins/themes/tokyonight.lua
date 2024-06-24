@@ -48,6 +48,7 @@ local function on_highlights(H, C)
     H.DapUINormal = { bg = C.bg_dark }
     -- Completion
     H.CmpItemKindVariable = { fg = C.cyan }
+    H.CmpItemKindFile = { fg = C.yellow }
 
     if transparent then
         H.NormalFloat = { bg = C.bg }

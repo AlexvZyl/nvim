@@ -25,13 +25,13 @@ if vim.g.colors_name == "nordic" then
     green = C.green.base
     yellow = C.yellow.base
     red = C.red.base
-elseif vim.g.colors_name == "tokyonight" then
-    local C = require("tokyonight.colors")
-    text_hl = { fg = C.default.fg_gutter }
-    icon_hl = { fg = C.default.dark3 }
-    green = C.default.green1
-    yellow = C.default.yellow
-    red = C.default.red1
+elseif vim.g.colors_name == "tokyonight-night" then
+    local C = require("tokyonight.colors.moon")
+    text_hl = { fg = C.fg_gutter }
+    icon_hl = { fg = C.dark3 }
+    green = C.green1
+    yellow = C.yellow
+    red = C.red1
 end
 
 local function get_recording_color()

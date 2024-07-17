@@ -1,4 +1,5 @@
 local TC = require("tokyonight.colors")
+local default = require("tokyonight.colors.moon")
 local blend = require("tokyonight.util").blend
 
 local transparent = true
@@ -29,10 +30,10 @@ local function on_highlights(H, C)
     -- Telescope
     H.TelescopePromptTitle = { fg = C.bg_dark, bg = C.orange }
     H.TelescopePreviewTitle = { fg = C.bg_dark, bg = C.orange }
-    local prompt = TC.default.bg_dark
+    local prompt = default.bg_dark
     H.TelescopePromptBorder = { fg = C.bg_dark, bg = prompt }
     H.TelescopePromptNormal = { bg = prompt }
-    local preview = blend(C.bg_dark, C.bg, 0.15)
+    local preview = blend(C.bg_dark, 0.15, C.bg)
     H.TelescopeNormal = { bg = preview }
     H.TelescopeBorder = { fg = C.bg_dark, bg = preview }
 

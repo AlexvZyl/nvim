@@ -11,8 +11,8 @@ config.project = {
 
 config.shortcut = {
     {
-        desc = "  New file ",
-        action = "enew",
+        desc = "󰠮  Notes ",
+        action = "enew | set filetype=markdown",
         group = "@string",
         key = "n",
     },

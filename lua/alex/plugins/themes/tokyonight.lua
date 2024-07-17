@@ -19,6 +19,7 @@ local function on_highlights(H, C)
     H.DashboardMruTitle = { fg = C.orange, bold = true }
     H.DashboardProjectTitle = { fg = C.orange, bold = true }
     H.DashboardProjectIcon = { fg = C.magenta, bold = true }
+    H.DashboardFiles = { fg = C.fg }
     -- Leap
     H.LeapBackdrop = {}
     H.LeapLabelPrimary = { bg = C.bg_dark, fg = C.red1 }
@@ -59,9 +60,12 @@ local function on_highlights(H, C)
         H.SpecialCmpBorder.bg = "NONE"
         H.NoicePopup = { bg = "NONE" }
         H.NoicePopupBorder = { bg = "NONE" }
-        H.WhichKeyFloat = { bg = C.bg }
-        H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }
     end
+
+    -- Whichkey.
+    H.WhichKeyBorder = { fg = C.bg_dark, bg = C.bg }
+    H.WhichKeyNormal = { bg = C.bg }
+    H.WhichKeyTitle = { fg = C.yellow, bg = C.bg_dark, bold = true }
 
     -- Winbar.
     H.CustomWinBar = { fg = C.comment }
@@ -78,5 +82,5 @@ require("tokyonight").load({
 })
 
 require("lualine").setup({
-    options = { theme = "tokyonight" },
+    options = { theme = "tokyonight-night" },
 })

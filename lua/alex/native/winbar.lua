@@ -43,8 +43,11 @@ function M.set_winbar(force)
     vim.opt_local.winbar = M.get_winbar()
 end
 
-vim.api.nvim_create_autocmd({ "BufModifiedSet", "BufWinEnter", "BufFilePost", "BufWritePost", "WinEnter" }, {
-    callback = function() require("alex.native.winbar").set_winbar() end,
-})
+vim.api.nvim_create_autocmd(
+    { "BufModifiedSet", "BufWinEnter", "BufFilePost", "BufWritePost", "WinEnter" },
+    {
+        callback = function() require("alex.native.winbar").set_winbar() end,
+    }
+)
 
 return M

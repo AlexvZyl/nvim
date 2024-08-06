@@ -33,8 +33,8 @@ local picker_buffer = {
     preview = false,
     wrap_results = false,
     layout_config = {
-        height = 0.35,
-        width = 0.4,
+        height = 0.4,
+        width = 0.5
     },
     sort_mru = true,
     ignore_current_buffer = true,
@@ -47,8 +47,8 @@ local small_lsp_layout = {
     preview = true,
     wrap_results = false,
     layout_config = {
-        height = 0.6,
-        width = 0.6,
+        height = 0.65,
+        width = 0.65,
         mirror = true,
     },
     borderchars = {

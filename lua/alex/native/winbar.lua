@@ -7,6 +7,12 @@ local winbar_filetype_exclude = {
     "NvimTree",
 }
 
+-- filetype: bar
+local custom_bars = {
+    qf = " QuickFix",
+    netrw = "  Netrw"
+}
+
 local excludes = function()
     if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then return true end
     return false
@@ -15,6 +21,11 @@ end
 local M = {}
 
 function M.get_winbar()
+    local filetype = U.current_buffer_filetype()
+    if custom_bars[filetype] ~= nil then
+        return "  " .. custom_bars[filetype]
+    end
+
     local file_icon = U.current_buffer_icon()
     if file_icon == nil then file_icon = "" end
 

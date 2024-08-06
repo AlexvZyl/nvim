@@ -10,7 +10,7 @@ local winbar_filetype_exclude = {
 -- filetype: bar
 local custom_bars = {
     qf = " QuickFix",
-    netrw = "  Netrw"
+    netrw = "  Netrw",
 }
 
 local excludes = function()
@@ -22,9 +22,7 @@ local M = {}
 
 function M.get_winbar()
     local filetype = U.current_buffer_filetype()
-    if custom_bars[filetype] ~= nil then
-        return "  " .. custom_bars[filetype]
-    end
+    if custom_bars[filetype] ~= nil then return "  " .. custom_bars[filetype] end
 
     local file_icon = U.current_buffer_icon()
     if file_icon == nil then file_icon = "" end

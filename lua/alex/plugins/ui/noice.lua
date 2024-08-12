@@ -24,6 +24,7 @@ local function routes_config()
         "no client attached",
         "E21",
         "E382",
+        "E553"
     }
 
     local routes = {}

@@ -77,6 +77,10 @@ function M.native()
 
     -- Buffers
     keymap(n, "Q", function() require("alex.keymaps.utils").delete_buffer() end, default_settings)
+
+    -- Quickfix.
+    keymap(n, "}", "<Cmd>cnext<CR>", default_settings)
+    keymap(n, "{", "<Cmd>cprevious<CR>", default_settings)
 end
 
 function M.editing()

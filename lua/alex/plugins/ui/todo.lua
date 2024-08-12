@@ -17,7 +17,7 @@ require("todo-comments").setup({
         after = "",
         pattern = {
             [[.*<(KEYWORDS)\s*:]], -- default
-            [[.*<(KEYWORDS)(\(\S+\))?:]],
+            [[.*<(KEYWORDS)(\(\S+\)):]],
         },
     },
     search = {

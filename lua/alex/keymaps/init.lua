@@ -24,8 +24,8 @@ end
 
 function M.lsp()
     keymap(n, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
-    keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
     keymap(n, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
+    keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
     keymap(n_i, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
 
     keymap(
@@ -79,8 +79,8 @@ function M.native()
     keymap(n, "Q", function() require("alex.keymaps.utils").delete_buffer() end, default_settings)
 
     -- Quickfix.
-    keymap(n, "}", "<Cmd>cnext<CR>", default_settings)
-    keymap(n, "{", "<Cmd>cprevious<CR>", default_settings)
+    keymap(n, "}", "<Cmd>cnext<CR>zz_", default_settings)
+    keymap(n, "{", "<Cmd>cprevious<CR>zz_", default_settings)
 end
 
 function M.editing()

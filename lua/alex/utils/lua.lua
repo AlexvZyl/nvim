@@ -39,13 +39,8 @@ function M.in_home_dir(subdir)
     return M.in_dir(path)
 end
 
-function M.current_dir()
-    return vim.uv.cwd()
-end
+function M.current_dir() return vim.uv.cwd() end
 
-function M.exists(dir)
-    return stat and stat.type == "directory" or stat.type == "directory" or false
-end
-
+function M.exists(dir) return stat and stat.type == "directory" or stat.type == "directory" or false end
 
 return M

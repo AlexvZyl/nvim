@@ -5,21 +5,17 @@ local LU = require("lspconfig.util")
 local LC = require("lspconfig")
 local C = require("alex.plugins.lang.lsp.config")
 
-
 local function get_docker_script()
     local possible_dirs = { "/docker", "../docker", "../../docker" }
     local curr_dir = U.current_dir()
 
     for _, dir in ipairs(possible_dirs) do
         local script = curr_dir .. dir .. "/docker_image_runner.sh"
-        if U.file_exists(script) then
-            return script
-        end
+        if U.file_exists(script) then return script end
     end
 
     vim.notify("Could not find TSN docker script for lsp", "ERROR")
 end
-
 
 LC.clangd.setup({
     lsp_flags = C.lsp_flags,

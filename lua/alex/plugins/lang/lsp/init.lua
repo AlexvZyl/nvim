@@ -1,24 +1,15 @@
 local LU = require("lspconfig.util")
 local LC = require("lspconfig")
-local DC = require("cmp_nvim_lsp").default_capabilities()
+local C = require("alex.plugins.lang.lsp.config")
 
 require("lspconfig.ui.windows").default_options.border =
     require("alex.utils").get_border_chars("float")
 
-local lsp_flags = {
-    debounce_text_changes = 250, -- ms
-}
-
-local default = {
-    lsp_flags = lsp_flags,
-    capabilities = DC,
-}
-
 -- Setup LSPs.
 
 LC.clangd.setup({
-    lsp_flags = lsp_flags,
-    capabilities = DC,
+    lsp_flags = C.lsp_flags,
+    capabilities = C.capabilities,
     root_dir = LU.root_pattern(
         ".clangd",
         ".clang-tidy",
@@ -30,52 +21,49 @@ LC.clangd.setup({
     ),
 })
 
-LC.cssls.setup({ default })
-LC.nixd.setup({ default })
-LC.lua_ls.setup({ default })
-LC.julials.setup({ default })
-LC.bashls.setup({ default })
-LC.pyright.setup({ default })
---LC.ruff_lsp.setup { default }
-LC.rust_analyzer.setup({ default })
-LC.texlab.setup({ default })
-LC.yamlls.setup({ default })
-LC.gopls.setup({ default })
---LC.hls.setup { default }
-LC.terraformls.setup({ default })
-LC.powershell_es.setup({
-    bundle_path = "~/.local/share/nvim/mason/packages/powershell-editor-services",
-})
+LC.cssls.setup({ C.default })
+LC.nixd.setup({ C.default })
+LC.lua_ls.setup({ C.default })
+LC.julials.setup({ C.default })
+LC.bashls.setup({ C.default })
+LC.pyright.setup({ C.default })
+--LC.ruff_lsp.setup { C.default }
+LC.rust_analyzer.setup({ C.default })
+LC.texlab.setup({ C.default })
+LC.yamlls.setup({ C.default })
+LC.gopls.setup({ C.default })
+--LC.hls.setup { C.default }
+LC.terraformls.setup({ C.default })
 
 LC.eslint.setup({
-    lsp_flags = lsp_flags,
-    capabilities = DC,
+    lsp_flags = C.lsp_flags,
+    capabilities = C.capabilities,
     root_dir = LU.root_pattern({ "*.js", "*.ts" }),
 })
 
 LC.tsserver.setup({
-    lsp_flags = lsp_flags,
-    capabilities = DC,
+    lsp_flags = C.lsp_flags,
+    capabilities = C.capabilities,
     root_dir = LU.root_pattern({ "*.js", "*.ts" }),
 })
 
 LC.cmake.setup({
-    lsp_flags = lsp_flags,
-    capabilities = DC,
+    lsp_flags = C.lsp_flags,
+    capabilities = C.capabilities,
     root_dir = LU.root_pattern("CMakeLists.txt"),
 })
 
 LC.dockerls.setup({
-    lsp_flags = lsp_flags,
-    capabilities = DC,
+    lsp_flags = C.lsp_flags,
+    capabilities = C.capabilities,
     root_dir = LU.root_pattern({
         "[dD]ockerfile*",
     }),
 })
 
 LC.docker_compose_language_service.setup({
-    default.lsp_flags,
-    default.capabilities,
+    C.default.lsp_flags,
+    C.default.capabilities,
     root_dir = LU.root_pattern({
         "docker-compose.ya?ml",
         "compose.ya?ml",
@@ -83,14 +71,14 @@ LC.docker_compose_language_service.setup({
 })
 
 LC.html.setup({
-    capabilities = DC,
-    lsp_flags = lsp_flags,
+    capabilities = C.capabilities,
+    lsp_flags = C.lsp_flags,
     cmd = { "html-languageserver" },
 })
 
 LC.jsonls.setup({
-    capabilities = DC,
-    lsp_flags = lsp_flags,
+    capabilities = C.capabilities,
+    lsp_flags = C.lsp_flags,
     cmd = { "json-languageserver", "--stdio" },
 })
 

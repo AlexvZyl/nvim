@@ -13,14 +13,11 @@ local function get_docker_path()
 
     for _, dir in ipairs(possible_dirs) do
         local script_abs = curr_dir .. dir .. script_file
-        if U.file_exists(script_abs) then
-            return curr_dir .. dir
-        end
+        if U.file_exists(script_abs) then return curr_dir .. dir end
     end
 
     return nil
 end
-
 
 local function get_lsp_command()
     local docker_path = get_docker_path()
@@ -48,7 +45,6 @@ local function get_lsp_command()
         }
     end
 end
-
 
 LC.clangd.setup({
     lsp_flags = C.lsp_flags,

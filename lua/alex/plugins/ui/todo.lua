@@ -22,6 +22,6 @@ require("todo-comments").setup({
     },
     search = {
         -- TODO: Sort this out.
-        pattern = [[\b(KEYWORDS)\S*:]],
+        pattern = [[\b(KEYWORDS): | \b(KEYWORDS)\(\S*\):]],
     },
 })

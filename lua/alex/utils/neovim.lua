@@ -48,7 +48,7 @@ end
 
 function M.current_buffer_lsp()
     local buf_ft = M.current_buffer_filetype()
-    local clients = vim.lsp.get_active_clients()
+    local clients = vim.lsp.get_clients()
     if next(clients) == nil then return "" end
     local current_clients = ""
 

@@ -34,6 +34,15 @@ elseif vim.g.colors_name == "tokyonight-night" then
     red = C.red1
 end
 
+
+local function get_virtual_text_color()
+    local enabled = require('alex.keymaps.utils').virtual_diagnostics
+    if enabled then
+        return { fg = green }
+    end
+    return icon_hl
+end
+
 local function get_recording_color()
     if U.is_recording() then
         return { fg = red }
@@ -198,29 +207,34 @@ require("lualine").setup({
                 icon = { " ", color = icon_hl },
             },
             {
-                "copilot",
-                padding = 1,
-                color = icon_hl,
-                show_colors = true,
-                symbols = {
-                    status = {
-                        icons = {
-                            enabled = " ",
-                            disabled = " ",
-                            warning = " ",
-                            unknown = " ",
-                        },
-                        hl = {
-                            enabled = green,
-                            disabled = icon_hl.fg,
-                            warning = yellow,
-                            unknown = icon_hl.fg,
-                        },
-                    },
-                    spinners = { " " },
-                    spinner_color = green,
-                },
+                function() return " " end,
+                color = get_virtual_text_color,
+                padding = 1
             },
+            -- {
+            --     "copilot",
+            --     padding = 1,
+            --     color = icon_hl,
+            --     show_colors = true,
+            --     symbols = {
+            --         status = {
+            --             icons = {
+            --                 enabled = " ",
+            --                 disabled = " ",
+            --                 warning = " ",
+            --                 unknown = " ",
+            --             },
+            --             hl = {
+            --                 enabled = green,
+            --                 disabled = icon_hl.fg,
+            --                 warning = yellow,
+            --                 unknown = icon_hl.fg,
+            --             },
+            --         },
+            --         spinners = { " " },
+            --         spinner_color = green,
+            --     },
+            -- },
         },
         lualine_y = {},
         lualine_z = {

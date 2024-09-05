@@ -42,7 +42,7 @@ function M.lsp()
     keymap(n, "<leader>l", "<Cmd>LspInfo<CR>", default_settings)
 end
 
-function M.blame() keymap(n, "gb", "<CMD>GitBlameToggle<CR>", default_settings) end
+function M.blame() keymap(n, "<leader>b", "<CMD>GitBlameToggle<CR>", default_settings) end
 
 function M.noice()
     vim.keymap.set({ "n", "i", "s" }, "<C-d>", function()
@@ -74,6 +74,7 @@ function M.native()
     keymap(n, "K", "<nop>", default_settings)
     keymap(n, "<leader>e", "<Cmd>Explore<CR>", default_settings)
     keymap(n, "\\", function() require("alex.keymaps.utils").format_bufer() end, default_settings)
+    keymap(n, "<leader>d", function() require("alex.keymaps.utils").toggle_virtual_diagnostics() end, default_settings)
 
     -- Buffers
     keymap(n, "Q", function() require("alex.keymaps.utils").delete_buffer() end, default_settings)

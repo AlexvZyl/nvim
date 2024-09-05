@@ -78,8 +78,6 @@ function M.is_nordic() return vim.g.colors_name == "nordic" end
 
 function M.is_tokyonight() return vim.g.colors_name == "tokyonight" end
 
-function M.refresh_statusline()
-    require('lualine').refresh({ statusline = true })
-end
+function M.refresh_statusline() require("lualine").refresh({ statusline = true }) end
 
 return M

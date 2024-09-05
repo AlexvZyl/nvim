@@ -20,7 +20,7 @@ local signs = {
 -- TODO: Setup floating windows.
 vim.diagnostic.config({
     signs = signs,
-    virtual_text = require('alex.keymaps.utils').virtual_diagnostics,
+    virtual_text = require("alex.keymaps.utils").virtual_diagnostics,
     update_on_insert = true,
 })
 

@@ -34,12 +34,9 @@ elseif vim.g.colors_name == "tokyonight-night" then
     red = C.red1
 end
 
-
 local function get_virtual_text_color()
-    local enabled = require('alex.keymaps.utils').virtual_diagnostics
-    if enabled then
-        return { fg = green }
-    end
+    local enabled = require("alex.keymaps.utils").virtual_diagnostics
+    if enabled then return { fg = green } end
     return icon_hl
 end
 
@@ -209,7 +206,7 @@ require("lualine").setup({
             {
                 function() return " " end,
                 color = get_virtual_text_color,
-                padding = 1
+                padding = 1,
             },
             -- {
             --     "copilot",

@@ -1,32 +1,28 @@
 local M = {}
 
--- Signs
-
-vim.fn.sign_define(
-    "DiagnosticSignError",
-    { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignError" }
-)
-vim.fn.sign_define(
-    "DiagnosticSignWarn",
-    { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignWarn" }
-)
-vim.fn.sign_define(
-    "DiagnosticSignInfo",
-    { text = "", texthl = "", linehl = "", numhl = "DiagnosticSignInfo" }
-)
-vim.fn.sign_define(
-    "DiagnosticSignHint",
-    { text = "󱤅", texthl = "", linehl = "", numhl = "DiagnosticSignHint" }
-)
-
 -- LSP config.
 
-local config = {
-    virtual_text = false,
-    signs = true,
-    update_on_insert = true,
+local signs = {
+    text = {
+        [vim.diagnostic.severity.ERROR] = "",
+        [vim.diagnostic.severity.WARN] = "",
+        [vim.diagnostic.severity.INFO] = "",
+        [vim.diagnostic.severity.HINT] = "󱤅",
+    },
+    numhl = {
+        [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
+        [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
+        [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
+        [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
+    },
 }
-vim.diagnostic.config(config)
+
+-- TODO: Setup floating windows.
+vim.diagnostic.config({
+    signs = signs,
+    virtual_text = require('alex.keymaps.utils').virtual_diagnostics,
+    update_on_insert = true,
+})
 
 -- Diagnostics utils.
 

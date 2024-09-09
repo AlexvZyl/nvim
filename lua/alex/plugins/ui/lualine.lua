@@ -1,6 +1,8 @@
 local U = require("alex.utils")
 
+
 -- Custom mode names.
+-- I want all of them to be the same length so that lualine stays constant.
 local function fmt_mode(s)
     local mode_map = {
         ["COMMAND"] = "COMMND",
@@ -12,12 +14,13 @@ local function fmt_mode(s)
     return mode_map[s] or s
 end
 
+
+-- Theme dependant custom colors.
 local text_hl
 local icon_hl
 local green
 local yellow
 local red
-
 if vim.g.colors_name == "nordic" then
     local C = require("nordic.colors")
     text_hl = { fg = C.gray3 }
@@ -40,6 +43,7 @@ local function get_virtual_text_color()
     return icon_hl
 end
 
+
 local function get_recording_color()
     if U.is_recording() then
         return { fg = red }
@@ -47,6 +51,7 @@ local function get_recording_color()
         return { fg = text_hl }
     end
 end
+
 
 local function diff_source()
     local gitsigns = vim.b.gitsigns_status_dict
@@ -59,7 +64,6 @@ local function diff_source()
     end
 end
 
-local function get_short_cwd() return vim.fn.fnamemodify(vim.fn.getcwd(), ":~") end
 
 local tree = {
     sections = {
@@ -74,7 +78,7 @@ local tree = {
         lualine_b = {},
         lualine_c = {
             {
-                get_short_cwd,
+                U.get_short_cwd,
                 padding = 0,
                 icon = { "   ", color = icon_hl },
                 color = text_hl,
@@ -97,7 +101,6 @@ local tree = {
     filetypes = { "NvimTree" },
 }
 
-local function telescope_text() return "Telescope" end
 
 local telescope = {
     sections = {
@@ -112,7 +115,7 @@ local telescope = {
         lualine_b = {},
         lualine_c = {
             {
-                telescope_text,
+                function() return "Telescope" end,
                 color = text_hl,
                 icon = { "  ", color = icon_hl },
             },
@@ -122,17 +125,18 @@ local telescope = {
         lualine_z = {
             {
                 "location",
-                icon = { "", align = "left", color = icon_hl },
+                icon = { "", align = "left" },
             },
             {
                 "progress",
-                icon = { "", align = "left", color = icon_hl },
+                icon = { "", align = "left" },
                 separator = { right = "", left = "" },
             },
         },
     },
     filetypes = { "TelescopePrompt" },
 }
+
 
 require("lualine").setup({
     sections = {
@@ -159,12 +163,12 @@ require("lualine").setup({
                 separator = "",
                 padding = 0,
             },
-            {
-                U.get_git_compare,
-                padding = { left = 1 },
-                color = text_hl,
-                separator = "",
-            },
+            -- {
+            --     U.get_git_compare,
+            --     padding = { left = 1 },
+            --     color = text_hl,
+            --     separator = "",
+            -- },
             {
                 "diff",
                 color = text_hl,
@@ -257,6 +261,7 @@ require("lualine").setup({
         ["nvim-tree"] = tree,
     },
 })
+
 
 -- Ensure correct backgrond for lualine.
 vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {

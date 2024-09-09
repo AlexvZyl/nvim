@@ -27,8 +27,9 @@ M.border_chars_cmp_items = { "▛", "▀", "▀", " ", "▄", "▄", "▙", "▌
 M.border_chars_cmp_doc = { "▀", "▀", "▀", " ", "▄", "▄", "▄", "▏" }
 M.border_chars_outer_thin = { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
 M.border_chars_inner_thin = { " ", "▁", " ", "▏", " ", "▔", " ", "▕" }
-M.border_chars_outer_thin_telescope = { "▔", "▕", "▁", "▏", "🭽", "🭾", "🭿", "🭼" }
 M.border_chars_outer_thick_telescope = { "▀", "▐", "▄", "▌", "▛", "▜", "▟", "▙" }
+M.border_chars_outer_thin_telescope = { "▔", "▕", "▁", "▏", "🭽", "🭾", "🭿", "🭼" }
+M.border_helix_telescope = { "─", "│", "─", "│", "┌", "┐", "┘", "└", }
 M.border_chars_top_only = { "", M.top_thin, "", "", "", " ", "", "" }
 
 M.diagnostic_signs = {

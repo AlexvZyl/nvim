@@ -41,7 +41,7 @@ LC.eslint.setup({
     root_dir = LU.root_pattern({ "*.js", "*.ts" }),
 })
 
-LC.tsserver.setup({
+LC.ts_ls.setup({
     lsp_flags = C.lsp_flags,
     capabilities = C.capabilities,
     root_dir = LU.root_pattern({ "*.js", "*.ts" }),

@@ -30,6 +30,8 @@ local filter_notify = {
     "No signature help",
     "E42",
     "[LSP] Format",
+    -- HACK: Plenary causes issues.  Look into this.
+    "Invalid window id: 1001"
     -- This breaks noice.
     -- "[some_value]"
 }

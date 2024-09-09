@@ -78,7 +78,8 @@ return {
     },
     {
         "f-person/git-blame.nvim",
-        cmd = { "GitBlameToggle" },
+        keys = { "<leader>b" },
+        config = function() require("alex.plugins.ui.git-blame") end
     },
 
     -- Language.

@@ -19,7 +19,6 @@ function M.init()
 
     -- Lazyload dependents:
     M.telescope()
-    M.blame()
 end
 
 function M.lsp()
@@ -42,7 +41,7 @@ function M.lsp()
     keymap(n, "<leader>l", "<Cmd>LspInfo<CR>", default_settings)
 end
 
-function M.blame() keymap(n, "<leader>b", "<CMD>GitBlameToggle<CR>", default_settings) end
+function M.blame() keymap(n, "<leader>b", "<Cmd>GitBlameToggle<CR>", default_settings) end
 
 function M.noice()
     vim.keymap.set({ "n", "i", "s" }, "<C-d>", function()

@@ -19,7 +19,8 @@ function M.get_git_compare()
             "--count",
             "HEAD...@{upstream}",
         },
-    }):sync(100)[1]
+    })
+        :sync(100)[1]
 
     if type(result) ~= "string" then return "" end
     local ok, ahead, behind = pcall(string.match, result, "(%d+)%s*(%d+)")

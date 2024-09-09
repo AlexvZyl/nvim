@@ -1,6 +1,5 @@
 local U = require("alex.utils")
 
-
 -- Custom mode names.
 -- I want all of them to be the same length so that lualine stays constant.
 local function fmt_mode(s)
@@ -13,7 +12,6 @@ local function fmt_mode(s)
     }
     return mode_map[s] or s
 end
-
 
 -- Theme dependant custom colors.
 local text_hl
@@ -43,7 +41,6 @@ local function get_virtual_text_color()
     return icon_hl
 end
 
-
 local function get_recording_color()
     if U.is_recording() then
         return { fg = red }
@@ -51,7 +48,6 @@ local function get_recording_color()
         return { fg = text_hl }
     end
 end
-
 
 local function diff_source()
     local gitsigns = vim.b.gitsigns_status_dict
@@ -63,7 +59,6 @@ local function diff_source()
         }
     end
 end
-
 
 local tree = {
     sections = {
@@ -101,7 +96,6 @@ local tree = {
     filetypes = { "NvimTree" },
 }
 
-
 local telescope = {
     sections = {
         lualine_a = {
@@ -136,7 +130,6 @@ local telescope = {
     },
     filetypes = { "TelescopePrompt" },
 }
-
 
 require("lualine").setup({
     sections = {
@@ -261,7 +254,6 @@ require("lualine").setup({
         ["nvim-tree"] = tree,
     },
 })
-
 
 -- Ensure correct backgrond for lualine.
 vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {

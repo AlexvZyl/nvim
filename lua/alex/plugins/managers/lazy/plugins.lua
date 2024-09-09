@@ -79,7 +79,7 @@ return {
     {
         "f-person/git-blame.nvim",
         keys = { "<leader>b" },
-        config = function() require("alex.plugins.ui.git-blame") end
+        config = function() require("alex.plugins.ui.git-blame") end,
     },
 
     -- Language.

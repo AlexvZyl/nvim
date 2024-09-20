@@ -23,6 +23,10 @@ function M.current_buffer_modifiable()
     return true
 end
 
+function M.set_highlight(hl, config)
+    vim.api.nvim_set_hl(0, hl, config)
+end
+
 function M.current_buffer_filename()
     local bufname = vim.api.nvim_buf_get_name(0)
     return bufname ~= "" and vim.fn.fnamemodify(bufname, ":t") or ""

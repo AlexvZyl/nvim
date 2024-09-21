@@ -1,5 +1,6 @@
 local M = {}
 
+-- Single chars.
 M.bottom_thin = "▁"
 M.top_thin = "▔"
 M.left_thin = "▏"
@@ -18,6 +19,7 @@ M.bottom_left_round = "╰"
 M.vertical_default = "│"
 M.horizontal_default = "─"
 
+-- Border chars.
 M.border_chars_round = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
 M.border_chars_none = { "", "", "", "", "", "", "", "" }
 M.border_chars_empty = { " ", " ", " ", " ", " ", " ", " ", " " }
@@ -27,11 +29,18 @@ M.border_chars_cmp_items = { "▛", "▀", "▀", " ", "▄", "▄", "▙", "▌
 M.border_chars_cmp_doc = { "▀", "▀", "▀", " ", "▄", "▄", "▄", "▏" }
 M.border_chars_outer_thin = { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
 M.border_chars_inner_thin = { " ", "▁", " ", "▏", " ", "▔", " ", "▕" }
+M.border_chars_top_only_thin = { "", M.top_thin, "", "", "", " ", "", "" }
+M.border_chars_top_only_normal = { "", M.horizontal_default, "", "", "", " ", "", "" }
+
+-- Telscope chars.
+M.border_helix_telescope = { "─", "│", "─", "│", "┌", "┐", "┘", "└" }
 M.border_chars_outer_thick_telescope = { "▀", "▐", "▄", "▌", "▛", "▜", "▟", "▙" }
 M.border_chars_outer_thin_telescope = { "▔", "▕", "▁", "▏", "🭽", "🭾", "🭿", "🭼" }
-M.border_helix_telescope = { "─", "│", "─", "│", "┌", "┐", "┘", "└" }
-M.border_chars_top_only = { "", M.top_thin, "", "", "", " ", "", "" }
+M.border_chars_telescope_default = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }
+M.border_chars_telescope_prompt_thin = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
+M.border_chars_telescope_vert_preview_thin = { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
 
+-- Icons.
 M.diagnostic_signs = {
     error = " ",
     warning = " ",
@@ -75,8 +84,18 @@ M.kind_icons = {
 function M.get_border_chars(desc)
     local U = require("alex.utils.neovim")
 
+    if U.is_default() then
+        if desc == "telescope" then
+            return M.border_chars_telescope_default
+        end
+        return M.border_chars_round
+    end
+
     if vim.g.neovide then
-        -- Hmmmm
+        if desc == "telescope" then
+            return M.border_chars_telescope_default
+        end
+        return M.border_chars_round
     end
 
     if desc == "completion" then return M.border_chars_round end

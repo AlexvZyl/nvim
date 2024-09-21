@@ -17,21 +17,24 @@ end
 local text_hl
 local icon_hl
 local green
-local yellow
 local red
-if vim.g.colors_name == "nordic" then
+if U.is_default() then
+    local C = require("alex.native.themes.default").palette
+    red = C.red
+    green = C.green
+    icon_hl = { fg = C.white3 }
+    text_hl = { fg = C.white3 }
+elseif U.is_nordic() then
     local C = require("nordic.colors")
     text_hl = { fg = C.gray3 }
     icon_hl = { fg = C.gray4 }
     green = C.green.base
-    yellow = C.yellow.base
     red = C.red.base
-elseif vim.g.colors_name == "tokyonight-night" then
+elseif U.is_tokyonight() then
     local C = require("tokyonight.colors.moon")
     text_hl = { fg = C.fg_gutter }
     icon_hl = { fg = C.dark3 }
     green = C.green1
-    yellow = C.yellow
     red = C.red1
 end
 
@@ -205,30 +208,6 @@ require("lualine").setup({
                 color = get_virtual_text_color,
                 padding = 1,
             },
-            -- {
-            --     "copilot",
-            --     padding = 1,
-            --     color = icon_hl,
-            --     show_colors = true,
-            --     symbols = {
-            --         status = {
-            --             icons = {
-            --                 enabled = " ",
-            --                 disabled = " ",
-            --                 warning = " ",
-            --                 unknown = " ",
-            --             },
-            --             hl = {
-            --                 enabled = green,
-            --                 disabled = icon_hl.fg,
-            --                 warning = yellow,
-            --                 unknown = icon_hl.fg,
-            --             },
-            --         },
-            --         spinners = { " " },
-            --         spinner_color = green,
-            --     },
-            -- },
         },
         lualine_y = {},
         lualine_z = {
@@ -261,3 +240,5 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
     pattern = { "*.*" },
     once = true,
 })
+
+require("alex.native.themes.default").setup_lualine()

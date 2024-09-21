@@ -170,7 +170,7 @@ return {
     {
         "folke/tokyonight.nvim",
         priority = 1000,
-        lazy = false,
+        lazy = true,
         config = function() require("alex.plugins.themes.tokyonight") end,
     },
     {

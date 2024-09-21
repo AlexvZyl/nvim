@@ -82,6 +82,12 @@ function M.is_nordic() return vim.g.colors_name == "nordic" end
 
 function M.is_tokyonight() return vim.g.colors_name == "tokyonight" end
 
+function M.is_default() return vim.g.colors_name == "default" or vim.g.colors_name == nil end
+
+function M.hl_group_rgb(group)
+    return vim.api.nvim_get_hl(0, { name = group, link = false })
+end
+
 function M.refresh_statusline() require("lualine").refresh({ statusline = true }) end
 
 return M

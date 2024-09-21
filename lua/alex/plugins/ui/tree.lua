@@ -120,11 +120,15 @@ local Event = api.events.Event
 api.events.subscribe(Event.TreeOpen, function(_)
     vim.wo.statuscolumn = " "
     vim.wo.cursorlineopt = "line"
-    vim.cmd([[setlocal fillchars+=vert:🮇]])
-    vim.cmd([[setlocal fillchars+=horizup:🮇]])
-    vim.cmd([[setlocal fillchars+=vertright:🮇]])
-    vim.cmd([[setlocal fillchars+=vertleft:🮇]])
-    vim.cmd([[setlocal fillchars+=verthoriz:🮇]])
+
+    local U = require("alex.utils")
+    if not U.is_default() then
+        vim.cmd([[setlocal fillchars+=vert:🮇]])
+        vim.cmd([[setlocal fillchars+=horizup:🮇]])
+        vim.cmd([[setlocal fillchars+=vertright:🮇]])
+        vim.cmd([[setlocal fillchars+=vertleft:🮇]])
+        vim.cmd([[setlocal fillchars+=verthoriz:🮇]])
+    end
 end)
 
 -- Keymaps

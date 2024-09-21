@@ -1,4 +1,5 @@
 local C = require("alex.utils.chars")
+local U = require("alex.utils.neovim")
 
 -- Important to place this before loading plugins.
 vim.g.mapleader = " "
@@ -26,17 +27,23 @@ vim.opt.cmdheight = 0
 vim.g.VM_set_statusline = 0
 vim.g.VM_silent_exit = 1
 
-vim.opt.fillchars = {
-    horiz = C.bottom_thin,
-    horizup = C.bottom_thin,
-    horizdown = C.right_thick,
-    vert = C.right_thick,
-    vertleft = C.right_thick,
-    vertright = C.right_thick,
-    verthoriz = C.right_thick,
-    eob = " ",
-    diff = "╱",
-}
+
+if not U.is_default() then
+    vim.opt.fillchars = {
+        horiz = C.bottom_thin,
+        horizup = C.bottom_thin,
+        horizdown = C.right_thick,
+        vert = C.right_thick,
+        vertleft = C.right_thick,
+        vertright = C.right_thick,
+        verthoriz = C.right_thick,
+    }
+else
+    vim.opt.fillchars = {
+        eob = " ",
+        diff = "╱"
+    }
+end
 
 -- Numbers
 vim.opt.number = true

@@ -1,8 +1,12 @@
 local TS = require("telescope")
 local U = require("alex.utils")
 
-local prompt_chars = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
-local vert_preview_chars = { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
+local prompt_chars = U.border_chars_telescope_default
+local vert_preview_chars = U.border_chars_telescope_default
+if not U.is_default() then
+    prompt_chars = U.border_chars_telescope_prompt_thin
+    vert_preview_chars = U.border_chars_telescope_vert_preview_thin
+end
 
 local vertical_layout = {
     layout_strategy = "vertical",

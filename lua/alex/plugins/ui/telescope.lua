@@ -105,6 +105,7 @@ TS.setup({
         lsp_document_symbols = horizontal_layout,
         lsp_definitions = small_lsp_layout,
         lsp_references = small_lsp_layout,
+        lsp_implementations = small_lsp_layout
     },
 })
 

@@ -22,7 +22,8 @@ end
 local function get_lsp_command()
     local docker_path = get_docker_path()
     if not docker_path then
-        vim.notify("Could not find TSN docker script for lsp", "ERROR")
+        -- TODO: This is not working.
+        vim.defer_fn(function() vim.notify("Could not find TSN docker script for lsp", "ERROR") end, 2)
         return
     end
 

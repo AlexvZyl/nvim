@@ -23,7 +23,7 @@ end
 
 function M.lsp()
     keymap(n, "RR", function() pcall(vim.lsp.buf.rename) end, default_settings)
-    keymap(n, "gi", function() pcall(vim.lsp.buf.implementation) end, default_settings)
+    keymap(n, "gi", "<Cmd>Telescope lsp_implementations<CR>", default_settings)
     keymap(n, "gh", function() pcall(vim.lsp.buf.hover) end, default_settings)
     keymap(n_i, "<C-\\>", function() pcall(vim.lsp.buf.signature_help) end, default_settings)
 

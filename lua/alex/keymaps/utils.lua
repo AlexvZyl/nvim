@@ -56,6 +56,11 @@ function M.toggle_virtual_diagnostics()
     require("alex.utils").refresh_statusline()
 end
 
-function M.format_bufer() pcall(vim.lsp.buf.format) end
+function M.format_bufer()
+    local status, _ = pcall(vim.lsp.buf.format)
+    if not status then
+        vim.notify("Format failed")
+    end
+end
 
 return M

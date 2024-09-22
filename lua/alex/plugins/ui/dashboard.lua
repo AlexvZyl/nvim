@@ -37,7 +37,7 @@ config.shortcut = {
     {
         desc = "   Quit ",
         action = "q!",
-        group = "@variable.builtin",
+        group = "DiagnosticError",
         key = "q",
     },
 }

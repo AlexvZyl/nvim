@@ -39,13 +39,41 @@ local function init()
     U.set_highlight("Pmenu", { link = "Normal" })
     U.set_highlight("WinSeparator", { fg = M.palette.bg_dark, bg = M.palette.bg })
 
+    U.set_highlight("NormalFloat", { fg = M.palette.fg, bg = M.palette.bg })
+    U.set_highlight("FloatBorder", { fg = M.palette.fg, bg = M.palette.bg })
+
     U.set_highlight("DiagnosticError", { fg = M.palette.red })
     U.set_highlight("DiagnosticWarn", { fg = M.palette.yellow })
     U.set_highlight("DiagnosticHint", { fg = M.palette.green })
     U.set_highlight("DiagnosticOk", { fg = M.palette.green })
+    U.set_highlight("DiagnosticUnderlineError", { sp = M.palette.red, underline = false, undercurl = true })
+    U.set_highlight("DiagnosticUnderlineWarn", { sp = M.palette.yellow, underline = false, undercurl = true })
+    U.set_highlight("DiagnosticUnderlineHint", { sp = M.palette.green, underline = false, undercurl = true })
+    U.set_highlight("DiagnosticUnderlineOk", { sp = M.palette.green, underline = false, undercurl = true })
 
     U.set_highlight("WhichKeyNormal", { bg = M.palette.bg })
     U.set_highlight("WhichKeyBorder", { bg = M.palette.bg, fg = M.palette.bg_dark })
+
+    U.set_highlight("DashboardHeader", { fg = M.palette.yellow })
+    U.set_highlight("DashboardFooter", { fg = M.palette.blue1 })
+    U.set_highlight("DashboardProjectTitle", { fg = M.palette.orange })
+    U.set_highlight("DashboardMruTitle", { fg = M.palette.orange })
+
+    U.set_highlight("MatchParen", { bg = M.palette.bg, underline = true })
+    U.set_highlight("Statement", { fg = M.palette.orange, bold = false })
+
+    U.set_highlight("NvimTreeModifiedIcon", { fg = M.palette.gray2 })
+    U.set_highlight("NvimTreeGitDirtyIcon", { link = "NvimTreeModifiedIcon" })
+    U.set_highlight("NvimTreeGitStagedIcon", { link = "NvimTreeModifiedIcon" })
+    U.set_highlight("NvimTreeGitDeletedIcon", { link = "NvimTreeModifiedIcon" })
+    U.set_highlight("NvimTreeGitIgnoredIcon", { link = "NvimTreeModifiedIcon" })
+    U.set_highlight("NvimTreeGitNewIcon", { link = "NvimTreeModifiedIcon" })
+    U.set_highlight("NvimTreeGitRenamedIcon", { link = "NvimTreeModifiedIcon" })
+
+    U.set_highlight("TelescopePromptPrefix", { fg = M.palette.yellow, bg = M.palette.bg })
+
+    U.set_highlight("NotifyINFOTitle", { fg = M.palette.green })
+    U.set_highlight("NotifyINFOIcon", { fg = M.palette.green })
 end
 
 function M.setup_lualine()

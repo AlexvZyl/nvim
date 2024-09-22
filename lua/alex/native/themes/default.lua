@@ -46,10 +46,22 @@ local function init()
     U.set_highlight("DiagnosticWarn", { fg = M.palette.yellow })
     U.set_highlight("DiagnosticHint", { fg = M.palette.green })
     U.set_highlight("DiagnosticOk", { fg = M.palette.green })
-    U.set_highlight("DiagnosticUnderlineError", { sp = M.palette.red, underline = false, undercurl = true })
-    U.set_highlight("DiagnosticUnderlineWarn", { sp = M.palette.yellow, underline = false, undercurl = true })
-    U.set_highlight("DiagnosticUnderlineHint", { sp = M.palette.green, underline = false, undercurl = true })
-    U.set_highlight("DiagnosticUnderlineOk", { sp = M.palette.green, underline = false, undercurl = true })
+    U.set_highlight(
+        "DiagnosticUnderlineError",
+        { sp = M.palette.red, underline = false, undercurl = true }
+    )
+    U.set_highlight(
+        "DiagnosticUnderlineWarn",
+        { sp = M.palette.yellow, underline = false, undercurl = true }
+    )
+    U.set_highlight(
+        "DiagnosticUnderlineHint",
+        { sp = M.palette.green, underline = false, undercurl = true }
+    )
+    U.set_highlight(
+        "DiagnosticUnderlineOk",
+        { sp = M.palette.green, underline = false, undercurl = true }
+    )
 
     U.set_highlight("WhichKeyNormal", { bg = M.palette.bg })
     U.set_highlight("WhichKeyBorder", { bg = M.palette.bg, fg = M.palette.bg_dark })
@@ -78,22 +90,48 @@ end
 
 function M.setup_lualine()
     local U = require("alex.utils.neovim")
-    if not U.is_default() then
-        return
-    end
+    if not U.is_default() then return end
 
     local default_section = { fg = M.palette.white3, bg = M.palette.bg_dark }
     local default = {
-        normal = { a = { fg = M.palette.bg_dark, bg = M.palette.blue0, gui = "bold" }, b = default_section, c = default_section },
-        visual = { a = { fg = M.palette.bg_dark, bg = M.palette.red, gui = "bold" }, b = default_section, c = default_section },
-        replace = { a = { fg = M.palette.bg_dark, bg = M.palette.red, gui = "bold" }, b = default_section, c = default_section },
-        command = { a = { fg = M.palette.bg_dark, bg = M.palette.orange, gui = "bold" }, b = default_section, c = default_section },
-        insert = { a = { fg = M.palette.bg_dark, bg = M.palette.green, gui = "bold" }, b = default_section, c = default_section },
-        inactive = { a = { fg = M.palette.bg_dark, bg = M.palette.gray0, gui = "bold" }, b = default_section, c = default_section },
-        terminal = { a = { fg = M.palette.bg_dark, bg = M.palette.gray0, gui = "bold" }, b = default_section, c = default_section },
+        normal = {
+            a = { fg = M.palette.bg_dark, bg = M.palette.blue0, gui = "bold" },
+            b = default_section,
+            c = default_section,
+        },
+        visual = {
+            a = { fg = M.palette.bg_dark, bg = M.palette.red, gui = "bold" },
+            b = default_section,
+            c = default_section,
+        },
+        replace = {
+            a = { fg = M.palette.bg_dark, bg = M.palette.red, gui = "bold" },
+            b = default_section,
+            c = default_section,
+        },
+        command = {
+            a = { fg = M.palette.bg_dark, bg = M.palette.orange, gui = "bold" },
+            b = default_section,
+            c = default_section,
+        },
+        insert = {
+            a = { fg = M.palette.bg_dark, bg = M.palette.green, gui = "bold" },
+            b = default_section,
+            c = default_section,
+        },
+        inactive = {
+            a = { fg = M.palette.bg_dark, bg = M.palette.gray0, gui = "bold" },
+            b = default_section,
+            c = default_section,
+        },
+        terminal = {
+            a = { fg = M.palette.bg_dark, bg = M.palette.gray0, gui = "bold" },
+            b = default_section,
+            c = default_section,
+        },
     }
     require("lualine").setup({
-        options = { theme = default }
+        options = { theme = default },
     })
 end
 

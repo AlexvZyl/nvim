@@ -38,7 +38,8 @@ M.border_chars_outer_thick_telescope = { "▀", "▐", "▄", "▌", "▛", "▜
 M.border_chars_outer_thin_telescope = { "▔", "▕", "▁", "▏", "🭽", "🭾", "🭿", "🭼" }
 M.border_chars_telescope_default = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }
 M.border_chars_telescope_prompt_thin = { "▔", "▕", " ", "▏", "🭽", "🭾", "▕", "▏" }
-M.border_chars_telescope_vert_preview_thin = { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
+M.border_chars_telescope_vert_preview_thin =
+    { " ", "▕", "▁", "▏", "▏", "▕", "🭿", "🭼" }
 
 -- Icons.
 M.diagnostic_signs = {
@@ -85,16 +86,12 @@ function M.get_border_chars(desc)
     local U = require("alex.utils.neovim")
 
     if U.is_default() then
-        if desc == "telescope" then
-            return M.border_chars_telescope_default
-        end
+        if desc == "telescope" then return M.border_chars_telescope_default end
         return M.border_chars_round
     end
 
     if vim.g.neovide then
-        if desc == "telescope" then
-            return M.border_chars_telescope_default
-        end
+        if desc == "telescope" then return M.border_chars_telescope_default end
         return M.border_chars_round
     end
 

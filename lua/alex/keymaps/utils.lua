@@ -58,9 +58,7 @@ end
 
 function M.format_bufer()
     local status, _ = pcall(vim.lsp.buf.format)
-    if not status then
-        vim.notify("Format failed")
-    end
+    if not status then vim.notify("Format failed") end
 end
 
 return M

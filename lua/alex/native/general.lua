@@ -27,7 +27,6 @@ vim.opt.cmdheight = 0
 vim.g.VM_set_statusline = 0
 vim.g.VM_silent_exit = 1
 
-
 if not U.is_default() then
     vim.opt.fillchars = {
         horiz = C.bottom_thin,
@@ -41,7 +40,7 @@ if not U.is_default() then
 else
     vim.opt.fillchars = {
         eob = " ",
-        diff = "╱"
+        diff = "╱",
     }
 end
 

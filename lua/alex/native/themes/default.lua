@@ -1,5 +1,6 @@
 local M = {}
 
+-- TODO: Read these colors in at startup.
 M.palette = {
     -- Colors.
     red = "#f08080",
@@ -23,7 +24,6 @@ M.palette = {
     white2 = "#c4c6cd",
     white3 = "#9b9ea4",
 }
-
 M.palette.fg = M.palette.white0
 M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
@@ -31,61 +31,78 @@ M.palette.bg_dark = M.palette.black
 local function init()
     local U = require("alex.utils.neovim")
 
-    U.set_highlight("IndentBlanklineChar", { fg = M.palette.gray1 })
-    U.set_highlight("IndentBlanklineContextChar", { link = "IndentBlanklineChar" })
+    U.set_highlights_table({
+        -- Native UI.
+        WinBar = { fg = M.palette.white2, bg = M.palette.bg },
+        WinBarNC = { fg = M.palette.white2, bg = M.palette.bg },
+        Pmenu = { link = "Normal" },
+        WinSeparator = { fg = M.palette.bg_dark, bg = M.palette.bg },
+        NormalFloat = { fg = M.palette.fg, bg = M.palette.bg },
+        FloatBorder = { fg = M.palette.fg, bg = M.palette.bg },
+        LineNR = { fg = M.palette.gray2, bg = M.palette.bg },
+        CursorLineNR = { fg = M.palette.white0, bg = M.palette.bg, bold = true },
 
-    U.set_highlight("WinBar", { fg = M.palette.white3, bg = M.palette.bg })
-    U.set_highlight("WinBarNC", { link = "WinBar" })
-    U.set_highlight("Pmenu", { link = "Normal" })
-    U.set_highlight("WinSeparator", { fg = M.palette.bg_dark, bg = M.palette.bg })
+        -- Syntax tweaks.
+        MatchParen = { bg = M.palette.bg, underline = true },
+        Statement = { fg = M.palette.orange, bold = false },
+        Comment = { fg = M.palette.gray2, bold = false },
+        Title = { fg = M.palette.yellow, bold = true },
+        ["@markup.heading.2"] = { fg = M.palette.orange },
+        ["@markup.heading.3"] = { link = "markup.heading.2" },
+        ["@markup.heading.4"] = { link = "markup.heading.2" },
+        ["@markup.heading.5"] = { link = "markup.heading.2" },
 
-    U.set_highlight("NormalFloat", { fg = M.palette.fg, bg = M.palette.bg })
-    U.set_highlight("FloatBorder", { fg = M.palette.fg, bg = M.palette.bg })
+        -- Indent blankline.
+        IndentBlanklineChar = { fg = M.palette.gray1 },
+        IndentBlanklineContextChar = { link = "IndentBlanklineChar" },
 
-    U.set_highlight("DiagnosticError", { fg = M.palette.red })
-    U.set_highlight("DiagnosticWarn", { fg = M.palette.yellow })
-    U.set_highlight("DiagnosticHint", { fg = M.palette.green })
-    U.set_highlight("DiagnosticOk", { fg = M.palette.green })
-    U.set_highlight(
-        "DiagnosticUnderlineError",
-        { sp = M.palette.red, underline = false, undercurl = true }
-    )
-    U.set_highlight(
-        "DiagnosticUnderlineWarn",
-        { sp = M.palette.yellow, underline = false, undercurl = true }
-    )
-    U.set_highlight(
-        "DiagnosticUnderlineHint",
-        { sp = M.palette.green, underline = false, undercurl = true }
-    )
-    U.set_highlight(
-        "DiagnosticUnderlineOk",
-        { sp = M.palette.green, underline = false, undercurl = true }
-    )
+        -- Diagnostics.
+        DiagnosticError = { fg = M.palette.red },
+        DiagnosticWarn = { fg = M.palette.yellow },
+        DiagnosticHint = { fg = M.palette.green },
+        DiagnosticOk = { fg = M.palette.green },
+        DiagnosticUnderlineError = { sp = M.palette.red, underline = false, undercurl = true },
+        DiagnosticUnderlineWarn = { sp = M.palette.yellow, underline = false, undercurl = true },
+        DiagnosticUnderlineHint = { sp = M.palette.green, underline = false, undercurl = true },
+        DiagnosticUnderlineOk = { sp = M.palette.green, underline = false, undercurl = true },
 
-    U.set_highlight("WhichKeyNormal", { bg = M.palette.bg })
-    U.set_highlight("WhichKeyBorder", { bg = M.palette.bg, fg = M.palette.bg_dark })
+        -- Whichkey.
+        WhichKeyNormal = { bg = M.palette.bg },
+        WhichKeyBorder = { bg = M.palette.bg, fg = M.palette.bg_dark },
 
-    U.set_highlight("DashboardHeader", { fg = M.palette.yellow })
-    U.set_highlight("DashboardFooter", { fg = M.palette.blue1 })
-    U.set_highlight("DashboardProjectTitle", { fg = M.palette.orange })
-    U.set_highlight("DashboardMruTitle", { fg = M.palette.orange })
+        -- Dashboard.
+        DashboardHeader = { fg = M.palette.yellow },
+        DashboardFooter = { fg = M.palette.blue1 },
+        DashboardProjectTitle = { fg = M.palette.orange },
+        DashboardMruTitle = { fg = M.palette.orange },
 
-    U.set_highlight("MatchParen", { bg = M.palette.bg, underline = true })
-    U.set_highlight("Statement", { fg = M.palette.orange, bold = false })
+        -- Tree.
+        NvimTreeModifiedIcon = { fg = M.palette.gray2 },
+        NvimTreeGitDirtyIcon = { link = "NvimTreeModifiedIcon" },
+        NvimTreeGitStagedIcon = { link = "NvimTreeModifiedIcon" },
+        NvimTreeGitDeletedIcon = { link = "NvimTreeModifiedIcon" },
+        NvimTreeGitIgnoredIcon = { link = "NvimTreeModifiedIcon" },
+        NvimTreeGitNewIcon = { link = "NvimTreeModifiedIcon" },
+        NvimTreeGitRenamedIcon = { link = "NvimTreeModifiedIcon" },
+        NvimTreeRootFolder = { fg = M.palette.white3 },
 
-    U.set_highlight("NvimTreeModifiedIcon", { fg = M.palette.gray2 })
-    U.set_highlight("NvimTreeGitDirtyIcon", { link = "NvimTreeModifiedIcon" })
-    U.set_highlight("NvimTreeGitStagedIcon", { link = "NvimTreeModifiedIcon" })
-    U.set_highlight("NvimTreeGitDeletedIcon", { link = "NvimTreeModifiedIcon" })
-    U.set_highlight("NvimTreeGitIgnoredIcon", { link = "NvimTreeModifiedIcon" })
-    U.set_highlight("NvimTreeGitNewIcon", { link = "NvimTreeModifiedIcon" })
-    U.set_highlight("NvimTreeGitRenamedIcon", { link = "NvimTreeModifiedIcon" })
+        -- Telescope.
+        TelescopePromptPrefix = { fg = M.palette.yellow, bg = M.palette.bg },
 
-    U.set_highlight("TelescopePromptPrefix", { fg = M.palette.yellow, bg = M.palette.bg })
-
-    U.set_highlight("NotifyINFOTitle", { fg = M.palette.green })
-    U.set_highlight("NotifyINFOIcon", { fg = M.palette.green })
+        -- Notify.
+        NotifyINFOTitle = { fg = M.palette.green },
+        NotifyINFOIcon = { fg = M.palette.green },
+        NotifyINFOBorder = { fg = M.palette.green },
+        NotifyINFOBody = { fg = M.palette.fg },
+        NotifyWARNTitle = { fg = M.palette.yellow },
+        NotifyWARNIcon = { fg = M.palette.yellow },
+        NotifyWARNBorder = { fg = M.palette.yellow },
+        NotifyWARNBody = { fg = M.palette.fg },
+        NotifyERRORTitle = { fg = M.palette.red },
+        NotifyERRORIcon = { fg = M.palette.red },
+        NotifyERRORBorder = { fg = M.palette.red },
+        NotifyERRORBody = { fg = M.palette.fg },
+    })
 end
 
 function M.setup_lualine()

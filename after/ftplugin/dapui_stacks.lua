@@ -1,2 +1,2 @@
-vim.cmd "setlocal winbar=\\ Stacks"
-vim.cmd "setlocal statuscolumn=\\ "
+vim.cmd("setlocal winbar=\\ Stacks")
+vim.cmd("setlocal statuscolumn=\\ ")

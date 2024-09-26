@@ -1,1 +1,1 @@
-vim.cmd [[setlocal statuscolumn=\ ]]
+vim.cmd([[setlocal statuscolumn=\ ]])

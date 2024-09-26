@@ -82,6 +82,11 @@ return {
         keys = { "<leader>b" },
         config = function() require("alex.plugins.ui.git-blame") end,
     },
+    {
+        "stevearc/quicker.nvim",
+        event = { "User NvimStartupDone" },
+        config = function() require("alex.plugins.ui.quicker") end,
+    },
 
     -- Language.
     {
@@ -164,20 +169,20 @@ return {
     {
         "AlexvZyl/nordic.nvim",
         branch = "dev",
-        priority = 1000,
+        -- priority = 1000,
         config = function() require("alex.plugins.themes.nordic") end,
         lazy = true,
     },
     {
         "folke/tokyonight.nvim",
-        priority = 1000,
+        -- priority = 1000,
         lazy = true,
         config = function() require("alex.plugins.themes.tokyonight") end,
     },
     {
         "sainnhe/gruvbox-material",
         lazy = true,
-        priority = 1000,
+        -- priority = 1000,
         config = function() require("alex.plugins.themes.gruvbox") end,
     },
 

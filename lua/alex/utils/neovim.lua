@@ -94,4 +94,6 @@ function M.hl_group_rgb(group) return vim.api.nvim_get_hl(0, { name = group, lin
 
 function M.refresh_statusline() require("lualine").refresh({ statusline = true }) end
 
+function M.get_hl_group(name) return vim.api.nvim_get_hl(0, { name = name, link = false }) end
+
 return M

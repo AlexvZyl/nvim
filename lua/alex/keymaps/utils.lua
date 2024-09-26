@@ -61,4 +61,13 @@ function M.format_bufer()
     if not status then vim.notify("Format failed") end
 end
 
+function M.toggle_netrw()
+    local U = require("alex.utils.neovim")
+    if U.current_buffer_filetype() == "netrw" then
+        pcall(vim.api.nvim_command, "b#")
+    else
+        vim.cmd("Explore")
+    end
+end
+
 return M

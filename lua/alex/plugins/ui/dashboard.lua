@@ -17,7 +17,7 @@ config.shortcut = {
         key = "n",
     },
     {
-        desc = " 󰈔  File/path ",
+        desc = " 󰱼  File ",
         action = "Telescope find_files find_command=rg,--hidden,--files",
         group = "@string",
         key = "fF",
@@ -35,7 +35,7 @@ config.shortcut = {
         key = "p",
     },
     {
-        desc = "   Quit ",
+        desc = " 󰅙  Quit ",
         action = "q!",
         group = "DiagnosticError",
         key = "q",

@@ -1,6 +1,8 @@
 local M = {}
 
--- TODO: Read these colors in at startup.
+local U = require("alex.utils.neovim")
+
+-- TODO: Read these colors in at startup from the builtin groups.
 M.palette = {
     -- Colors.
     red = "#f08080",
@@ -10,7 +12,7 @@ M.palette = {
     orange = "#ffa07a",
     blue0 = "#87cefa",
     blue1 = "#b0e2ff",
-    cyan = "#20b2aa",
+    cyan = "#8cf8f7",
 
     -- Blacks/grays.
     black = "#07080d",
@@ -29,9 +31,12 @@ M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
 
 local function init()
-    local U = require("alex.utils.neovim")
-
     U.set_highlights_table({
+        -- Git
+        Added = { fg = M.palette.green },
+        Removed = { fg = M.palette.red },
+        Changed = { fg = M.palette.cyan },
+
         -- Native UI.
         WinBar = { fg = M.palette.white2, bg = M.palette.bg },
         WinBarNC = { fg = M.palette.white2, bg = M.palette.bg },
@@ -47,10 +52,11 @@ local function init()
         Statement = { fg = M.palette.orange, bold = false },
         Comment = { fg = M.palette.gray2, bold = false },
         Title = { fg = M.palette.yellow, bold = true },
-        ["@markup.heading.2"] = { fg = M.palette.orange },
-        ["@markup.heading.3"] = { link = "markup.heading.2" },
-        ["@markup.heading.4"] = { link = "markup.heading.2" },
-        ["@markup.heading.5"] = { link = "markup.heading.2" },
+        ["@markup.heading.2"] = { fg = M.palette.orange, bold = true },
+        ["@markup.heading.3"] = { fg = M.palette.orange },
+        ["@markup.heading.4"] = { link = "@markup.heading.3" },
+        ["@markup.heading.5"] = { link = "@markup.heading.3" },
+        ["@markup.heading.6"] = { link = "@markup.heading.3" },
 
         -- Indent blankline.
         IndentBlanklineChar = { fg = M.palette.gray1 },
@@ -61,10 +67,12 @@ local function init()
         DiagnosticWarn = { fg = M.palette.yellow },
         DiagnosticHint = { fg = M.palette.green },
         DiagnosticOk = { fg = M.palette.green },
+        DiagnosticInfo = { fg = M.palette.cyan },
         DiagnosticUnderlineError = { sp = M.palette.red, underline = false, undercurl = true },
         DiagnosticUnderlineWarn = { sp = M.palette.yellow, underline = false, undercurl = true },
         DiagnosticUnderlineHint = { sp = M.palette.green, underline = false, undercurl = true },
         DiagnosticUnderlineOk = { sp = M.palette.green, underline = false, undercurl = true },
+        DiagnosticUnderlineInfo = { sp = M.palette.cyan, underline = false, undercurl = true },
 
         -- Whichkey.
         WhichKeyNormal = { bg = M.palette.bg },
@@ -72,7 +80,7 @@ local function init()
 
         -- Dashboard.
         DashboardHeader = { fg = M.palette.yellow },
-        DashboardFooter = { fg = M.palette.blue1 },
+        DashboardFooter = { fg = M.palette.cyan },
         DashboardProjectTitle = { fg = M.palette.orange },
         DashboardMruTitle = { fg = M.palette.orange },
 
@@ -85,6 +93,7 @@ local function init()
         NvimTreeGitNewIcon = { link = "NvimTreeModifiedIcon" },
         NvimTreeGitRenamedIcon = { link = "NvimTreeModifiedIcon" },
         NvimTreeRootFolder = { fg = M.palette.white3 },
+        NvimTreeSpecialFile = { fg = M.palette.yellow, bold = false },
 
         -- Telescope.
         TelescopePromptPrefix = { fg = M.palette.yellow, bg = M.palette.bg },

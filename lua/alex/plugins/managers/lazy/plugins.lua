@@ -21,6 +21,12 @@ return {
         config = function() require("alex.plugins.ui.nvim-web-devicons") end,
     },
     {
+        'stevearc/oil.nvim',
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        keys = { "<leader>e" },
+        config = function() require("alex.plugins.ui.oil-nvim") end
+    },
+    {
         "NvChad/nvim-colorizer.lua",
         event = { "User NvimStartupDone" },
         config = function() require("alex.plugins.ui.colorizer") end,
@@ -47,7 +53,7 @@ return {
     {
         "folke/noice.nvim",
         dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
-        event = { "User NvimStartupDone" },
+        -- event = { "User NvimStartupDone" },
         config = function() require("alex.plugins.ui.noice") end,
     },
     {
@@ -69,13 +75,6 @@ return {
         "folke/which-key.nvim",
         event = { "User NvimStartupDone" },
         config = function() require("alex.plugins.ui.which-key") end,
-    },
-    {
-        "nvim-tree/nvim-tree.lua",
-        version = "*",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function() require("alex.plugins.ui.tree") end,
-        keys = { "<leader>f", "gf" },
     },
     {
         "f-person/git-blame.nvim",
@@ -169,20 +168,20 @@ return {
     {
         "AlexvZyl/nordic.nvim",
         branch = "dev",
-        -- priority = 1000,
+        priority = 1000,
         config = function() require("alex.plugins.themes.nordic") end,
         lazy = true,
     },
     {
         "folke/tokyonight.nvim",
-        -- priority = 1000,
+        priority = 1000,
         lazy = true,
         config = function() require("alex.plugins.themes.tokyonight") end,
     },
     {
         "sainnhe/gruvbox-material",
         lazy = true,
-        -- priority = 1000,
+        priority = 1000,
         config = function() require("alex.plugins.themes.gruvbox") end,
     },
 
@@ -194,5 +193,4 @@ return {
     --{ 'marko-cerovac/material.nvim', lazy = true },
     --{ 'navarasu/onedark.nvim', lazy = true },
     --{ 'Shatur/neovim-ayu', lazy = true },
-    --{ 'oxfist/night-owl.nvim', lazy = true },
 }

@@ -71,12 +71,6 @@ function M.native()
     keymap(n_v, "<C-e>", "j<C-e>", default_settings)
     keymap(n_v, "<C-y>", "k<C-y>", default_settings)
     keymap(n, "K", "<nop>", default_settings)
-    keymap(
-        n,
-        "<leader>e",
-        function() require("alex.keymaps.utils").toggle_netrw() end,
-        default_settings
-    )
     keymap(n, "\\", function() require("alex.keymaps.utils").format_bufer() end, default_settings)
     keymap(
         n,
@@ -91,6 +85,19 @@ function M.native()
     -- Quickfix.
     keymap(n, "}", "<Cmd>cnext<CR>zz_", default_settings)
     keymap(n, "{", "<Cmd>cprevious<CR>zz_", default_settings)
+end
+
+function M.oil()
+    keymap(n, "<leader>e", function() require("alex.keymaps.utils").toggle_oil() end)
+    require("oil").setup({
+        keymaps = {
+            ["<CR>"] = "actions.select",
+            ["-"] = "actions.parent",
+        },
+        use_default_keymaps = false,
+
+
+    })
 end
 
 function M.editing()
@@ -139,21 +146,6 @@ function M.telescope()
 end
 
 function M.copilot() keymap(n, "<leader>c", "<Cmd>Copilot panel<CR>", default_settings) end
-
-function M.tree()
-    keymap(
-        n_v,
-        "gf",
-        function() require("alex.keymaps.utils").cwd_current_buffer() end,
-        default_settings
-    )
-    keymap(
-        n_v,
-        "<Leader>f",
-        function() require("alex.keymaps.utils").toggle_tree() end,
-        default_settings
-    )
-end
 
 function M.debugger()
     keymap(n, "<C-b>", "<Cmd>DapToggleBreakpoint<CR>", default_settings)

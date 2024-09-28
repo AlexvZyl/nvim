@@ -9,11 +9,6 @@ function M.cwd_current_buffer()
     vim.cmd("NvimTreeFindFile")
 end
 
-function M.toggle_tree()
-    local tree = require("nvim-tree.api").tree
-    tree.toggle({ focus = false })
-end
-
 function M.save_file()
     if vim.api.nvim_buf_get_option(0, "readonly") then return end
     local buftype = vim.api.nvim_buf_get_option(0, "buftype")
@@ -67,6 +62,15 @@ function M.toggle_netrw()
         pcall(vim.api.nvim_command, "b#")
     else
         vim.cmd("Explore")
+    end
+end
+
+function M.toggle_oil()
+    local U = require("alex.utils.neovim")
+    if U.current_buffer_filetype() == "oil" then
+        pcall(vim.api.nvim_command, "b#")
+    else
+        vim.cmd("Oil")
     end
 end
 

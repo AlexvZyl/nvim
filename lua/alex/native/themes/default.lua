@@ -10,8 +10,7 @@ M.palette = {
     yellow = "#fce094",
     magenta = "#ffcaff",
     orange = "#ffa07a",
-    blue0 = "#87cefa",
-    blue1 = "#b0e2ff",
+    blue = "#87cefa",
     cyan = "#8cf8f7",
 
     -- Blacks/grays.
@@ -35,7 +34,7 @@ local function init()
         -- Git
         Added = { fg = M.palette.green },
         Removed = { fg = M.palette.red },
-        Changed = { fg = M.palette.cyan },
+        Changed = { fg = M.palette.blue },
 
         -- Native UI.
         WinBar = { fg = M.palette.white2, bg = M.palette.bg },
@@ -67,12 +66,12 @@ local function init()
         DiagnosticWarn = { fg = M.palette.yellow },
         DiagnosticHint = { fg = M.palette.green },
         DiagnosticOk = { fg = M.palette.green },
-        DiagnosticInfo = { fg = M.palette.cyan },
+        DiagnosticInfo = { fg = M.palette.blue },
         DiagnosticUnderlineError = { sp = M.palette.red, underline = false, undercurl = true },
         DiagnosticUnderlineWarn = { sp = M.palette.yellow, underline = false, undercurl = true },
         DiagnosticUnderlineHint = { sp = M.palette.green, underline = false, undercurl = true },
         DiagnosticUnderlineOk = { sp = M.palette.green, underline = false, undercurl = true },
-        DiagnosticUnderlineInfo = { sp = M.palette.cyan, underline = false, undercurl = true },
+        DiagnosticUnderlineInfo = { sp = M.palette.blue, underline = false, undercurl = true },
 
         -- Whichkey.
         WhichKeyNormal = { bg = M.palette.bg },
@@ -111,6 +110,14 @@ local function init()
         NotifyERRORIcon = { fg = M.palette.red },
         NotifyERRORBorder = { fg = M.palette.red },
         NotifyERRORBody = { fg = M.palette.fg },
+
+        -- Noice.
+        NoiceCmdlinePopupBorder = { fg = M.palette.cyan },
+        NoiceCmdlineIcon = { fg = M.palette.yellow },
+
+        -- Todo comments
+        TodoFgTODO = { fg = M.palette.cyan, bold = true },
+
     })
 end
 
@@ -121,7 +128,7 @@ function M.setup_lualine()
     local default_section = { fg = M.palette.white3, bg = M.palette.bg_dark }
     local default = {
         normal = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.blue0, gui = "bold" },
+            a = { fg = M.palette.bg_dark, bg = M.palette.blue, gui = "bold" },
             b = default_section,
             c = default_section,
         },

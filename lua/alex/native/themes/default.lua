@@ -45,6 +45,8 @@ local function init()
         FloatBorder = { fg = M.palette.fg, bg = M.palette.bg },
         LineNR = { fg = M.palette.gray2, bg = M.palette.bg },
         CursorLineNR = { fg = M.palette.white0, bg = M.palette.bg, bold = true },
+        QuickFixFilename = { fg = M.palette.fg },
+        QuickFixLine = { fg = M.palette.fg },
 
         -- Syntax tweaks.
         MatchParen = { bg = M.palette.bg, underline = true },

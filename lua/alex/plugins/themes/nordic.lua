@@ -3,8 +3,8 @@ require("nordic").load({
         theme = "dark",
     },
     telescope = {
-        style = "classic"
-    }
+        style = "classic",
+    },
 })
 
 require("lualine").setup({

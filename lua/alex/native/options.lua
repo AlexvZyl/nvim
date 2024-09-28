@@ -74,6 +74,5 @@ vim.cmd([[
     autocmd BufWritePre * %s/\s\+$//e
 ]])
 
-
 -- Prefer treesitter (has value of 95).
 -- vim.highlight.priorities.semantic_tokens = 94

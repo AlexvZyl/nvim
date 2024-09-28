@@ -21,10 +21,10 @@ return {
         config = function() require("alex.plugins.ui.nvim-web-devicons") end,
     },
     {
-        'stevearc/oil.nvim',
+        "stevearc/oil.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         keys = { "<leader>e" },
-        config = function() require("alex.plugins.ui.oil-nvim") end
+        config = function() require("alex.plugins.ui.oil-nvim") end,
     },
     {
         "NvChad/nvim-colorizer.lua",

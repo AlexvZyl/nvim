@@ -32,7 +32,7 @@ local filter_notify = {
     "[LSP] Format",
     -- HACK: Plenary causes issues.  Look into this.
     "Invalid window id: 1001",
-    "WARNING: vim.treesitter"
+    "WARNING: vim.treesitter",
     -- This breaks noice.
     -- "[some_value]"
 }

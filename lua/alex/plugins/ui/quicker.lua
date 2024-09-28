@@ -6,9 +6,9 @@ require("quicker").setup({
         W = U.diagnostic_signs.warning,
         I = U.diagnostic_signs.info,
         N = U.diagnostic_signs.other,
-        H = U.diagnostic_signs.hint
+        H = U.diagnostic_signs.hint,
     },
     borders = {
-        vert = U.vertical_default
-    }
+        vert = U.vertical_default,
+    },
 })

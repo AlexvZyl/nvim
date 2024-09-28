@@ -117,7 +117,6 @@ local function init()
 
         -- Todo comments
         TodoFgTODO = { fg = M.palette.cyan, bold = true },
-
     })
 end
 

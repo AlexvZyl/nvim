@@ -95,8 +95,6 @@ function M.oil()
             ["-"] = "actions.parent",
         },
         use_default_keymaps = false,
-
-
     })
 end
 

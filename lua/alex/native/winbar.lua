@@ -4,13 +4,13 @@ vim.opt.winbar = nil
 
 local winbar_filetype_exclude = {
     "dashboard",
-    "NvimTree",
 }
 
 -- filetype: bar
 local custom_bars = {
-    qf = " QuickFix",
-    netrw = "  Netrw",
+    qf = { icon = "", name = "QuickFix" },
+    netrw = { icon = "", name = "Netrw" },
+    oil = { icon = "", name = " Files" },
 }
 
 local excludes = function()
@@ -21,18 +21,20 @@ end
 local M = {}
 
 function M.get_winbar()
-    local filetype = U.current_buffer_filetype()
-    if custom_bars[filetype] ~= nil then return "  " .. custom_bars[filetype] end
-
-    local file_icon = U.current_buffer_icon()
-    if file_icon == nil then file_icon = "" end
-
     local mod_icon = ""
     if U.current_buffer_modified() then
         mod_icon = " ●"
     elseif not U.current_buffer_modifiable() then
         mod_icon = " "
     end
+
+    local filetype = U.current_buffer_filetype()
+    if custom_bars[filetype] ~= nil then
+        return "  " .. custom_bars[filetype].icon .. " " .. custom_bars[filetype].name .. mod_icon
+    end
+
+    local file_icon = U.current_buffer_icon()
+    if file_icon == nil then file_icon = "" end
 
     local filename = U.current_buffer_filename()
     if filename == "" then

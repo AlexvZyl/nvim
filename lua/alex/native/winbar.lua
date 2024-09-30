@@ -8,9 +8,9 @@ local winbar_filetype_exclude = {
 
 -- filetype: bar
 local custom_bars = {
-    qf = { icon = "", name = "QuickFix" },
-    netrw = { icon = "", name = "Netrw" },
-    oil = { icon = "", name = " Files" },
+    qf = { icon = "", name = function() return "QuickFix" end },
+    netrw = { icon = "", name = function() return "Netrw" end },
+    oil = { icon = "", name = function() return " " .. string.gsub(vim.fn.expand('%'), "oil://", "") end },
 }
 
 local excludes = function()
@@ -30,7 +30,7 @@ function M.get_winbar()
 
     local filetype = U.current_buffer_filetype()
     if custom_bars[filetype] ~= nil then
-        return "  " .. custom_bars[filetype].icon .. " " .. custom_bars[filetype].name .. mod_icon
+        return "  " .. custom_bars[filetype].icon .. " " .. custom_bars[filetype].name() .. mod_icon
     end
 
     local file_icon = U.current_buffer_icon()

@@ -114,24 +114,20 @@ function M.editing()
 end
 
 function M.telescope()
-    keymap(n, "fh", "<Cmd>Telescope help_tags<CR>", default_settings)
-    keymap(n, "fk", "<Cmd>Telescope keymaps<CR>", default_settings)
-    keymap(n, "fo", "<Cmd>Telescope oldfiles<CR>", default_settings)
-    keymap(n, "ff", "<Cmd>Telescope find_files<CR>", default_settings)
-    keymap(n, "fF", "<Cmd>Telescope find_files cwd=~<CR>", default_settings)
-    keymap(
-        n,
-        "<C-f>",
-        "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
-        default_settings
-    )
-    keymap(
-        n,
-        "fg",
-        "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
-        default_settings
-    )
+    keymap(n, "fh", function() require('telescope.builtin').help_tags({}) end)
+    keymap(n, "fk", function() require('telescope.builtin').keymaps({}) end)
+
+    keymap(n, "fo", function() require('telescope.builtin').oldfiles({ cwd = vim.loop.cwd() }) end, default_settings)
+    keymap(n, "fO", function() require('telescope.builtin').oldfiles({ cwd = vim.fn.expand("~") }) end, default_settings)
+    keymap(n, "ff", function() require('telescope.builtin').find_files({}) end)
+    keymap(n, "fF", function() require('telescope.builtin').find_files({ cwd = vim.fn.expand("~") }) end,
+        default_settings)
+    keymap(n, "<C-f>", function() require('telescope.builtin').find_files({ cwd = vim.fn.expand("~") }) end,
+        default_settings)
+    keymap(n, "<C-f>", "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>", default_settings)
+    keymap(n, "fg", "<C-f>", default_settings)
     keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
+
     keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "ft", "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>", default_settings)
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)

@@ -2,6 +2,9 @@ local M = {}
 
 -- LSP config.
 
+-- Set just below treesitter.
+vim.highlight.priorities.semantic_tokens = 99
+
 local signs = {
     text = {
         [vim.diagnostic.severity.ERROR] = "",

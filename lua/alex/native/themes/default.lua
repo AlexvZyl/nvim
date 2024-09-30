@@ -2,6 +2,12 @@ local M = {}
 
 local U = require("alex.utils.neovim")
 
+local transparent = true;
+
+local function get_bg(color)
+    return transparent and "NONE" or color
+end
+
 -- TODO: Read these colors in at startup from the builtin groups.
 M.palette = {
     -- Colors.
@@ -35,21 +41,22 @@ local function init()
         Added = { fg = M.palette.green },
         Removed = { fg = M.palette.red },
         Changed = { fg = M.palette.blue },
+        Normal = { bg = get_bg(M.palette.bg) },
 
         -- Native UI.
-        WinBar = { fg = M.palette.white2, bg = M.palette.bg },
-        WinBarNC = { fg = M.palette.white2, bg = M.palette.bg },
+        WinBar = { fg = M.palette.white2, bg = get_bg(M.palette.bg) },
+        WinBarNC = { fg = M.palette.white2, bg = get_bg(M.palette.bg) },
         Pmenu = { link = "Normal" },
-        WinSeparator = { fg = M.palette.bg_dark, bg = M.palette.bg },
-        NormalFloat = { fg = M.palette.fg, bg = M.palette.bg },
-        FloatBorder = { fg = M.palette.fg, bg = M.palette.bg },
-        LineNR = { fg = M.palette.gray2, bg = M.palette.bg },
-        CursorLineNR = { fg = M.palette.white0, bg = M.palette.bg, bold = true },
+        WinSeparator = { fg = M.palette.bg_dark, bg = get_bg(M.palette.bg) },
+        NormalFloat = { fg = M.palette.fg, bg = get_bg(M.palette.bg) },
+        FloatBorder = { fg = M.palette.fg, bg = get_bg(M.palette.bg) },
+        LineNR = { fg = M.palette.gray2, bg = get_bg(M.palette.bg) },
+        CursorLineNR = { fg = M.palette.white0, bg = get_bg(M.palette.bg), bold = true },
         QuickFixFilename = { fg = M.palette.fg },
         QuickFixLine = { fg = M.palette.fg },
 
         -- Syntax tweaks.
-        MatchParen = { bg = M.palette.bg, underline = true },
+        MatchParen = { bg = get_bg(M.palette.bg), underline = true },
         Statement = { fg = M.palette.orange, bold = false },
         Comment = { fg = M.palette.gray2, bold = false },
         Title = { fg = M.palette.yellow, bold = true },
@@ -76,8 +83,8 @@ local function init()
         DiagnosticUnderlineInfo = { sp = M.palette.blue, underline = false, undercurl = true },
 
         -- Whichkey.
-        WhichKeyNormal = { bg = M.palette.bg },
-        WhichKeyBorder = { bg = M.palette.bg, fg = M.palette.bg_dark },
+        WhichKeyNormal = { bg = get_bg(M.palette.bg) },
+        WhichKeyBorder = { bg = get_bg(M.palette.bg), fg = M.palette.bg_dark },
 
         -- Dashboard.
         DashboardHeader = { fg = M.palette.yellow },
@@ -97,7 +104,7 @@ local function init()
         NvimTreeSpecialFile = { fg = M.palette.yellow, bold = false },
 
         -- Telescope.
-        TelescopePromptPrefix = { fg = M.palette.yellow, bg = M.palette.bg },
+        TelescopePromptPrefix = { fg = M.palette.yellow, bg = get_bg(M.palette.bg) },
 
         -- Notify.
         NotifyINFOTitle = { fg = M.palette.green },
@@ -123,7 +130,6 @@ local function init()
 end
 
 function M.setup_lualine()
-    local U = require("alex.utils.neovim")
     if not U.is_default() then return end
 
     local default_section = { fg = M.palette.white3, bg = M.palette.bg_dark }

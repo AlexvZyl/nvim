@@ -23,8 +23,8 @@ return {
     {
         "stevearc/oil.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        keys = { "<leader>e" },
         config = function() require("alex.plugins.ui.oil-nvim") end,
+        lazy = false
     },
     {
         "NvChad/nvim-colorizer.lua",
@@ -156,6 +156,7 @@ return {
         "aserowy/tmux.nvim",
         event = { "User NvimStartupDone" },
         config = function() require("tmux").setup() end,
+        lazy = false
     },
     {
         "ggandor/leap.nvim",

@@ -2,11 +2,9 @@ local M = {}
 
 local U = require("alex.utils.neovim")
 
-local transparent = true;
+local transparent = true
 
-local function get_bg(color)
-    return transparent and "NONE" or color
-end
+local function get_bg(color) return transparent and "NONE" or color end
 
 -- TODO: Read these colors in at startup from the builtin groups.
 M.palette = {

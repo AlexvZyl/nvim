@@ -10,7 +10,10 @@ local winbar_filetype_exclude = {
 local custom_bars = {
     qf = { icon = "", name = function() return "QuickFix" end },
     netrw = { icon = "", name = function() return "Netrw" end },
-    oil = { icon = "", name = function() return " " .. string.gsub(vim.fn.expand('%'), "oil://", "") end },
+    oil = {
+        icon = "",
+        name = function() return " " .. string.gsub(vim.fn.expand("%"), "oil://", "") end,
+    },
 }
 
 local excludes = function()

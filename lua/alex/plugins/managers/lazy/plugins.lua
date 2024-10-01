@@ -118,7 +118,7 @@ return {
     {
         "neovim/nvim-lspconfig",
         config = function() require("alex.plugins.lang.lsp") end,
-        event = { "VeryLazy" }
+        event = { "VeryLazy" },
     },
     {
         "folke/lazydev.nvim",
@@ -148,7 +148,7 @@ return {
     {
         "aserowy/tmux.nvim",
         config = function() require("tmux").setup() end,
-        event = { "VeryLazy" }
+        event = { "VeryLazy" },
     },
     {
         "ggandor/leap.nvim",

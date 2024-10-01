@@ -131,7 +131,7 @@ local function init()
         TodoFgTODO = { fg = M.palette.cyan, bold = true },
 
         -- Lazy.
-        LazyProgressDone = { fg = M.palette.green }
+        LazyProgressDone = { fg = M.palette.green },
     })
 end
 

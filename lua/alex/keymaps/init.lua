@@ -194,7 +194,10 @@ function M.completion()
             ["<C-d>"] = cmp.mapping.scroll_docs(4),
             ["<C-Space>"] = cmp.mapping.complete(),
             ["<C-e>"] = cmp.mapping.abort(),
-            ["<CR>"] = cmp.mapping.confirm({ select = false, behavior = cmp.ConfirmBehavior.Insert }),
+            ["<CR>"] = cmp.mapping.confirm({
+                select = false,
+                behavior = cmp.ConfirmBehavior.Insert,
+            }),
         }),
     })
 end

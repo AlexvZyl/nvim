@@ -7,6 +7,7 @@ local transparent = true
 local function get_bg(color) return transparent and "NONE" or color end
 
 -- TODO: Read these colors in at startup from the builtin groups.
+-- Not really sure if it is even possible.
 M.palette = {
     -- Colors.
     red = "#f08080",
@@ -58,11 +59,14 @@ local function init()
         Statement = { fg = M.palette.orange, bold = false },
         Comment = { fg = M.palette.gray2, bold = false },
         Title = { fg = M.palette.yellow, bold = true },
+        Constant = { bold = false },
         ["@markup.heading.2"] = { fg = M.palette.orange, bold = true },
         ["@markup.heading.3"] = { fg = M.palette.orange },
         ["@markup.heading.4"] = { link = "@markup.heading.3" },
         ["@markup.heading.5"] = { link = "@markup.heading.3" },
         ["@markup.heading.6"] = { link = "@markup.heading.3" },
+        Number = { fg = M.palette.magenta },
+        Boolean = { fg = M.palette.magenta },
 
         -- Indent blankline.
         IndentBlanklineChar = { fg = M.palette.gray1 },
@@ -117,6 +121,7 @@ local function init()
         NotifyERRORIcon = { fg = M.palette.red },
         NotifyERRORBorder = { fg = M.palette.red },
         NotifyERRORBody = { fg = M.palette.fg },
+        NotifyBackground = { bg = get_bg(M.palette.bg) },
 
         -- Noice.
         NoiceCmdlinePopupBorder = { fg = M.palette.cyan },
@@ -124,6 +129,9 @@ local function init()
 
         -- Todo comments
         TodoFgTODO = { fg = M.palette.cyan, bold = true },
+
+        -- Lazy.
+        LazyProgressDone = { fg = M.palette.green }
     })
 end
 

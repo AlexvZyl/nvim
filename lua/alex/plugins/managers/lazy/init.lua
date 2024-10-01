@@ -1,5 +1,4 @@
 require("alex.plugins.managers.lazy.bootstrap")
-require("alex.plugins.managers.lazy.events")
 
 local U = require("alex.utils.chars")
 local plugins = require("alex.plugins.managers.lazy.plugins")

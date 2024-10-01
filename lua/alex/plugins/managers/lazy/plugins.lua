@@ -14,7 +14,7 @@ return {
             "nvim-telescope/telescope.nvim",
         },
         config = function() require("alex.plugins.ui.todo") end,
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
     },
     {
         "nvim-tree/nvim-web-devicons",
@@ -28,7 +28,7 @@ return {
     },
     {
         "NvChad/nvim-colorizer.lua",
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.colorizer") end,
     },
     {
@@ -47,13 +47,13 @@ return {
             "nvim-tree/nvim-web-devicons",
             "AndreM222/copilot-lualine",
         },
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.lualine") end,
     },
     {
         "folke/noice.nvim",
         dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
-        -- event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.noice") end,
     },
     {
@@ -63,7 +63,7 @@ return {
     },
     {
         "lewis6991/gitsigns.nvim",
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.gitsigns") end,
     },
     {
@@ -73,7 +73,7 @@ return {
     },
     {
         "folke/which-key.nvim",
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.which-key") end,
     },
     {
@@ -83,17 +83,11 @@ return {
     },
     {
         "stevearc/quicker.nvim",
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.quicker") end,
     },
 
     -- Language.
-    {
-        "zbirenbaum/copilot.lua",
-        config = function() require("alex.plugins.lang.copilot") end,
-        cmd = { "Copilot" },
-        build = "Copilot auth",
-    },
     {
         "mfussenegger/nvim-dap",
         dependencies = {
@@ -103,12 +97,12 @@ return {
                 config = function() require("alex.plugins.ui.dapui") end,
             },
         },
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.lang.dap") end,
     },
     {
         "mfussenegger/nvim-lint",
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.lang.linter") end,
     },
     {
@@ -117,15 +111,14 @@ return {
             "nvim-treesitter/nvim-treesitter-textobjects",
             "nvim-treesitter/playground",
         },
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         build = { ":TSUpdate" },
         config = function() require("alex.plugins.ui.treesitter") end,
     },
     {
         "neovim/nvim-lspconfig",
         config = function() require("alex.plugins.lang.lsp") end,
-        -- If this is lazy, it seems that the lsp misses the FileType event
-        lazy = false,
+        event = { "VeryLazy" }
     },
     {
         "folke/lazydev.nvim",
@@ -134,7 +127,7 @@ return {
     },
     {
         "hrsh7th/nvim-cmp",
-        event = { "User NvimStartupDone" },
+        event = { "VeryLazy" },
         config = function() require("alex.plugins.lang.completion") end,
         dependencies = {
             "hrsh7th/cmp-omni",
@@ -154,9 +147,8 @@ return {
     -- Other.
     {
         "aserowy/tmux.nvim",
-        event = { "User NvimStartupDone" },
         config = function() require("tmux").setup() end,
-        lazy = false,
+        event = { "VeryLazy" }
     },
     {
         "ggandor/leap.nvim",
@@ -181,8 +173,8 @@ return {
     },
     {
         "sainnhe/gruvbox-material",
-        lazy = true,
         priority = 1000,
+        lazy = true,
         config = function() require("alex.plugins.themes.gruvbox") end,
     },
 

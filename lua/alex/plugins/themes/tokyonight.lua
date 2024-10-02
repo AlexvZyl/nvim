@@ -44,8 +44,6 @@ local function on_highlights(H, C)
     H.NoiceLspProgressClient = { bg = C.bg }
     H.NoiceLspProgressSpinner = { bg = C.bg }
 
-    -- Copilot
-    H.CopilotSuggestion = { fg = C.fg_gutter, italic = false }
     -- Debugger
     H.DapUINormal = { bg = C.bg_dark }
     -- Completion

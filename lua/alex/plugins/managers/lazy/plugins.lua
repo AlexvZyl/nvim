@@ -45,7 +45,6 @@ return {
         lazy = false,
         dependencies = {
             "nvim-tree/nvim-web-devicons",
-            "AndreM222/copilot-lualine",
         },
         event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.lualine") end,

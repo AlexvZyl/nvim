@@ -162,8 +162,6 @@ function M.telescope()
     keymap(n, "gd", "<Cmd>Telescope lsp_definitions<CR>", default_settings)
 end
 
-function M.copilot() keymap(n, "<leader>c", "<Cmd>Copilot panel<CR>", default_settings) end
-
 function M.debugger()
     keymap(n, "<C-b>", "<Cmd>DapToggleBreakpoint<CR>", default_settings)
     keymap(

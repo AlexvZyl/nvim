@@ -21,14 +21,14 @@ end
 
 local function get_lsp_command()
     local docker_path = get_docker_path()
+    local timeout_ms = 150
     if not docker_path then
-        -- TODO: This is not working.
-        vim.defer_fn(
-            function() vim.notify("Could not find TSN docker script for lsp", "WARN") end,
-            150
-        )
+        vim.defer_fn(function() vim.notify("Could not find TSN docker script for lsp", "WARN") end, timeout_ms)
         return
+    else
+        vim.defer_fn(function() vim.notify("Using dockerfile at " .. docker_path .. "\"", "INFO") end, timeout_ms)
     end
+
 
     local repos = { "tsnsystems_utils" }
     local curr_dir = U.current_dir_abs()
@@ -54,7 +54,8 @@ local function get_lsp_command()
         "clangd",
         "--background-index",
         "--path-mappings",
-        curr_dir .. "=/app/dev",
+        -- TODO: This sould be the parent of the root of the git repo?
+        "/home/alex/TSN/Repos=/app/dev",
     }
 end
 

@@ -43,6 +43,23 @@ local picker_buffer = {
     sort_mru = true,
     ignore_current_buffer = true,
     file_ignore_patters = { "\\." },
+    on_complete = {
+        function(picker)
+            vim.schedule(function()
+                picker:set_selection(0)
+            end)
+        end
+    }
+}
+
+local picker_register = {
+    sort_mru = true,
+    preview = false,
+    wrap_results = false,
+    layout_config = {
+        height = 0.6,
+        width = 0.6,
+    },
 }
 
 local small_lsp_layout = {
@@ -102,6 +119,7 @@ TS.setup({
         oldfiles = horizontal_layout,
         find_files = horizontal_layout,
         buffers = picker_buffer,
+        registers = picker_register,
         lsp_document_symbols = horizontal_layout,
         lsp_definitions = small_lsp_layout,
         lsp_references = small_lsp_layout,

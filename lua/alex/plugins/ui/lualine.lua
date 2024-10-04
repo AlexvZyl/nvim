@@ -22,8 +22,8 @@ if U.is_default() then
     local C = require("alex.native.themes.default").palette
     red = C.red
     green = C.green
-    icon_hl = { fg = C.white3 }
-    text_hl = { fg = C.white3 }
+    icon_hl = { fg = C.gray2 }
+    text_hl = { fg = C.gray2 }
 elseif U.is_nordic() then
     local C = require("nordic.colors")
     text_hl = { fg = C.gray3 }
@@ -147,7 +147,7 @@ require("lualine").setup({
         lualine_b = {},
         lualine_c = {
             {
-                U.get_recording_icon,
+                U.get_recording_state_icon,
                 color = get_recording_color,
                 padding = 0,
                 separator = "",
@@ -159,12 +159,6 @@ require("lualine").setup({
                 separator = "",
                 padding = 0,
             },
-            -- {
-            --     U.get_git_compare,
-            --     padding = { left = 1 },
-            --     color = text_hl,
-            --     separator = "",
-            -- },
             {
                 "diff",
                 color = text_hl,

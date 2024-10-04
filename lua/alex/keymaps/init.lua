@@ -139,22 +139,23 @@ function M.telescope()
     keymap(
         n,
         "<C-f>",
-        function() require("telescope.builtin").find_files({ cwd = vim.fn.expand("~") }) end,
+        function() require("telescope.builtin").current_buffer_fuzzy_find({ previewer = false }) end,
         default_settings
     )
-    keymap(
-        n,
-        "<C-f>",
-        "<Cmd>Telescope current_buffer_fuzzy_find previewer=false<CR>",
-        default_settings
-    )
-    keymap(n, "fg", "<C-f>", default_settings)
+
     keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
 
     keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "ft", "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>", default_settings)
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
     keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
+
+    keymap(
+        n,
+        "fg",
+        function() require("telescope.builtin").registers() end,
+        default_settings
+    )
 
     -- For LSP.
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)

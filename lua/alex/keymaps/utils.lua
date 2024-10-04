@@ -1,14 +1,5 @@
 local M = {}
 
-function M.cwd_current_buffer()
-    local abs_path = vim.api.nvim_buf_get_name(0)
-    local dir = abs_path:match("(.*[/\\])")
-    if dir == nil then return end
-    -- vim.cmd('cd ' .. dir)
-    vim.cmd("NvimTreeRefresh")
-    vim.cmd("NvimTreeFindFile")
-end
-
 function M.save_file()
     if vim.api.nvim_buf_get_option(0, "readonly") then return end
     local buftype = vim.api.nvim_buf_get_option(0, "buftype")
@@ -52,17 +43,15 @@ function M.toggle_virtual_diagnostics()
 end
 
 function M.format_bufer()
+    -- Remove trailing whitespace.
+    local cursor_position = vim.api.nvim_win_get_cursor(0)
+    vim.api.nvim_exec([[%s/\s\+$//e]], false)
+    vim.cmd("noh")
+    vim.api.nvim_win_set_cursor(0, cursor_position)
+
+    -- Try to format the buffer using the attached lsp.
     local status, _ = pcall(vim.lsp.buf.format)
     if not status then vim.notify("Format failed") end
-end
-
-function M.toggle_netrw()
-    local U = require("alex.utils.neovim")
-    if U.current_buffer_filetype() == "netrw" then
-        pcall(vim.api.nvim_command, "b#")
-    else
-        vim.cmd("Explore")
-    end
 end
 
 function M.toggle_oil()

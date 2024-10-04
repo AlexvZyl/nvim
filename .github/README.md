@@ -13,6 +13,4 @@ I do not use a distro becuase:
 - I try to keep all of the key bindings in [one file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/keymaps/init.lua) so that it is easier to keep track of everything and prevent conflicts.
 - You can add more LSPs to the end of [this file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/plugins/lang/lsp/init.lua).
 
-*Images are outdated.*
-![nvim-1](https://github.com/AlexvZyl/nvim/assets/81622310/3c9f6ec9-1186-4398-af0c-2c84dab116e7)
-![nvim02](https://github.com/AlexvZyl/nvim/assets/81622310/961f6a62-ddf5-47d7-9e09-e8abcf2875f3)
+![image](https://github.com/user-attachments/assets/503f3470-a29f-496c-b399-3b966ba3e4ce)

@@ -23,12 +23,17 @@ local function get_lsp_command()
     local docker_path = get_docker_path()
     local timeout_ms = 150
     if not docker_path then
-        vim.defer_fn(function() vim.notify("Could not find TSN docker script for lsp", "WARN") end, timeout_ms)
+        vim.defer_fn(
+            function() vim.notify("Could not find TSN docker script for lsp", "WARN") end,
+            timeout_ms
+        )
         return
     else
-        vim.defer_fn(function() vim.notify("Using dockerfile at " .. docker_path .. "\"", "INFO") end, timeout_ms)
+        vim.defer_fn(
+            function() vim.notify("Using dockerfile at " .. docker_path .. '"', "INFO") end,
+            timeout_ms
+        )
     end
-
 
     local repos = { "tsnsystems_utils" }
     local curr_dir = U.current_dir_abs()

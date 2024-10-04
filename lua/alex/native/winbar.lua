@@ -34,7 +34,11 @@ function M.get_winbar()
 
     local filetype = U.current_buffer_filetype()
     if custom_bars[filetype] ~= nil then
-        return prefix .. custom_bars[filetype].icon .. " " .. custom_bars[filetype].name() .. mod_icon
+        return prefix
+            .. custom_bars[filetype].icon
+            .. " "
+            .. custom_bars[filetype].name()
+            .. mod_icon
     end
 
     local file_icon = U.current_buffer_icon()

@@ -45,11 +45,9 @@ local picker_buffer = {
     file_ignore_patters = { "\\." },
     on_complete = {
         function(picker)
-            vim.schedule(function()
-                picker:set_selection(0)
-            end)
-        end
-    }
+            vim.schedule(function() picker:set_selection(0) end)
+        end,
+    },
 }
 
 local picker_register = {

@@ -53,7 +53,7 @@ local function init()
         CursorLineNR = { fg = M.palette.white0, bg = get_bg(M.palette.bg), bold = true },
         QuickFixFilename = { fg = M.palette.fg },
         QuickFixLine = { fg = M.palette.fg },
-        LspInfoBorder = {  link = "FloatBorder" },
+        LspInfoBorder = { link = "FloatBorder" },
 
         -- Syntax tweaks.
         MatchParen = { bg = get_bg(M.palette.bg), underline = true },

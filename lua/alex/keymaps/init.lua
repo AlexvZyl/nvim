@@ -150,12 +150,7 @@ function M.telescope()
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
     keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
 
-    keymap(
-        n,
-        "fg",
-        function() require("telescope.builtin").registers() end,
-        default_settings
-    )
+    keymap(n, "fg", function() require("telescope.builtin").registers() end, default_settings)
 
     -- For LSP.
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)

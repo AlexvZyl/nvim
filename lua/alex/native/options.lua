@@ -43,6 +43,10 @@ else
     vim.opt.fillchars = {
         eob = " ",
         diff = "╱",
+        vert = C.right_thick,
+        vertleft = C.right_thick,
+        vertright = C.right_thick,
+        verthoriz = C.right_thick,
     }
 end
 
@@ -67,9 +71,3 @@ vim.opt.background = "dark"
 -- vim.api.nvim_command('autocmd WinNew * wincmd H')
 
 vim.cmd("filetype plugin indent on")
-
--- Automatically remove trailing whitespace.
-vim.cmd([[
-    match ExtraWhitespace /\s\+$/
-    autocmd BufWritePre * %s/\s\+$//e
-]])

@@ -53,6 +53,7 @@ local function init()
         CursorLineNR = { fg = M.palette.white0, bg = get_bg(M.palette.bg), bold = true },
         QuickFixFilename = { fg = M.palette.fg },
         QuickFixLine = { fg = M.palette.fg },
+        LspInfoBorder = {  link = "FloatBorder" },
 
         -- Syntax tweaks.
         MatchParen = { bg = get_bg(M.palette.bg), underline = true },
@@ -85,8 +86,9 @@ local function init()
         DiagnosticUnderlineInfo = { sp = M.palette.blue, underline = false, undercurl = true },
 
         -- Whichkey.
-        WhichKeyNormal = { bg = get_bg(M.palette.bg) },
-        WhichKeyBorder = { bg = get_bg(M.palette.bg), fg = M.palette.bg_dark },
+        WhichKeyNormal = { bg = M.palette.bg_dark },
+        WhichKeyTitle = { bg = M.palette.bg_dark, fg = M.palette.yellow, bold = true },
+        WhichKeyBorder = { bg = M.palette.bg_dark, fg = M.palette.bg_dark },
 
         -- Dashboard.
         DashboardHeader = { fg = M.palette.yellow },
@@ -138,7 +140,7 @@ end
 function M.setup_lualine()
     if not U.is_default() then return end
 
-    local default_section = { fg = M.palette.white3, bg = M.palette.bg_dark }
+    local default_section = { fg = M.palette.gray2, bg = M.palette.bg_dark }
     local default = {
         normal = {
             a = { fg = M.palette.bg_dark, bg = M.palette.blue, gui = "bold" },

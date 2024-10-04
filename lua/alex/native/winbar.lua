@@ -24,6 +24,7 @@ end
 local M = {}
 
 function M.get_winbar()
+    local prefix = "  "
     local mod_icon = ""
     if U.current_buffer_modified() then
         mod_icon = " ●"
@@ -33,7 +34,7 @@ function M.get_winbar()
 
     local filetype = U.current_buffer_filetype()
     if custom_bars[filetype] ~= nil then
-        return "  " .. custom_bars[filetype].icon .. " " .. custom_bars[filetype].name() .. mod_icon
+        return prefix .. custom_bars[filetype].icon .. " " .. custom_bars[filetype].name() .. mod_icon
     end
 
     local file_icon = U.current_buffer_icon()
@@ -45,7 +46,7 @@ function M.get_winbar()
         file_icon = " "
     end
 
-    return "  " .. file_icon .. " " .. U.current_buffer_parent() .. filename .. mod_icon
+    return prefix .. file_icon .. " " .. U.current_buffer_parent() .. filename .. mod_icon
 end
 
 function M.set_winbar(force)

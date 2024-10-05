@@ -32,4 +32,9 @@ function M.get_git_compare()
     return string
 end
 
+function M.get_git_root()
+    local dot_git_path = vim.fn.finddir(".git", ".;")
+    return vim.fn.fnamemodify(dot_git_path, ":p")
+end
+
 return M

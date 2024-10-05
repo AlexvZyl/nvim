@@ -1,6 +1,8 @@
 -- I want to keep all of the key bindings in one file so that it is easy to see
 -- what is being used and ensure nothing being overwritten by accident.
 
+local U = require("alex.utils")
+
 local n, i, v, t = "n", "i", "v", "t"
 local ex_t = { n, i, v }
 local n_i = { n, i }
@@ -146,11 +148,13 @@ function M.telescope()
     keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
 
     keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
-    keymap(n, "ft", "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>", default_settings)
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
     keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
 
     keymap(n, "fg", function() require("telescope.builtin").registers() end, default_settings)
+
+    keymap(n, "ft", "<Cmd>TodoTelescope previewer=false wrap_results=false cwd=" .. U.get_git_root() .. "<CR>",
+        default_settings)
 
     -- For LSP.
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)

@@ -52,6 +52,10 @@ function M.current_buffer_parent()
     return parent .. "/"
 end
 
+function M.current_buffer_full_file()
+    return vim.fn.expand("%")
+end
+
 function M.current_buffer_lsp()
     local buf_ft = M.current_buffer_filetype()
     local clients = vim.lsp.get_clients()

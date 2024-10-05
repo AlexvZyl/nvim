@@ -153,8 +153,12 @@ function M.telescope()
 
     keymap(n, "fg", function() require("telescope.builtin").registers() end, default_settings)
 
-    keymap(n, "ft", "<Cmd>TodoTelescope previewer=false wrap_results=false cwd=" .. U.get_git_root() .. "<CR>",
-        default_settings)
+    keymap(
+        n,
+        "ft",
+        "<Cmd>TodoTelescope previewer=false wrap_results=false cwd=" .. U.get_git_root() .. "<CR>",
+        default_settings
+    )
 
     -- For LSP.
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)

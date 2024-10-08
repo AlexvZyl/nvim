@@ -1,4 +1,5 @@
-local U = require("alex.utils.lua")
+local U = require("alex.utils")
+
 if not U.in_home_dir("TSN") and not U.in_dir("/app") then return end
 
 local LU = require("lspconfig.util")
@@ -30,37 +31,31 @@ local function get_lsp_command()
         return
     else
         vim.defer_fn(
-            function() vim.notify("Using dockerfile at " .. docker_path .. '"', "INFO") end,
+            function() vim.notify('Using docker @ \"' .. docker_path .. '/"', "INFO") end,
             timeout_ms
         )
     end
 
-    local repos = { "tsnsystems_utils" }
+    local suffix = "box4dev"
+
+    local repos = {
+        "tsnsystems_ipc",
+        "tsnsystems_utils"
+    }
     local curr_dir = U.current_dir_abs()
     for _, repo in ipairs(repos) do
-        if string.find(curr_dir, "tsnsystems_utils") then
-            return {
-                docker_path .. "/" .. script_file,
-                docker_path .. "/../docker.configs/" .. "Dockerfile." .. repo,
-                "--lsp",
-                "clangd",
-                "--background-index",
-                "--path-mappings",
-                curr_dir .. "=/app/dev",
-            }
+        if string.find(curr_dir, repo) then
+            suffix = repo
         end
     end
 
-    -- Default.
     return {
         docker_path .. "/" .. script_file,
-        docker_path .. "/../docker.configs/" .. "Dockerfile.box4pc",
+        docker_path .. "/../docker.configs/" .. "Dockerfile." .. suffix,
         "--lsp",
         "clangd",
         "--background-index",
-        "--path-mappings",
-        -- TODO: This sould be the parent of the root of the git repo?
-        "/home/alex/TSN/Repos=/app/dev",
+        "--path-mappings=" .. U.get_git_root():gsub("/$", "") .. "=/app/dev",
     }
 end
 

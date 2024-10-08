@@ -13,7 +13,7 @@ local vertical_layout = {
     preview_title = "",
     layout_config = {
         mirror = true,
-        preview_height = 0.55
+        preview_height = 0.55,
     },
     borderchars = {
         prompt = prompt_chars,

@@ -31,7 +31,7 @@ local function get_lsp_command()
         return
     else
         vim.defer_fn(
-            function() vim.notify('Using docker @ \"' .. docker_path .. '/"', "INFO") end,
+            function() vim.notify('Using docker @ "' .. docker_path .. '/"', "INFO") end,
             timeout_ms
         )
     end
@@ -40,13 +40,11 @@ local function get_lsp_command()
 
     local repos = {
         "tsnsystems_ipc",
-        "tsnsystems_utils"
+        "tsnsystems_utils",
     }
     local curr_dir = U.current_dir_abs()
     for _, repo in ipairs(repos) do
-        if string.find(curr_dir, repo) then
-            suffix = repo
-        end
+        if string.find(curr_dir, repo) then suffix = repo end
     end
 
     return {

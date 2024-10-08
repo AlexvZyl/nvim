@@ -13,6 +13,7 @@ local vertical_layout = {
     preview_title = "",
     layout_config = {
         mirror = true,
+        preview_height = 0.55
     },
     borderchars = {
         prompt = prompt_chars,
@@ -114,8 +115,8 @@ TS.setup({
         diagnostics = vertical_layout,
         live_grep = horizontal_layout,
         help_tags = horizontal_layout,
-        oldfiles = horizontal_layout,
-        find_files = horizontal_layout,
+        oldfiles = vertical_layout,
+        find_files = vertical_layout,
         buffers = picker_buffer,
         registers = picker_register,
         lsp_document_symbols = horizontal_layout,

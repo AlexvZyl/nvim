@@ -11,15 +11,15 @@ function M.get_git_compare()
     local curr_dir = U.current_buffer_dir()
 
     local result = Job:new({
-        command = "git",
-        cwd = curr_dir,
-        args = {
-            "rev-list",
-            "--left-right",
-            "--count",
-            "HEAD...@{upstream}",
-        },
-    })
+            command = "git",
+            cwd = curr_dir,
+            args = {
+                "rev-list",
+                "--left-right",
+                "--count",
+                "HEAD...@{upstream}",
+            },
+        })
         :sync(100)[1]
 
     if type(result) ~= "string" then return "" end
@@ -33,7 +33,7 @@ function M.get_git_compare()
 end
 
 function M.get_git_root()
-    local dot_git_path = vim.fn.finddir(".git", ".;")
+    local dot_git_path = vim.fn.finddir(".git", ".;") .. "/../"
     return vim.fn.fnamemodify(dot_git_path, ":p")
 end
 

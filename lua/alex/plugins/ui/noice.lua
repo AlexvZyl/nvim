@@ -35,6 +35,7 @@ local filter_notify = {
     "WARNING: vim.treesitter",
     "NotifyBackground",
     "no parser for",
+    "No buffers were deleted:  bdelete #",
 }
 
 local function routes_config()

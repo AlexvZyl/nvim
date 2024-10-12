@@ -16,8 +16,8 @@ local custom_bars = {
     },
     checkhealth = {
         icon = " ",
-        name = function() return "Checkhealth" end
-    }
+        name = function() return "Checkhealth" end,
+    },
 }
 
 local excludes = function()

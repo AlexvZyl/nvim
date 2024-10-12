@@ -138,7 +138,7 @@ function M.init()
 
         -- HACK:
         luaParenError = { link = "Normal" },
-        markdownError = { link = "Normal" }
+        markdownError = { link = "Normal" },
     })
 end
 

@@ -50,7 +50,6 @@ else
         verthoriz = C.right_thick,
         horiz = C.bottom_thin,
         horizup = C.bottom_right_thin,
-
     }
 end
 

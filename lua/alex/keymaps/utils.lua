@@ -27,9 +27,7 @@ function M.toggle_diffview()
     end
 end
 
-function M.delete_buffer()
-    vim.cmd([[:bp | bdelete #]])
-end
+function M.delete_buffer() vim.cmd([[:bp | bdelete #]]) end
 
 M.virtual_diagnostics = false
 function M.toggle_virtual_diagnostics()

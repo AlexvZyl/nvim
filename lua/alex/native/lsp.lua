@@ -10,7 +10,7 @@ local signs = {
         [vim.diagnostic.severity.ERROR] = "",
         [vim.diagnostic.severity.WARN] = "",
         [vim.diagnostic.severity.INFO] = "",
-        [vim.diagnostic.severity.HINT] = "󱤅",
+        [vim.diagnostic.severity.HINT] = "",
     },
     numhl = {
         [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
@@ -26,6 +26,12 @@ vim.diagnostic.config({
     virtual_text = require("alex.keymaps.utils").virtual_diagnostics,
     update_on_insert = true,
 })
+
+
+vim.fn.sign_define('DiagnosticSignError', { text = '', numhl = 'DiagnosticSignError' })
+vim.fn.sign_define('DiagnosticSignWarn', { text = '', numhl = 'DiagnosticSignWarn' })
+vim.fn.sign_define('DiagnosticSignInfo', { text = '', numhl = 'DiagnosticSignInfo' })
+vim.fn.sign_define('DiagnosticSignHint', { text = '', numhl = 'DiagnosticSignHint' })
 
 -- Diagnostics utils.
 

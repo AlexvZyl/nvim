@@ -2,9 +2,6 @@ local LU = require("lspconfig.util")
 local LC = require("lspconfig")
 local C = require("alex.plugins.lang.lsp.config")
 
-require("lspconfig.ui.windows").default_options.border =
-    require("alex.utils").get_border_chars("float")
-
 -- Setup LSPs.
 
 LC.clangd.setup({

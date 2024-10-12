@@ -22,16 +22,19 @@ local vertical_layout = {
     },
 }
 
-local horizontal_layout = {
-    layout_strategy = "horizontal",
-    wrap_results = false,
+local diagnostics = {
+    sort_by = "severity",
+    layout_strategy = "vertical",
     preview_title = "",
+    layout_config = {
+        mirror = true,
+        preview_height = 0.55,
+    },
     borderchars = {
         prompt = prompt_chars,
+        preview = vert_preview_chars,
         results = U.get_border_chars("telescope"),
-        preview = U.get_border_chars("telescope"),
     },
-    layout_config = { preview_width = 0.57 },
 }
 
 local picker_buffer = {
@@ -83,8 +86,8 @@ local defaults = {
     sorting_strategy = "ascending",
     layout_config = {
         prompt_position = "top",
-        height = 0.9,
-        width = 0.8,
+        height = 0.95,
+        width = 0.7,
     },
     border = true,
     borderchars = {
@@ -112,14 +115,14 @@ local defaults = {
 TS.setup({
     defaults = defaults,
     pickers = {
-        diagnostics = vertical_layout,
-        live_grep = horizontal_layout,
-        help_tags = horizontal_layout,
+        diagnostics = diagnostics,
+        live_grep = vertical_layout,
+        help_tags = vertical_layout,
         oldfiles = vertical_layout,
         find_files = vertical_layout,
         buffers = picker_buffer,
         registers = picker_register,
-        lsp_document_symbols = horizontal_layout,
+        lsp_document_symbols = vertical_layout,
         lsp_definitions = small_lsp_layout,
         lsp_references = small_lsp_layout,
         lsp_implementations = small_lsp_layout,

@@ -22,6 +22,7 @@ vim.opt.expandtab = true
 vim.opt.autoindent = true
 vim.opt.smartindent = true
 vim.opt.wrap = false
+vim.opt.showtabline = 0
 
 vim.opt.inccommand = "nosplit"
 
@@ -47,6 +48,9 @@ else
         vertleft = C.right_thick,
         vertright = C.right_thick,
         verthoriz = C.right_thick,
+        horiz = C.bottom_thin,
+        horizup = C.bottom_right_thin,
+
     }
 end
 

@@ -31,7 +31,7 @@ M.border_chars_cmp_items = { "▛", "▀", "▀", " ", "▄", "▄", "▙", "▌
 M.border_chars_cmp_doc = { "▀", "▀", "▀", " ", "▄", "▄", "▄", "▏" }
 M.border_chars_outer_thin = { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
 M.border_chars_inner_thin = { " ", "▁", " ", "▏", " ", "▔", " ", "▕" }
-M.border_chars_top_only_thin = { "", M.top_thin, "", "", "", " ", "", "" }
+M.border_chars_top_only_thin = { " ", M.top_thin, " ", " ", " ", " ", " ", " " }
 M.border_chars_top_only_normal = { "", M.horizontal_default, "", "", "", " ", "", "" }
 
 -- Telscope chars.
@@ -50,8 +50,8 @@ M.diagnostic_signs = {
     warn = " ",
     info = " ",
     information = " ",
-    hint = "󱤅 ",
-    other = "󰠠 ",
+    hint = "",
+    other = "",
 }
 M.kind_icons = {
     Text = " ",

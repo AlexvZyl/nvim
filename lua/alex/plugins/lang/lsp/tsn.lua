@@ -37,7 +37,6 @@ local function get_lsp_command()
     end
 
     local suffix = "box4dev"
-
     local repos = {
         "tsnsystems_ipc",
         "tsnsystems_utils",

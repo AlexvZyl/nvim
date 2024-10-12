@@ -34,7 +34,7 @@ M.palette.fg = M.palette.white0
 M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
 
-local function init()
+function M.init()
     U.set_highlights_table({
         -- Git
         Added = { fg = M.palette.green },
@@ -109,6 +109,7 @@ local function init()
 
         -- Telescope.
         TelescopePromptPrefix = { fg = M.palette.yellow, bg = get_bg(M.palette.bg) },
+        TelescopeTitle = { fg = M.palette.bg_dark, bg = M.palette.orange },
 
         -- Notify.
         NotifyINFOTitle = { fg = M.palette.green },
@@ -134,6 +135,10 @@ local function init()
 
         -- Lazy.
         LazyProgressDone = { fg = M.palette.green },
+
+        -- HACK:
+        luaParenError = { link = "Normal" },
+        markdownError = { link = "Normal" }
     })
 end
 
@@ -183,6 +188,6 @@ function M.setup_lualine()
     })
 end
 
-init()
+M.init()
 
 return M

@@ -80,6 +80,7 @@ function M.native()
         function() require("alex.keymaps.utils").toggle_virtual_diagnostics() end,
         default_settings
     )
+    keymap(n, "gm", "<Cmd>vertical Man<CR>", default_settings)
 
     -- Buffers
     keymap(n, "Q", function() require("alex.keymaps.utils").delete_buffer() end, default_settings)
@@ -151,7 +152,7 @@ function M.telescope()
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
     keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
 
-    keymap(n, "fg", function() require("telescope.builtin").registers() end, default_settings)
+    keymap(n_v, "fg", function() require("telescope.builtin").registers() end, default_settings)
 
     keymap(
         n,

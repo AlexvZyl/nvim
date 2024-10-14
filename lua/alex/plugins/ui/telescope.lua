@@ -104,11 +104,17 @@ TS.setup({
         lsp_implementations = small_lsp_layout,
 
         live_grep = { preview_title = "" },
-        help_tags = { preview_title = "", mappings = { i = { ["<CR>"] = require("telescope.actions").select_vertical } } },
+        help_tags = {
+            preview_title = "",
+            mappings = { i = { ["<CR>"] = require("telescope.actions").select_vertical } },
+        },
         oldfiles = { preview_title = "" },
         find_files = { preview_title = "" },
         lsp_document_symbols = { preview_title = "" },
-        man_pages = { preview_title = "", mappings = { i = { ["<CR>"] = require("telescope.actions").select_vertical } } },
+        man_pages = {
+            preview_title = "",
+            mappings = { i = { ["<CR>"] = require("telescope.actions").select_vertical } },
+        },
     },
 })
 

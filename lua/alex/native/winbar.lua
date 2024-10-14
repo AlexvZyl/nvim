@@ -16,15 +16,15 @@ local custom_bars = {
     },
     checkhealth = {
         icon = "󰋠",
-        name = function() return "Checkhealth" end
+        name = function() return "Checkhealth" end,
     },
     man = {
         icon = "󰌽",
         name = function()
             local filename = U.current_buffer_filename()
             return "man/" .. string.gsub(filename, "man//", "")
-        end
-    }
+        end,
+    },
 }
 
 local excludes = function()

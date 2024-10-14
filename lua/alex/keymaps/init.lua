@@ -143,7 +143,13 @@ function M.telescope()
     keymap(
         n,
         "<C-f>",
-        function() require("telescope.builtin").current_buffer_fuzzy_find({ previewer = false, results_ts_highlight = false, wrap_results = false }) end,
+        function()
+            require("telescope.builtin").current_buffer_fuzzy_find({
+                previewer = false,
+                results_ts_highlight = false,
+                wrap_results = false,
+            })
+        end,
         default_settings
     )
 

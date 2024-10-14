@@ -8,35 +8,6 @@ if not U.is_default() then
     vert_preview_chars = U.border_chars_telescope_vert_preview_thin
 end
 
-local vertical_layout = {
-    layout_strategy = "vertical",
-    preview_title = "",
-    layout_config = {
-        mirror = true,
-        preview_height = 0.55,
-    },
-    borderchars = {
-        prompt = prompt_chars,
-        preview = vert_preview_chars,
-        results = U.get_border_chars("telescope"),
-    },
-}
-
-local diagnostics = {
-    sort_by = "severity",
-    layout_strategy = "vertical",
-    preview_title = "",
-    layout_config = {
-        mirror = true,
-        preview_height = 0.55,
-    },
-    borderchars = {
-        prompt = prompt_chars,
-        preview = vert_preview_chars,
-        results = U.get_border_chars("telescope"),
-    },
-}
-
 local picker_buffer = {
     preview = false,
     wrap_results = false,
@@ -82,19 +53,26 @@ local small_lsp_layout = {
 }
 
 local defaults = {
-    sort_mru = true,
-    sorting_strategy = "ascending",
+    layout_strategy = "vertical",
+    preview_title = "",
+    dynamic_preview_title = false,
+
     layout_config = {
         prompt_position = "top",
+        mirror = true,
+        preview_height = 0.55,
         height = 0.95,
         width = 0.7,
     },
-    border = true,
     borderchars = {
         prompt = prompt_chars,
+        preview = vert_preview_chars,
         results = U.get_border_chars("telescope"),
-        preview = U.get_border_chars("telescope"),
     },
+
+    sort_mru = true,
+    sorting_strategy = "ascending",
+    border = true,
     multi_icon = "",
     entry_prefix = "   ",
     prompt_prefix = "   ",
@@ -109,23 +87,28 @@ local defaults = {
             ["<C-Esc>"] = require("telescope.actions").close,
         },
     },
-    preview = { treesitter = true },
+
+    -- BUG: This causes too many issues.
+    preview = { treesitter = false },
 }
 
 TS.setup({
     defaults = defaults,
     pickers = {
-        diagnostics = diagnostics,
-        live_grep = vertical_layout,
-        help_tags = vertical_layout,
-        oldfiles = vertical_layout,
-        find_files = vertical_layout,
+        diagnostics = { sort_by = "severity", preview_title = "" },
         buffers = picker_buffer,
         registers = picker_register,
-        lsp_document_symbols = vertical_layout,
+
         lsp_definitions = small_lsp_layout,
         lsp_references = small_lsp_layout,
         lsp_implementations = small_lsp_layout,
+
+        live_grep = { preview_title = "" },
+        help_tags = { preview_title = "", mappings = { i = { ["<CR>"] = require("telescope.actions").select_vertical } } },
+        oldfiles = { preview_title = "" },
+        find_files = { preview_title = "" },
+        lsp_document_symbols = { preview_title = "" },
+        man_pages = { preview_title = "", mappings = { i = { ["<CR>"] = require("telescope.actions").select_vertical } } },
     },
 })
 

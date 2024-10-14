@@ -34,7 +34,6 @@ local filter_notify = {
     "Invalid window id: 1001",
     "WARNING: vim.treesitter",
     "NotifyBackground",
-    "no parser for",
     "No buffers were deleted:  bdelete #",
 }
 

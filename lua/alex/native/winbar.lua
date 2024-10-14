@@ -15,9 +15,16 @@ local custom_bars = {
         name = function() return string.gsub(vim.fn.expand("%"), "oil://", "") end,
     },
     checkhealth = {
-        icon = " ",
-        name = function() return "Checkhealth" end,
+        icon = "󰋠",
+        name = function() return "Checkhealth" end
     },
+    man = {
+        icon = "󰌽",
+        name = function()
+            local filename = U.current_buffer_filename()
+            return "man/" .. string.gsub(filename, "man//", "")
+        end
+    }
 }
 
 local excludes = function()
@@ -33,7 +40,7 @@ function M.get_winbar()
     if U.current_buffer_modified() then
         mod_icon = " ●"
     elseif not U.current_buffer_modifiable() then
-        mod_icon = "  "
+        mod_icon = " "
     end
 
     local filetype = U.current_buffer_filetype()

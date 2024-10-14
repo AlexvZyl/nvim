@@ -40,7 +40,7 @@ function M.init()
         Added = { fg = M.palette.green },
         Removed = { fg = M.palette.red },
         Changed = { fg = M.palette.blue },
-        Normal = { bg = get_bg(M.palette.bg) },
+        -- Normal = { bg = get_bg(M.palette.bg) },
 
         -- Native UI.
         WinBar = { fg = M.palette.white2, bg = get_bg(M.palette.bg) },

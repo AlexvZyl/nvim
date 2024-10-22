@@ -16,7 +16,7 @@ local custom_bars = {
     },
     checkhealth = {
         icon = "󰋠",
-        name = function() return "Healthcheck" end
+        name = function() return "Healthcheck" end,
     },
     man = {
         icon = "󰌽",

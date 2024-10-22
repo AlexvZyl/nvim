@@ -44,6 +44,12 @@ local function get_virtual_text_color()
     return icon_hl
 end
 
+local function get_format_enabled_color()
+    local enabled = require("alex.native.lsp").format_enabled
+    if enabled then return { fg = green } end
+    return icon_hl
+end
+
 local function get_recording_color()
     if U.is_recording() then
         return { fg = red }
@@ -62,6 +68,23 @@ local function diff_source()
         }
     end
 end
+
+local default_z = {
+    {
+        "location",
+        icon = { "", align = "left" },
+        fmt = function(str)
+            local fixed_width = 7
+            return string.format('%' .. fixed_width .. 's', str)
+        end
+    },
+    {
+        "progress",
+        icon = { "", align = "left" },
+        separator = { right = "", left = "" },
+    },
+
+}
 
 local tree = {
     sections = {
@@ -84,17 +107,7 @@ local tree = {
         },
         lualine_x = {},
         lualine_y = {},
-        lualine_z = {
-            {
-                "location",
-                icon = { "", align = "left" },
-            },
-            {
-                "progress",
-                icon = { "", align = "left" },
-                separator = { right = "", left = "" },
-            },
-        },
+        lualine_z = default_z,
     },
     filetypes = { "NvimTree" },
 }
@@ -119,17 +132,7 @@ local telescope = {
         },
         lualine_x = {},
         lualine_y = {},
-        lualine_z = {
-            {
-                "location",
-                icon = { "", align = "left" },
-            },
-            {
-                "progress",
-                icon = { "", align = "left" },
-                separator = { right = "", left = "" },
-            },
-        },
+        lualine_z = default_z,
     },
     filetypes = { "TelescopePrompt" },
 }
@@ -198,23 +201,18 @@ require("lualine").setup({
                 icon = { " ", color = icon_hl },
             },
             {
-                function() return " " end,
+                function() return "󰉼" end,
+                color = get_format_enabled_color,
+                separator = { " ", "" }
+            },
+            {
+                function() return "  " end,
                 color = get_virtual_text_color,
-                padding = 1,
+                padding = 0
             },
         },
         lualine_y = {},
-        lualine_z = {
-            {
-                "location",
-                icon = { "", align = "left" },
-            },
-            {
-                "progress",
-                icon = { "", align = "left" },
-                separator = { right = "", left = "" },
-            },
-        },
+        lualine_z = default_z,
     },
     options = {
         disabled_filetypes = { "dashboard" },

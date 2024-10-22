@@ -68,4 +68,31 @@ function M.next_diag() vim.diagnostic.goto_next({ float = float_options }) end
 
 function M.prev_diag() vim.diagnostic.goto_prev({ float = float_options }) end
 
+function M.format_buffer()
+    -- Remove trailing whitespace.
+    local cursor_position = vim.api.nvim_win_get_cursor(0)
+    vim.api.nvim_exec([[%s/\s\+$//e]], false)
+    vim.cmd("noh")
+    vim.api.nvim_win_set_cursor(0, cursor_position)
+
+    -- Try to format the buffer using the attached lsp.
+    local status, _ = pcall(vim.lsp.buf.format)
+    if not status then vim.notify("Format failed") end
+end
+
+M.format_enabled = true
+function M.toggle_format_enabled()
+    M.format_enabled = not M.format_enabled
+    require("alex.utils").refresh_statusline()
+end
+
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+    callback = function()
+        local L = require("alex.native.lsp")
+        if L.format_enabled then
+            L.format_buffer()
+        end
+    end
+})
+
 return M

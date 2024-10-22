@@ -73,11 +73,17 @@ function M.native()
     keymap(n_v, "<C-e>", "j<C-e>", default_settings)
     keymap(n_v, "<C-y>", "k<C-y>", default_settings)
     keymap(n, "K", "<nop>", default_settings)
-    keymap(n, "\\", function() require("alex.keymaps.utils").format_bufer() end, default_settings)
+    keymap(n, "\\", function() require("alex.native.lsp").format_buffer() end, default_settings)
     keymap(
         n,
         "<leader>d",
         function() require("alex.native.lsp").toggle_virtual_diagnostics() end,
+        default_settings
+    )
+    keymap(
+        n,
+        "<leader>f",
+        function() require("alex.native.lsp").toggle_format_enabled() end,
         default_settings
     )
     keymap(n, "gm", "<Cmd>vertical Man<CR>", default_settings)

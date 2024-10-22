@@ -29,18 +29,6 @@ end
 
 function M.delete_buffer() vim.cmd([[:bp | bdelete #]]) end
 
-function M.format_bufer()
-    -- Remove trailing whitespace.
-    local cursor_position = vim.api.nvim_win_get_cursor(0)
-    vim.api.nvim_exec([[%s/\s\+$//e]], false)
-    vim.cmd("noh")
-    vim.api.nvim_win_set_cursor(0, cursor_position)
-
-    -- Try to format the buffer using the attached lsp.
-    local status, _ = pcall(vim.lsp.buf.format)
-    if not status then vim.notify("Format failed") end
-end
-
 function M.toggle_oil()
     local U = require("alex.utils.neovim")
     if U.current_buffer_filetype() == "oil" then

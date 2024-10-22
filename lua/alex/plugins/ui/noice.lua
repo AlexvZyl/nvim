@@ -30,13 +30,13 @@ local filter_notify = {
     "No signature help",
     "E42",
     "Format request failed",
-    -- HACK: Plenary causes issues.  Look into this.
-    "Invalid window id: 1001",
+    "Invalid window id: 1001", -- HACK: Plenary causes issues.  Look into this.
     "WARNING: vim.treesitter",
     "NotifyBackground",
     "No buffers were deleted:  bdelete #",
     "Can't find file",
     "server does not support",
+    "No LSP Implementations found",
 }
 
 local function routes_config()

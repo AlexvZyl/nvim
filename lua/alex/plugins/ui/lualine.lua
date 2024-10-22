@@ -75,15 +75,14 @@ local default_z = {
         icon = { "", align = "left" },
         fmt = function(str)
             local fixed_width = 7
-            return string.format('%' .. fixed_width .. 's', str)
-        end
+            return string.format("%" .. fixed_width .. "s", str)
+        end,
     },
     {
         "progress",
         icon = { "", align = "left" },
         separator = { right = "", left = "" },
     },
-
 }
 
 local tree = {
@@ -203,12 +202,12 @@ require("lualine").setup({
             {
                 function() return "󰉼" end,
                 color = get_format_enabled_color,
-                separator = { " ", "" }
+                separator = { " ", "" },
             },
             {
                 function() return "  " end,
                 color = get_virtual_text_color,
-                padding = 0
+                padding = 0,
             },
         },
         lualine_y = {},

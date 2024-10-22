@@ -89,10 +89,8 @@ end
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     callback = function()
         local L = require("alex.native.lsp")
-        if L.format_enabled then
-            L.format_buffer()
-        end
-    end
+        if L.format_enabled then L.format_buffer() end
+    end,
 })
 
 return M

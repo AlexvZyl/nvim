@@ -156,26 +156,50 @@ return {
         config = function() require("alex.plugins.ui.leap") end,
     },
 
+    -- {
+    --     "nvim-neo-tree/neo-tree.nvim",
+    --     branch = "v3.x",
+    --     dependencies = {
+    --         "nvim-lua/plenary.nvim",
+    --         "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+    --         "MunifTanjim/nui.nvim",
+    --         -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+    --     }
+    -- },
+    -- {
+    --     "nvim-tree/nvim-tree.lua",
+    --     version = "*",
+    --     lazy = false,
+    --     dependencies = {
+    --         "nvim-tree/nvim-web-devicons",
+    --     },
+    --     config = function()
+    --         require("nvim-tree").setup {}
+    --     end,
+    -- },
     -- Themes
-    {
-        "AlexvZyl/nordic.nvim",
-        branch = "dev",
-        priority = 1000,
-        config = function() require("alex.plugins.themes.nordic") end,
-        lazy = true,
-    },
-    {
-        "folke/tokyonight.nvim",
-        priority = 1000,
-        lazy = true,
-        config = function() require("alex.plugins.themes.tokyonight") end,
-    },
-    {
-        "sainnhe/gruvbox-material",
-        priority = 1000,
-        lazy = true,
-        config = function() require("alex.plugins.themes.gruvbox") end,
-    },
+    -- {
+    --     -- "AlexvZyl/nordic.nvim",
+    --     -- branch = "dev",
+    --
+    --     "bini-x/nordic.nvim",
+    --     branch = "neotreeColors",
+    --     priority = 1000,
+    --     config = function() require("alex.plugins.themes.nordic") end,
+    --     lazy = false,
+    -- },
+    -- {
+    --     "folke/tokyonight.nvim",
+    --     priority = 1000,
+    --     lazy = true,
+    --     config = function() require("alex.plugins.themes.tokyonight") end,
+    -- },
+    -- {
+    --     "sainnhe/gruvbox-material",
+    --     priority = 1000,
+    --     lazy = true,
+    --     config = function() require("alex.plugins.themes.gruvbox") end,
+    -- },
 
     -- Nice themes.
     --{ 'EdenEast/nightfox.nvim', lazy = true },

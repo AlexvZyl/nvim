@@ -2,7 +2,7 @@ local M = {}
 
 local U = require("alex.utils.neovim")
 
-local transparent = true
+local transparent = false
 
 local function get_bg(color) return transparent and "NONE" or color end
 
@@ -40,9 +40,10 @@ function M.init()
         Added = { fg = M.palette.green },
         Removed = { fg = M.palette.red },
         Changed = { fg = M.palette.blue },
-        -- Normal = { bg = get_bg(M.palette.bg) },
+        Normal = { bg = get_bg(M.palette.bg) },
 
         -- Native UI.
+        Visual = { bg = M.palette.gray1 },
         WinBar = { fg = M.palette.white2, bg = get_bg(M.palette.bg) },
         WinBarNC = { fg = M.palette.white2, bg = get_bg(M.palette.bg) },
         Pmenu = { link = "Normal" },
@@ -79,11 +80,16 @@ function M.init()
         DiagnosticHint = { fg = M.palette.green },
         DiagnosticOk = { fg = M.palette.green },
         DiagnosticInfo = { fg = M.palette.blue },
-        DiagnosticUnderlineError = { sp = M.palette.red, underline = false, undercurl = true },
-        DiagnosticUnderlineWarn = { sp = M.palette.yellow, underline = false, undercurl = true },
-        DiagnosticUnderlineHint = { sp = M.palette.green, underline = false, undercurl = true },
-        DiagnosticUnderlineOk = { sp = M.palette.green, underline = false, undercurl = true },
-        DiagnosticUnderlineInfo = { sp = M.palette.blue, underline = false, undercurl = true },
+        DiagnosticUnderlineError = { sp = M.palette.red, underline = true, undercurl = false },
+        DiagnosticUnderlineWarn = { sp = M.palette.yellow, underline = true, undercurl = false },
+        DiagnosticUnderlineHint = { sp = M.palette.green, underline = true, undercurl = false },
+        DiagnosticUnderlineOk = { sp = M.palette.green, underline = true, undercurl = false },
+        DiagnosticUnderlineInfo = { sp = M.palette.blue, underline = true, undercurl = false },
+        DiagnosticVirtualTextError = { fg = M.palette.red, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextWarn = { fg = M.palette.yellow, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextHint = { fg = M.palette.green, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextOk = { fg = M.palette.green, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextInfo = { fg = M.palette.blue, bg = get_bg(M.palette.bg), underline = true },
 
         -- Whichkey.
         WhichKeyNormal = { bg = M.palette.bg_dark },
@@ -143,8 +149,6 @@ function M.init()
 end
 
 function M.setup_lualine()
-    if not U.is_default() then return end
-
     local default_section = { fg = M.palette.gray2, bg = M.palette.bg_dark }
     local default = {
         normal = {

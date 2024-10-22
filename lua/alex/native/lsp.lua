@@ -20,10 +20,17 @@ local signs = {
     },
 }
 
+M.virtual_diagnostics = false
+function M.toggle_virtual_diagnostics()
+    M.virtual_diagnostics = not M.virtual_diagnostics
+    vim.diagnostic.config({ virtual_text = M.virtual_diagnostics })
+    require("alex.utils").refresh_statusline()
+end
+
 -- TODO: Setup floating windows.
 vim.diagnostic.config({
     signs = signs,
-    virtual_text = require("alex.keymaps.utils").virtual_diagnostics,
+    virtual_text = M.virtual_diagnostics,
     update_on_insert = true,
 })
 

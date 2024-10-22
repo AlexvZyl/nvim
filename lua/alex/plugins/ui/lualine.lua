@@ -5,9 +5,9 @@ local U = require("alex.utils")
 local function fmt_mode(s)
     local mode_map = {
         ["COMMAND"] = "COMMND",
-        ["V-BLOCK"] = "VBLOCK",
+        ["V-BLOCK"] = "V-BLCK",
         ["TERMINAL"] = "TERMNL",
-        ["V-REPLACE"] = "VREPLC",
+        ["V-REPLACE"] = "V-RPLC",
         ["O-PENDING"] = "0PNDNG",
     }
     return mode_map[s] or s
@@ -39,7 +39,7 @@ elseif U.is_tokyonight() then
 end
 
 local function get_virtual_text_color()
-    local enabled = require("alex.keymaps.utils").virtual_diagnostics
+    local enabled = require("alex.native.lsp").virtual_diagnostics
     if enabled then return { fg = green } end
     return icon_hl
 end
@@ -182,11 +182,11 @@ require("lualine").setup({
                 "diagnostics",
                 sources = { "nvim_diagnostic" },
                 symbols = {
-                    error = " ",
-                    warn = " ",
-                    info = " ",
-                    hint = "󱤅 ",
-                    other = "󰠠 ",
+                    error = U.diagnostic_signs.error,
+                    warn = U.diagnostic_signs.warn,
+                    info = U.diagnostic_signs.info,
+                    hint = U.diagnostic_signs.hint,
+                    other = U.diagnostic_signs.other,
                 },
                 colored = true,
                 padding = 2,
@@ -234,5 +234,9 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
     pattern = { "*.*" },
     once = true,
 })
+vim.defer_fn(function() require("lualine").setup({}) end, 1)
 
-require("alex.native.themes.default").setup_lualine()
+
+if U.is_default() then
+    require("alex.native.themes.default").setup_lualine()
+end

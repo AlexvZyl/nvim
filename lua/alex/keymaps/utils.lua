@@ -29,13 +29,6 @@ end
 
 function M.delete_buffer() vim.cmd([[:bp | bdelete #]]) end
 
-M.virtual_diagnostics = false
-function M.toggle_virtual_diagnostics()
-    M.virtual_diagnostics = not M.virtual_diagnostics
-    vim.diagnostic.config({ virtual_text = M.virtual_diagnostics })
-    require("alex.utils").refresh_statusline()
-end
-
 function M.format_bufer()
     -- Remove trailing whitespace.
     local cursor_position = vim.api.nvim_win_get_cursor(0)

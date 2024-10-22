@@ -77,7 +77,7 @@ function M.native()
     keymap(
         n,
         "<leader>d",
-        function() require("alex.keymaps.utils").toggle_virtual_diagnostics() end,
+        function() require("alex.native.lsp").toggle_virtual_diagnostics() end,
         default_settings
     )
     keymap(n, "gm", "<Cmd>vertical Man<CR>", default_settings)
@@ -119,6 +119,7 @@ end
 function M.telescope()
     keymap(n, "fh", function() require("telescope.builtin").help_tags({}) end)
     keymap(n, "fk", function() require("telescope.builtin").keymaps({}) end)
+    keymap(n, "fj", function() require("telescope.builtin").jumplist({ cwd = vim.loop.cwd() }) end)
     keymap(n, "fm", function() require("telescope.builtin").man_pages({ sections = { "ALL" } }) end)
 
     keymap(

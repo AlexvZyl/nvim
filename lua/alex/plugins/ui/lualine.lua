@@ -200,14 +200,14 @@ require("lualine").setup({
                 icon = { " ", color = icon_hl },
             },
             {
-                function() return "󰉼" end,
-                color = get_format_enabled_color,
-                separator = { " ", "" },
+                function() return "" end,
+                color = get_virtual_text_color,
+                separator = { " ", "" }
             },
             {
-                function() return "  " end,
-                color = get_virtual_text_color,
-                padding = 0,
+                function() return "󰉼  " end,
+                color = get_format_enabled_color,
+                padding = 0
             },
         },
         lualine_y = {},

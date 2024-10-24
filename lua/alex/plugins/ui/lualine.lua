@@ -202,12 +202,12 @@ require("lualine").setup({
             {
                 function() return "" end,
                 color = get_virtual_text_color,
-                separator = { " ", "" }
+                separator = { " ", "" },
             },
             {
                 function() return "󰉼  " end,
                 color = get_format_enabled_color,
-                padding = 0
+                padding = 0,
             },
         },
         lualine_y = {},

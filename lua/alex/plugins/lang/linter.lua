@@ -1,6 +1,6 @@
 local L = require("lint")
 
-local cpp_check_args = require('lint').linters.cppcheck.args
+local cpp_check_args = require("lint").linters.cppcheck.args
 table.insert(cpp_check_args, "--suppress=missingIncludeSystem")
 table.insert(cpp_check_args, "--suppress=missingInclude")
 
@@ -10,7 +10,7 @@ L.linters_by_ft = {
     go = { "golangcilint" },
     cpp = { "cppcheck" },
     bash = { "shellcheck" },
-    sh = { "shellcheck" }
+    sh = { "shellcheck" },
 }
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {

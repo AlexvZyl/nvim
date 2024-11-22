@@ -62,7 +62,7 @@ local defaults = {
         mirror = true,
         preview_height = 0.55,
         height = 0.95,
-        width = 0.7,
+        width = 0.75,
     },
     borderchars = {
         prompt = prompt_chars,

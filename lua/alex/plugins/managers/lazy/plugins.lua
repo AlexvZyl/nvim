@@ -56,11 +56,6 @@ return {
         config = function() require("alex.plugins.ui.noice") end,
     },
     {
-        "lukas-reineke/indent-blankline.nvim",
-        event = { "VeryLazy" },
-        config = function() require("alex.plugins.ui.indent-blankline") end,
-    },
-    {
         "lewis6991/gitsigns.nvim",
         event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.gitsigns") end,
@@ -84,6 +79,14 @@ return {
         "stevearc/quicker.nvim",
         event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.quicker") end,
+    },
+
+    -- Editing / movement.
+    {
+        "ggandor/leap.nvim",
+        dependencies = "tpope/vim-repeat",
+        keys = { "s", "S" },
+        config = function() require("alex.plugins.ui.leap") end,
     },
 
     -- Language.
@@ -149,34 +152,7 @@ return {
         config = function() require("tmux").setup() end,
         event = { "VeryLazy" },
     },
-    {
-        "ggandor/leap.nvim",
-        dependencies = "tpope/vim-repeat",
-        keys = { "s", "S" },
-        config = function() require("alex.plugins.ui.leap") end,
-    },
 
-    -- {
-    --     "nvim-neo-tree/neo-tree.nvim",
-    --     branch = "v3.x",
-    --     dependencies = {
-    --         "nvim-lua/plenary.nvim",
-    --         "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-    --         "MunifTanjim/nui.nvim",
-    --         -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
-    --     }
-    -- },
-    -- {
-    --     "nvim-tree/nvim-tree.lua",
-    --     version = "*",
-    --     lazy = false,
-    --     dependencies = {
-    --         "nvim-tree/nvim-web-devicons",
-    --     },
-    --     config = function()
-    --         require("nvim-tree").setup {}
-    --     end,
-    -- },
     -- Themes
     -- {
     --     -- "AlexvZyl/nordic.nvim",

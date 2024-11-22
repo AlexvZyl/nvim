@@ -8,7 +8,7 @@ L.linters_by_ft = {
     lua = { "luacheck" },
     python = { "flake8" },
     go = { "golangcilint" },
-    cpp = { "cppcheck" },
+    -- cpp = { "cppcheck" },
     bash = { "shellcheck" },
     sh = { "shellcheck" },
 }

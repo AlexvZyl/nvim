@@ -123,6 +123,7 @@ end
 
 function M.telescope()
     keymap(n, "fh", function() require("telescope.builtin").help_tags({}) end)
+    keymap(n, "z=", function() require("telescope.builtin").spell_suggest({}) end)
     keymap(n, "fk", function() require("telescope.builtin").keymaps({}) end)
     keymap(n, "fj", function() require("telescope.builtin").jumplist({ cwd = vim.loop.cwd() }) end)
     keymap(n, "fm", function() require("telescope.builtin").man_pages({ sections = { "ALL" } }) end)

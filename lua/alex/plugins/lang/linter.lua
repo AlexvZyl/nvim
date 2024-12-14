@@ -5,7 +5,7 @@ table.insert(cpp_check_args, "--suppress=missingIncludeSystem")
 table.insert(cpp_check_args, "--suppress=missingInclude")
 
 L.linters_by_ft = {
-    lua = { "luacheck" },
+    -- lua = { "luacheck" },
     python = { "flake8" },
     go = { "golangcilint" },
     -- cpp = { "cppcheck" },

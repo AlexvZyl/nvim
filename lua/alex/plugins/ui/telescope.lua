@@ -41,7 +41,7 @@ local small_lsp_layout = {
     preview = true,
     wrap_results = false,
     layout_config = {
-        height = 0.65,
+        height = 0.75,
         width = 0.65,
         mirror = true,
     },

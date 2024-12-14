@@ -37,6 +37,7 @@ local filter_notify = {
     "server does not support",
     "No LSP Implementations found",
     "No more valid diagnostics",
+    "warning: offset_encoding is required",
 }
 
 local function routes_config()

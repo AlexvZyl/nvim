@@ -1,19 +1,19 @@
 local U = require("alex.utils")
-
 if not U.in_home_dir("TSN") and not U.in_dir("/app") then return end
 
 local LU = require("lspconfig.util")
 local LC = require("lspconfig")
 local C = require("alex.plugins.lang.lsp.config")
 
-local script_file = "docker_image_runner.sh"
+local SCRIPT_FILE = "docker_image_runner.sh"
 
 local function get_docker_path()
+    -- TODO: Check this iteratively.
     local possible_dirs = { "/docker", "/../docker", "/../../docker" }
     local curr_dir = U.current_dir_abs()
 
     for _, dir in ipairs(possible_dirs) do
-        local script_abs = curr_dir .. dir .. "/" .. script_file
+        local script_abs = curr_dir .. dir .. "/" .. SCRIPT_FILE
         if U.file_exists(script_abs) then return curr_dir .. dir end
     end
 
@@ -36,20 +36,16 @@ local function get_lsp_command()
         )
     end
 
-    -- Get specific dockerfile.
-    local suffix = "box4dev"
-    local repos = {
-        "tsnsystems_ipc",
-        "tsnsystems_utils",
-    }
+    -- Determine suffix.
+    local dockerfile_path = docker_path .. "/Dockerfile.base"
     local curr_dir = U.current_dir_abs()
-    for _, repo in ipairs(repos) do
-        if string.find(curr_dir, repo) then suffix = repo end
+    if string.find(curr_dir, "analysis") then
+        dockerfile_path = docker_path .. "/../docker.configs/Dockerfile.box4dev"
     end
 
     return {
-        docker_path .. "/" .. script_file,
-        docker_path .. "/../docker.configs/" .. "Dockerfile." .. suffix,
+        docker_path .. "/" .. SCRIPT_FILE,
+        dockerfile_path,
         "--lsp",
         "clangd",
         "--background-index",

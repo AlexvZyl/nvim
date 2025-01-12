@@ -17,10 +17,6 @@ return {
         event = { "VeryLazy" },
     },
     {
-        "nvim-tree/nvim-web-devicons",
-        config = function() require("alex.plugins.ui.nvim-web-devicons") end,
-    },
-    {
         "stevearc/oil.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function() require("alex.plugins.ui.oil-nvim") end,
@@ -43,9 +39,7 @@ return {
     {
         "nvim-lualine/lualine.nvim",
         lazy = false,
-        dependencies = {
-            "nvim-tree/nvim-web-devicons",
-        },
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.lualine") end,
     },
@@ -90,18 +84,6 @@ return {
     },
 
     -- Language.
-    {
-        "mfussenegger/nvim-dap",
-        dependencies = {
-            "nvim-neotest/nvim-nio",
-            {
-                "rcarriga/nvim-dap-ui",
-                config = function() require("alex.plugins.ui.dapui") end,
-            },
-        },
-        event = { "VeryLazy" },
-        config = function() require("alex.plugins.lang.dap") end,
-    },
     {
         "mfussenegger/nvim-lint",
         event = { "VeryLazy" },
@@ -153,36 +135,9 @@ return {
         event = { "VeryLazy" },
     },
 
-    -- Themes
-    -- {
-    --     -- "AlexvZyl/nordic.nvim",
-    --     -- branch = "dev",
-    --
-    --     "bini-x/nordic.nvim",
-    --     branch = "neotreeColors",
-    --     priority = 1000,
-    --     config = function() require("alex.plugins.themes.nordic") end,
-    --     lazy = false,
-    -- },
-    -- {
-    --     "folke/tokyonight.nvim",
-    --     priority = 1000,
-    --     lazy = true,
-    --     config = function() require("alex.plugins.themes.tokyonight") end,
-    -- },
-    -- {
-    --     "sainnhe/gruvbox-material",
-    --     priority = 1000,
-    --     lazy = true,
-    --     config = function() require("alex.plugins.themes.gruvbox") end,
-    -- },
-
-    -- Nice themes.
-    --{ 'EdenEast/nightfox.nvim', lazy = true },
-    --{ 'catppuccin/nvim', lazy = true },
-    --{ 'sainnhe/everforest', lazy = true },
-    --{ 'rebelot/kanagawa.nvim', lazy = true },
-    --{ 'marko-cerovac/material.nvim', lazy = true },
-    --{ 'navarasu/onedark.nvim', lazy = true },
-    --{ 'Shatur/neovim-ayu', lazy = true },
+    -- Dependencies.
+    {
+        "nvim-tree/nvim-web-devicons",
+        config = function() require("alex.plugins.ui.nvim-web-devicons") end,
+    },
 }

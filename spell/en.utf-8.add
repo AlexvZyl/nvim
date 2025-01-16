@@ -186,3 +186,7 @@ nic
 pcapng
 box3
 PTP
+TSN
+µs
+Wireshark
+debian

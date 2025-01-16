@@ -36,12 +36,19 @@ local function get_lsp_command()
         )
     end
 
-    -- Determine suffix.
-    local dockerfile_path = docker_path .. "/Dockerfile.base"
+    -- Determine dockerfile.
+    local dockerfile_path = nil
+    --- TODO: This is technically not correct.
     local curr_dir = U.current_dir_abs()
     if string.find(curr_dir, "analysis") then
         dockerfile_path = docker_path .. "/../docker.configs/Dockerfile.box4dev"
+    elseif string.find(curr_dir, "tsnsystems_utils") then
+        dockerfile_path = docker_path .. "/Dockerfile.base"
     end
+
+    local git_root = U.get_git_root()
+    local docker_work_dir = "/app/dev"
+    local compile_commands_dir = U.current_dir_abs():gsub(git_root, "")
 
     return {
         docker_path .. "/" .. SCRIPT_FILE,
@@ -49,7 +56,8 @@ local function get_lsp_command()
         "--lsp",
         "clangd",
         "--background-index",
-        "--path-mappings=" .. U.get_git_root():gsub("/$", "") .. "=/app/dev",
+        "--path-mappings=" .. git_root:gsub("/$", "") .. "=" .. docker_work_dir,
+        "--compile-commands-dir=" .. docker_work_dir .. "/" .. compile_commands_dir
     }
 end
 

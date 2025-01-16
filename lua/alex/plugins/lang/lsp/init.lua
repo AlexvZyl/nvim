@@ -7,6 +7,7 @@ local C = require("alex.plugins.lang.lsp.config")
 LC.clangd.setup({
     lsp_flags = C.lsp_flags,
     capabilities = C.capabilities,
+    filetypes = { "c", "cpp", "objc", "objcpp" },
     root_dir = LU.root_pattern(
         ".clangd",
         ".clang-tidy",
@@ -24,13 +25,12 @@ LC.lua_ls.setup({ C.default })
 LC.julials.setup({ C.default })
 LC.bashls.setup({ C.default })
 LC.pyright.setup({ C.default })
---LC.ruff_lsp.setup { C.default }
 LC.rust_analyzer.setup({ C.default })
 LC.texlab.setup({ C.default })
 LC.yamlls.setup({ C.default })
 LC.gopls.setup({ C.default })
---LC.hls.setup { C.default }
 LC.terraformls.setup({ C.default })
+LC.buf_ls.setup({  C.default })
 
 LC.eslint.setup({
     lsp_flags = C.lsp_flags,

@@ -57,7 +57,7 @@ local function get_lsp_command()
         "clangd",
         "--background-index",
         "--path-mappings=" .. git_root:gsub("/$", "") .. "=" .. docker_work_dir,
-        "--compile-commands-dir=" .. docker_work_dir .. "/" .. compile_commands_dir
+        "--compile-commands-dir=" .. docker_work_dir .. "/" .. compile_commands_dir,
     }
 end
 

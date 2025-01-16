@@ -30,7 +30,7 @@ LC.texlab.setup({ C.default })
 LC.yamlls.setup({ C.default })
 LC.gopls.setup({ C.default })
 LC.terraformls.setup({ C.default })
-LC.buf_ls.setup({  C.default })
+LC.buf_ls.setup({ C.default })
 
 LC.eslint.setup({
     lsp_flags = C.lsp_flags,

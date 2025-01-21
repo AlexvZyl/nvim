@@ -11,6 +11,7 @@ L.linters_by_ft = {
     -- cpp = { "cppcheck" },
     bash = { "shellcheck" },
     sh = { "shellcheck" },
+    proto = {"buf_lint" }
 }
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {

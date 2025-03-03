@@ -23,9 +23,10 @@ return {
         lazy = false,
     },
     {
+        -- TODO: How do I want to load this?
         "NvChad/nvim-colorizer.lua",
-        event = { "VeryLazy" },
         config = function() require("alex.plugins.ui.colorizer") end,
+        lazy = true,
     },
     {
         "nvim-telescope/telescope.nvim",

@@ -32,11 +32,11 @@ LC.gopls.setup({ C.default })
 LC.terraformls.setup({ C.default })
 LC.buf_ls.setup({ C.default })
 
-LC.eslint.setup({
-    lsp_flags = C.lsp_flags,
-    capabilities = C.capabilities,
-    root_dir = LU.root_pattern({ "*.js", "*.ts" }),
-})
+-- LC.eslint.setup({
+--     lsp_flags = C.lsp_flags,
+--     capabilities = C.capabilities,
+--     root_dir = LU.root_pattern({ "*.js", "*.ts" }),
+-- })
 
 LC.ts_ls.setup({
     lsp_flags = C.lsp_flags,

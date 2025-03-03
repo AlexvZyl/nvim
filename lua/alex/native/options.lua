@@ -7,7 +7,7 @@ vim.g.mapleader = " "
 vim.opt.showmode = false
 vim.opt.clipboard:append("unnamedplus")
 vim.opt.swapfile = false
-vim.opt.mouse = "a"
+vim.opt.mouse = ""
 vim.opt.hlsearch = true
 
 vim.opt.ignorecase = true

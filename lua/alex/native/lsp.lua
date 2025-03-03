@@ -80,7 +80,7 @@ function M.format_buffer()
     if not status then vim.notify("Format failed") end
 end
 
-M.format_enabled = true
+M.format_enabled = false
 function M.toggle_format_enabled()
     M.format_enabled = not M.format_enabled
     require("alex.utils").refresh_statusline()

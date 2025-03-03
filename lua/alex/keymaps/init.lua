@@ -171,6 +171,12 @@ function M.telescope()
     keymap(
         n,
         "ft",
+        "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>",
+        default_settings
+    )
+    keymap(
+        n,
+        "fT",
         "<Cmd>TodoTelescope previewer=false wrap_results=false cwd=" .. U.get_git_root() .. "<CR>",
         default_settings
     )

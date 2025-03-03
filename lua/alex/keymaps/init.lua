@@ -168,12 +168,7 @@ function M.telescope()
 
     keymap(n_v, "fg", function() require("telescope.builtin").registers() end, default_settings)
 
-    keymap(
-        n,
-        "ft",
-        "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>",
-        default_settings
-    )
+    keymap(n, "ft", "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>", default_settings)
     keymap(
         n,
         "fT",

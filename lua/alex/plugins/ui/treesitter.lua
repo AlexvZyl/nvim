@@ -24,7 +24,9 @@ require("nvim-treesitter.configs").setup({
         "terraform",
     },
 
-    ignore_install = {},
+    ignore_install = {
+        "dockerfile"
+    },
 
     sync_install = false,
     auto_install = true,

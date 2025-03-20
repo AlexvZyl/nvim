@@ -25,7 +25,7 @@ require("nvim-treesitter.configs").setup({
     },
 
     ignore_install = {
-        "dockerfile"
+        "dockerfile",
     },
 
     sync_install = false,

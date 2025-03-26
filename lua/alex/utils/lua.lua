@@ -39,6 +39,6 @@ function M.in_home_dir(subdir)
     return M.in_dir(path)
 end
 
-function M.current_dir_abs() return vim.uv.cwd() end
+function M.current_dir_abs() return vim.fn.getcwd() end
 
 return M

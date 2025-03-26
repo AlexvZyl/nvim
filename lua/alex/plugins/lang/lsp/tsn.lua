@@ -37,18 +37,24 @@ local function get_lsp_command()
     end
 
     -- Determine dockerfile.
-    local dockerfile_path = nil
-    --- TODO: This is technically not correct.
+    local dockerfile_path = docker_path .. "/Dockerfile.base"
+    local docker_work_dir = "/app/dev"
+    --- TODO: This is technically not correct.  Revisit.
     local curr_dir = U.current_dir_abs()
-    if string.find(curr_dir, "analysis") then
-        dockerfile_path = docker_path .. "/../docker.configs/Dockerfile.box4dev"
-    elseif string.find(curr_dir, "tsnsystems_utils") then
+    if string.find(curr_dir, "tsnsystems_utils") then
         dockerfile_path = docker_path .. "/Dockerfile.base"
+    elseif string.find(curr_dir, "analysis") then
+        dockerfile_path = docker_path .. "/../docker.configs/Dockerfile.box4dev"
     end
 
     local git_root = U.get_git_root()
-    local docker_work_dir = "/app/dev"
-    local compile_commands_dir = U.current_dir_abs():gsub(git_root, "")
+    if not git_root then
+        vim.defer_fn(
+            function() vim.notify('Could not find git root for :\"' .. curr_dir .. "\"") end,
+            timeout_ms
+        )
+        return
+    end
 
     return {
         docker_path .. "/" .. SCRIPT_FILE,
@@ -56,8 +62,8 @@ local function get_lsp_command()
         "--lsp",
         "clangd",
         "--background-index",
-        "--path-mappings=" .. git_root:gsub("/$", "") .. "=" .. docker_work_dir,
-        "--compile-commands-dir=" .. docker_work_dir .. "/" .. compile_commands_dir,
+        "--path-mappings=" .. git_root .. "=" .. docker_work_dir,
+        "--compile-commands-dir=" .. docker_work_dir,
     }
 end
 

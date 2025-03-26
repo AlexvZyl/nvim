@@ -1,6 +1,6 @@
 local U = require("alex.utils.chars")
 
--- TODO(alex): Will this slow things down?
+-- TODO: Will this slow things down?
 local filter_notify = {
     "written",
     "fewer lines",

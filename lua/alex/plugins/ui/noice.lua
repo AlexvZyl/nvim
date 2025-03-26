@@ -87,7 +87,7 @@ local lsp = {
         ["cmp.entry.get_documentation"] = true,
     },
     signature = { enabled = false, view = "virtualtext" },
-    progress = { enabled = false, view = "mini" },
+    progress = { enabled = true, view = "mini" },
 }
 
 local notify = {

@@ -154,6 +154,7 @@ function M.init()
 
         -- Noice.
         NoiceCmdlinePopupBorder = { fg = M.palette.cyan },
+        NoiceFormatProgressDone = { bg = M.palette.green },
         NoiceCmdlineIcon = { fg = M.palette.yellow },
 
         -- Todo comments

@@ -20,6 +20,9 @@ local signs = {
     },
 }
 
+-- TODO: Do we want this
+vim.lsp.inlay_hint.enable()
+
 M.virtual_diagnostics = false
 function M.toggle_virtual_diagnostics()
     M.virtual_diagnostics = not M.virtual_diagnostics

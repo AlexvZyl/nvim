@@ -8,7 +8,7 @@ local C = require("alex.plugins.lang.lsp.config")
 local SCRIPT_FILE = "docker_image_runner.sh"
 
 local function get_docker_path()
-    -- TODO: Check this iteratively.
+    -- TODO: Use vim.fn.finddir
     local possible_dirs = { "/docker", "/../docker", "/../../docker" }
     local curr_dir = U.current_dir_abs()
 
@@ -23,6 +23,8 @@ end
 local function get_lsp_command()
     local docker_path = get_docker_path()
     local timeout_ms = 150
+    local curr_dir = U.current_dir_abs()
+
     if not docker_path then
         vim.defer_fn(
             function() vim.notify("Could not find TSN docker script for lsp", "WARN") end,
@@ -36,17 +38,7 @@ local function get_lsp_command()
         )
     end
 
-    -- Determine dockerfile.
-    local dockerfile_path = docker_path .. "/Dockerfile.base"
-    local docker_work_dir = "/app/dev"
-    --- TODO: This is technically not correct.  Revisit.
-    local curr_dir = U.current_dir_abs()
-    if string.find(curr_dir, "tsnsystems_utils") then
-        dockerfile_path = docker_path .. "/Dockerfile.base"
-    elseif string.find(curr_dir, "analysis") then
-        dockerfile_path = docker_path .. "/../docker.configs/Dockerfile.box4dev"
-    end
-
+    -- Git root.
     local git_root = U.get_git_root()
     if not git_root then
         vim.defer_fn(
@@ -56,14 +48,29 @@ local function get_lsp_command()
         return
     end
 
+    local dockerfile_path = docker_path .. "/Dockerfile.base"
+    local map_source = git_root
+    local map_dest = "/app/dev"
+    local comp_cmds_dir = map_dest .. curr_dir:gsub(git_root, "")
+
+
+    -- Determine dockerfile.
+    -- TODO: This should check for the git root name.
+    if string.find(curr_dir, "tsnsystems_utils") then
+        dockerfile_path = docker_path .. "/Dockerfile.base"
+    elseif string.find(curr_dir, "analysis") then
+        dockerfile_path = docker_path .. "/../docker.configs/Dockerfile.box4dev"
+    end
+
+
     return {
         docker_path .. "/" .. SCRIPT_FILE,
         dockerfile_path,
         "--lsp",
         "clangd",
         "--background-index",
-        "--path-mappings=" .. git_root .. "=" .. docker_work_dir,
-        "--compile-commands-dir=" .. docker_work_dir,
+        "--path-mappings=" .. map_source .. "=" .. map_dest,
+        "--compile-commands-dir=" .. comp_cmds_dir,
     }
 end
 

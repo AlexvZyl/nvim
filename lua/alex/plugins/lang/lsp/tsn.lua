@@ -50,7 +50,7 @@ local function get_lsp_command()
     local git_root = U.get_git_root()
     if not git_root then
         vim.defer_fn(
-            function() vim.notify('Could not find git root for :\"' .. curr_dir .. "\"") end,
+            function() vim.notify('Could not find git root for :"' .. curr_dir .. '"') end,
             timeout_ms
         )
         return

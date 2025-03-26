@@ -53,7 +53,6 @@ local function get_lsp_command()
     local map_dest = "/app/dev"
     local comp_cmds_dir = map_dest .. curr_dir:gsub(git_root, "")
 
-
     -- Determine dockerfile.
     -- TODO: This should check for the git root name.
     if string.find(curr_dir, "tsnsystems_utils") then
@@ -61,7 +60,6 @@ local function get_lsp_command()
     elseif string.find(curr_dir, "analysis") then
         dockerfile_path = docker_path .. "/../docker.configs/Dockerfile.box4dev"
     end
-
 
     return {
         docker_path .. "/" .. SCRIPT_FILE,

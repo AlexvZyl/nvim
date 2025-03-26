@@ -1,6 +1,6 @@
 local M = {}
 
-local U = require('alex.utils')
+local U = require("alex.utils")
 
 -- Set just below treesitter.
 vim.highlight.priorities.semantic_tokens = 99

@@ -36,9 +36,7 @@ end
 function M.merge_highlights_table(table)
     for group, new_config in pairs(table) do
         local existing_config = vim.api.nvim_get_hl(0, { name = group })
-        if not next(existing_config) then
-            existing_config = {}
-        end
+        if not next(existing_config) then existing_config = {} end
         local merged_config = vim.tbl_extend("force", existing_config, new_config)
         vim.api.nvim_set_hl(0, group, merged_config)
     end

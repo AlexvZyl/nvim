@@ -1,6 +1,6 @@
 local M = {}
 
--- LSP config.
+local U = require('alex.utils')
 
 -- Set just below treesitter.
 vim.highlight.priorities.semantic_tokens = 99
@@ -20,31 +20,33 @@ local signs = {
     },
 }
 
--- TODO: Do we want this
-vim.lsp.inlay_hint.enable()
-
-M.virtual_diagnostics = false
+M.virtual_diagnostics = true
 function M.toggle_virtual_diagnostics()
     M.virtual_diagnostics = not M.virtual_diagnostics
-    vim.diagnostic.config({ virtual_text = M.virtual_diagnostics })
+    vim.diagnostic.config({
+        signs = signs,
+        virtual_text = false,
+        virtual_lines = M.virtual_diagnostics,
+        update_in_insert = true,
+    })
+    U.merge_highlights_table({
+        DiagnosticUnderlineError = { underline = not M.virtual_diagnostics },
+        DiagnosticUnderlineWarn = { underline = not M.virtual_diagnostics },
+        DiagnosticUnderlineHint = { underline = not M.virtual_diagnostics },
+        DiagnosticUnderlineOk = { underline = not M.virtual_diagnostics },
+        DiagnosticUnderlineInfo = { underline = not M.virtual_diagnostics },
+    })
     require("alex.utils").refresh_statusline()
 end
 
--- TODO: Setup floating windows.
-vim.diagnostic.config({
-    signs = signs,
-    virtual_text = M.virtual_diagnostics,
-    update_on_insert = true,
-})
+M.toggle_virtual_diagnostics()
 
+-- TODO: For some reason this is still required for telescope stuff.
 vim.fn.sign_define("DiagnosticSignError", { text = "", numhl = "DiagnosticSignError" })
 vim.fn.sign_define("DiagnosticSignWarn", { text = "", numhl = "DiagnosticSignWarn" })
 vim.fn.sign_define("DiagnosticSignInfo", { text = "", numhl = "DiagnosticSignInfo" })
 vim.fn.sign_define("DiagnosticSignHint", { text = "", numhl = "DiagnosticSignHint" })
 
--- Diagnostics utils.
-
-local U = require("alex.utils.chars")
 local float_options = {
     border = U.border_chars_round,
     prefix = "  ",

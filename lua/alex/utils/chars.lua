@@ -88,29 +88,49 @@ M.kind_icons = {
 
 function M.get_border_chars(desc)
     if U.is_default() then
-        if desc == "telescope" then return M.border_chars_telescope_default end
+        if desc == "telescope" then
+            return M.border_chars_telescope_default
+        end
         return M.border_chars_round
     end
 
     if vim.g.neovide then
-        if desc == "telescope" then return M.border_chars_telescope_default end
+        if desc == "telescope" then
+            return M.border_chars_telescope_default
+        end
         return M.border_chars_round
     end
 
-    if desc == "completion" then return M.border_chars_round end
-    if desc == "cmdline" then return M.border_chars_round end
-    if desc == "search" then return M.border_chars_round end
-    if desc == "float" then return M.border_chars_outer_thin end
-    if desc == "telescope" then return M.border_chars_outer_thin_telescope end
+    if desc == "completion" then
+        return M.border_chars_round
+    end
+    if desc == "cmdline" then
+        return M.border_chars_round
+    end
+    if desc == "search" then
+        return M.border_chars_round
+    end
+    if desc == "float" then
+        return M.border_chars_outer_thin
+    end
+    if desc == "telescope" then
+        return M.border_chars_outer_thin_telescope
+    end
 
     if desc == "lsp" then
-        if U.is_nordic() then return M.border_chars_outer_thin end
+        if U.is_nordic() then
+            return M.border_chars_outer_thin
+        end
         return M.border_chars_round
     end
 
     -- Defaults
-    if U.is_nordic() then return M.border_chars_outer_thin end
-    if U.is_tokyonight() then return M.border_chars_round end
+    if U.is_nordic() then
+        return M.border_chars_outer_thin
+    end
+    if U.is_tokyonight() then
+        return M.border_chars_round
+    end
 
     return M.border_chars_round
 end

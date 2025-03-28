@@ -1,7 +1,9 @@
 local M = {}
 
 function M.merge(table1, table2)
-    if table1 == table2 == nil then return {} end
+    if table1 == table2 == nil then
+        return {}
+    end
     if table1 == nil then
         return table2
     elseif table2 == nil then
@@ -35,10 +37,14 @@ end
 
 function M.in_home_dir(subdir)
     local path = vim.loop.os_homedir()
-    if subdir ~= nil then path = path .. "/" .. subdir end
+    if subdir ~= nil then
+        path = path .. "/" .. subdir
+    end
     return M.in_dir(path)
 end
 
-function M.current_dir_abs() return vim.fn.getcwd() end
+function M.current_dir_abs()
+    return vim.fn.getcwd()
+end
 
 return M

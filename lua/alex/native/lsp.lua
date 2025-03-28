@@ -56,7 +56,9 @@ local float_options = {
     severity_sort = true,
 }
 
-function M.open_diagnostics_float() vim.diagnostic.open_float(float_options) end
+function M.open_diagnostics_float()
+    vim.diagnostic.open_float(float_options)
+end
 
 function M.next_error()
     vim.diagnostic.goto_next({
@@ -97,7 +99,9 @@ function M.format_buffer()
 
     -- Try to format the buffer using the attached lsp.
     local status, _ = pcall(vim.lsp.buf.format)
-    if not status then vim.notify("Format failed") end
+    if not status then
+        vim.notify("Format failed")
+    end
 end
 
 M.format_enabled = false
@@ -109,7 +113,9 @@ end
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     callback = function()
         local L = require("alex.native.lsp")
-        if L.format_enabled then L.format_buffer() end
+        if L.format_enabled then
+            L.format_buffer()
+        end
     end,
 })
 

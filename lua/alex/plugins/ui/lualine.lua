@@ -40,13 +40,17 @@ end
 
 local function get_virtual_text_color()
     local enabled = require("alex.native.lsp").virtual_diagnostics
-    if enabled then return { fg = green } end
+    if enabled then
+        return { fg = green }
+    end
     return icon_hl
 end
 
 local function get_format_enabled_color()
     local enabled = require("alex.native.lsp").format_enabled
-    if enabled then return { fg = green } end
+    if enabled then
+        return { fg = green }
+    end
     return icon_hl
 end
 
@@ -124,7 +128,9 @@ local telescope = {
         lualine_b = {},
         lualine_c = {
             {
-                function() return "Telescope" end,
+                function()
+                    return "Telescope"
+                end,
                 color = text_hl,
                 icon = { "  ", color = icon_hl },
             },
@@ -200,12 +206,16 @@ require("lualine").setup({
                 icon = { " ", color = icon_hl },
             },
             {
-                function() return "" end,
+                function()
+                    return ""
+                end,
                 color = get_virtual_text_color,
                 separator = { " ", "" },
             },
             {
-                function() return "󰉼  " end,
+                function()
+                    return "󰉼  "
+                end,
                 color = get_format_enabled_color,
                 padding = 0,
             },
@@ -227,10 +237,16 @@ require("lualine").setup({
 
 -- Ensure correct backgrond for lualine.
 vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
-    callback = function(_) require("lualine").setup({}) end,
+    callback = function(_)
+        require("lualine").setup({})
+    end,
     pattern = { "*.*" },
     once = true,
 })
-vim.defer_fn(function() require("lualine").setup({}) end, 1)
+vim.defer_fn(function()
+    require("lualine").setup({})
+end, 1)
 
-if U.is_default() then require("alex.native.default-theme").setup_lualine() end
+if U.is_default() then
+    require("alex.native.default-theme").setup_lualine()
+end

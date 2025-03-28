@@ -3,7 +3,9 @@ local default = require("tokyonight.colors.moon")
 local blend = require("tokyonight.util").blend
 
 local transparent = true
-if vim.g.neovide then transparent = false end
+if vim.g.neovide then
+    transparent = false
+end
 
 local function on_highlights(H, C)
     -- Native

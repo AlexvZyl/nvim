@@ -11,7 +11,9 @@ local sources = CMP.config.sources({
     { name = "path" },
 })
 local snippet = {
-    expand = function(args) require("luasnip").lsp_expand(args.body) end,
+    expand = function(args)
+        require("luasnip").lsp_expand(args.body)
+    end,
 }
 CMP.setup({
     sources = sources,

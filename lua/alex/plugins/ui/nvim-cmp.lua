@@ -4,7 +4,9 @@ local U = require("alex.utils")
 -- Format the completion menu. Yes, I am that pedantic.
 local function format(_, item)
     local MAX_LABEL_WIDTH = 55
-    local function whitespace(max, len) return (" "):rep(max - len) end
+    local function whitespace(max, len)
+        return (" "):rep(max - len)
+    end
 
     -- Limit content width.
     local content = item.abbr

@@ -5,8 +5,12 @@ local U = require("alex.utils.neovim")
 -- Display the difference in commits between local and head.
 local Job = require("plenary.job")
 function M.get_git_compare()
-    if U.current_window_floating() then return "" end
-    if U.current_buffer_type() == "nofile" then return "" end
+    if U.current_window_floating() then
+        return ""
+    end
+    if U.current_buffer_type() == "nofile" then
+        return ""
+    end
 
     -- TODO: This could be wrong?
     local curr_dir = U.current_buffer_dir()
@@ -22,13 +26,21 @@ function M.get_git_compare()
     })
         :sync(100)[1]
 
-    if type(result) ~= "string" then return "" end
+    if type(result) ~= "string" then
+        return ""
+    end
     local ok, ahead, behind = pcall(string.match, result, "(%d+)%s*(%d+)")
-    if not ok then return "" end
+    if not ok then
+        return ""
+    end
 
     local string = ""
-    if behind ~= "0" then string = string .. "󱦳" .. behind end
-    if ahead ~= "0" then string = string .. "󱦲" .. ahead end
+    if behind ~= "0" then
+        string = string .. "󱦳" .. behind
+    end
+    if ahead ~= "0" then
+        string = string .. "󱦲" .. ahead
+    end
     return string
 end
 

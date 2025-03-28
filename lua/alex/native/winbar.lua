@@ -8,15 +8,29 @@ local winbar_filetype_exclude = {
 
 -- filetype: bar
 local custom_bars = {
-    qf = { icon = "", name = function() return "QuickFix" end },
-    netrw = { icon = "", name = function() return "Netrw" end },
+    qf = {
+        icon = "",
+        name = function()
+            return "QuickFix"
+        end,
+    },
+    netrw = {
+        icon = "",
+        name = function()
+            return "Netrw"
+        end,
+    },
     oil = {
         icon = " ",
-        name = function() return string.gsub(vim.fn.expand("%"), "oil://", "") end,
+        name = function()
+            return string.gsub(vim.fn.expand("%"), "oil://", "")
+        end,
     },
     checkhealth = {
         icon = "󰋠",
-        name = function() return "Healthcheck" end,
+        name = function()
+            return "Healthcheck"
+        end,
     },
     man = {
         icon = "󰌽",
@@ -28,7 +42,9 @@ local custom_bars = {
 }
 
 local excludes = function()
-    if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then return true end
+    if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then
+        return true
+    end
     return false
 end
 
@@ -53,7 +69,9 @@ function M.get_winbar()
     end
 
     local file_icon = U.current_buffer_icon()
-    if file_icon == nil then file_icon = "" end
+    if file_icon == nil then
+        file_icon = ""
+    end
 
     local filename = U.current_buffer_filename()
     if filename == "" then
@@ -66,8 +84,12 @@ end
 
 function M.set_winbar(force)
     if not force then
-        if excludes() then return end
-        if U.current_window_floating() then return end
+        if excludes() then
+            return
+        end
+        if U.current_window_floating() then
+            return
+        end
     end
 
     vim.opt_local.winbar = M.get_winbar()
@@ -76,7 +98,9 @@ end
 vim.api.nvim_create_autocmd(
     { "BufModifiedSet", "BufWinEnter", "BufFilePost", "BufWritePost", "WinEnter" },
     {
-        callback = function() require("alex.native.winbar").set_winbar() end,
+        callback = function()
+            require("alex.native.winbar").set_winbar()
+        end,
     }
 )
 

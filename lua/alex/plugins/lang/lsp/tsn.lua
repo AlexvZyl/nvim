@@ -1,5 +1,7 @@
 local U = require("alex.utils")
-if not U.in_home_dir("TSN") and not U.in_dir("/app") then return end
+if not U.in_home_dir("TSN") and not U.in_dir("/app") then
+    return
+end
 
 local LU = require("lspconfig.util")
 local LC = require("lspconfig")
@@ -14,7 +16,9 @@ local function get_docker_path()
 
     for _, dir in ipairs(possible_dirs) do
         local script_abs = curr_dir .. dir .. "/" .. SCRIPT_FILE
-        if U.file_exists(script_abs) then return curr_dir .. dir end
+        if U.file_exists(script_abs) then
+            return curr_dir .. dir
+        end
     end
 
     return nil
@@ -26,25 +30,22 @@ local function get_lsp_command()
     local curr_dir = U.current_dir_abs()
 
     if not docker_path then
-        vim.defer_fn(
-            function() vim.notify("Could not find TSN docker script for lsp", "WARN") end,
-            timeout_ms
-        )
+        vim.defer_fn(function()
+            vim.notify("Could not find TSN docker script for lsp", "WARN")
+        end, timeout_ms)
         return
     else
-        vim.defer_fn(
-            function() vim.notify('Using docker @ "' .. docker_path .. '/"', "INFO") end,
-            timeout_ms
-        )
+        vim.defer_fn(function()
+            vim.notify('Using docker @ "' .. docker_path .. '/"', "INFO")
+        end, timeout_ms)
     end
 
     -- Git root.
     local git_root = U.get_git_root()
     if not git_root then
-        vim.defer_fn(
-            function() vim.notify('Could not find git root for :"' .. curr_dir .. '"') end,
-            timeout_ms
-        )
+        vim.defer_fn(function()
+            vim.notify('Could not find git root for :"' .. curr_dir .. '"')
+        end, timeout_ms)
         return
     end
 

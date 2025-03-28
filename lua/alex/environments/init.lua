@@ -13,7 +13,9 @@ function M.init()
     -- Setup environment variables.
     local U = require("alex.utils.lua")
     local env_file = os.getenv("HOME") .. "/.private/nvim_env.lua"
-    if U.file_exists(env_file) then vim.cmd("luafile " .. env_file) end
+    if U.file_exists(env_file) then
+        vim.cmd("luafile " .. env_file)
+    end
 
     -- This makes neovim load faster.
     vim.loader.enable()

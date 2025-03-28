@@ -1,7 +1,9 @@
 local M = {}
 
 -- Statuscolumn was added in 0.9.
-if vim.version.major == 0 and vim.version.minor < 9 then return M end
+if vim.version.major == 0 and vim.version.minor < 9 then
+    return M
+end
 
 function M.no_sep()
     vim.opt.numberwidth = 4

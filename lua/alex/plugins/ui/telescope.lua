@@ -20,7 +20,9 @@ local picker_buffer = {
     file_ignore_patters = { "\\." },
     on_complete = {
         function(picker)
-            vim.schedule(function() picker:set_selection(0) end)
+            vim.schedule(function()
+                picker:set_selection(0)
+            end)
         end,
     },
 }
@@ -120,7 +122,9 @@ TS.setup({
 
 vim.api.nvim_create_autocmd("User", {
     pattern = "TelescopePreviewerLoaded",
-    callback = function() vim.opt_local.number = true end,
+    callback = function()
+        vim.opt_local.number = true
+    end,
 })
 
 -- Extensions.

@@ -3,7 +3,7 @@ local DC = require("cmp_nvim_lsp").default_capabilities()
 local M = {}
 
 M.lsp_flags = {
-    debounce_text_changes = 100, -- ms
+    debounce_text_changes = 500, -- ms
 }
 
 M.default = {

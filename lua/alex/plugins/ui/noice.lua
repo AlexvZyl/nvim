@@ -38,6 +38,7 @@ local filter_notify = {
     "No LSP Implementations found",
     "No more valid diagnostics",
     "warning: offset_encoding is required",
+    "client.is_stopped",
 }
 
 local function routes_config()
@@ -86,7 +87,7 @@ local lsp = {
         ["vim.lsp.util.stylize_markdown"] = true,
         ["cmp.entry.get_documentation"] = true,
     },
-    signature = { enabled = false, view = "virtualtext" },
+    signature = { enabled = false, view = "popup" },
     progress = { enabled = true, view = "mini" },
 }
 

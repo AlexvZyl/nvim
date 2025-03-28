@@ -2,8 +2,9 @@ local M = {}
 
 local U = require("alex.utils")
 
--- Set just below treesitter.
-vim.highlight.priorities.semantic_tokens = 99
+-- Place this just below treesitter.
+-- I like treesitter highlights more than the LSP ones.
+vim.hl.priorities.semantic_tokens = 99
 
 local signs = {
     text = {
@@ -25,9 +26,10 @@ function M.toggle_virtual_diagnostics()
     M.virtual_diagnostics = not M.virtual_diagnostics
     vim.diagnostic.config({
         signs = signs,
-        virtual_text = false,
         virtual_lines = M.virtual_diagnostics,
+        virtual_text = false,
         update_in_insert = true,
+        severity_sort = true,
     })
     U.merge_highlights_table({
         DiagnosticUnderlineError = { underline = not M.virtual_diagnostics },
@@ -51,27 +53,40 @@ local float_options = {
     border = U.border_chars_round,
     prefix = "  ",
     header = "",
+    severity_sort = true,
 }
 
 function M.open_diagnostics_float() vim.diagnostic.open_float(float_options) end
 
 function M.next_error()
     vim.diagnostic.goto_next({
+        count = 1,
         severity = vim.diagnostic.severity.ERROR,
         float = float_options,
     })
 end
 
 function M.prev_error()
-    vim.diagnostic.goto_prev({
+    vim.diagnostic.jump({
+        count = -1,
         severity = vim.diagnostic.severity.ERROR,
         float = float_options,
     })
 end
 
-function M.next_diag() vim.diagnostic.goto_next({ float = float_options }) end
+function M.next_diag()
+    vim.diagnostic.jump({
+        count = 1,
+        float = float_options,
+    })
+end
 
-function M.prev_diag() vim.diagnostic.goto_prev({ float = float_options }) end
+function M.prev_diag()
+    vim.diagnostic.jump({
+        count = -1,
+        float = float_options,
+    })
+end
 
 function M.format_buffer()
     -- Remove trailing whitespace.

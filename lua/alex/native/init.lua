@@ -1,6 +1,5 @@
 require("alex.native.options")
 require("alex.native.statuscolumn")
 require("alex.native.winbar")
-require("alex.native.netrw")
 require("alex.native.lsp")
-require("alex.native.themes")
+require("alex.native.default-theme")

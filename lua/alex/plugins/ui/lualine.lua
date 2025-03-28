@@ -19,7 +19,7 @@ local icon_hl
 local green
 local red
 if U.is_default() then
-    local C = require("alex.native.themes.default").palette
+    local C = require("alex.native.default-theme").palette
     red = C.red
     green = C.green
     icon_hl = { fg = C.gray2 }
@@ -233,4 +233,4 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
 })
 vim.defer_fn(function() require("lualine").setup({}) end, 1)
 
-if U.is_default() then require("alex.native.themes.default").setup_lualine() end
+if U.is_default() then require("alex.native.default-theme").setup_lualine() end

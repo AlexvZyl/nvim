@@ -175,7 +175,7 @@ function M.setup_lualine()
     function create_group(mode_color)
         local DEFAULT_SECTION = {
             fg = U.blend(M.palette.gray1, 0.9, M.palette.bg_dark),
-            bg = M.palette.bg_dark
+            bg = M.palette.bg_dark,
         }
         return {
             a = { fg = M.palette.bg_dark, bg = mode_color, gui = "bold" },
@@ -194,7 +194,7 @@ function M.setup_lualine()
                 insert = create_group(M.palette.green),
                 interactive = create_group(M.palette.gray0),
                 terminal = create_group(M.palette.gray0),
-            }
+            },
         },
     })
 end

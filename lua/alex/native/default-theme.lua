@@ -1,6 +1,6 @@
 local M = {}
 
-local U = require("alex.utils.neovim")
+local U = require("alex.utils")
 
 local transparent = false
 
@@ -73,7 +73,7 @@ function M.init()
         Boolean = { fg = M.palette.magenta },
 
         -- Indent blankline.
-        IndentBlanklineChar = { fg = M.palette.gray1 },
+        IndentBlanklineChar = { fg = U.blend(M.palette.gray1, 0.5, M.palette.bg) },
         IndentBlanklineContextChar = { link = "IndentBlanklineChar" },
 
         -- Diagnostics.
@@ -172,46 +172,30 @@ function M.init()
 end
 
 function M.setup_lualine()
-    local default_section = { fg = M.palette.gray2, bg = M.palette.bg_dark }
-    local default = {
-        normal = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.blue, gui = "bold" },
-            b = default_section,
-            c = default_section,
-        },
-        visual = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.red, gui = "bold" },
-            b = default_section,
-            c = default_section,
-        },
-        replace = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.red, gui = "bold" },
-            b = default_section,
-            c = default_section,
-        },
-        command = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.orange, gui = "bold" },
-            b = default_section,
-            c = default_section,
-        },
-        insert = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.green, gui = "bold" },
-            b = default_section,
-            c = default_section,
-        },
-        inactive = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.gray0, gui = "bold" },
-            b = default_section,
-            c = default_section,
-        },
-        terminal = {
-            a = { fg = M.palette.bg_dark, bg = M.palette.gray0, gui = "bold" },
-            b = default_section,
-            c = default_section,
-        },
-    }
+    function create_group(mode_color)
+        local DEFAULT_SECTION = {
+            fg = U.blend(M.palette.gray1, 0.9, M.palette.bg_dark),
+            bg = M.palette.bg_dark
+        }
+        return {
+            a = { fg = M.palette.bg_dark, bg = mode_color, gui = "bold" },
+            b = DEFAULT_SECTION,
+            c = DEFAULT_SECTION,
+        }
+    end
+
     require("lualine").setup({
-        options = { theme = default },
+        options = {
+            theme = {
+                normal = create_group(M.palette.blue),
+                visual = create_group(M.palette.red),
+                replace = create_group(M.palette.red),
+                command = create_group(M.palette.orange),
+                insert = create_group(M.palette.green),
+                interactive = create_group(M.palette.gray0),
+                terminal = create_group(M.palette.gray0),
+            }
+        },
     })
 end
 

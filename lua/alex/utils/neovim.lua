@@ -143,4 +143,5 @@ function M.get_hl_group(name)
     return vim.api.nvim_get_hl(0, { name = name, link = false })
 end
 
+
 return M

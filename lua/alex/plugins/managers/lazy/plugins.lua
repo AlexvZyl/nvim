@@ -10,6 +10,13 @@ return {
         priority = 999,
     },
     {
+        "lukas-reineke/indent-blankline.nvim",
+        config = function()
+            require("alex.plugins.ui.indent-blankline")
+        end,
+        event = { "VeryLazy" },
+    },
+    {
         "folke/todo-comments.nvim",
         dependencies = {
             "nvim-lua/plenary.nvim",
@@ -29,12 +36,11 @@ return {
         lazy = false,
     },
     {
-        -- TODO: How do I want to load this?
         "NvChad/nvim-colorizer.lua",
         config = function()
             require("alex.plugins.ui.colorizer")
         end,
-        lazy = true,
+        event = { "VeryLazy" },
     },
     {
         "nvim-telescope/telescope.nvim",

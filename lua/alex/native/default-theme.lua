@@ -50,7 +50,12 @@ function M.init()
 
         -- Native UI.
         Visual = { bg = M.palette.gray1 },
-        WinBar = { fg = M.palette.fg_dim, bg = get_bg(M.palette.bg_float), underline = true, sp = M.palette.bg_dark },
+        WinBar = {
+            fg = M.palette.fg_dim,
+            bg = get_bg(M.palette.bg_float),
+            underline = true,
+            sp = M.palette.bg_dark,
+        },
         WinBarNC = { link = "WinBar" },
         Pmenu = { link = "Normal" },
         WinSeparator = { fg = M.palette.bg_dark, bg = get_bg(M.palette.bg) },
@@ -96,11 +101,31 @@ function M.init()
         DiagnosticUnderlineHint = { sp = M.palette.green, underline = true, undercurl = false },
         DiagnosticUnderlineOk = { sp = M.palette.green, underline = true, undercurl = false },
         DiagnosticUnderlineInfo = { sp = M.palette.blue, underline = true, undercurl = false },
-        DiagnosticVirtualTextError = { fg = M.palette.red, bg = get_bg(M.palette.bg), underline = true },
-        DiagnosticVirtualTextWarn = { fg = M.palette.yellow, bg = get_bg(M.palette.bg), underline = true },
-        DiagnosticVirtualTextHint = { fg = M.palette.green, bg = get_bg(M.palette.bg), underline = true },
-        DiagnosticVirtualTextOk = { fg = M.palette.green, bg = get_bg(M.palette.bg), underline = true },
-        DiagnosticVirtualTextInfo = { fg = M.palette.blue, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextError = {
+            fg = M.palette.red,
+            bg = get_bg(M.palette.bg),
+            underline = true,
+        },
+        DiagnosticVirtualTextWarn = {
+            fg = M.palette.yellow,
+            bg = get_bg(M.palette.bg),
+            underline = true,
+        },
+        DiagnosticVirtualTextHint = {
+            fg = M.palette.green,
+            bg = get_bg(M.palette.bg),
+            underline = true,
+        },
+        DiagnosticVirtualTextOk = {
+            fg = M.palette.green,
+            bg = get_bg(M.palette.bg),
+            underline = true,
+        },
+        DiagnosticVirtualTextInfo = {
+            fg = M.palette.blue,
+            bg = get_bg(M.palette.bg),
+            underline = true,
+        },
         DiagnosticVirtualLinesError = { fg = M.palette.red, bg = M.palette.bg_float },
         DiagnosticVirtualLinesWarn = { fg = M.palette.yellow, bg = M.palette.bg_float },
         DiagnosticVirtualLinesHint = { fg = M.palette.green, bg = M.palette.bg_float },

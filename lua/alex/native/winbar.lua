@@ -92,7 +92,7 @@ function M.set_winbar(force)
         end
     end
 
-    vim.opt_local.winbar = M.get_winbar()
+        vim.opt_local.winbar = M.get_winbar()
 end
 
 vim.api.nvim_create_autocmd(

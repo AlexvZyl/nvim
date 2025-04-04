@@ -32,9 +32,13 @@ M.palette = {
     white2 = "#c4c6cd",
     white3 = "#9b9ea4",
 }
+
+-- Extensions.
 M.palette.fg = M.palette.white0
 M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
+M.palette.bg_float = U.blend(M.palette.bg, 0.55, M.palette.bg_dark)
+M.palette.fg_dim = U.blend(M.palette.white2, 0.65, M.palette.bg_dark)
 
 function M.init()
     U.set_highlights_table({
@@ -46,8 +50,8 @@ function M.init()
 
         -- Native UI.
         Visual = { bg = M.palette.gray1 },
-        WinBar = { fg = M.palette.white2, bg = get_bg(M.palette.bg) },
-        WinBarNC = { fg = M.palette.white2, bg = get_bg(M.palette.bg) },
+        WinBar = { fg = M.palette.fg_dim, bg = get_bg(M.palette.bg_float), underline = true, sp = M.palette.bg_dark },
+        WinBarNC = { link = "WinBar" },
         Pmenu = { link = "Normal" },
         WinSeparator = { fg = M.palette.bg_dark, bg = get_bg(M.palette.bg) },
         NormalFloat = { fg = M.palette.fg, bg = get_bg(M.palette.bg) },
@@ -73,7 +77,7 @@ function M.init()
         Boolean = { fg = M.palette.magenta },
 
         -- Indent blankline.
-        IndentBlanklineChar = { fg = U.blend(M.palette.gray1, 0.5, M.palette.bg) },
+        IndentBlanklineChar = { fg = U.blend(M.palette.gray1, 0.7, M.palette.bg) },
         IndentBlanklineContextChar = { link = "IndentBlanklineChar" },
 
         -- Diagnostics.
@@ -82,41 +86,31 @@ function M.init()
         DiagnosticHint = { fg = M.palette.green },
         DiagnosticOk = { fg = M.palette.green },
         DiagnosticInfo = { fg = M.palette.blue },
+        DiagnosticSignError = { fg = M.palette.red, bold = true },
+        DiagnosticSignWarn = { fg = M.palette.yellow, bold = true },
+        DiagnosticSignHint = { fg = M.palette.green, bold = true },
+        DiagnosticSignOk = { fg = M.palette.green, bold = true },
+        DiagnosticSignInfo = { fg = M.palette.blue, bold = true },
         DiagnosticUnderlineError = { sp = M.palette.red, underline = true, undercurl = false },
         DiagnosticUnderlineWarn = { sp = M.palette.yellow, underline = true, undercurl = false },
         DiagnosticUnderlineHint = { sp = M.palette.green, underline = true, undercurl = false },
         DiagnosticUnderlineOk = { sp = M.palette.green, underline = true, undercurl = false },
         DiagnosticUnderlineInfo = { sp = M.palette.blue, underline = true, undercurl = false },
-        DiagnosticVirtualTextError = {
-            fg = M.palette.red,
-            bg = get_bg(M.palette.bg),
-            underline = true,
-        },
-        DiagnosticVirtualTextWarn = {
-            fg = M.palette.yellow,
-            bg = get_bg(M.palette.bg),
-            underline = true,
-        },
-        DiagnosticVirtualTextHint = {
-            fg = M.palette.green,
-            bg = get_bg(M.palette.bg),
-            underline = true,
-        },
-        DiagnosticVirtualTextOk = {
-            fg = M.palette.green,
-            bg = get_bg(M.palette.bg),
-            underline = true,
-        },
-        DiagnosticVirtualTextInfo = {
-            fg = M.palette.blue,
-            bg = get_bg(M.palette.bg),
-            underline = true,
-        },
+        DiagnosticVirtualTextError = { fg = M.palette.red, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextWarn = { fg = M.palette.yellow, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextHint = { fg = M.palette.green, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextOk = { fg = M.palette.green, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualTextInfo = { fg = M.palette.blue, bg = get_bg(M.palette.bg), underline = true },
+        DiagnosticVirtualLinesError = { fg = M.palette.red, bg = M.palette.bg_float },
+        DiagnosticVirtualLinesWarn = { fg = M.palette.yellow, bg = M.palette.bg_float },
+        DiagnosticVirtualLinesHint = { fg = M.palette.green, bg = M.palette.bg_float },
+        DiagnosticVirtualLinesOk = { fg = M.palette.green, bg = M.palette.bg_float },
+        DiagnosticVirtualLinesInfo = { fg = M.palette.blue, bg = M.palette.bg_float },
 
         -- Whichkey.
-        WhichKeyNormal = { bg = M.palette.bg_dark },
-        WhichKeyTitle = { bg = M.palette.bg_dark, fg = M.palette.yellow, bold = true },
-        WhichKeyBorder = { bg = M.palette.bg_dark, fg = M.palette.bg_dark },
+        WhichKeyNormal = { bg = M.palette.bg_float },
+        WhichKeyTitle = { bg = M.palette.bg_float, fg = M.palette.yellow, bold = true },
+        WhichKeyBorder = { bg = M.palette.bg_float, fg = M.palette.bg_dark },
 
         -- Dashboard.
         DashboardHeader = { fg = M.palette.yellow },
@@ -158,6 +152,8 @@ function M.init()
         NoiceCmdlinePopupBorder = { fg = M.palette.cyan },
         NoiceFormatProgressDone = { bg = M.palette.green },
         NoiceCmdlineIcon = { fg = M.palette.yellow },
+        NoiceCmdlineIconSearch = { fg = M.palette.yellow, bg = M.palette.bg_dark },
+        NoiceCmdline = { bg = M.palette.bg_dark },
 
         -- Todo comments
         TodoFgTODO = { fg = M.palette.cyan, bold = true },
@@ -172,9 +168,9 @@ function M.init()
 end
 
 function M.setup_lualine()
-    function create_group(mode_color)
+    local function create_group(mode_color)
         local DEFAULT_SECTION = {
-            fg = U.blend(M.palette.gray1, 0.9, M.palette.bg_dark),
+            fg = M.palette.fg_dim,
             bg = M.palette.bg_dark,
         }
         return {

@@ -1,1 +1,1 @@
-vim.opt.winbar = " "
+vim.opt.winbar = nil

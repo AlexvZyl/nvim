@@ -1,10 +1,13 @@
+local U = require("alex.utils")
+
+local border = U.border_chars_top_only_thin
+local padding = { 0, 0 }
+
 require("which-key").setup({
     delay = 750,
     win = {
-        border = "none",
-        padding = { 1, 1 },
-        title = true,
+        border = border,
+        padding = padding,
+        title = false,
     },
 })
-
-vim.cmd("set timeoutlen=1000")

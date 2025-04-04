@@ -4,6 +4,8 @@ local U = require("alex.utils.neovim")
 -- Important to place this before loading plugins.
 vim.g.mapleader = " "
 
+-- vim.opt.winborder = 'rounded'
+
 vim.opt.showmode = false
 vim.opt.clipboard:append("unnamedplus")
 vim.opt.swapfile = false

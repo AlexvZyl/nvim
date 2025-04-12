@@ -40,7 +40,7 @@ return {
         config = function()
             require("alex.plugins.ui.colorizer")
         end,
-        event = { "VeryLazy" },
+        lazy = true,
     },
     {
         "nvim-telescope/telescope.nvim",

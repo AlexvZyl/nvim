@@ -38,11 +38,11 @@ vim.lsp.config("clangd", {
 })
 
 vim.lsp.config("ts_ls", {
-    root_dir = LU.root_pattern({ "*.js", "*.ts" })
+    root_dir = LU.root_pattern({ "*.js", "*.ts" }),
 })
 
 vim.lsp.config("cmake", {
-    root_dir = LU.root_pattern("CMakeLists.txt")
+    root_dir = LU.root_pattern("CMakeLists.txt"),
 })
 
 vim.lsp.config("dockerls", {
@@ -55,5 +55,5 @@ vim.lsp.config("docker_compose_language_service", {
     root_dir = LU.root_pattern({
         "docker-compose.ya?ml",
         "compose.ya?ml",
-    })
+    }),
 })

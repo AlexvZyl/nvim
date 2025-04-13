@@ -138,15 +138,12 @@ return {
     },
     {
         "neovim/nvim-lspconfig",
-        config = function()
-            require("alex.plugins.lang.lsp")
-        end,
         event = { "VeryLazy" },
     },
     {
         "folke/lazydev.nvim",
-        ft = "lua",
         dependencies = { "Bilal2453/luvit-meta" },
+        ft = "lua",
     },
     {
         "hrsh7th/nvim-cmp",

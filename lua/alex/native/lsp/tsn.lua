@@ -3,10 +3,6 @@ if not U.in_home_dir("TSN") and not U.in_dir("/app") then
     return
 end
 
-local LU = require("lspconfig.util")
-local LC = require("lspconfig")
-local C = require("alex.plugins.lang.lsp.config")
-
 local SCRIPT_FILE = "docker_image_runner.sh"
 
 local function get_docker_path()
@@ -73,9 +69,6 @@ local function get_lsp_command()
     }
 end
 
-LC.clangd.setup({
-    lsp_flags = C.lsp_flags,
-    capabilities = C.capabilities,
+vim.lsp.config("clangd", {
     cmd = get_lsp_command(),
-    root_dir = LU.root_pattern("compile_commands.json"),
 })

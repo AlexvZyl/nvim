@@ -155,22 +155,14 @@ require("lualine").setup({
         lualine_b = {},
         lualine_c = {
             {
-                U.get_recording_state_icon,
-                color = get_recording_color,
-                padding = 0,
-                separator = "",
-            },
-            {
                 "branch",
                 color = text_hl,
                 icon = { " ", color = icon_hl },
-                separator = "",
-                padding = 0,
+                padding = 2,
             },
             {
                 "diff",
                 color = text_hl,
-                icon = { "  ", color = text_hl },
                 source = diff_source,
                 symbols = {
                     added = " ",
@@ -182,7 +174,12 @@ require("lualine").setup({
                     modified = icon_hl,
                     removed = icon_hl,
                 },
-                padding = 0,
+                padding = 1,
+            },
+            {
+                U.get_recording_state_icon,
+                color = get_recording_color,
+                padding = 1,
             },
         },
         lualine_x = {

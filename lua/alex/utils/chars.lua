@@ -137,7 +137,7 @@ end
 
 function M.get_recording_state_icon()
     if U.is_recording() then
-        return M.kind_icons.Recording
+        return M.kind_icons.Recording .. vim.fn.reg_recording()
     else
         return M.kind_icons.None
     end

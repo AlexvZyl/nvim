@@ -10,14 +10,22 @@ return {
         priority = 999,
     },
     {
+        "karb94/neoscroll.nvim",
+        event = { "VeryLazy" },
+        config = function()
+            require("alex.plugins.ui.neoscroll-nvim")
+        end,
+    },
+    {
         "lukas-reineke/indent-blankline.nvim",
+        event = { "VeryLazy" },
         config = function()
             require("alex.plugins.ui.indent-blankline")
         end,
-        event = { "VeryLazy" },
     },
     {
         "folke/todo-comments.nvim",
+        event = { "VeryLazy" },
         dependencies = {
             "nvim-lua/plenary.nvim",
             "nvim-telescope/telescope.nvim",
@@ -25,7 +33,6 @@ return {
         config = function()
             require("alex.plugins.ui.todo")
         end,
-        event = { "VeryLazy" },
     },
     {
         "stevearc/oil.nvim",
@@ -71,11 +78,13 @@ return {
         end,
     },
     {
+        -- This plugin has issues when lazy.
         "lewis6991/gitsigns.nvim",
-        event = { "VeryLazy" },
+        -- event = { "VeryLazy" },
         config = function()
             require("alex.plugins.ui.gitsigns")
         end,
+        lazy = false,
     },
     {
         "sindrets/diffview.nvim",

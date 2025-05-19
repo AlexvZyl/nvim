@@ -23,10 +23,6 @@ vim.lsp.enable("zls")
 
 -- Override some of the configs.
 
-vim.lsp.config("ts_ls", {
-    root_dir = LU.root_pattern({ "*.js", "*.ts" }),
-})
-
 vim.lsp.config("cmake", {
     root_dir = LU.root_pattern("CMakeLists.txt"),
 })

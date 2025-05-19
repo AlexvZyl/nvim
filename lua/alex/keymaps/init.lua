@@ -59,17 +59,20 @@ function M.blame()
 end
 
 function M.noice()
+    local N = require("neoscroll")
+    local duration = require("alex.plugins.ui.neoscroll-nvim").duration
+
     vim.keymap.set({ "n", "i", "s" }, "<C-d>", function()
         if not require("noice.lsp").scroll(4) then
-            return "<C-d>"
+            N.ctrl_d({ duration = duration })
         end
-    end, { silent = true, expr = true })
+    end, { silent = true })
 
     vim.keymap.set({ "n", "i", "s" }, "<C-u>", function()
         if not require("noice.lsp").scroll(-4) then
-            return "<C-u>"
+            return N.ctrl_u({ duration = duration })
         end
-    end, { silent = true, expr = true })
+    end, { silent = true })
 end
 
 function M.native()
@@ -168,13 +171,14 @@ function M.telescope()
     keymap(n, "fF", function()
         require("telescope.builtin").find_files({ cwd = vim.fn.expand("~") })
     end, default_settings)
-    keymap(n, "<C-f>", function()
-        require("telescope.builtin").current_buffer_fuzzy_find({
-            previewer = false,
-            results_ts_highlight = false,
-            wrap_results = false,
-        })
-    end, default_settings)
+    -- TODO: Maybe come back to this.
+    -- keymap(n, "<C-f>", function()
+    --     require("telescope.builtin").current_buffer_fuzzy_find({
+    --         previewer = false,
+    --         results_ts_highlight = false,
+    --         wrap_results = false,
+    --     })
+    -- end, default_settings)
 
     keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
 

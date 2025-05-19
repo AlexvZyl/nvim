@@ -5,6 +5,9 @@ local M = {}
 
 local U = require("alex.utils")
 
+-- Enable logging.
+vim.lsp.set_log_level("error")
+
 -- Place this just below treesitter.
 -- I like treesitter highlights more than the LSP ones.
 vim.hl.priorities.semantic_tokens = 99
@@ -35,11 +38,11 @@ function M.toggle_virtual_diagnostics()
         severity_sort = true,
     })
     U.merge_highlights_table({
-        DiagnosticUnderlineError = { underline = not M.virtual_diagnostics },
-        DiagnosticUnderlineWarn = { underline = not M.virtual_diagnostics },
-        DiagnosticUnderlineHint = { underline = not M.virtual_diagnostics },
-        DiagnosticUnderlineOk = { underline = not M.virtual_diagnostics },
-        DiagnosticUnderlineInfo = { underline = not M.virtual_diagnostics },
+        DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics },
+        DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics },
+        DiagnosticUnderlineHint = { undercurl = not M.virtual_diagnostics },
+        DiagnosticUnderlineOk = { undercurl = not M.virtual_diagnostics },
+        DiagnosticUnderlineInfo = { undercurl = not M.virtual_diagnostics },
     })
     require("alex.utils").refresh_statusline()
 end

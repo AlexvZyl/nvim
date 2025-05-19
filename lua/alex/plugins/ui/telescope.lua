@@ -12,8 +12,8 @@ local picker_buffer = {
     preview = false,
     wrap_results = false,
     layout_config = {
-        height = 0.4,
-        width = 0.5,
+        height = 0.5,
+        width = 0.6,
     },
     sort_mru = true,
     ignore_current_buffer = true,

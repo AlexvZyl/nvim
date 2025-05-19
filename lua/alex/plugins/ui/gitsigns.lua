@@ -1,7 +1,6 @@
 local git_char = "│"
 --local git_char = '┃'
 
-
 local signs = {
     add = { text = git_char },
     change = { text = git_char },
@@ -10,7 +9,6 @@ local signs = {
     changedelete = { text = git_char },
     untracked = { text = git_char },
 }
-
 
 require("gitsigns").setup({
     signs = signs,

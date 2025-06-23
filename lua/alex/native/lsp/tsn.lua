@@ -48,7 +48,7 @@ local function get_lsp_command()
         dockerfile = vim.fn.finddir("Dockerfiles", ".;") .. "/box4dev"
     end
 
-    return {
+    local cmd = {
         docker_path .. "/" .. SCRIPT_FILE,
         dockerfile,
         "--lsp",
@@ -57,6 +57,11 @@ local function get_lsp_command()
         "--path-mappings=" .. map_source .. "=" .. map_dest,
         "--compile-commands-dir=" .. comp_cmds_dir,
     }
+
+        vim.defer_fn(function()
+            vim.notify(vim.inspect(cmd))
+        end, timeout_ms)
+    return cmd
 end
 
 vim.lsp.config("clangd", {

@@ -67,7 +67,7 @@ function M.open_diagnostics_float()
 end
 
 function M.next_error()
-    vim.diagnostic.goto_next({
+    vim.diagnostic.jump({
         count = 1,
         severity = vim.diagnostic.severity.ERROR,
         float = float_options,

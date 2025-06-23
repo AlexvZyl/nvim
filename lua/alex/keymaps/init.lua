@@ -171,16 +171,15 @@ function M.telescope()
     keymap(n, "fF", function()
         require("telescope.builtin").find_files({ cwd = vim.fn.expand("~") })
     end, default_settings)
-    -- TODO: Maybe come back to this.
-    -- keymap(n, "<C-f>", function()
-    --     require("telescope.builtin").current_buffer_fuzzy_find({
-    --         previewer = false,
-    --         results_ts_highlight = false,
-    --         wrap_results = false,
-    --     })
-    -- end, default_settings)
+    keymap(n, "fw", function()
+        require("telescope.builtin").current_buffer_fuzzy_find({
+            previewer = false,
+            results_ts_highlight = false,
+            wrap_results = false,
+        })
+    end, default_settings)
 
-    keymap(n, "fG", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
+    keymap(n, "fW", "<Cmd>Telescope live_grep disable_coordinates=true<CR>", default_settings)
 
     keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)

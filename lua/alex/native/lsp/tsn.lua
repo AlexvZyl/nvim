@@ -58,9 +58,9 @@ local function get_lsp_command()
         "--compile-commands-dir=" .. comp_cmds_dir,
     }
 
-        vim.defer_fn(function()
-            vim.notify(vim.inspect(cmd))
-        end, timeout_ms)
+    vim.defer_fn(function()
+        vim.notify(vim.inspect(cmd))
+    end, timeout_ms)
     return cmd
 end
 

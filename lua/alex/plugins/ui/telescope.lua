@@ -62,9 +62,9 @@ local defaults = {
     layout_config = {
         prompt_position = "top",
         mirror = true,
-        preview_height = 0.55,
+        preview_height = 0.6,
         height = 0.95,
-        width = 0.75,
+        width = 0.7,
     },
     borderchars = {
         prompt = prompt_chars,

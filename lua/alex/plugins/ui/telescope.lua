@@ -14,14 +14,14 @@ end
 local actions = require("telescope.actions")
 
 local ACTIONS = {
-    ["<Esc>"]   = actions.close,
+    ["<Esc>"] = actions.close,
     ["<C-Esc>"] = actions.close,
-    ["<C-q>"]   = actions.smart_send_to_qflist + actions.open_qflist,
+    ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
 }
 
 local MAPPINGS = {
     i = ACTIONS,
-    n = ACTIONS
+    n = ACTIONS,
 }
 
 local defaults = {
@@ -56,8 +56,7 @@ local defaults = {
 
     mappings = MAPPINGS,
     -- BUG: This causes too many issues.
-    preview = { treesitter = false, },
-
+    preview = { treesitter = false },
 }
 
 ----------------------------------------------------------------------------------------------------

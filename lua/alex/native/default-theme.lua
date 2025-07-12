@@ -157,6 +157,7 @@ function M.init()
         -- Telescope.
         TelescopePromptPrefix = { fg = M.palette.yellow, bg = get_bg(M.palette.bg) },
         TelescopeTitle = { fg = M.palette.bg_dark, bg = M.palette.orange },
+        TelescopeMultiIcon = { fg = M.palette.fg },
 
         -- Notify.
         NotifyINFOTitle = { fg = M.palette.green },

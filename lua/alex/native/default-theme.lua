@@ -39,6 +39,7 @@ M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
 M.palette.bg_float = U.blend(M.palette.bg, 0.55, M.palette.bg_dark)
 M.palette.fg_dim = U.blend(M.palette.white2, 0.65, M.palette.bg_dark)
+M.palette.bg_highlight = M.palette.gray1
 
 function M.init()
     U.set_highlights_table({
@@ -49,7 +50,7 @@ function M.init()
         Normal = { bg = get_bg(M.palette.bg) },
 
         -- Native UI.
-        Visual = { bg = M.palette.gray1 },
+        Visual = { bg = M.palette.bg_highlight },
         WinBar = {
             fg = M.palette.fg_dim,
             bg = get_bg(M.palette.bg_float),
@@ -157,7 +158,7 @@ function M.init()
         -- Telescope.
         TelescopePromptPrefix = { fg = M.palette.yellow, bg = get_bg(M.palette.bg) },
         TelescopeTitle = { fg = M.palette.bg_dark, bg = M.palette.orange },
-        TelescopeMultiIcon = { fg = M.palette.fg },
+        -- TelescopeMultiIcon = { bg = M.palette.bg },
 
         -- Notify.
         NotifyINFOTitle = { fg = M.palette.green },

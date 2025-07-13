@@ -1,15 +1,8 @@
 local TS = require("telescope")
 local U = require("alex.utils")
 
-local prompt_chars = U.border_chars_telescope_default
-local vert_preview_chars = U.border_chars_telescope_default
-if not U.is_default() then
-    prompt_chars = U.border_chars_telescope_prompt_thin
-    vert_preview_chars = U.border_chars_telescope_vert_preview_thin
-end
-
 ----------------------------------------------------------------------------------------------------
---- Default
+--- Defaults
 
 local actions = require("telescope.actions")
 
@@ -24,54 +17,71 @@ local MAPPINGS = {
     n = ACTIONS,
 }
 
+local SINGLE_SELECT_ICON = "   "
+local SINGLE_SELECT_ENTRY_PREFIX = "   "
+
 local defaults = {
-    layout_strategy = "vertical",
-    preview_title = "",
+    layout_strategy = "center",
+    previewer = false,
+    preview_title = false,
     dynamic_preview_title = false,
+    results_title = false,
 
     layout_config = {
         prompt_position = "top",
-        mirror = true,
-        preview_height = 0.6,
-        height = 0.95,
-        width = 0.7,
+        height = 25,
+        width = 0.45,
     },
+
+    border = true,
     borderchars = {
-        prompt = prompt_chars,
-        preview = vert_preview_chars,
-        results = U.get_border_chars("telescope"),
+        prompt = U.border_chars_telescope_combine_top,
+        results = U.border_chars_telescope_combine_bottom,
+        preview = U.border_chars_telescope_default,
     },
 
     sort_mru = true,
     sorting_strategy = "ascending",
-    border = true,
     multi_icon = "   ",
     entry_prefix = "   ",
     prompt_prefix = "   ",
     selection_caret = "   ",
     hl_result_eol = true,
-    results_title = "",
+    wrap_results = false,
     winblend = 0,
-    wrap_results = true,
 
     mappings = MAPPINGS,
-    -- BUG: This causes too many issues.
-    preview = { treesitter = false },
+    preview = { treesitter = true },
+}
+
+-- NOTE: Intended to be used on top of the normal default.
+local default_single_select = {
+    entry_prefix = SINGLE_SELECT_ENTRY_PREFIX,
+    selection_caret = SINGLE_SELECT_ICON,
+    previewer = false,
+    multi_icon = "",
+}
+
+local with_previewer = {
+    previewer = true,
+    preview_title = false,
+
+    layout_config = {
+        prompt_position = "top",
+        width = 0.6,
+        anchor = "N"
+    },
 }
 
 ----------------------------------------------------------------------------------------------------
 --- Custom
 
 local picker_buffer = {
-    preview = false,
-    wrap_results = false,
-    layout_config = {
-        height = 0.5,
-        width = 0.6,
-    },
+    previewer = false,
     sort_mru = true,
     ignore_current_buffer = true,
     file_ignore_patters = { "\\." },
+
     on_complete = {
         function(picker)
             vim.schedule(function()
@@ -79,66 +89,17 @@ local picker_buffer = {
             end)
         end,
     },
-
-    multi_icon = "",
-    entry_prefix = "   ",
-    selection_caret = "  ",
-}
-
-local picker_register = {
-    sort_mru = true,
-    preview = false,
-    wrap_results = false,
-    layout_config = {
-        height = 0.6,
-        width = 0.6,
-    },
-
-    multi_icon = "",
-    entry_prefix = "   ",
-    selection_caret = "  ",
-}
-
-local small_lsp_layout = {
-    layout_strategy = "vertical",
-    preview_title = "",
-    preview = true,
-    wrap_results = false,
-    layout_config = {
-        height = 0.75,
-        width = 0.65,
-        mirror = true,
-    },
-    borderchars = {
-        prompt = prompt_chars,
-        preview = vert_preview_chars,
-        results = U.get_border_chars("telescope"),
-    },
-
-    multi_icon = "",
-    entry_prefix = "   ",
-    selection_caret = "  ",
-}
-
-local diagnostics = {
-    sort_by = "severity",
-    multi_icon = "",
-    entry_prefix = "   ",
-    selection_caret = "  ",
-    preview_title = "",
 }
 
 local help_tags = {
-    sort_by = "severity",
-    multi_icon = "",
-    entry_prefix = "   ",
-    selection_caret = "  ",
-    preview_title = "",
+    prompt_title = "Neovim help",
+    previewer = false,
     mappings = { i = { ["<CR>"] = actions.select_vertical } },
 }
 
 local man_pages = {
-    preview_title = "",
+    prompt_title = "Manpages",
+    previewer = false,
     mappings = { i = { ["<CR>"] = actions.select_vertical } },
 }
 
@@ -150,17 +111,22 @@ TS.setup({
     pickers = {
         oldfiles = defaults,
         find_files = defaults,
+        current_buffer_fuzzy_find = defaults,
+        live_grep = defaults,
+        registers = defaults,
 
-        diagnostics = diagnostics,
         buffers = picker_buffer,
-        registers = picker_register,
 
-        lsp_definitions = small_lsp_layout,
-        lsp_references = small_lsp_layout,
-        lsp_implementations = small_lsp_layout,
+        lsp_definitions = with_previewer,
+        lsp_references = with_previewer,
+        lsp_implementations = with_previewer,
+        lsp_document_symbols = with_previewer,
+        diagnostics = with_previewer,
 
         help_tags = help_tags,
         man_pages = man_pages,
+
+        spell_suggest = default_single_select,
     },
 })
 

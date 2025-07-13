@@ -69,7 +69,7 @@ local with_previewer = {
     layout_config = {
         prompt_position = "top",
         width = 0.6,
-        anchor = "N"
+        anchor = "N",
     },
 }
 

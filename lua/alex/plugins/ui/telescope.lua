@@ -30,7 +30,7 @@ local defaults = {
     layout_config = {
         prompt_position = "top",
         height = 25,
-        width = 0.45,
+        width = 113,
     },
 
     border = true,
@@ -68,7 +68,6 @@ local with_previewer = {
 
     layout_config = {
         prompt_position = "top",
-        width = 0.6,
         anchor = "N",
     },
 }
@@ -127,6 +126,8 @@ TS.setup({
         man_pages = man_pages,
 
         spell_suggest = default_single_select,
+
+        todo_telescope = with_previewer,
     },
 })
 

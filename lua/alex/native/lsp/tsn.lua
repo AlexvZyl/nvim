@@ -6,15 +6,14 @@ if not U.in_home_dir("TSN") then
 end
 
 local SCRIPT_FILE = "docker_image_runner.sh"
+local TIMEOUT_MS = 100
 
 local function get_lsp_command()
     -- Give everything some time to startup before we try to push
     -- the notification.
-    local timeout_ms = 100
-
     local curr_dir = U.current_dir_abs()
 
-    -- HACK: What is going on here
+    -- TODO: Why is this not working?
     local docker_path = vim.fn.finddir("docker", ".;")
     if string.find(curr_dir, "tsnsystems_utils") then
         docker_path = vim.fn.finddir("./docker", ".;")
@@ -24,7 +23,7 @@ local function get_lsp_command()
     if not docker_path or docker_path == "" then
         vim.defer_fn(function()
             vim.notify("Could not find TSN docker path", vim.log.levels.WARN)
-        end, timeout_ms)
+        end, TIMEOUT_MS)
         return
     end
 
@@ -33,21 +32,23 @@ local function get_lsp_command()
     if not git_root then
         vim.defer_fn(function()
             vim.notify('Could not find git root for :"' .. curr_dir .. '"')
-        end, timeout_ms)
+        end, TIMEOUT_MS)
         return
     end
 
+    -- Defaults.
     local dockerfile = docker_path .. "/Dockerfiles/base"
     local map_source = git_root
     local map_dest = "/app/dev"
-    local comp_cmds_dir = map_dest .. curr_dir:gsub(git_root, "")
 
-    -- Determine dockerfile.
+    -- Custom config (not all repos have the same setup)
     if string.find(curr_dir, "tsnsystems_utils") then
-    elseif string.find(curr_dir, "analysis") then
+    elseif string.find(curr_dir, "analysis/box4") then
         dockerfile = vim.fn.finddir("Dockerfiles", ".;") .. "/box4dev"
+        map_dest = "/app/dev/analysis"
     end
 
+    local compile_commands_dir = map_dest .. curr_dir:gsub(git_root, "")
     local cmd = {
         docker_path .. "/" .. SCRIPT_FILE,
         dockerfile,
@@ -55,12 +56,12 @@ local function get_lsp_command()
         "clangd",
         "--background-index",
         "--path-mappings=" .. map_source .. "=" .. map_dest,
-        "--compile-commands-dir=" .. comp_cmds_dir,
+        "--compile-commands-dir=" .. compile_commands_dir,
     }
 
     vim.defer_fn(function()
         vim.notify(vim.inspect(cmd))
-    end, timeout_ms)
+    end, TIMEOUT_MS)
     return cmd
 end
 

@@ -129,7 +129,6 @@ TS.setup({
         spell_suggest = default_single_select,
 
         todo_telescope = with_previewer,
-
     },
 })
 

@@ -17,12 +17,6 @@ config.shortcut = {
         key = "n",
     },
     {
-        desc = " 󰱼  File ",
-        action = "Telescope find_files find_command=rg,--hidden,--files",
-        group = "@string",
-        key = "fF",
-    },
-    {
         desc = "   Update ",
         action = "Lazy sync",
         group = "@string",

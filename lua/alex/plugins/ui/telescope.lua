@@ -102,6 +102,14 @@ local man_pages = {
     mappings = { i = { ["<CR>"] = actions.select_vertical } },
 }
 
+local current_buffer_fuzzy = {
+    prompt_title = "Buffer",
+    previewer = false,
+    multi_icon = " ",
+    entry_prefix = " ",
+    selection_caret = " ",
+}
+
 ----------------------------------------------------------------------------------------------------
 --- Configure
 
@@ -110,7 +118,6 @@ TS.setup({
     pickers = {
         oldfiles = defaults,
         find_files = defaults,
-        current_buffer_fuzzy_find = defaults,
         live_grep = defaults,
         registers = defaults,
 
@@ -125,9 +132,8 @@ TS.setup({
 
         help_tags = help_tags,
         man_pages = man_pages,
-
         spell_suggest = default_single_select,
-
+        current_buffer_fuzzy_find = current_buffer_fuzzy,
         todo_telescope = with_previewer,
     },
 })

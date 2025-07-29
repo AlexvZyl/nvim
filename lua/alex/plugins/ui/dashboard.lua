@@ -20,7 +20,13 @@ config.shortcut = {
         desc = "   Update ",
         action = "Lazy sync",
         group = "@string",
-        key = "u",
+        key = "uu",
+    },
+    {
+        desc = " 󰱼  File ",
+        action = "Telescope find_files cwd=~",
+        group = "@string",
+        key = "ff",
     },
     {
         desc = " 󰓅  Profile ",

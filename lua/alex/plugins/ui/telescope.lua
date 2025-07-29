@@ -29,8 +29,8 @@ local defaults = {
 
     layout_config = {
         prompt_position = "top",
-        height = 25,
-        width = 113,
+        height = 27,
+        width = 115,
     },
 
     border = true,
@@ -121,6 +121,7 @@ TS.setup({
         lsp_implementations = with_previewer,
         lsp_document_symbols = with_previewer,
         diagnostics = with_previewer,
+        highlights = with_previewer,
 
         help_tags = help_tags,
         man_pages = man_pages,
@@ -128,6 +129,7 @@ TS.setup({
         spell_suggest = default_single_select,
 
         todo_telescope = with_previewer,
+
     },
 })
 

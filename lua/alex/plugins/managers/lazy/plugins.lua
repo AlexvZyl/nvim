@@ -43,13 +43,6 @@ return {
         lazy = false,
     },
     {
-        "NvChad/nvim-colorizer.lua",
-        config = function()
-            require("alex.plugins.ui.colorizer")
-        end,
-        event = { "VeryLazy" },
-    },
-    {
         "nvim-telescope/telescope.nvim",
         dependencies = {
             "nvim-lua/plenary.nvim",
@@ -91,13 +84,6 @@ return {
         cmd = { "DiffviewClose", "DiffviewOpen" },
         config = function()
             require("alex.plugins.ui.diffview")
-        end,
-    },
-    {
-        "folke/which-key.nvim",
-        event = { "VeryLazy" },
-        config = function()
-            require("alex.plugins.ui.which-key")
         end,
     },
     {
@@ -191,4 +177,13 @@ return {
             require("alex.plugins.ui.nvim-web-devicons")
         end,
     },
+
+    -- Bin (maybe to remove)
+    -- {
+    --     "NvChad/nvim-colorizer.lua",
+    --     config = function()
+    --         require("alex.plugins.ui.colorizer")
+    --     end,
+    --     event = { "VeryLazy" },
+    -- },
 }

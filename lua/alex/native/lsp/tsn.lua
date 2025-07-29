@@ -36,6 +36,20 @@ local function get_lsp_command()
         return
     end
 
+    -- TODO: Try to finish this.
+    -- local nix_std_include
+    -- local handle = io.popen("nix eval --raw nixpkgs#linuxHeaders")
+    -- if handle then
+    --     local dir = handle:read("*a")
+    --     handle:close()
+    --     nix_std_include = dir:gsub("\n", "") .. "/include"
+    -- else
+    --     vim.defer_fn(function()
+    --         vim.notify("Could not get nix std lib location")
+    --     end, TIMEOUT_MS)
+    --     return
+    -- end
+
     -- Defaults.
     local dockerfile = docker_path .. "/Dockerfiles/base"
     local map_source = git_root
@@ -56,6 +70,7 @@ local function get_lsp_command()
         "clangd",
         "--background-index",
         "--path-mappings=" .. map_source .. "=" .. map_dest,
+        -- "--path-mappings=" .. map_source .. "=" .. map_dest .. "," .. nix_std_include .. "=" .. "/usr/include",
         "--compile-commands-dir=" .. compile_commands_dir,
     }
 

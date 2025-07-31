@@ -118,9 +118,7 @@ TS.setup({
     pickers = {
         oldfiles = defaults,
         find_files = defaults,
-        live_grep = defaults,
         registers = defaults,
-
         buffers = picker_buffer,
 
         lsp_definitions = with_previewer,
@@ -129,6 +127,7 @@ TS.setup({
         lsp_document_symbols = with_previewer,
         diagnostics = with_previewer,
         highlights = with_previewer,
+        live_grep = with_previewer,
 
         help_tags = help_tags,
         man_pages = man_pages,

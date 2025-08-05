@@ -1,5 +1,7 @@
 local U = require("alex.utils")
 
+local M = {}
+
 -- Custom mode names.
 -- I want all of them to be the same length so that lualine stays constant.
 local function fmt_mode(s)
@@ -247,3 +249,9 @@ end, 1)
 if U.is_default() then
     require("alex.native.default-theme").setup_lualine()
 end
+
+function M.refresh_statusline()
+    require("lualine").refresh({ statusline = true })
+end
+
+return M

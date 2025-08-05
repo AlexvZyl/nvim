@@ -59,18 +59,17 @@ function M.blame()
 end
 
 function M.noice()
-    local N = require("neoscroll")
-    local duration = require("alex.plugins.ui.neoscroll-nvim").duration
+    local duration = require("alex.plugins.ui.neoscroll-nvim").scroll_duration
 
     vim.keymap.set({ "n", "i", "s" }, "<C-d>", function()
         if not require("noice.lsp").scroll(4) then
-            N.ctrl_d({ duration = duration })
+            require("neoscroll").ctrl_d({ duration = duration })
         end
     end, { silent = true })
 
     vim.keymap.set({ "n", "i", "s" }, "<C-u>", function()
         if not require("noice.lsp").scroll(-4) then
-            return N.ctrl_u({ duration = duration })
+            return require("neoscroll").ctrl_u({ duration = duration })
         end
     end, { silent = true })
 end

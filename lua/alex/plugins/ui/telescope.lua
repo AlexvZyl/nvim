@@ -105,9 +105,6 @@ local man_pages = {
 local current_buffer_fuzzy = {
     prompt_title = "Buffer",
     previewer = false,
-    multi_icon = " ",
-    entry_prefix = " ",
-    selection_caret = " ",
 }
 
 ----------------------------------------------------------------------------------------------------

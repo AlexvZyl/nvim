@@ -27,7 +27,7 @@ local signs = {
     },
 }
 
-M.virtual_diagnostics = true
+M.virtual_diagnostics = false
 function M.toggle_virtual_diagnostics()
     M.virtual_diagnostics = not M.virtual_diagnostics
     vim.diagnostic.config({
@@ -44,10 +44,24 @@ function M.toggle_virtual_diagnostics()
         DiagnosticUnderlineOk = { undercurl = not M.virtual_diagnostics },
         DiagnosticUnderlineInfo = { undercurl = not M.virtual_diagnostics },
     })
-    require("alex.utils").refresh_statusline()
+    require("alex.plugins.ui.lualine").refresh_statusline()
 end
 
-M.toggle_virtual_diagnostics()
+-- Setup diags.
+vim.diagnostic.config({
+    signs = signs,
+    virtual_lines = M.virtual_diagnostics,
+    virtual_text = false,
+    update_in_insert = true,
+    severity_sort = true,
+})
+U.merge_highlights_table({
+    DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics },
+    DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics },
+    DiagnosticUnderlineHint = { undercurl = not M.virtual_diagnostics },
+    DiagnosticUnderlineOk = { undercurl = not M.virtual_diagnostics },
+    DiagnosticUnderlineInfo = { undercurl = not M.virtual_diagnostics },
+})
 
 -- TODO: For some reason this is still required for telescope stuff.
 vim.fn.sign_define("DiagnosticSignError", { text = "", numhl = "DiagnosticSignError" })
@@ -113,7 +127,7 @@ end
 M.format_enabled = false
 function M.toggle_format_enabled()
     M.format_enabled = not M.format_enabled
-    require("alex.utils").refresh_statusline()
+    require("alex.plugins.ui.lualine").refresh_statusline()
 end
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {

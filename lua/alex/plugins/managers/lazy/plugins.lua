@@ -11,9 +11,9 @@ return {
     },
     {
         "karb94/neoscroll.nvim",
-        event = { "VeryLazy" },
+        event = { "WinScrolled" },
         config = function()
-            require("alex.plugins.ui.neoscroll-nvim")
+            require("alex.plugins.ui.neoscroll-nvim").init()
         end,
     },
     {
@@ -25,10 +25,12 @@ return {
     },
     {
         "folke/todo-comments.nvim",
+        -- This needs to be at stratup so that we can get the highliting.
         event = { "VeryLazy" },
         dependencies = {
             "nvim-lua/plenary.nvim",
-            "nvim-telescope/telescope.nvim",
+            -- This is a dep but it does not have to be loaded with this plugin.
+            -- "nvim-telescope/telescope.nvim",
         },
         config = function()
             require("alex.plugins.ui.todo")
@@ -44,18 +46,24 @@ return {
     },
     {
         "nvim-telescope/telescope.nvim",
+        cmd = { "Telescope" },
         dependencies = {
             "nvim-lua/plenary.nvim",
             "nvim-lua/popup.nvim",
+            {
+                -- Currently only using these enhancements with telescope.
+                "stevearc/quicker.nvim",
+                config = function()
+                    require("alex.plugins.ui.quicker")
+                end,
+            },
         },
-        cmd = "Telescope",
         config = function()
             require("alex.plugins.ui.telescope")
         end,
     },
     {
         "nvim-lualine/lualine.nvim",
-        lazy = false,
         dependencies = { "nvim-tree/nvim-web-devicons" },
         event = { "VeryLazy" },
         config = function()
@@ -93,13 +101,6 @@ return {
             require("alex.plugins.ui.git-blame")
         end,
     },
-    {
-        "stevearc/quicker.nvim",
-        event = { "VeryLazy" },
-        config = function()
-            require("alex.plugins.ui.quicker")
-        end,
-    },
 
     -- Editing / movement.
     {
@@ -114,17 +115,16 @@ return {
     -- Language.
     {
         "mfussenegger/nvim-lint",
-        event = { "VeryLazy" },
+        -- Does not make sense to have a linter without a LSP.
+        -- This will have to change if that ever happens.
+        event = { "LspAttach" },
         config = function()
             require("alex.plugins.lang.linter")
         end,
     },
     {
         "nvim-treesitter/nvim-treesitter",
-        dependencies = {
-            "nvim-treesitter/nvim-treesitter-textobjects",
-            "nvim-treesitter/playground",
-        },
+        dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
         event = { "VeryLazy" },
         build = { ":TSUpdate" },
         config = function()
@@ -132,17 +132,14 @@ return {
         end,
     },
     {
-        "neovim/nvim-lspconfig",
-        event = { "VeryLazy" },
-    },
-    {
         "folke/lazydev.nvim",
         dependencies = { "Bilal2453/luvit-meta" },
         ft = "lua",
+        event = { "LspAttach" },
     },
     {
         "hrsh7th/nvim-cmp",
-        event = { "VeryLazy" },
+        event = { "LspAttach" },
         config = function()
             require("alex.plugins.lang.completion")
         end,
@@ -164,10 +161,10 @@ return {
     -- Other.
     {
         "aserowy/tmux.nvim",
+        event = { "VeryLazy" },
         config = function()
             require("tmux").setup()
         end,
-        event = { "VeryLazy" },
     },
 
     -- Dependencies.
@@ -177,13 +174,24 @@ return {
             require("alex.plugins.ui.nvim-web-devicons")
         end,
     },
+    {
+        -- Loaded by the native config.
+        "neovim/nvim-lspconfig",
+    },
 
     -- Bin (maybe to remove)
-    -- {
-    --     "NvChad/nvim-colorizer.lua",
-    --     config = function()
-    --         require("alex.plugins.ui.colorizer")
-    --     end,
-    --     event = { "VeryLazy" },
-    -- },
+    {
+        "folke/which-key.nvim",
+        event = { "VeryLazy" },
+        config = function()
+            require("alex.plugins.ui.which-key")
+        end,
+    },
+    {
+        "NvChad/nvim-colorizer.lua",
+        event = { "VeryLazy" },
+        config = function()
+            require("alex.plugins.ui.colorizer")
+        end,
+    },
 }

@@ -65,7 +65,7 @@ return {
     {
         "nvim-lualine/lualine.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
-        event = { "VeryLazy" },
+        lazy = false,
         config = function()
             require("alex.plugins.ui.lualine")
         end,
@@ -187,9 +187,11 @@ return {
             require("alex.plugins.ui.which-key")
         end,
     },
+    -- TODO: Maybe add keybind for loading and enabling/disabling this.
     {
         "NvChad/nvim-colorizer.lua",
-        event = { "VeryLazy" },
+        lazy = true,
+        -- event = { "VeryLazy" },
         config = function()
             require("alex.plugins.ui.colorizer")
         end,

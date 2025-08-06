@@ -54,7 +54,6 @@ local defaults = {
     preview = { treesitter = true },
 }
 
--- NOTE: Intended to be used on top of the normal default.
 local default_single_select = {
     entry_prefix = SINGLE_SELECT_ENTRY_PREFIX,
     selection_caret = SINGLE_SELECT_ICON,
@@ -62,10 +61,9 @@ local default_single_select = {
     multi_icon = "",
 }
 
-local with_previewer = {
+local default_with_previewer = {
     previewer = true,
     preview_title = false,
-
     layout_config = {
         prompt_position = "top",
         anchor = "N",
@@ -116,21 +114,23 @@ TS.setup({
         oldfiles = defaults,
         find_files = defaults,
         registers = defaults,
-        buffers = picker_buffer,
 
-        lsp_definitions = with_previewer,
-        lsp_references = with_previewer,
-        lsp_implementations = with_previewer,
-        lsp_document_symbols = with_previewer,
-        diagnostics = with_previewer,
-        highlights = with_previewer,
-        live_grep = with_previewer,
+        spell_suggest = default_single_select,
+
+        jumplist = default_with_previewer,
+        live_grep = default_with_previewer,
+        highlights = default_with_previewer,
+        diagnostics = default_with_previewer,
+        lsp_references = default_with_previewer,
+        todo_telescope = default_with_previewer,
+        lsp_definitions = default_with_previewer,
+        lsp_implementations = default_with_previewer,
+        lsp_document_symbols = default_with_previewer,
 
         help_tags = help_tags,
         man_pages = man_pages,
-        spell_suggest = default_single_select,
+        buffers = picker_buffer,
         current_buffer_fuzzy_find = current_buffer_fuzzy,
-        todo_telescope = with_previewer,
     },
 })
 

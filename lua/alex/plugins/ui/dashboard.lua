@@ -4,6 +4,7 @@ config.mru = {
     label = " Recent Files",
     limit = 10,
 }
+
 config.project = {
     label = " Recent Projects",
     limit = 10,

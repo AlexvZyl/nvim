@@ -41,7 +41,7 @@ local custom_bars = {
     },
 }
 
-local excludes = function()
+local function excludes()
     if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then
         return true
     end
@@ -82,14 +82,12 @@ function M.get_winbar()
     return prefix .. file_icon .. " " .. U.current_buffer_parent() .. filename .. mod_icon
 end
 
-function M.set_winbar(force)
-    if not force then
-        if excludes() then
-            return
-        end
-        if U.current_window_floating() then
-            return
-        end
+function M.set_winbar()
+    if excludes() then
+        return
+    end
+    if U.current_window_floating() then
+        return
     end
 
     vim.opt_local.winbar = M.get_winbar()

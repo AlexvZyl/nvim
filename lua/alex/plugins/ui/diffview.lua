@@ -5,4 +5,9 @@ require("diffview").setup({
             require("diffview.actions").toggle_files()
         end,
     },
+    view = {
+        merge_tool = {
+            layout = "diff3_mixed"
+        }
+    }
 })

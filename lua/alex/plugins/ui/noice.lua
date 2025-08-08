@@ -39,6 +39,7 @@ local filter_notify = {
     "No more valid diagnostics",
     "warning: offset_encoding is required",
     "client.is_stopped",
+    "No diagnostics found"
 }
 
 local function routes_config()

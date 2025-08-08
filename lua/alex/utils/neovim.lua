@@ -67,7 +67,7 @@ function M.current_buffer_filename()
     return bufname ~= "" and vim.fn.fnamemodify(bufname, ":t") or ""
 end
 
-local function get_short_cwd()
+function M.get_short_cwd()
     return vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
 end
 

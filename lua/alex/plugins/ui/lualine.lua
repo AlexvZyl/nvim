@@ -2,6 +2,9 @@ local U = require("alex.utils")
 
 local M = {}
 
+----------------------------------------------------------------------------------------------------
+--- Utils.
+
 -- Custom mode names.
 -- I want all of them to be the same length so that lualine stays constant.
 local function fmt_mode(s)
@@ -75,6 +78,9 @@ local function diff_source()
     end
 end
 
+----------------------------------------------------------------------------------------------------
+--- Defaults.
+
 local default_z = {
     {
         "location",
@@ -91,7 +97,47 @@ local default_z = {
     },
 }
 
-local tree = {
+local default_x = {
+    {
+        "diagnostics",
+        sources = { "nvim_diagnostic" },
+        symbols = {
+            error = U.diagnostic_signs.error,
+            warn = U.diagnostic_signs.warn,
+            info = U.diagnostic_signs.info,
+            hint = U.diagnostic_signs.hint,
+            other = U.diagnostic_signs.other,
+        },
+        colored = true,
+        padding = 2,
+    },
+    {
+        U.current_buffer_lsp,
+        padding = 1,
+        color = text_hl,
+        icon = { " ", color = icon_hl },
+    },
+    {
+        function()
+            return ""
+        end,
+        color = get_virtual_text_color,
+        separator = { " ", "" },
+    },
+    {
+        function()
+            return "󰉼  "
+        end,
+        color = get_format_enabled_color,
+        padding = 0,
+    },
+
+}
+
+----------------------------------------------------------------------------------------------------
+--- Custom.
+
+local oil = {
     sections = {
         lualine_a = {
             {
@@ -110,11 +156,11 @@ local tree = {
                 color = text_hl,
             },
         },
-        lualine_x = {},
+        lualine_x = default_x,
         lualine_y = {},
         lualine_z = default_z,
     },
-    filetypes = { "NvimTree" },
+    filetypes = { "oil" },
 }
 
 local telescope = {
@@ -137,12 +183,16 @@ local telescope = {
                 icon = { "  ", color = icon_hl },
             },
         },
-        lualine_x = {},
+        lualine_x = default_x,
         lualine_y = {},
         lualine_z = default_z,
     },
     filetypes = { "TelescopePrompt" },
 }
+
+
+----------------------------------------------------------------------------------------------------
+--- Setup.
 
 require("lualine").setup({
     sections = {
@@ -184,41 +234,7 @@ require("lualine").setup({
                 padding = 1,
             },
         },
-        lualine_x = {
-            {
-                "diagnostics",
-                sources = { "nvim_diagnostic" },
-                symbols = {
-                    error = U.diagnostic_signs.error,
-                    warn = U.diagnostic_signs.warn,
-                    info = U.diagnostic_signs.info,
-                    hint = U.diagnostic_signs.hint,
-                    other = U.diagnostic_signs.other,
-                },
-                colored = true,
-                padding = 2,
-            },
-            {
-                U.current_buffer_lsp,
-                padding = 1,
-                color = text_hl,
-                icon = { " ", color = icon_hl },
-            },
-            {
-                function()
-                    return ""
-                end,
-                color = get_virtual_text_color,
-                separator = { " ", "" },
-            },
-            {
-                function()
-                    return "󰉼  "
-                end,
-                color = get_format_enabled_color,
-                padding = 0,
-            },
-        },
+        lualine_x = default_x,
         lualine_y = {},
         lualine_z = default_z,
     },
@@ -230,7 +246,7 @@ require("lualine").setup({
     },
     extensions = {
         telescope,
-        ["nvim-tree"] = tree,
+        oil,
     },
 })
 
@@ -242,9 +258,11 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
     pattern = { "*.*" },
     once = true,
 })
-vim.defer_fn(function()
-    require("lualine").setup({})
-end, 1)
+
+-- Looks like this is no longer needed?
+-- vim.defer_fn(function()
+--     require("lualine").setup({})
+-- end, 1)
 
 if U.is_default() then
     require("alex.native.default-theme").setup_lualine()

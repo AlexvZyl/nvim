@@ -3,6 +3,7 @@ local TRANSPARENT = false
 
 ----------------------------------------------------------------------------------------------------
 --- Utils.
+--- All utils are in this file so this is an easy copy & use.
 ----------------------------------------------------------------------------------------------------
 
 local function set_highlights_table(table)
@@ -230,6 +231,7 @@ end
 --- Plugin utils.
 ----------------------------------------------------------------------------------------------------
 
+--- This should be called to set the theme for lualine.
 function M.setup_lualine()
     local function create_group(mode_color)
         local DEFAULT_SECTION = {

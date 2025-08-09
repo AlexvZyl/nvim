@@ -7,7 +7,7 @@ require("diffview").setup({
         end,
         view_closed = function()
             vim.diagnostic.enable(true)
-        end
+        end,
     },
     view = {
         merge_tool = {

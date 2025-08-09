@@ -13,19 +13,6 @@ function M.save_file()
     end
 end
 
-M.DAP_UI_ENABLED = false
-function M.dap_toggle_ui()
-    require("dapui").toggle()
-    M.DAP_UI_ENABLED = not M.DAP_UI_ENABLED
-end
-
-function M.dap_float_scope()
-    if not M.DAP_UI_ENABLED then
-        return
-    end
-    require("dapui").float_element("scopes")
-end
-
 function M.toggle_diffview()
     local view = require("diffview.lib").get_current_view()
     if view then

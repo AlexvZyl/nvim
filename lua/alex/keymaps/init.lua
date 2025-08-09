@@ -200,24 +200,8 @@ function M.telescope()
     keymap(n, "gd", "<Cmd>Telescope lsp_definitions<CR>", default_settings)
 end
 
-function M.debugger()
-    keymap(n, "<C-b>", "<Cmd>DapToggleBreakpoint<CR>", default_settings)
-    keymap(n, "<leader>s", function()
-        require("alex.keymaps.utils").dap_float_scope()
-    end, default_settings)
-    keymap(n, "<F1>", function()
-        require("alex.keymaps.utils").dap_toggle_ui()
-    end, default_settings)
-    keymap(n, "<F2>", "<Cmd>DapContinue<CR>", default_settings)
-    keymap(n, "<Right>", "<Cmd>DapStepInto<CR>", default_settings)
-    keymap(n, "<Down>", "<Cmd>DapStepOver<CR>", default_settings)
-    keymap(n, "<Left>", "<Cmd>DapStepOut<CR>", default_settings)
-    keymap(n, "<Up>", "<Cmd>DapRestartFrame<CR>", default_settings)
-end
-
 function M.completion()
     local cmp = require("cmp")
-    local luasnip = require("luasnip")
     cmp.setup({
         mapping = cmp.mapping.preset.insert({
             ["<C-u>"] = cmp.mapping.scroll_docs(-4),

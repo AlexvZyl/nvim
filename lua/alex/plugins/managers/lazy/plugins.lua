@@ -187,13 +187,4 @@ return {
             require("alex.plugins.ui.which-key")
         end,
     },
-    -- TODO: Maybe add keybind for loading and enabling/disabling this.
-    {
-        "NvChad/nvim-colorizer.lua",
-        lazy = true,
-        -- event = { "VeryLazy" },
-        config = function()
-            require("alex.plugins.ui.colorizer")
-        end,
-    },
 }

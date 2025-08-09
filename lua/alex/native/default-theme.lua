@@ -222,6 +222,4 @@ function M.setup_lualine()
     })
 end
 
-M.init()
-
 return M

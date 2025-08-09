@@ -257,11 +257,6 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
     once = true,
 })
 
--- Looks like this is no longer needed?
--- vim.defer_fn(function()
---     require("lualine").setup({})
--- end, 1)
-
 if U.is_default() then
     require("alex.native.default-theme").setup_lualine()
 end
@@ -269,5 +264,10 @@ end
 function M.refresh_statusline()
     require("lualine").refresh({ statusline = true })
 end
+
+-- This removes the incorrectbackbround behind zones a + z.
+vim.defer_fn(function()
+    require("lualine").setup({})
+end, 1)
 
 return M

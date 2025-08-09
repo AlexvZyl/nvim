@@ -234,8 +234,8 @@ function M.setup()
         DiffAdd = { bg = M.palette.diff.add },
         DiffDelete = { bg = M.palette.diff.delete },
         DiffChange = { bg = M.palette.bg },
-        DiffText = { bg = M.palette.diff.add },
-        DiffTextAdd = { bg = M.palette.diff.add },
+        DiffText = { bg = M.palette.diff.change },
+        DiffTextAdd = { bg = M.palette.diff.change },
     })
 end
 

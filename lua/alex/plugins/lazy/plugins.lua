@@ -4,7 +4,7 @@ return {
         "glepnir/dashboard-nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("alex.plugins.ui.dashboard")
+            require("alex.plugins.dashboard")
         end,
         lazy = false,
         priority = 999,
@@ -13,14 +13,14 @@ return {
         "karb94/neoscroll.nvim",
         event = { "WinScrolled" },
         config = function()
-            require("alex.plugins.ui.neoscroll-nvim").init()
+            require("alex.plugins.neoscroll-nvim").init()
         end,
     },
     {
         "lukas-reineke/indent-blankline.nvim",
         event = { "VeryLazy" },
         config = function()
-            require("alex.plugins.ui.indent-blankline")
+            require("alex.plugins.indent-blankline")
         end,
     },
     {
@@ -33,14 +33,14 @@ return {
             -- "nvim-telescope/telescope.nvim",
         },
         config = function()
-            require("alex.plugins.ui.todo")
+            require("alex.plugins.todo")
         end,
     },
     {
         "stevearc/oil.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("alex.plugins.ui.oil-nvim")
+            require("alex.plugins.oil-nvim")
         end,
         lazy = false,
     },
@@ -54,12 +54,12 @@ return {
                 -- Currently only using these enhancements with telescope.
                 "stevearc/quicker.nvim",
                 config = function()
-                    require("alex.plugins.ui.quicker")
+                    require("alex.plugins.quicker")
                 end,
             },
         },
         config = function()
-            require("alex.plugins.ui.telescope")
+            require("alex.plugins.telescope")
         end,
     },
     {
@@ -67,7 +67,7 @@ return {
         dependencies = { "nvim-tree/nvim-web-devicons" },
         lazy = false,
         config = function()
-            require("alex.plugins.ui.lualine")
+            require("alex.plugins.lualine")
         end,
     },
     {
@@ -75,7 +75,7 @@ return {
         dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
         event = { "VeryLazy" },
         config = function()
-            require("alex.plugins.ui.noice")
+            require("alex.plugins.noice")
         end,
     },
     {
@@ -83,7 +83,7 @@ return {
         "lewis6991/gitsigns.nvim",
         -- event = { "VeryLazy" },
         config = function()
-            require("alex.plugins.ui.gitsigns")
+            require("alex.plugins.gitsigns")
         end,
         lazy = false,
     },
@@ -91,14 +91,14 @@ return {
         "sindrets/diffview.nvim",
         cmd = { "DiffviewClose", "DiffviewOpen" },
         config = function()
-            require("alex.plugins.ui.diffview")
+            require("alex.plugins.diffview")
         end,
     },
     {
         "f-person/git-blame.nvim",
         keys = { "<leader>b" },
         config = function()
-            require("alex.plugins.ui.git-blame")
+            require("alex.plugins.git-blame")
         end,
     },
 
@@ -108,7 +108,7 @@ return {
         dependencies = "tpope/vim-repeat",
         keys = { "s", "S" },
         config = function()
-            require("alex.plugins.ui.leap")
+            require("alex.plugins.leap")
         end,
     },
 
@@ -119,7 +119,7 @@ return {
         -- This will have to change if that ever happens.
         event = { "LspAttach" },
         config = function()
-            require("alex.plugins.lang.linter")
+            require("alex.plugins.linter")
         end,
     },
     {
@@ -128,7 +128,7 @@ return {
         event = { "VeryLazy" },
         build = { ":TSUpdate" },
         config = function()
-            require("alex.plugins.ui.treesitter")
+            require("alex.plugins.treesitter")
         end,
     },
     {
@@ -141,7 +141,7 @@ return {
         "hrsh7th/nvim-cmp",
         event = { "LspAttach" },
         config = function()
-            require("alex.plugins.lang.completion")
+            require("alex.plugins.completion")
         end,
         dependencies = {
             "hrsh7th/cmp-omni",
@@ -171,7 +171,7 @@ return {
     {
         "nvim-tree/nvim-web-devicons",
         config = function()
-            require("alex.plugins.ui.nvim-web-devicons")
+            require("alex.plugins.nvim-web-devicons")
         end,
     },
     {
@@ -184,7 +184,7 @@ return {
         "folke/which-key.nvim",
         event = { "VeryLazy" },
         config = function()
-            require("alex.plugins.ui.which-key")
+            require("alex.plugins.which-key")
         end,
     },
 }

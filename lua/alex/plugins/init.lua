@@ -1,1 +1,1 @@
-require("alex.plugins.managers.lazy")
+require("alex.plugins.lazy")

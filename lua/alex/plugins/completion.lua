@@ -1,7 +1,7 @@
 local CMP = require("cmp")
 local U = require("alex.utils")
 
-require("alex.plugins.ui.nvim-cmp")
+require("alex.plugins.nvim-cmp")
 -- require("luasnip.loaders.from_vscode").lazy_load()
 
 -- Main.

@@ -45,12 +45,6 @@ function M.set_highlight(hl, config)
     vim.api.nvim_set_hl(0, hl, config)
 end
 
-function M.set_highlights_table(table)
-    for group, config in pairs(table) do
-        vim.api.nvim_set_hl(0, group, config)
-    end
-end
-
 function M.merge_highlights_table(table)
     for group, new_config in pairs(table) do
         local existing_config = vim.api.nvim_get_hl(0, { name = group })

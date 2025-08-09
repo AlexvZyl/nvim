@@ -1,11 +1,52 @@
 local M = {}
+local TRANSPARENT = false
 
-local U = require("alex.utils")
+----------------------------------------------------------------------------------------------------
+--- Utils.
+----------------------------------------------------------------------------------------------------
 
-local transparent = false
-local function get_bg(color)
-    return transparent and "NONE" or color
+local function set_highlights_table(table)
+    for group, config in pairs(table) do
+        vim.api.nvim_set_hl(0, group, config)
+    end
 end
+
+local function get_bg(color)
+    return TRANSPARENT and "NONE" or color
+end
+
+-- Taken from folke/tokyonight
+---@param c  string
+local function to_rgb(c)
+    c = string.lower(c)
+    return { tonumber(c:sub(2, 3), 16), tonumber(c:sub(4, 5), 16), tonumber(c:sub(6, 7), 16) }
+end
+
+-- Taken from folke/tokyonight
+---@param foreground string foreground color
+---@param background string background color
+---@param alpha number|string number between 0 and 1. 0 results in bg, 1 results in fg
+local function blend(foreground, alpha, background)
+    alpha = type(alpha) == "string" and (tonumber(alpha, 16) / 0xff) or alpha
+    local bg = to_rgb(background)
+    local fg = to_rgb(foreground)
+
+    local blendChannel = function(i)
+        local ret = (alpha * fg[i] + ((1 - alpha) * bg[i]))
+        return math.floor(math.min(math.max(0, ret), 255) + 0.5)
+    end
+
+    return string.format("#%02x%02x%02x", blendChannel(1), blendChannel(2), blendChannel(3))
+end
+
+local function get_color_hex(name)
+    local rgb = vim.api.nvim_get_color_by_name(name)
+    return string.format("#%06x", rgb)
+end
+
+----------------------------------------------------------------------------------------------------
+--- Palette.
+----------------------------------------------------------------------------------------------------
 
 -- NOTE: Using builtin neovim colors.
 M.palette = {
@@ -31,21 +72,16 @@ M.palette = {
     white3 = "NvimLightGray4",
 }
 
-local function get_color_hex(name)
-    local rgb = vim.api.nvim_get_color_by_name(name)
-    return string.format("#%06x", rgb)
-end
-
 -- Extensions.
 M.palette.fg = M.palette.white0
 M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
-M.palette.bg_float = U.blend(get_color_hex(M.palette.bg), 0.55, get_color_hex(M.palette.bg_dark))
-M.palette.fg_dim = U.blend(get_color_hex(M.palette.white2), 0.65, get_color_hex(M.palette.bg_dark))
+M.palette.bg_float = blend(get_color_hex(M.palette.bg), 0.55, get_color_hex(M.palette.bg_dark))
+M.palette.fg_dim = blend(get_color_hex(M.palette.white2), 0.65, get_color_hex(M.palette.bg_dark))
 M.palette.bg_highlight = M.palette.gray1
 
 function M.init()
-    U.set_highlights_table({
+    set_highlights_table({
         -- Git
         Added = { fg = M.palette.green },
         Removed = { fg = M.palette.red },
@@ -87,7 +123,7 @@ function M.init()
 
         -- Indent blankline.
         IndentBlanklineChar = {
-            fg = U.blend(get_color_hex(M.palette.gray1), 0.7, get_color_hex(M.palette.bg)),
+            fg = blend(get_color_hex(M.palette.gray1), 0.7, get_color_hex(M.palette.bg)),
         },
         IndentBlanklineContextChar = { link = "IndentBlanklineChar" },
 
@@ -149,17 +185,6 @@ function M.init()
         DashboardProjectTitle = { fg = M.palette.orange },
         DashboardMruTitle = { fg = M.palette.orange },
 
-        -- Tree.
-        NvimTreeModifiedIcon = { fg = M.palette.gray2 },
-        NvimTreeGitDirtyIcon = { link = "NvimTreeModifiedIcon" },
-        NvimTreeGitStagedIcon = { link = "NvimTreeModifiedIcon" },
-        NvimTreeGitDeletedIcon = { link = "NvimTreeModifiedIcon" },
-        NvimTreeGitIgnoredIcon = { link = "NvimTreeModifiedIcon" },
-        NvimTreeGitNewIcon = { link = "NvimTreeModifiedIcon" },
-        NvimTreeGitRenamedIcon = { link = "NvimTreeModifiedIcon" },
-        NvimTreeRootFolder = { fg = M.palette.white3 },
-        NvimTreeSpecialFile = { fg = M.palette.yellow, bold = false },
-
         -- Telescope.
         TelescopePromptPrefix = { fg = M.palette.yellow, bg = get_bg(M.palette.bg) },
         TelescopeTitle = { fg = M.palette.bg_dark, bg = M.palette.orange },
@@ -193,11 +218,17 @@ function M.init()
         -- Lazy.
         LazyProgressDone = { fg = M.palette.green },
 
-        -- HACK:
+        -- Hacky stuff
         luaParenError = { link = "Normal" },
         markdownError = { link = "Normal" },
+
+        -- Diffs
     })
 end
+
+----------------------------------------------------------------------------------------------------
+--- Plugin utils.
+----------------------------------------------------------------------------------------------------
 
 function M.setup_lualine()
     local function create_group(mode_color)
@@ -226,5 +257,7 @@ function M.setup_lualine()
         },
     })
 end
+
+----------------------------------------------------------------------------------------------------
 
 return M

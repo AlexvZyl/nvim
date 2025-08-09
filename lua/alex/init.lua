@@ -5,6 +5,6 @@ if not require("alex.environments").should_setup then
 end
 
 require("alex.native.options")
-require("alex.plugins")
+require("alex.loader")
 require("alex.native")
 require("alex.keymaps").init()

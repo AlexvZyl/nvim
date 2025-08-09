@@ -1,7 +1,7 @@
-require("alex.plugins.lazy.bootstrap")
+require("alex.loader.bootstrap")
 
 local U = require("alex.utils.chars")
-local plugins = require("alex.plugins.lazy.plugins")
+local plugins = require("alex.loader.plugins")
 
 local opts = {
     ui = { border = U.border_chars_outer_thin },

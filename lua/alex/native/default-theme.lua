@@ -3,42 +3,45 @@ local M = {}
 local U = require("alex.utils")
 
 local transparent = false
-
 local function get_bg(color)
     return transparent and "NONE" or color
 end
 
--- TODO: Read these colors in at startup from the builtin groups.
--- Not really sure if it is even possible.
+-- NOTE: Using builtin neovim colors.
 M.palette = {
     -- Colors.
-    red = "#f08080",
-    green = "#b3f6c0",
-    yellow = "#fce094",
-    magenta = "#ffcaff",
-    orange = "#ffa07a",
-    blue = "#87cefa",
-    cyan = "#8cf8f7",
+    red = "LightCoral",
+    green = "NvimLightGreen",
+    yellow = "NvimLightYellow",
+    magenta = "NvimLightMagenta",
+    orange = "LightSalmon",
+    blue = "LightSkyBlue",
+    cyan = "NvimLightCyan",
 
     -- Blacks/grays.
-    black = "#07080d",
-    gray0 = "#14161b",
-    gray1 = "#2c2e33",
-    gray2 = "#4f5258",
+    black = "NvimDarkGray1",
+    gray0 = "NvimDarkGray2",
+    gray1 = "NvimDarkGray3",
+    gray2 = "NvimDarkGray4",
 
     -- Whites.
-    white0 = "#eef1f8",
-    white1 = "#e0e2ea",
-    white2 = "#c4c6cd",
-    white3 = "#9b9ea4",
+    white0 = "NvimLightGray1",
+    white1 = "NvimLightGray2",
+    white2 = "NvimLightGray3",
+    white3 = "NvimLightGray4",
 }
+
+local function get_color_hex(name)
+    local rgb = vim.api.nvim_get_color_by_name(name)
+    return string.format("#%06x", rgb)
+end
 
 -- Extensions.
 M.palette.fg = M.palette.white0
 M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
-M.palette.bg_float = U.blend(M.palette.bg, 0.55, M.palette.bg_dark)
-M.palette.fg_dim = U.blend(M.palette.white2, 0.65, M.palette.bg_dark)
+M.palette.bg_float = U.blend(get_color_hex(M.palette.bg), 0.55, get_color_hex(M.palette.bg_dark))
+M.palette.fg_dim = U.blend(get_color_hex(M.palette.white2), 0.65, get_color_hex(M.palette.bg_dark))
 M.palette.bg_highlight = M.palette.gray1
 
 function M.init()
@@ -83,7 +86,7 @@ function M.init()
         Boolean = { fg = M.palette.magenta },
 
         -- Indent blankline.
-        IndentBlanklineChar = { fg = U.blend(M.palette.gray1, 0.7, M.palette.bg) },
+        IndentBlanklineChar = { fg = U.blend(get_color_hex(M.palette.gray1), 0.7, get_color_hex(M.palette.bg)) },
         IndentBlanklineContextChar = { link = "IndentBlanklineChar" },
 
         -- Diagnostics.

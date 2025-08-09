@@ -81,7 +81,8 @@ M.palette.bg_float = blend(get_color_hex(M.palette.bg), 0.55, get_color_hex(M.pa
 M.palette.fg_dim = blend(get_color_hex(M.palette.white2), 0.65, get_color_hex(M.palette.bg_dark))
 M.palette.bg_highlight = M.palette.gray1
 
-function M.init()
+--- Call to setup and load colors.
+function M.setup()
     set_highlights_table({
         -- Git
         Added = { fg = M.palette.green },
@@ -226,8 +227,6 @@ function M.init()
         -- Diffs
     })
 end
-
-M.init()
 
 ----------------------------------------------------------------------------------------------------
 --- Plugin utils.

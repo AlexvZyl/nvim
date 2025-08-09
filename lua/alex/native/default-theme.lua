@@ -86,7 +86,9 @@ function M.init()
         Boolean = { fg = M.palette.magenta },
 
         -- Indent blankline.
-        IndentBlanklineChar = { fg = U.blend(get_color_hex(M.palette.gray1), 0.7, get_color_hex(M.palette.bg)) },
+        IndentBlanklineChar = {
+            fg = U.blend(get_color_hex(M.palette.gray1), 0.7, get_color_hex(M.palette.bg)),
+        },
         IndentBlanklineContextChar = { link = "IndentBlanklineChar" },
 
         -- Diagnostics.

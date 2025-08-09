@@ -81,9 +81,9 @@ M.palette.bg_float = blend(M.palette.bg, 0.55, M.palette.bg_dark)
 M.palette.fg_dim = blend(M.palette.white2, 0.65, M.palette.bg_dark)
 M.palette.bg_highlight = M.palette.gray1
 M.palette.diff = {
-    add = blend(M.palette.green, 0.3, M.palette.bg_dark),
-    delete = blend(M.palette.red, 0.3, M.palette.bg_dark),
-    change = blend(M.palette.blue, 0.3, M.palette.bg_dark),
+    add = blend(M.palette.green, 0.2, M.palette.bg_dark),
+    delete = blend(M.palette.red, 0.2, M.palette.bg_dark),
+    change = blend(M.palette.blue, 0.2, M.palette.bg_dark),
     text = M.palette.blue,
 }
 

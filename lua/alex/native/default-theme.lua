@@ -52,34 +52,40 @@ end
 -- NOTE: Using builtin neovim colors.
 M.palette = {
     -- Colors.
-    red = "LightCoral",
-    green = "NvimLightGreen",
-    yellow = "NvimLightYellow",
-    magenta = "NvimLightMagenta",
-    orange = "LightSalmon",
-    blue = "LightSkyBlue",
-    cyan = "NvimLightCyan",
+    red = get_color_hex("LightCoral"),
+    green = get_color_hex("NvimLightGreen"),
+    yellow = get_color_hex("NvimLightYellow"),
+    magenta = get_color_hex("NvimLightMagenta"),
+    orange = get_color_hex("LightSalmon"),
+    blue = get_color_hex("LightSkyBlue"),
+    cyan = get_color_hex("NvimLightCyan"),
 
     -- Blacks/grays.
-    black = "NvimDarkGray1",
-    gray0 = "NvimDarkGray2",
-    gray1 = "NvimDarkGray3",
-    gray2 = "NvimDarkGray4",
+    black = get_color_hex("NvimDarkGray1"),
+    gray0 = get_color_hex("NvimDarkGray2"),
+    gray1 = get_color_hex("NvimDarkGray3"),
+    gray2 = get_color_hex("NvimDarkGray4"),
 
     -- Whites.
-    white0 = "NvimLightGray1",
-    white1 = "NvimLightGray2",
-    white2 = "NvimLightGray3",
-    white3 = "NvimLightGray4",
+    white0 = get_color_hex("NvimLightGray1"),
+    white1 = get_color_hex("NvimLightGray2"),
+    white2 = get_color_hex("NvimLightGray3"),
+    white3 = get_color_hex("NvimLightGray4"),
 }
 
 -- Extensions.
 M.palette.fg = M.palette.white0
 M.palette.bg = M.palette.gray0
 M.palette.bg_dark = M.palette.black
-M.palette.bg_float = blend(get_color_hex(M.palette.bg), 0.55, get_color_hex(M.palette.bg_dark))
-M.palette.fg_dim = blend(get_color_hex(M.palette.white2), 0.65, get_color_hex(M.palette.bg_dark))
+M.palette.bg_float = blend(M.palette.bg, 0.55, M.palette.bg_dark)
+M.palette.fg_dim = blend(M.palette.white2, 0.65, M.palette.bg_dark)
 M.palette.bg_highlight = M.palette.gray1
+M.palette.diff = {
+    add = blend(M.palette.green, 0.25, M.palette.bg_dark),
+    delete = blend(M.palette.red, 0.25, M.palette.bg_dark),
+    change = blend(M.palette.blue, 0.25, M.palette.bg_dark),
+    text = M.palette.blue,
+}
 
 --- Call to setup and load colors.
 function M.setup()
@@ -125,7 +131,7 @@ function M.setup()
 
         -- Indent blankline.
         IndentBlanklineChar = {
-            fg = blend(get_color_hex(M.palette.gray1), 0.7, get_color_hex(M.palette.bg)),
+            fg = blend(M.palette.gray1, 0.7, M.palette.bg),
         },
         IndentBlanklineContextChar = { link = "IndentBlanklineChar" },
 
@@ -224,7 +230,12 @@ function M.setup()
         luaParenError = { link = "Normal" },
         markdownError = { link = "Normal" },
 
-        -- Diffs
+        -- Diffview.
+        DiffAdd = { bg = M.palette.diff.add },
+        DiffDelete = { bg = M.palette.diff.delete },
+        DiffChange = { bg = M.palette.bg },
+        DiffText = { bg = M.palette.diff.add },
+        DiffTextAdd = { bg = M.palette.diff.add },
     })
 end
 

@@ -19,29 +19,11 @@ local function fmt_mode(s)
 end
 
 -- Theme dependant custom colors.
-local text_hl
-local icon_hl
-local green
-local red
-if U.is_default() then
-    local C = require("alex.native.default-theme").palette
-    red = C.red
-    green = C.green
-    icon_hl = { fg = C.gray2 }
-    text_hl = { fg = C.gray2 }
-elseif U.is_nordic() then
-    local C = require("nordic.colors")
-    text_hl = { fg = C.gray3 }
-    icon_hl = { fg = C.gray4 }
-    green = C.green.base
-    red = C.red.base
-elseif U.is_tokyonight() then
-    local C = require("tokyonight.colors.moon")
-    text_hl = { fg = C.fg_gutter }
-    icon_hl = { fg = C.dark3 }
-    green = C.green1
-    red = C.red1
-end
+local C = require("default.palette")
+local red = C.red
+local green = C.green
+local icon_hl = { fg = C.gray2 }
+local text_hl = { fg = C.gray2 }
 
 local function get_virtual_text_color()
     local enabled = require("alex.native.lsp").virtual_diagnostics
@@ -237,6 +219,7 @@ require("lualine").setup({
         lualine_z = default_z,
     },
     options = {
+        theme = "auto",
         disabled_filetypes = { "dashboard" },
         globalstatus = true,
         section_separators = { left = " ", right = " " },
@@ -256,10 +239,6 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
     pattern = { "*.*" },
     once = true,
 })
-
-if U.is_default() then
-    require("alex.native.default-theme").setup_lualine()
-end
 
 function M.refresh_statusline()
     require("lualine").refresh({ statusline = true })

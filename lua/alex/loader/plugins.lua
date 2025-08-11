@@ -179,6 +179,16 @@ return {
         "neovim/nvim-lspconfig",
     },
 
+    -- Themes.
+    {
+        'AlexvZyl/default.nvim',
+        lazy = false,
+        priority = 1000,
+        config = function()
+            require('default').load()
+        end
+    },
+
     -- Bin (maybe to remove)
     {
         "folke/which-key.nvim",

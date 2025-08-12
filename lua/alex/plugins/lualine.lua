@@ -241,7 +241,6 @@ require("lualine").setup({
 --     once = true,
 -- })
 
-
 -- Ensure correct backgrond for lualine.
 local id
 id = vim.api.nvim_create_autocmd({ "BufWinEnter" }, {

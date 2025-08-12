@@ -1,5 +1,5 @@
 require("nvim-treesitter.configs").setup({
-    modules={},
+    modules = {},
     ensure_installed = {},
     ignore_install = {
         "dockerfile",

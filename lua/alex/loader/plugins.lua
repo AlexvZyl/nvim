@@ -177,7 +177,7 @@ return {
     {
         -- Loaded by the native config.
         "neovim/nvim-lspconfig",
-        lazy  = true,
+        lazy = true,
     },
 
     -- Themes.

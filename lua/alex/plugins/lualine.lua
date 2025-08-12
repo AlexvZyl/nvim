@@ -231,22 +231,37 @@ require("lualine").setup({
     },
 })
 
+-- TODO: Improve this.
+-- vim.api.nvim_create_autocmd(, {
+--     callback = function(_)
+--         require("lualine").setup({})
+--         vim.notify("In callback")
+--     end,
+--     pattern = { "*.*" },
+--     once = true,
+-- })
+
+
 -- Ensure correct backgrond for lualine.
-vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
-    callback = function(_)
-        require("lualine").setup({})
+local id
+id = vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+    callback = function(args)
+        vim.defer_fn(function()
+            local excludes = {
+                "dashboard",
+                "",
+            }
+
+            if not vim.tbl_contains(excludes, vim.bo[args.buf].filetype) then
+                require("lualine").setup({})
+                vim.api.nvim_del_autocmd(id)
+            end
+        end, 5)
     end,
-    pattern = { "*.*" },
-    once = true,
 })
 
 function M.refresh_statusline()
     require("lualine").refresh({ statusline = true })
 end
-
--- This removes the incorrectbackbround behind zones a + z.
-vim.defer_fn(function()
-    require("lualine").setup({})
-end, 1)
 
 return M

@@ -7,7 +7,7 @@ return {
             require("alex.plugins.dashboard")
         end,
         lazy = false,
-        priority = 999,
+        priority = 1000,
     },
     {
         "karb94/neoscroll.nvim",
@@ -177,6 +177,7 @@ return {
     {
         -- Loaded by the native config.
         "neovim/nvim-lspconfig",
+        lazy  = true,
     },
 
     -- Themes.

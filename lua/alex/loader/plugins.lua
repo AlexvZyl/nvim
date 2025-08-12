@@ -7,7 +7,7 @@ return {
             require("alex.plugins.dashboard")
         end,
         lazy = false,
-        priority = 1000,
+        priority = 999,
     },
     {
         "karb94/neoscroll.nvim",

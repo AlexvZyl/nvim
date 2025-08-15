@@ -29,8 +29,8 @@ local defaults = {
 
     layout_config = {
         prompt_position = "top",
-        height = 27,
-        width = 115,
+        height = 30,
+        width = 120,
     },
 
     border = true,

@@ -231,16 +231,6 @@ require("lualine").setup({
     },
 })
 
--- TODO: Improve this.
--- vim.api.nvim_create_autocmd(, {
---     callback = function(_)
---         require("lualine").setup({})
---         vim.notify("In callback")
---     end,
---     pattern = { "*.*" },
---     once = true,
--- })
-
 -- Ensure correct backgrond for lualine.
 local id
 id = vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
@@ -248,6 +238,7 @@ id = vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
         vim.defer_fn(function()
             local excludes = {
                 "dashboard",
+                "lazy",
                 "",
             }
 
@@ -255,7 +246,7 @@ id = vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
                 require("lualine").setup({})
                 vim.api.nvim_del_autocmd(id)
             end
-        end, 5)
+        end, 50)
     end,
 })
 

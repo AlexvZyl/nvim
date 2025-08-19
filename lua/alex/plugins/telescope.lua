@@ -26,11 +26,12 @@ local defaults = {
     preview_title = false,
     dynamic_preview_title = false,
     results_title = false,
+    line_width = "full",
 
     layout_config = {
         prompt_position = "top",
-        height = 30,
-        width = 120,
+        height = 28,
+        width = 118,
     },
 
     border = true,
@@ -47,7 +48,7 @@ local defaults = {
     prompt_prefix = "   ",
     selection_caret = "   ",
     hl_result_eol = true,
-    wrap_results = false,
+    wrap_results = true,
     winblend = 0,
 
     mappings = MAPPINGS,

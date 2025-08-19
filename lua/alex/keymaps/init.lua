@@ -104,6 +104,7 @@ function M.native()
     keymap(n, "Q", function()
         require("alex.keymaps.utils").delete_buffer()
     end, default_settings)
+    keymap(n, "yp", "<Cmd>let @+ = expand(\"%:p\")<CR>")
 
     -- Quickfix.
     keymap(n, "}", "<Cmd>cnext<CR>zz_", default_settings)

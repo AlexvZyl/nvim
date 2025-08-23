@@ -70,11 +70,7 @@ function M.get_winbar()
     local buftype = vim.bo.buftype
     local custom_bar = custom_bars[filetype] or custom_bars[buftype]
     if custom_bar ~= nil then
-        return prefix
-            .. custom_bar.icon
-            .. " "
-            .. custom_bar.name()
-            .. mod_icon
+        return prefix .. custom_bar.icon .. " " .. custom_bar.name() .. mod_icon
     end
 
     local file_icon = U.current_buffer_icon()

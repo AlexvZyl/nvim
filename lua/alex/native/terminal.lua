@@ -6,7 +6,7 @@ vim.api.nvim_create_autocmd("TermOpen", {
 
 vim.api.nvim_create_autocmd({ "TermOpen", "WinEnter" }, {
     pattern = "term://*",
-    command = "startinsert"
+    command = "startinsert",
 })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")

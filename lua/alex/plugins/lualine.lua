@@ -233,18 +233,33 @@ require("lualine").setup({
 
 -- Ensure correct backgrond for lualine.
 local id
-id = vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+id = vim.api.nvim_create_autocmd({ "BufWinEnter", "TermEnter", "TermOpen" }, {
     callback = function(args)
         vim.defer_fn(function()
+            if vim.bo[args.buf].buftype == "terminal" then
+                require("lualine").setup({})
+                if id then
+                    pcall(vim.api.nvim_del_autocmd, id)
+                    id = nil
+                end
+                return
+            end
+
             local excludes = {
                 "dashboard",
                 "lazy",
+                "noice",
+                "nofile",
+                "lazy_backdrop",
                 "",
             }
 
             if not vim.tbl_contains(excludes, vim.bo[args.buf].filetype) then
                 require("lualine").setup({})
-                vim.api.nvim_del_autocmd(id)
+                if id then
+                    pcall(vim.api.nvim_del_autocmd, id)
+                    id = nil
+                end
             end
         end, 50)
     end,

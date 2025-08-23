@@ -21,6 +21,11 @@ function M.signs_right_align()
     vim.opt.statuscolumn = " %s%=%{v:relnum?v:relnum:v:lnum}%#WinSeparator#  "
 end
 
+function M.terminal()
+    vim.opt_local.numberwidth = 1
+    vim.opt_local.statuscolumn = " "
+end
+
 M.signs_right_align()
 
 return M

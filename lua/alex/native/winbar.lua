@@ -2,11 +2,12 @@ local U = require("alex.utils.neovim")
 
 vim.opt.winbar = nil
 
-local winbar_filetype_exclude = {
+-- filetype/buftype
+local winbar_type_exclude = {
     "dashboard",
 }
 
--- filetype: bar
+-- [filetype/buftype]: bar
 local custom_bars = {
     qf = {
         icon = "",
@@ -39,10 +40,16 @@ local custom_bars = {
             return "man/" .. string.gsub(filename, "man//", "")
         end,
     },
+    terminal = {
+        icon = "",
+        name = function()
+            return "Terminal"
+        end,
+    },
 }
 
 local function excludes()
-    if vim.tbl_contains(winbar_filetype_exclude, vim.bo.filetype) then
+    if vim.tbl_contains(winbar_type_exclude, vim.bo.filetype) then
         return true
     end
     return false
@@ -60,11 +67,13 @@ function M.get_winbar()
     end
 
     local filetype = U.current_buffer_filetype()
-    if custom_bars[filetype] ~= nil then
+    local buftype = vim.bo.buftype
+    local custom_bar = custom_bars[filetype] or custom_bars[buftype]
+    if custom_bar ~= nil then
         return prefix
-            .. custom_bars[filetype].icon
+            .. custom_bar.icon
             .. " "
-            .. custom_bars[filetype].name()
+            .. custom_bar.name()
             .. mod_icon
     end
 
@@ -94,7 +103,7 @@ function M.set_winbar()
 end
 
 vim.api.nvim_create_autocmd(
-    { "BufModifiedSet", "BufWinEnter", "BufFilePost", "BufWritePost", "WinEnter" },
+    { "BufModifiedSet", "BufWinEnter", "BufFilePost", "BufWritePost", "WinEnter", "TermOpen" },
     {
         callback = function()
             require("alex.native.winbar").set_winbar()

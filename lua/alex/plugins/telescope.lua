@@ -20,8 +20,7 @@ local MAPPINGS = {
 local SINGLE_SELECT_ICON = "   "
 local SINGLE_SELECT_ENTRY_PREFIX = "   "
 
-local defaults = {
-    layout_strategy = "center",
+local baseline = {
     previewer = false,
     preview_title = false,
     dynamic_preview_title = false,
@@ -30,8 +29,6 @@ local defaults = {
 
     layout_config = {
         prompt_position = "top",
-        height = 27,
-        width = 115,
     },
 
     border = true,
@@ -55,28 +52,44 @@ local defaults = {
     preview = { treesitter = true },
 }
 
-local default_single_select = {
+local small = {
+    layout_strategy = "center",
+    layout_config = {
+        height = 28,
+        width = 114,
+    }
+}
+small = U.merge(baseline, small)
+
+local normal = {
+    layout_strategy = "horizontal",
+    previewer = true,
+    borderchars = {
+        prompt = U.border_chars_telescope_default,
+        results = U.border_chars_telescope_default,
+        preview = U.border_chars_telescope_default,
+    },
+    layout_config = {
+        height = 0.925,
+        width = 190,
+        preview_width = 100,
+    }
+}
+normal = U.merge(baseline, normal)
+
+
+local single_select = {
     entry_prefix = SINGLE_SELECT_ENTRY_PREFIX,
     selection_caret = SINGLE_SELECT_ICON,
     previewer = false,
     multi_icon = "",
 }
-
-local default_with_previewer = {
-    previewer = true,
-    preview_title = false,
-    layout_config = {
-        prompt_position = "top",
-        anchor = "N",
-    },
-}
+single_select = U.merge(small, single_select)
 
 ----------------------------------------------------------------------------------------------------
 --- Custom
 
 local picker_buffer = {
-    previewer = false,
-    sort_mru = true,
     ignore_current_buffer = true,
     file_ignore_patters = { "\\." },
 
@@ -88,45 +101,46 @@ local picker_buffer = {
         end,
     },
 }
+picker_buffer = U.merge(small, picker_buffer)
 
 local help_tags = {
     prompt_title = "Neovim help",
-    previewer = false,
     mappings = { i = { ["<CR>"] = actions.select_vertical } },
 }
+help_tags = U.merge(normal, help_tags)
 
 local man_pages = {
     prompt_title = "Manpages",
-    previewer = false,
     mappings = { i = { ["<CR>"] = actions.select_vertical } },
 }
+man_pages = U.merge(normal, man_pages)
 
 local current_buffer_fuzzy = {
     prompt_title = "Buffer",
     previewer = false,
 }
+current_buffer_fuzzy = U.merge(normal, current_buffer_fuzzy)
 
 ----------------------------------------------------------------------------------------------------
 --- Configure
 
 TS.setup({
-    defaults = defaults,
+    defaults = small,
     pickers = {
-        oldfiles = defaults,
-        find_files = defaults,
-        registers = defaults,
+        oldfiles = small,
+        find_files = small,
+        registers = small,
 
-        spell_suggest = default_single_select,
+        spell_suggest = single_select,
 
-        jumplist = default_with_previewer,
-        live_grep = default_with_previewer,
-        highlights = default_with_previewer,
-        diagnostics = default_with_previewer,
-        lsp_references = default_with_previewer,
-        todo_telescope = default_with_previewer,
-        lsp_definitions = default_with_previewer,
-        lsp_implementations = default_with_previewer,
-        lsp_document_symbols = default_with_previewer,
+        jumplist = normal,
+        live_grep = normal,
+        highlights = normal,
+        diagnostics = normal,
+        lsp_references = normal,
+        lsp_definitions = normal,
+        lsp_implementations = normal,
+        lsp_document_symbols = normal,
 
         help_tags = help_tags,
         man_pages = man_pages,

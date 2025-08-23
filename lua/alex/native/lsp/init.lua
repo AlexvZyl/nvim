@@ -6,7 +6,7 @@ local M = {}
 local U = require("alex.utils")
 
 -- Enable logging.
-vim.lsp.set_log_level("error")
+vim.lsp.log.set_level("error")
 
 -- Place this just below treesitter.
 -- I like treesitter highlights more than the LSP ones.

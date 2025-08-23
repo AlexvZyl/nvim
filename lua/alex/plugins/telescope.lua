@@ -57,7 +57,7 @@ local small = {
     layout_config = {
         height = 28,
         width = 114,
-    }
+    },
 }
 small = U.merge(baseline, small)
 
@@ -73,10 +73,9 @@ local normal = {
         height = 0.925,
         width = 190,
         preview_width = 100,
-    }
+    },
 }
 normal = U.merge(baseline, normal)
-
 
 local single_select = {
     entry_prefix = SINGLE_SELECT_ENTRY_PREFIX,

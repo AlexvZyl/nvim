@@ -52,6 +52,15 @@ local baseline = {
     preview = { treesitter = true },
 }
 
+local large = {
+    layout_strategy = "center",
+    layout_config = {
+        height = 39,
+        width = 160,
+    },
+}
+large = U.merge(baseline, large)
+
 local small = {
     layout_strategy = "center",
     layout_config = {
@@ -61,7 +70,15 @@ local small = {
 }
 small = U.merge(baseline, small)
 
-local normal = {
+local single_select_small = {
+    entry_prefix = SINGLE_SELECT_ENTRY_PREFIX,
+    selection_caret = SINGLE_SELECT_ICON,
+    previewer = false,
+    multi_icon = "",
+}
+single_select_small = U.merge(small, single_select_small)
+
+local preview_large = {
     layout_strategy = "horizontal",
     previewer = true,
     borderchars = {
@@ -75,15 +92,7 @@ local normal = {
         preview_width = 100,
     },
 }
-normal = U.merge(baseline, normal)
-
-local single_select = {
-    entry_prefix = SINGLE_SELECT_ENTRY_PREFIX,
-    selection_caret = SINGLE_SELECT_ICON,
-    previewer = false,
-    multi_icon = "",
-}
-single_select = U.merge(small, single_select)
+preview_large = U.merge(baseline, preview_large)
 
 ----------------------------------------------------------------------------------------------------
 --- Custom
@@ -106,40 +115,40 @@ local help_tags = {
     prompt_title = "Neovim help",
     mappings = { i = { ["<CR>"] = actions.select_vertical } },
 }
-help_tags = U.merge(normal, help_tags)
+help_tags = U.merge(preview_large, help_tags)
 
 local man_pages = {
     prompt_title = "Manpages",
     mappings = { i = { ["<CR>"] = actions.select_vertical } },
 }
-man_pages = U.merge(normal, man_pages)
+man_pages = U.merge(preview_large, man_pages)
 
 local current_buffer_fuzzy = {
     prompt_title = "Buffer",
     previewer = false,
 }
-current_buffer_fuzzy = U.merge(normal, current_buffer_fuzzy)
+current_buffer_fuzzy = U.merge(preview_large, current_buffer_fuzzy)
 
 ----------------------------------------------------------------------------------------------------
 --- Configure
 
 TS.setup({
-    defaults = small,
+    defaults = large,
     pickers = {
         oldfiles = small,
         find_files = small,
         registers = small,
 
-        spell_suggest = single_select,
+        spell_suggest = single_select_small,
 
-        jumplist = normal,
-        live_grep = normal,
-        highlights = normal,
-        diagnostics = normal,
-        lsp_references = normal,
-        lsp_definitions = normal,
-        lsp_implementations = normal,
-        lsp_document_symbols = normal,
+        jumplist = preview_large,
+        live_grep = preview_large,
+        highlights = preview_large,
+        diagnostics = preview_large,
+        lsp_references = preview_large,
+        lsp_definitions = preview_large,
+        lsp_implementations = preview_large,
+        lsp_document_symbols = preview_large,
 
         help_tags = help_tags,
         man_pages = man_pages,

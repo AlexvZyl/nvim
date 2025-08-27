@@ -12,7 +12,7 @@ vim.api.nvim_create_autocmd({ "TermOpen", "WinEnter" }, {
 -- Close the buffer when the terminal exits.
 vim.api.nvim_create_autocmd({ "TermClose" }, {
     pattern = "term://*",
-    command = "bd"
+    command = "bd",
 })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")

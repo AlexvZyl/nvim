@@ -13,16 +13,16 @@ vim.opt.hlsearch = true
 
 vim.opt.clipboard:append("unnamedplus")
 vim.g.clipboard = {
-  name = "xclip",
-  copy = {
-    ["+"] = "xclip -selection clipboard",
-    ["*"] = "xclip -selection primary",
-  },
-  paste = {
-    ["+"] = "xclip -selection clipboard -o",
-    ["*"] = "xclip -selection primary -o",
-  },
-  cache_enabled = 0,
+    name = "xclip",
+    copy = {
+        ["+"] = "xclip -selection clipboard",
+        ["*"] = "xclip -selection primary",
+    },
+    paste = {
+        ["+"] = "xclip -selection clipboard -o",
+        ["*"] = "xclip -selection primary -o",
+    },
+    cache_enabled = 0,
 }
 
 vim.opt.ignorecase = true

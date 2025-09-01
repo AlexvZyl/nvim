@@ -60,10 +60,10 @@ local M = {}
 function M.get_winbar()
     local prefix = "  "
     local mod_icon = ""
-    if U.current_buffer_modified() then
-        mod_icon = " ●"
-    elseif not U.current_buffer_modifiable() then
+    if not U.current_buffer_modifiable() then
         mod_icon = " "
+    elseif U.current_buffer_modified() then
+        mod_icon = " ●"
     end
 
     local filetype = U.current_buffer_filetype()

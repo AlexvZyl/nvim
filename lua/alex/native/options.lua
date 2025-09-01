@@ -7,10 +7,23 @@ vim.g.mapleader = " "
 vim.opt.winborder = "rounded"
 
 vim.opt.showmode = false
-vim.opt.clipboard:append("unnamedplus")
 vim.opt.swapfile = false
 vim.opt.mouse = ""
 vim.opt.hlsearch = true
+
+vim.opt.clipboard:append("unnamedplus")
+vim.g.clipboard = {
+  name = "xclip",
+  copy = {
+    ["+"] = "xclip -selection clipboard",
+    ["*"] = "xclip -selection primary",
+  },
+  paste = {
+    ["+"] = "xclip -selection clipboard -o",
+    ["*"] = "xclip -selection primary -o",
+  },
+  cache_enabled = 0,
+}
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
@@ -71,8 +84,5 @@ vim.opt.pumheight = 10
 
 -- Theme
 vim.opt.background = "dark"
-
--- Default new window to vertical split (this messes up debugger windows).
--- vim.api.nvim_command('autocmd WinNew * wincmd H')
 
 vim.cmd("filetype plugin indent on")

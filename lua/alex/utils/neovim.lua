@@ -38,6 +38,9 @@ function M.current_buffer_modifiable()
     if buftype == "nofile" or buftype == "prompt" or buftype == "help" then
         return false
     end
+    if vim.bo.readonly then
+        return false
+    end
     return true
 end
 

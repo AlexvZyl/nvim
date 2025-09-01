@@ -1,4 +1,5 @@
 local U = require("alex.utils")
 
--- TODO: Come back to this
--- vim.opt.cursorlineopt = "both"
+-- TODO: Sort out highlights here.
+
+vim.opt_local.cursorlineopt = "line"

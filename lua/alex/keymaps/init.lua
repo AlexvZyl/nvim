@@ -21,6 +21,7 @@ function M.init()
 
     -- Lazyload dependents:
     M.telescope()
+    M.no_neck_pain()
 end
 
 function M.lsp()
@@ -56,6 +57,10 @@ end
 
 function M.blame()
     keymap(n, "<leader>b", "<Cmd>GitBlameToggle<CR>", default_settings)
+end
+
+function M.no_neck_pain()
+    keymap(n, "<leader>n", "<Cmd>NoNeckPain<CR>", default_settings)
 end
 
 function M.noice()
@@ -111,6 +116,10 @@ function M.native()
     -- Quickfix.
     keymap(n, "}", "<Cmd>cnext<CR>zz_", default_settings)
     keymap(n, "{", "<Cmd>cprevious<CR>zz_", default_settings)
+
+    -- HACK: Don't copy selected region back into registers.
+    vim.keymap.set(v, "p", '"_dP', { noremap = true, silent = true })
+    vim.keymap.set(v, "P", '"_dP', { noremap = true, silent = true })
 end
 
 function M.oil()

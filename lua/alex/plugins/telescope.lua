@@ -20,6 +20,9 @@ local MAPPINGS = {
 local SINGLE_SELECT_ICON = "   "
 local SINGLE_SELECT_ENTRY_PREFIX = "   "
 
+----------------------------------------------------------------------------------------------------
+--- Templates.
+
 local baseline = {
     previewer = false,
     preview_title = false,
@@ -52,23 +55,23 @@ local baseline = {
     preview = { treesitter = true },
 }
 
-local large = {
+local large_no_preview = {
     layout_strategy = "center",
     layout_config = {
         height = 39,
         width = 160,
     },
 }
-large = U.merge(baseline, large)
+large_no_preview = U.merge(baseline, large_no_preview)
 
-local small = {
+local small_no_preview = {
     layout_strategy = "center",
     layout_config = {
-        height = 28,
-        width = 114,
+        height = 30,
+        width = 120,
     },
 }
-small = U.merge(baseline, small)
+small_no_preview = U.merge(baseline, small_no_preview)
 
 local single_select_small = {
     entry_prefix = SINGLE_SELECT_ENTRY_PREFIX,
@@ -76,9 +79,9 @@ local single_select_small = {
     previewer = false,
     multi_icon = "",
 }
-single_select_small = U.merge(small, single_select_small)
+single_select_small = U.merge(small_no_preview, single_select_small)
 
-local preview_large = {
+local preview_horizontal = {
     layout_strategy = "horizontal",
     previewer = true,
     borderchars = {
@@ -92,68 +95,78 @@ local preview_large = {
         preview_width = 100,
     },
 }
-preview_large = U.merge(baseline, preview_large)
+preview_horizontal = U.merge(baseline, preview_horizontal)
 
-----------------------------------------------------------------------------------------------------
---- Custom
-
-local picker_buffer = {
-    ignore_current_buffer = true,
-    file_ignore_patters = { "\\." },
-
-    on_complete = {
-        function(picker)
-            vim.schedule(function()
-                picker:set_selection(0)
-            end)
-        end,
+local preview_vertical = {
+    layout_strategy = "vertical",
+    previewer = true,
+    borderchars = {
+        prompt = U.border_chars_telescope_default,
+        results = U.border_chars_telescope_default,
+        preview = U.border_chars_telescope_default,
+    },
+    layout_config = {
+        height = 500, -- HACK: 1.0 does not seem to work
+        width = 150,
+        preview_height = 25,
+        mirror = true,
     },
 }
-picker_buffer = U.merge(small, picker_buffer)
-
-local help_tags = {
-    prompt_title = "Neovim help",
-    mappings = { i = { ["<CR>"] = actions.select_vertical } },
-}
-help_tags = U.merge(preview_large, help_tags)
-
-local man_pages = {
-    prompt_title = "Manpages",
-    mappings = { i = { ["<CR>"] = actions.select_vertical } },
-}
-man_pages = U.merge(preview_large, man_pages)
-
-local current_buffer_fuzzy = {
-    prompt_title = "Buffer",
-    previewer = false,
-}
-current_buffer_fuzzy = U.merge(preview_large, current_buffer_fuzzy)
+preview_vertical = U.merge(baseline, preview_vertical)
 
 ----------------------------------------------------------------------------------------------------
 --- Configure
 
 TS.setup({
-    defaults = large,
+    defaults = large_no_preview,
     pickers = {
-        oldfiles = small,
-        find_files = small,
-        registers = small,
+        oldfiles = small_no_preview,
+        find_files = small_no_preview,
+        registers = small_no_preview,
 
         spell_suggest = single_select_small,
 
-        jumplist = preview_large,
-        live_grep = preview_large,
-        highlights = preview_large,
-        diagnostics = preview_large,
-        lsp_references = preview_large,
-        lsp_definitions = preview_large,
-        lsp_implementations = preview_large,
-        lsp_document_symbols = preview_large,
+        jumplist = preview_horizontal,
+        live_grep = preview_horizontal,
+        highlights = preview_horizontal,
 
-        help_tags = help_tags,
-        man_pages = man_pages,
-        buffers = picker_buffer,
-        current_buffer_fuzzy_find = current_buffer_fuzzy,
+        lsp_references = preview_vertical,
+        lsp_definitions = preview_vertical,
+        lsp_implementations = preview_vertical,
+        diagnostics = preview_vertical,
+        lsp_document_symbols = U.merge(preview_vertical, {
+            symbol_width = 0.75,
+        }),
+
+        -- Custom.
+
+        help_tags = U.merge(small_no_preview, {
+            prompt_title = "Neovim help",
+            mappings = { i = { ["<CR>"] = actions.select_vertical } },
+        }),
+
+        buffers = U.merge(small_no_preview, {
+            ignore_current_buffer = true,
+            file_ignore_patters = { "\\." },
+
+            on_complete = {
+                function(picker)
+                    vim.schedule(function()
+                        picker:set_selection(0)
+                    end)
+                end,
+            },
+        }),
+
+        man_pages = U.merge(preview_horizontal, {
+            prompt_title = "Manpages",
+            mappings = { i = { ["<CR>"] = actions.select_vertical } },
+        }),
+
+        current_buffer_fuzzy_find = U.merge(preview_horizontal, {
+            prompt_title = "Buffer",
+            previewer = false,
+        }),
     },
 })
 

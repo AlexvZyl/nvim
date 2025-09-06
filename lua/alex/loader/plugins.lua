@@ -10,6 +10,13 @@ return {
         priority = 999,
     },
     {
+        "shortcuts/no-neck-pain.nvim",
+        cmd = { "NoNeckPain" },
+        config = function()
+            require("alex.plugins.no-neck-pain")
+        end
+    },
+    {
         "karb94/neoscroll.nvim",
         event = { "WinScrolled" },
         config = function()

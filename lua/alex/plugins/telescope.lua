@@ -107,7 +107,7 @@ local preview_vertical = {
     },
     layout_config = {
         height = 500, -- HACK: 1.0 does not seem to work
-        width = 150,
+        width = 149,
         preview_height = 25,
         mirror = true,
     },

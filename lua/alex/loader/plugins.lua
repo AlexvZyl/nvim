@@ -14,7 +14,7 @@ return {
         cmd = { "NoNeckPain" },
         config = function()
             require("alex.plugins.no-neck-pain")
-        end
+        end,
     },
     {
         "karb94/neoscroll.nvim",

@@ -5,7 +5,7 @@ vim.opt.winbar = nil
 -- filetype/buftype
 local winbar_type_exclude = {
     "dashboard",
-    "no-neck-pain"
+    "no-neck-pain",
 }
 
 -- [filetype/buftype]: bar

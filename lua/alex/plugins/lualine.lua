@@ -26,16 +26,21 @@ local icon_hl = { fg = C.gray2 }
 local text_hl = { fg = C.gray2 }
 
 local function get_virtual_text_color()
-    local enabled = require("alex.native.lsp").virtual_diagnostics
-    if enabled then
+    if require("alex.native.lsp").virtual_diagnostics then
         return { fg = green }
     end
     return icon_hl
 end
 
 local function get_format_enabled_color()
-    local enabled = require("alex.native.lsp").format_enabled
-    if enabled then
+    if require("alex.native.lsp").format_enabled then
+        return { fg = green }
+    end
+    return icon_hl
+end
+
+local function get_zen_mode_color()
+    if require("alex.plugins.no-neck-pain").enabled then
         return { fg = green }
     end
     return icon_hl
@@ -105,6 +110,13 @@ local default_x = {
         end,
         color = get_virtual_text_color,
         separator = { " ", "" },
+    },
+    {
+        function()
+            return " "
+        end,
+        color = get_zen_mode_color,
+        padding = 0,
     },
     {
         function()

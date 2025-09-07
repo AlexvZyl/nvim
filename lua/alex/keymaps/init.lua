@@ -60,7 +60,7 @@ function M.blame()
 end
 
 function M.no_neck_pain()
-    keymap(n, "<leader>n", "<Cmd>NoNeckPain<CR>", default_settings)
+    keymap(n, "<leader>n", require("alex.plugins.no-neck-pain").toggle, default_settings)
 end
 
 function M.noice()

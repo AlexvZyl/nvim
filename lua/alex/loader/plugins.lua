@@ -13,7 +13,7 @@ return {
         "shortcuts/no-neck-pain.nvim",
         cmd = { "NoNeckPain" },
         config = function()
-            require("alex.plugins.no-neck-pain")
+            require("alex.plugins.no-neck-pain").setup()
         end,
     },
     {

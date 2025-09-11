@@ -4,7 +4,7 @@ M.enabled = false
 
 function M.setup()
     require("no-neck-pain").setup({
-        width = 140,
+        width = 150,
     })
 end
 

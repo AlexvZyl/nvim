@@ -19,6 +19,11 @@ local MAPPINGS = {
 
 local SINGLE_SELECT_ICON = "   "
 local SINGLE_SELECT_ENTRY_PREFIX = "   "
+local LARGE_WIDTH = 141
+local SMALL_WIDTH = 120
+local LARGE_HEIGHT = 1.0
+local FULL_HEIGHT = 1000 -- HACK: 1.0 does not seem to work
+local WITH_PREVIEW_WITH = 190
 
 ----------------------------------------------------------------------------------------------------
 --- Templates.
@@ -59,7 +64,7 @@ local large_no_preview = {
     layout_strategy = "center",
     layout_config = {
         height = 39,
-        width = 160,
+        width = LARGE_WIDTH,
     },
 }
 large_no_preview = U.merge(baseline, large_no_preview)
@@ -68,7 +73,7 @@ local small_no_preview = {
     layout_strategy = "center",
     layout_config = {
         height = 30,
-        width = 120,
+        width = SMALL_WIDTH,
     },
 }
 small_no_preview = U.merge(baseline, small_no_preview)
@@ -90,8 +95,8 @@ local preview_horizontal = {
         preview = U.border_chars_telescope_default,
     },
     layout_config = {
-        height = 0.925,
-        width = 190,
+        height = FULL_HEIGHT,
+        width = WITH_PREVIEW_WITH,
         preview_width = 100,
     },
 }
@@ -106,8 +111,8 @@ local preview_vertical = {
         preview = U.border_chars_telescope_default,
     },
     layout_config = {
-        height = 500, -- HACK: 1.0 does not seem to work
-        width = 149,
+        height = FULL_HEIGHT,
+        width = LARGE_WIDTH,
         preview_height = 25,
         mirror = true,
     },

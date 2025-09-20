@@ -168,9 +168,8 @@ TS.setup({
             mappings = { i = { ["<CR>"] = actions.select_vertical } },
         }),
 
-        current_buffer_fuzzy_find = U.merge(preview_horizontal, {
+        current_buffer_fuzzy_find = U.merge(large_no_preview, {
             prompt_title = "Buffer",
-            previewer = false,
         }),
     },
 })

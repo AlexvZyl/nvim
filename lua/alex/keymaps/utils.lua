@@ -23,7 +23,7 @@ function M.toggle_diffview()
 end
 
 function M.delete_buffer()
-    vim.cmd([[:bp | bdelete #]])
+    vim.cmd([[:bdelete]])
 end
 
 function M.toggle_oil()

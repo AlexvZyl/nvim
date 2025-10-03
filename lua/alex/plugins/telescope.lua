@@ -21,9 +21,7 @@ local SINGLE_SELECT_ICON = "   "
 local SINGLE_SELECT_ENTRY_PREFIX = "   "
 local LARGE_WIDTH = 141
 local SMALL_WIDTH = 120
-local LARGE_HEIGHT = 1.0
 local FULL_HEIGHT = 1000 -- HACK: 1.0 does not seem to work
-local WITH_PREVIEW_WITH = 190
 
 ----------------------------------------------------------------------------------------------------
 --- Templates.
@@ -86,22 +84,6 @@ local single_select_small = {
 }
 single_select_small = U.merge(small_no_preview, single_select_small)
 
-local preview_horizontal = {
-    layout_strategy = "horizontal",
-    previewer = true,
-    borderchars = {
-        prompt = U.border_chars_telescope_default,
-        results = U.border_chars_telescope_default,
-        preview = U.border_chars_telescope_default,
-    },
-    layout_config = {
-        height = FULL_HEIGHT,
-        width = WITH_PREVIEW_WITH,
-        preview_width = 100,
-    },
-}
-preview_horizontal = U.merge(baseline, preview_horizontal)
-
 local preview_vertical = {
     layout_strategy = "vertical",
     previewer = true,
@@ -131,10 +113,9 @@ TS.setup({
 
         spell_suggest = single_select_small,
 
-        jumplist = preview_horizontal,
-        live_grep = preview_horizontal,
-        highlights = preview_horizontal,
-
+        jumplist = preview_vertical,
+        highlights = preview_vertical,
+        live_grep = preview_vertical,
         lsp_references = preview_vertical,
         lsp_definitions = preview_vertical,
         lsp_implementations = preview_vertical,
@@ -163,7 +144,7 @@ TS.setup({
             },
         }),
 
-        man_pages = U.merge(preview_horizontal, {
+        man_pages = U.merge(preview_vertical, {
             prompt_title = "Manpages",
             mappings = { i = { ["<CR>"] = actions.select_vertical } },
         }),

@@ -39,3 +39,11 @@ vim.lsp.config("docker_compose_language_service", {
         "compose.ya?ml",
     }),
 })
+
+vim.lsp.config("bashls", {
+    settings = {
+        bashIde = {
+            shellcheckArguments = { "-x" },
+        },
+    },
+})

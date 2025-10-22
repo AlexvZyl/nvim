@@ -6,6 +6,9 @@ local L = require("lint")
 -- local lua_check = L.linters.luacheck
 -- table.insert(lua_check.args, 1, "--enable=information,warning")
 
+local shellcheck = L.linters.shellcheck
+table.insert(shellcheck.args, "-x")
+
 L.linters_by_ft = {
     -- lua = { "luacheck" },
     python = { "flake8" },

@@ -56,11 +56,11 @@ end
 
 local cmdline = {
     format = {
-        cmdline = { title = "", icon = " " },
+        cmdline = { title = "", icon = "" },
         lua = { title = "", icon = "󰢱 " },
-        help = { title = "", icon = "󰋖 " },
-        input = { title = "", icon = " " },
-        filter = { title = "", icon = " " },
+        help = { title = "", icon = "󰋖" },
+        input = { title = "", icon = "" },
+        filter = { title = "", icon = "" },
         search_up = { icon = "   " },
         search_down = { icon = "   " },
     },
@@ -68,8 +68,7 @@ local cmdline = {
 
 local views = {
     cmdline_popup = {
-        -- border = { style = { "", "", "", "", "", "", "", "" }, },
-        border = { style = "none" },
+        border = { style = "none", },
         position = { row = "100%", col = "50%" },
         size = { width = 70 },
     },

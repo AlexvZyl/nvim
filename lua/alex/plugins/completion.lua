@@ -26,7 +26,7 @@ local cmdline_window = {
         winhighlight = "Normal:WhichKeyNormal,Search:None",
         scrollbar = false,
         border = "none",
-        col_offset = -3,
+        col_offset = -2,
         side_padding = 0,
     },
 }

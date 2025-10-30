@@ -68,7 +68,7 @@ local cmdline = {
 
 local views = {
     cmdline_popup = {
-        border = { style = "none", },
+        border = { style = "none" },
         position = { row = "100%", col = "50%" },
         size = { width = 70 },
     },

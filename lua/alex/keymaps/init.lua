@@ -11,6 +11,7 @@ local n_v = { n, v }
 local keymap = vim.keymap.set
 local default_settings = { noremap = true, silent = true }
 local allow_remap = { noremap = false, silent = true }
+local default_expr = { noremap = true,  expr = true }
 
 local M = {}
 
@@ -118,8 +119,18 @@ function M.native()
     keymap(n, "{", "<Cmd>cprevious<CR>zz_", default_settings)
 
     -- HACK: Don't copy selected region back into registers.
-    vim.keymap.set(v, "p", '"_dP', { noremap = true, silent = true })
-    vim.keymap.set(v, "P", '"_dP', { noremap = true, silent = true })
+    vim.keymap.set(v, "p", '"_dP', default_settings)
+    vim.keymap.set(v, "P", '"_dP', default_settings)
+
+    -- Prevent backspace from exiting the cmdline when it's empty
+    vim.keymap.set('c', '<BS>', function()
+        local cmd = vim.fn.getcmdline()
+        if #cmd == 0 then
+            return ''
+        else
+            return '<BS>'
+        end
+    end, default_expr)
 end
 
 function M.oil()

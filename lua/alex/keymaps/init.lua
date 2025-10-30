@@ -11,7 +11,7 @@ local n_v = { n, v }
 local keymap = vim.keymap.set
 local default_settings = { noremap = true, silent = true }
 local allow_remap = { noremap = false, silent = true }
-local default_expr = { noremap = true,  expr = true }
+local default_expr = { noremap = true, expr = true }
 
 local M = {}
 
@@ -123,12 +123,12 @@ function M.native()
     vim.keymap.set(v, "P", '"_dP', default_settings)
 
     -- Prevent backspace from exiting the cmdline when it's empty
-    vim.keymap.set('c', '<BS>', function()
+    vim.keymap.set("c", "<BS>", function()
         local cmd = vim.fn.getcmdline()
         if #cmd == 0 then
-            return ''
+            return ""
         else
-            return '<BS>'
+            return "<BS>"
         end
     end, default_expr)
 end

@@ -1,4 +1,4 @@
-local U = require("alex.utils.chars")
+local U = require("alex.utils")
 
 -- TODO: Will this slow things down?
 local filter_notify = {
@@ -59,7 +59,7 @@ local cmdline = {
         cmdline = { title = "", icon = "" },
         lua = { title = "", icon = "󰢱 " },
         help = { title = "", icon = "󰋖" },
-        input = { title = "", icon = "" },
+        input = { title = "", icon = "󰑕 " },
         filter = { title = "", icon = "" },
         search_up = { icon = "   " },
         search_down = { icon = "   " },
@@ -67,14 +67,17 @@ local cmdline = {
 }
 
 local views = {
-    cmdline_popup = {
-        border = { style = "none" },
-        position = { row = "100%", col = "50%" },
-        size = { width = 70 },
-    },
-    hover = { border = { style = "rounded" } },
-    float = { border = { style = "rounded" } },
-    popup = { border = { style = "rounded" } },
+	cmdline_popup = {
+		border = { style = "none" },
+		position = { row = "100%", col = "50%" },
+		size = { width = 70 },
+	},
+	cmdline_input = {
+		border = { style =  U.border_chars_none },
+	},
+	hover = { border = { style = "rounded" } },
+	float = { border = { style = "rounded" } },
+	popup = { border = { style = "rounded" } },
 }
 
 local lsp = {
@@ -89,16 +92,15 @@ local lsp = {
 
 local notify = {
     enabled = true,
-    fps = 75,
+    fps = 100,
     level = "ERROR",
 }
 
 local presets = {
-    bottom_search = true, -- use a classic bottom cmdline for search
-    command_palette = true, -- position the cmdline and popupmenu together
+    bottom_search = true,         -- use a classic bottom cmdline for search
+    command_palette = true,       -- position the cmdline and popupmenu together
     long_message_to_split = true, -- long messages will be sent to a split
-    inc_rename = false, -- enables an input dialog for inc-rename.nvim
-    lsp_doc_border = true, -- add a border to hover docs and signature help
+    lsp_doc_border = true,        -- add a border to hover docs and signature help
 }
 
 require("noice").setup({

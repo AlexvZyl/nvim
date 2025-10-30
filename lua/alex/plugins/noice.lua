@@ -67,17 +67,17 @@ local cmdline = {
 }
 
 local views = {
-	cmdline_popup = {
-		border = { style = "none" },
-		position = { row = "100%", col = "50%" },
-		size = { width = 70 },
-	},
-	cmdline_input = {
-		border = { style =  U.border_chars_none },
-	},
-	hover = { border = { style = "rounded" } },
-	float = { border = { style = "rounded" } },
-	popup = { border = { style = "rounded" } },
+    cmdline_popup = {
+        border = { style = "none" },
+        position = { row = "100%", col = "50%" },
+        size = { width = 70 },
+    },
+    cmdline_input = {
+        border = { style = U.border_chars_none },
+    },
+    hover = { border = { style = "rounded" } },
+    float = { border = { style = "rounded" } },
+    popup = { border = { style = "rounded" } },
 }
 
 local lsp = {
@@ -97,10 +97,10 @@ local notify = {
 }
 
 local presets = {
-    bottom_search = true,         -- use a classic bottom cmdline for search
-    command_palette = true,       -- position the cmdline and popupmenu together
+    bottom_search = true, -- use a classic bottom cmdline for search
+    command_palette = true, -- position the cmdline and popupmenu together
     long_message_to_split = true, -- long messages will be sent to a split
-    lsp_doc_border = true,        -- add a border to hover docs and signature help
+    lsp_doc_border = true, -- add a border to hover docs and signature help
 }
 
 require("noice").setup({

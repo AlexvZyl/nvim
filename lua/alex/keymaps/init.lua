@@ -67,17 +67,19 @@ end
 function M.noice()
     local duration = require("alex.plugins.neoscroll-nvim").scroll_duration
 
-    vim.keymap.set({ "n", "i", "s" }, "<C-d>", function()
+    keymap({ "n", "i", "s" }, "<C-d>", function()
         if not require("noice.lsp").scroll(4) then
             require("neoscroll").ctrl_d({ duration = duration })
         end
     end, { silent = true })
 
-    vim.keymap.set({ "n", "i", "s" }, "<C-u>", function()
+    keymap({ "n", "i", "s" }, "<C-u>", function()
         if not require("noice.lsp").scroll(-4) then
             return require("neoscroll").ctrl_u({ duration = duration })
         end
     end, { silent = true })
+
+    keymap(n, "C-m", "<Cmd>NoiceDismiss<CR>", default_settings)
 end
 
 function M.native()
@@ -122,14 +124,21 @@ function M.native()
     vim.keymap.set(v, "p", '"_dP', default_settings)
     vim.keymap.set(v, "P", '"_dP', default_settings)
 
-    -- Prevent backspace from exiting the cmdline when it's empty
+    -- Custom cmdline backspace behavior.
     vim.keymap.set("c", "<BS>", function()
         local cmd = vim.fn.getcmdline()
+
+        -- Don't close on empty.
         if #cmd == 0 then
             return ""
-        else
-            return "<BS>"
         end
+
+        -- Stay in modes.
+        if cmd:match("^!$") or cmd:match("^lua $") or cmd:match("^h $") then
+            return ""
+        end
+
+        return "<BS>"
     end, default_expr)
 end
 

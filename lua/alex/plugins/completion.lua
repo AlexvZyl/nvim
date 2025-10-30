@@ -20,28 +20,19 @@ CMP.setup({
     -- snippet = snippet,
 })
 
--- Tex.
-local tex = {
-    sources = {
-        { name = "nvim_lsp" },
-        -- { name = "luasnip" },
-        { name = "latex_symbols" },
-    },
-}
-CMP.setup.filetype({ "tex", "latex" }, tex)
-
 -- Cmdline.
 local cmdline_window = {
-    completion = CMP.config.window.bordered({
-        winhighlight = "Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None",
-        scrollbar = true,
-        border = U.get_border_chars("cmdline"),
-        col_offset = -4,
+    completion = {
+        winhighlight = "Normal:WhichKeyNormal,Search:None",
+        scrollbar = false,
+        border = "none",
+        col_offset = -3,
         side_padding = 0,
-    }),
+    },
 }
 local cmdline = {
     window = cmdline_window,
+    completion = { autocomplete = false },
     mapping = CMP.mapping.preset.cmdline(),
     sources = CMP.config.sources({
         { name = "cmdline" },
@@ -51,17 +42,8 @@ local cmdline = {
 CMP.setup.cmdline({ ":", ":!" }, cmdline)
 
 -- Search.
-local search_window = {
-    completion = CMP.config.window.bordered({
-        winhighlight = "Normal:Pmenu,FloatBorder:SpecialCmpBorder,Search:None",
-        scrollbar = true,
-        border = U.get_border_chars("search"),
-        col_offset = -1,
-        side_padding = 0,
-    }),
-}
 local search = {
-    window = search_window,
+    window = cmdline_window,
     mapping = CMP.mapping.preset.cmdline(),
     sources = CMP.config.sources({ { name = "buffer" } }),
 }

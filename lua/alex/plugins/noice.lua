@@ -61,21 +61,17 @@ local cmdline = {
         help = { title = "", icon = "󰋖 " },
         input = { title = "", icon = " " },
         filter = { title = "", icon = " " },
-        search_up = { icon = "    " },
-        search_down = { icon = "    " },
+        search_up = { icon = "   " },
+        search_down = { icon = "   " },
     },
 }
 
 local views = {
     cmdline_popup = {
-        border = {
-            style = U.border_chars_round,
-            padding = { 0, 2 },
-        },
-        position = {
-            row = "49%",
-            col = "50%",
-        },
+        -- border = { style = { "", "", "", "", "", "", "", "" }, },
+        border = { style = "none", },
+        position = { row = "100%", col = "50%" },
+        size = { width = 70 },
     },
     hover = { border = { style = "rounded" } },
     float = { border = { style = "rounded" } },
@@ -99,11 +95,11 @@ local notify = {
 }
 
 local presets = {
-    bottom_search = true, -- use a classic bottom cmdline for search
-    command_palette = true, -- position the cmdline and popupmenu together
+    bottom_search = true,         -- use a classic bottom cmdline for search
+    command_palette = true,       -- position the cmdline and popupmenu together
     long_message_to_split = true, -- long messages will be sent to a split
-    inc_rename = false, -- enables an input dialog for inc-rename.nvim
-    lsp_doc_border = true, -- add a border to hover docs and signature help
+    inc_rename = false,           -- enables an input dialog for inc-rename.nvim
+    lsp_doc_border = true,        -- add a border to hover docs and signature help
 }
 
 require("noice").setup({

@@ -3,7 +3,7 @@
 
 local U = require("alex.utils")
 
-local n, i, v, t = "n", "i", "v", "t"
+local n, i, v, t, c = "n", "i", "v", "t", "c"
 local ex_t = { n, i, v }
 local n_i = { n, i }
 local n_v = { n, v }
@@ -208,6 +208,7 @@ function M.telescope()
 
     -- For LSP.
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)
+    -- TODO: I don't want this to jump if there is only one entry.
     keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
     keymap(n, "gd", "<Cmd>Telescope lsp_definitions<CR>", default_settings)
 end
@@ -226,6 +227,10 @@ function M.completion()
             }),
         }),
     })
+
+    keymap(c, "<C-Space>", function()
+        require("cmp").complete()
+    end, default_settings)
 end
 
 return M

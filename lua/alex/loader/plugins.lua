@@ -146,7 +146,7 @@ return {
     },
     {
         "hrsh7th/nvim-cmp",
-        event = { "LspAttach" },
+        event = { "VeryLazy" },
         config = function()
             require("alex.plugins.completion")
         end,

@@ -79,7 +79,7 @@ function M.noice()
         end
     end, { silent = true })
 
-    keymap(n, "C-m", "<Cmd>NoiceDismiss<CR>", default_settings)
+    keymap(n, "<C-m>", "<Cmd>NoiceDismiss<CR>", default_settings)
 end
 
 function M.native()

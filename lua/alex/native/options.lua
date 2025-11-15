@@ -1,5 +1,4 @@
 local C = require("alex.utils.chars")
-local U = require("alex.utils.neovim")
 
 -- Important to place this before loading plugins.
 vim.g.mapleader = " "
@@ -56,11 +55,6 @@ vim.opt.fillchars = {
     horizup = C.bottom_right_thin,
 }
 
--- Numbers
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.signcolumn = "yes"
-
 -- Cursor
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = "number"
@@ -69,8 +63,5 @@ vim.opt.cursorlineopt = "number"
 vim.opt.winblend = 0
 vim.opt.pumblend = 0
 vim.opt.pumheight = 10
-
--- Theme
-vim.opt.background = "dark"
 
 vim.cmd("filetype plugin indent on")

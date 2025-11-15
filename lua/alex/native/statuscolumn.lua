@@ -1,9 +1,6 @@
 local M = {}
 
--- Statuscolumn was added in 0.9.
-if vim.version.major == 0 and vim.version.minor < 9 then
-    return M
-end
+vim.opt.signcolumn = "yes"
 
 function M.no_sep()
     vim.opt.numberwidth = 4
@@ -26,6 +23,14 @@ function M.terminal()
     vim.opt_local.statuscolumn = " "
 end
 
-M.signs_right_align()
+-- Statuscolumn was added in 0.9.
+if vim.version.major == 0 and vim.version.minor < 9 then
+    -- Fallback for when cannot set custom statuscolumn.
+    vim.opt.relativenumber = true
+    vim.opt.number = true
+    vim.opt.signcolumn = "yes"
+else
+    M.signs_right_align()
+end
 
 return M

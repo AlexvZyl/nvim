@@ -234,8 +234,8 @@ function M.telescope()
 end
 
 function M.leap()
-    vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)')
-    vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)')
+    vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)")
+    vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
 end
 
 function M.completion()

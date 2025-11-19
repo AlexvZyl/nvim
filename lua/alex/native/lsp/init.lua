@@ -40,9 +40,6 @@ function M.toggle_virtual_diagnostics()
     U.merge_highlights_table({
         DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics },
         DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics },
-        DiagnosticUnderlineHint = { undercurl = not M.virtual_diagnostics },
-        DiagnosticUnderlineOk = { undercurl = not M.virtual_diagnostics },
-        DiagnosticUnderlineInfo = { undercurl = not M.virtual_diagnostics },
     })
     require("alex.plugins.lualine").refresh_statusline()
 end
@@ -56,11 +53,11 @@ vim.diagnostic.config({
     severity_sort = true,
 })
 U.merge_highlights_table({
-    DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics },
-    DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics },
-    DiagnosticUnderlineHint = { undercurl = not M.virtual_diagnostics },
-    DiagnosticUnderlineOk = { undercurl = not M.virtual_diagnostics },
-    DiagnosticUnderlineInfo = { undercurl = not M.virtual_diagnostics },
+    DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics, underline = false },
+    DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics, underline = false },
+    DiagnosticUnderlineHint = { undercurl = false, underline = false },
+    DiagnosticUnderlineOk = { undercurl = false, underline = false },
+    DiagnosticUnderlineInfo = { undercurl = false, underline = false },
 })
 
 -- TODO: For some reason this is still required for telescope stuff.

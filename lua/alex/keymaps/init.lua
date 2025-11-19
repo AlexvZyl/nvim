@@ -233,6 +233,11 @@ function M.telescope()
     keymap(n, "gd", "<Cmd>Telescope lsp_definitions<CR>", default_settings)
 end
 
+function M.leap()
+    vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)')
+    vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)')
+end
+
 function M.completion()
     local cmp = require("cmp")
     cmp.setup({

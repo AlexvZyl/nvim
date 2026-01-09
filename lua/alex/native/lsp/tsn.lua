@@ -8,6 +8,15 @@ end
 local SCRIPT_FILE = "docker_image_runner.sh"
 local TIMEOUT_MS = 100
 
+local function is_repo(repo)
+    local git_root = U.get_git_root()
+    if not git_root then
+        return false
+    end
+    local basename = vim.fn.fnamemodify(git_root, ":t")
+    return basename == repo
+end
+
 local function get_lsp_command()
     -- Give everything some time to startup before we try to push
     -- the notification.
@@ -56,10 +65,9 @@ local function get_lsp_command()
     local map_dest = "/app/dev"
 
     -- Custom config (not all repos have the same setup)
-    if string.find(curr_dir, "tsnsystems_utils") then
-    elseif string.find(curr_dir, "analysis/box4") then
-        dockerfile = vim.fn.finddir("Dockerfiles", ".;") .. "/box4dev"
-        map_dest = "/app/dev/analysis"
+    if is_repo("box4") then
+        dockerfile = git_root .. "/Dockerfiles/box4dev"
+        map_dest = "/app/dev/box4"
     end
 
     local compile_commands_dir = map_dest .. curr_dir:gsub(git_root, "")

@@ -102,7 +102,7 @@ local default_x = {
         U.current_buffer_lsp,
         padding = 1,
         color = text_hl,
-        icon = { " ", color = icon_hl },
+        icon = { "󰒍", color = icon_hl },
     },
     {
         function()

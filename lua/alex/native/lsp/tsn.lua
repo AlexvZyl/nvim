@@ -18,18 +18,13 @@ local function is_repo(repo)
 end
 
 local function get_lsp_command()
-    -- Give everything some time to startup before we try to push
-    -- the notification.
     local curr_dir = U.current_dir_abs()
 
-    -- TODO: Why is this not working?
-    local docker_path = vim.fn.finddir("docker", ".;")
-    if string.find(curr_dir, "tsnsystems_utils") then
-        docker_path = vim.fn.finddir("./docker", ".;")
-    end
+    -- NOTE: This should hold in all cases.
+    local docker_path = "./docker"
 
     -- Could not find docker.
-    if not docker_path or docker_path == "" then
+    if vim.fn.isdirectory(docker_path) == 0 then
         vim.defer_fn(function()
             vim.notify("Could not find TSN docker path", vim.log.levels.WARN)
         end, TIMEOUT_MS)

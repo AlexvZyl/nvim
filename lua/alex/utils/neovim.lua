@@ -92,16 +92,32 @@ end
 
 function M.current_buffer_lsp()
     local clients = vim.lsp.get_clients({ bufnr = 0 })
-    if next(clients) == nil then
-        return ""
-    end
-    local current_clients = ""
+    local result = ""
+    local sep = "|"
 
-    for _, client in ipairs(clients) do
-        current_clients = current_clients .. client.name .. " "
+    -- Add LSP clients
+    if next(clients) ~= nil then
+        for _, client in ipairs(clients) do
+            result = result .. client.name .. sep
+        end
     end
 
-    return current_clients
+    -- Add linters
+    local current_filetype = M.current_buffer_filetype()
+    local linters = require("lint").linters_by_ft[current_filetype]
+
+    if linters then
+        for _, linter in ipairs(linters) do
+            result = result .. linter .. sep
+        end
+    end
+
+    -- Remove trailing separator
+    if result ~= "" and result:sub(-#sep) == sep then
+        result = result:sub(1, -#sep - 1)
+    end
+    
+    return "[" .. result .. "]"
 end
 
 function M.is_recording()

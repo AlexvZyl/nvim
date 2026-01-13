@@ -8,6 +8,11 @@ local U = require("alex.utils")
 -- Enable logging.
 vim.lsp.log.set_level("error")
 
+-- This command got removed from lsp-config.  Re-add.
+vim.api.nvim_create_user_command('LspLog', function()
+  vim.cmd.edit(vim.lsp.log.get_filename())
+end, {})
+
 -- Place this just below treesitter.
 -- I like treesitter highlights more than the LSP ones.
 vim.hl.priorities.semantic_tokens = 99

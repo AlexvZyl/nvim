@@ -124,7 +124,8 @@ return {
         "mfussenegger/nvim-lint",
         -- Does not make sense to have a linter without a LSP.
         -- This will have to change if that ever happens.
-        event = { "LspAttach" },
+        -- event = { "LspAttach" },
+        lazy = false,
         config = function()
             require("alex.plugins.linter")
         end,

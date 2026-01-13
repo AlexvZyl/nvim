@@ -9,8 +9,8 @@ local U = require("alex.utils")
 vim.lsp.log.set_level("error")
 
 -- This command got removed from lsp-config.  Re-add.
-vim.api.nvim_create_user_command('LspLog', function()
-  vim.cmd.edit(vim.lsp.log.get_filename())
+vim.api.nvim_create_user_command("LspLog", function()
+    vim.cmd.edit(vim.lsp.log.get_filename())
 end, {})
 
 -- Place this just below treesitter.

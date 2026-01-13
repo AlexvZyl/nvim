@@ -116,7 +116,7 @@ function M.current_buffer_lsp()
     if result ~= "" and result:sub(-#sep) == sep then
         result = result:sub(1, -#sep - 1)
     end
-    
+
     return "[" .. result .. "]"
 end
 

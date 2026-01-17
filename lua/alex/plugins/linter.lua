@@ -17,7 +17,7 @@ L.linters_by_ft = {
     bash = { "shellcheck" },
     sh = { "shellcheck" },
     proto = { "buf_lint" },
-    kotlin = { "ktlint" }
+    kotlin = { "ktlint" },
 }
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter" }, {

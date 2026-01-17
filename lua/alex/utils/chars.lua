@@ -20,7 +20,7 @@ M.bottom_right_round = "╯"
 M.bottom_left_round = "╰"
 M.vertical_default = "│"
 M.horizontal_default = "─"
-M.small_circle="•"
+M.small_circle = "•"
 
 -- Border chars.
 M.border_chars_round = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }

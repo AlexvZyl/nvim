@@ -93,7 +93,7 @@ end
 function M.current_buffer_lsp()
     local clients = vim.lsp.get_clients({ bufnr = 0 })
     local result = ""
-    local sep = "|"
+    local sep = "•"
 
     -- Add LSP clients
     if next(clients) ~= nil then

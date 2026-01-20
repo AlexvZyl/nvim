@@ -1,16 +1,16 @@
 local LU = require("lspconfig.util")
 
 -- Disable the cycling between function params using <Tab>, very irritating.
-vim.lsp.config('*', {
-    capabilities = vim.tbl_deep_extend('force', vim.lsp.protocol.make_client_capabilities(), {
+vim.lsp.config("*", {
+    capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
         textDocument = {
             completion = {
                 completionItem = {
-                    snippetSupport = false
-                }
-            }
-        }
-    })
+                    snippetSupport = false,
+                },
+            },
+        },
+    }),
 })
 
 -- These LSPs use the configs provided by `nvim-lspconfig`.

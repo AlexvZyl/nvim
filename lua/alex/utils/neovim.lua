@@ -90,14 +90,13 @@ function M.current_buffer_full_file()
     return vim.fn.expand("%")
 end
 
-
 -- Check if cached value should be used.
-function M.keep_statusline_state() 
+function M.keep_statusline_state()
     -- TODO: Do this for diagnostics as well.
     local keep_lsp = {
         "noice",
         "TelescopePrompt",
-        ""
+        "",
     }
 
     return vim.tbl_contains(keep_lsp, M.current_buffer_filetype())
@@ -127,8 +126,8 @@ function M.current_buffer_lsp()
     end
 
     -- Remove trailing separator
-    if result ~= "" and result:sub(- #sep) == sep then
-        result = result:sub(1, - #sep - 1)
+    if result ~= "" and result:sub(-#sep) == sep then
+        result = result:sub(1, -#sep - 1)
     end
 
     if M.keep_statusline_state() then

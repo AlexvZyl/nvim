@@ -112,18 +112,23 @@ function M.prev_diag()
     })
 end
 
-function M.format_buffer()
-    -- Remove trailing whitespace.
+function M.remove_trailing_whitespace()
     local cursor_position = vim.api.nvim_win_get_cursor(0)
     vim.api.nvim_exec([[%s/\s\+$//e]], false)
     vim.cmd("noh")
     vim.api.nvim_win_set_cursor(0, cursor_position)
+end
 
-    -- Try to format the buffer using the attached lsp.
+function M.format_via_lsp()
     local status, _ = pcall(vim.lsp.buf.format)
     if not status then
         vim.notify("Format failed")
     end
+end
+
+function M.format_buffer()
+    M.remove_trailing_whitespace()
+    M.format_via_lsp()
 end
 
 M.format_enabled = false

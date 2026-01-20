@@ -1,5 +1,4 @@
 local CMP = require("cmp")
-local U = require("alex.utils")
 
 require("alex.plugins.nvim-cmp")
 require("luasnip.loaders.from_vscode").lazy_load()
@@ -7,7 +6,7 @@ require("luasnip.loaders.from_vscode").lazy_load()
 -- Main.
 local sources = CMP.config.sources({
     { name = "nvim_lsp" },
-    { name = "luasnip" },
+    -- { name = "luasnip" },
     { name = "path" },
 })
 local snippet = {

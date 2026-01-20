@@ -165,6 +165,13 @@ return {
             },
         },
     },
+    {
+        "windwp/nvim-autopairs",
+        event = "InsertEnter",
+        config = function()
+            require("alex.plugins.autopairs")
+        end,
+    },
 
     -- Other.
     {

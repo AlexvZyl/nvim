@@ -6,9 +6,12 @@ vim.g.mapleader = " "
 vim.opt.winborder = "rounded"
 
 vim.opt.showmode = false
-vim.opt.swapfile = false
 vim.opt.mouse = ""
 vim.opt.hlsearch = true
+
+vim.opt.swapfile = false
+vim.opt.autowrite = false
+vim.opt.autoread = true
 
 vim.opt.clipboard:append("unnamedplus")
 vim.g.clipboard = {

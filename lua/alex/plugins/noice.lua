@@ -86,7 +86,10 @@ local lsp = {
         ["vim.lsp.util.stylize_markdown"] = true,
         ["cmp.entry.get_documentation"] = true,
     },
-    signature = { enabled = false, view = "popup" },
+    signature = { 
+        enabled = true,
+        auto_open = { enabled = false },
+    },
     progress = { enabled = true, view = "mini" },
 }
 

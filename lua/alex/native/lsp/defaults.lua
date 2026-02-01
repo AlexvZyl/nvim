@@ -33,7 +33,7 @@ vim.lsp.enable("jsonls")
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("docker_compose_language_service")
 vim.lsp.enable("zls")
-vim.lsp.enable("kotlin_language_server")
+vim.lsp.enable("kotlin_lsp")
 
 -- Override some of the configs.
 

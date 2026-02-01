@@ -20,7 +20,7 @@ L.linters_by_ft = {
     kotlin = { "ktlint" },
 }
 
-vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter" }, {
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter", "BufRead" }, {
     callback = function()
         require("lint").try_lint()
     end,

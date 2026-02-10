@@ -1,3 +1,6 @@
+local M = {}
+M.enabled = true
+
 local L = require("lint")
 
 -- local cpp_check = L.linters.cppcheck
@@ -22,6 +25,10 @@ L.linters_by_ft = {
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter", "BufRead" }, {
     callback = function()
-        require("lint").try_lint()
+        if M.enabled then
+            require("lint").try_lint()
+        end
     end,
 })
+
+return M

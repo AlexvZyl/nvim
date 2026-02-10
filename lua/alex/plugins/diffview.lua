@@ -3,10 +3,12 @@ require("diffview").setup({
     hooks = {
         view_opened = function()
             vim.diagnostic.enable(false)
+            require("alex.plugins.linter").enabled = false
             require("diffview.actions").toggle_files()
         end,
         view_closed = function()
             vim.diagnostic.enable(true)
+            require("alex.plugins.linter").enabled = true
         end,
     },
     view = {

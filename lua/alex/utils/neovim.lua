@@ -103,10 +103,9 @@ function M.keep_statusline_state()
         "",
     }
 
-    local force_skip_lsp_buftypes = {
-    }
+    local force_skip_lsp_buftypes = {}
 
-    if vim.tbl_contains(force_skip_lsp_buftypes, M.current_buffer_type())  then
+    if vim.tbl_contains(force_skip_lsp_buftypes, M.current_buffer_type()) then
         return false
     end
 

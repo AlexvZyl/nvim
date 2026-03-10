@@ -16,8 +16,12 @@ function M.current_window_floating()
     return vim.api.nvim_win_get_config(0).relative ~= ""
 end
 
-function M.current_buffer_dir()
+function M.current_buffer_name()
     return vim.api.nvim_buf_get_name(0)
+end
+
+function M.current_dir()
+    return vim.fn.getcwd()
 end
 
 function M.current_work_dir()
@@ -93,13 +97,20 @@ end
 -- Check if cached value should be used.
 function M.keep_statusline_state()
     -- TODO: Do this for diagnostics as well.
-    local keep_lsp = {
+    local keep_lsp_filetypes = {
         "noice",
         "TelescopePrompt",
         "",
     }
 
-    return vim.tbl_contains(keep_lsp, M.current_buffer_filetype())
+    local force_skip_lsp_buftypes = {
+    }
+
+    if vim.tbl_contains(force_skip_lsp_buftypes, M.current_buffer_type())  then
+        return false
+    end
+
+    return vim.tbl_contains(keep_lsp_filetypes, M.current_buffer_filetype())
 end
 
 M.previous_lsp_result = ""
@@ -165,6 +176,15 @@ end
 
 function M.get_hl_group(name)
     return vim.api.nvim_get_hl(0, { name = name, link = false })
+end
+
+function M.get_git_root()
+    local handle = io.popen("git rev-parse --show-toplevel")
+    if handle then
+        local dir = handle:read("*a")
+        handle:close()
+        return dir:gsub("\n", "")
+    end
 end
 
 return M

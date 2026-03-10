@@ -207,17 +207,17 @@ function M.telescope()
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
     keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
 
-    keymap(n_v, "fg", function()
+    keymap(n_v, "fr", function()
         require("telescope.builtin").registers()
     end, default_settings)
 
-    keymap(n, "ft", "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>", default_settings)
-    keymap(
-        n,
-        "fT",
-        "<Cmd>TodoTelescope previewer=false wrap_results=false cwd=" .. U.get_git_root() .. "<CR>",
-        default_settings
-    )
+    keymap(n, "ft", function()
+        local buf = U.current_buffer_name()
+        if buf ~= "" then
+            vim.cmd("TodoTelescope previewer=false wrap_results=false search_dirs=" .. buf)
+        end
+    end, default_settings)
+    keymap(n, "fT", "<Cmd>TodoTelescope previewer=false wrap_results=false<CR>", default_settings)
 
     -- For LSP.
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)

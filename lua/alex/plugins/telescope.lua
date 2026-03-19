@@ -121,6 +121,12 @@ TS.setup({
         lsp_implementations = preview_vertical,
         diagnostics = preview_vertical,
         lsp_document_symbols = U.merge(preview_vertical, {
+            show_line = false,
+            symbol_width = 0.75,
+        }),
+        lsp_dynamic_workspace_symbols = U.merge(preview_vertical, {
+            show_line = false,
+            path_display = { "hidden" },
             symbol_width = 0.75,
         }),
 
@@ -153,6 +159,11 @@ TS.setup({
             prompt_title = "Buffer",
         }),
     },
+    extensions = {
+        ["ui-select"] = {
+            require("telescope.themes").get_dropdown {}
+        }
+    }
 })
 
 vim.api.nvim_create_autocmd("User", {
@@ -164,3 +175,4 @@ vim.api.nvim_create_autocmd("User", {
 
 -- Extensions.
 TS.load_extension("notify")
+TS.load_extension("ui-select")

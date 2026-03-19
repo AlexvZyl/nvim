@@ -37,6 +37,10 @@ function M.lsp()
         pcall(vim.lsp.buf.signature_help)
     end, default_settings)
 
+    keymap(n_v, "ca", function()
+        pcall(vim.lsp.buf.code_action)
+    end, default_settings)
+
     keymap(n, "ge", function()
         require("alex.native.lsp").open_diagnostics_float()
     end, default_settings)
@@ -212,7 +216,7 @@ function M.telescope()
     end, default_settings)
 
     keymap(n, "ft", function()
-        local buf = U.current_buffer_name()
+        local buf = U.current_buffer_file_relative()
         if buf ~= "" then
             vim.cmd("TodoTelescope previewer=false wrap_results=false search_dirs=" .. buf)
         end
@@ -221,6 +225,7 @@ function M.telescope()
 
     -- For LSP.
     keymap(n, "fs", "<Cmd>Telescope lsp_document_symbols<CR>", default_settings)
+    keymap(n, "fS", "<Cmd>Telescope lsp_dynamic_workspace_symbols<CR>", default_settings)
     -- TODO: I don't want this to jump if there is only one entry.
     keymap(n, "gr", "<Cmd>Telescope lsp_references<CR>", default_settings)
     keymap(n, "gd", "<Cmd>Telescope lsp_definitions<CR>", default_settings)

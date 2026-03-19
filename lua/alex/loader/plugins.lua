@@ -57,6 +57,7 @@ return {
         dependencies = {
             "nvim-lua/plenary.nvim",
             "nvim-lua/popup.nvim",
+            "nvim-telescope/telescope-ui-select.nvim",
             {
                 -- Currently only using these enhancements with telescope.
                 "stevearc/quicker.nvim",

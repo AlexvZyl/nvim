@@ -90,7 +90,7 @@ function M.current_buffer_parent()
     return parent .. "/"
 end
 
-function M.current_buffer_full_file()
+function M.current_buffer_file_relative()
     return vim.fn.expand("%")
 end
 

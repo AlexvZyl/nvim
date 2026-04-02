@@ -1,3 +1,5 @@
+local U = require("alex.utils.neovim")
+
 local M = {}
 
 function M.save_file()
@@ -8,7 +10,8 @@ function M.save_file()
     if buftype == "nofile" or buftype == "prompt" then
         return
     end
-    if vim.api.nvim_buf_get_option(0, "modifiable") then
+
+    if U.current_buffer_modifiable() then
         vim.cmd("w!")
     end
 end

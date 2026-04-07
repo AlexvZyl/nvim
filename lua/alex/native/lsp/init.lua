@@ -86,7 +86,11 @@ function M.next_error()
     vim.diagnostic.jump({
         count = 1,
         severity = vim.diagnostic.severity.ERROR,
-        float = float_options,
+        on_jump = function()
+            vim.schedule(function()
+                vim.diagnostic.open_float(float_options)
+            end)
+        end,
     })
 end
 
@@ -94,21 +98,33 @@ function M.prev_error()
     vim.diagnostic.jump({
         count = -1,
         severity = vim.diagnostic.severity.ERROR,
-        float = float_options,
+        on_jump = function()
+            vim.schedule(function()
+                vim.diagnostic.open_float(float_options)
+            end)
+        end,
     })
 end
 
 function M.next_diag()
     vim.diagnostic.jump({
         count = 1,
-        float = float_options,
+        on_jump = function()
+            vim.schedule(function()
+                vim.diagnostic.open_float(float_options)
+            end)
+        end,
     })
 end
 
 function M.prev_diag()
     vim.diagnostic.jump({
         count = -1,
-        float = float_options,
+        on_jump = function()
+            vim.schedule(function()
+                vim.diagnostic.open_float(float_options)
+            end)
+        end,
     })
 end
 

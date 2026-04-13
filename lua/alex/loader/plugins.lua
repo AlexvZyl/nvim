@@ -112,6 +112,10 @@ return {
 
     -- Editing / movement.
     {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        lazy = false,
+    },
+    {
         url = "https://codeberg.org/andyg/leap.nvim",
         dependencies = "tpope/vim-repeat",
         keys = { "s", "S" },
@@ -129,15 +133,6 @@ return {
         lazy = false,
         config = function()
             require("alex.plugins.linter")
-        end,
-    },
-    {
-        "nvim-treesitter/nvim-treesitter",
-        dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
-        event = { "VeryLazy" },
-        build = { ":TSUpdate" },
-        config = function()
-            require("alex.plugins.treesitter")
         end,
     },
     {

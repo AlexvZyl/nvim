@@ -100,6 +100,13 @@ return {
             require("alex.plugins.git-blame")
         end,
     },
+    {
+        "folke/which-key.nvim",
+        event = { "VeryLazy" },
+        config = function()
+            require("alex.plugins.which-key")
+        end,
+    },
 
     -- Editing / movement.
     {
@@ -120,8 +127,7 @@ return {
         "mfussenegger/nvim-lint",
         -- Does not make sense to have a linter without a LSP.
         -- This will have to change if that ever happens.
-        -- event = { "LspAttach" },
-        lazy = false,
+        event = { "LspAttach" },
         config = function()
             require("alex.plugins.linter")
         end,
@@ -189,15 +195,6 @@ return {
         priority = 1000,
         config = function()
             require("default").load()
-        end,
-    },
-
-    -- Bin (maybe to remove)
-    {
-        "folke/which-key.nvim",
-        event = { "VeryLazy" },
-        config = function()
-            require("alex.plugins.which-key")
         end,
     },
 }

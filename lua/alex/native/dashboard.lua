@@ -41,6 +41,7 @@ function M.destroy()
     for _, b in ipairs(state.bufs) do pcall(vim.api.nvim_buf_delete, b, { force = true }) end
     if state.guicursor then vim.o.guicursor = state.guicursor end
     pcall(vim.api.nvim_del_augroup_by_name, "dashboard_cmdline")
+    pcall(vim.api.nvim_del_augroup_by_name, "dashboard_resize")
     require("alex.native.statuscolumn").default()
     state = { wins = {}, bufs = {}, guicursor = nil }
 end
@@ -109,6 +110,18 @@ local function create_buffer_autocmds()
 
     vim.api.nvim_create_autocmd({ "BufLeave", "BufWipeout", "BufDelete", "TextChangedI" }, {
         buffer = 0, once = true, callback = M.destroy,
+    })
+
+    vim.api.nvim_create_autocmd("VimResized", {
+        group = vim.api.nvim_create_augroup("dashboard_resize", { clear = true }),
+        callback = function()
+            if vim.bo.filetype ~= "dashboard" then return end
+            for _, w in ipairs(state.wins) do pcall(vim.api.nvim_win_close, w, true) end
+            for _, b in ipairs(state.bufs) do pcall(vim.api.nvim_buf_delete, b, { force = true }) end
+            state.wins = {}
+            state.bufs = {}
+            M.show_stats()
+        end,
     })
 end
 

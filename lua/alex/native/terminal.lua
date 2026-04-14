@@ -1,20 +1,26 @@
-vim.api.nvim_create_autocmd("TermOpen", {
-    callback = function()
-        require("alex.native.statuscolumn").terminal()
-    end,
-})
+local M = {}
 
-vim.api.nvim_create_autocmd({ "TermOpen", "WinEnter" }, {
-    pattern = "term://*",
-    command = "startinsert",
-})
+function M.setup()
+    vim.api.nvim_create_autocmd("TermOpen", {
+        callback = function()
+            require("alex.native.statuscolumn").terminal()
+        end,
+    })
 
--- Close the buffer when the terminal exits.
-vim.api.nvim_create_autocmd({ "TermClose" }, {
-    pattern = "term://*",
-    command = "bd",
-})
+    vim.api.nvim_create_autocmd({ "TermOpen", "WinEnter" }, {
+        pattern = "term://*",
+        command = "startinsert",
+    })
 
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
+    -- Close the buffer when the terminal exits.
+    vim.api.nvim_create_autocmd({ "TermClose" }, {
+        pattern = "term://*",
+        command = "bd",
+    })
 
-vim.opt.shell = "fish"
+    vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
+
+    vim.opt.shell = "fish"
+end
+
+return M

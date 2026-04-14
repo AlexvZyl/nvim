@@ -1,9 +1,6 @@
 local config = {}
 
-config.mru = {
-    label = " Recent Files",
-    limit = 10,
-}
+config.mru = { enable = false }
 
 config.project = {
     label = " Recent Projects",

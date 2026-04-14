@@ -1,15 +1,6 @@
 return {
     -- General UI/UX
     {
-        "glepnir/dashboard-nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            require("alex.plugins.dashboard")
-        end,
-        lazy = false,
-        priority = 999,
-    },
-    {
         "shortcuts/no-neck-pain.nvim",
         cmd = { "NoNeckPain" },
         config = function()

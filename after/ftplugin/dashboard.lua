@@ -1,1 +1,0 @@
-vim.opt.winbar = nil

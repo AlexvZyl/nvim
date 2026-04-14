@@ -4,7 +4,6 @@ vim.opt.winbar = nil
 
 -- filetype/buftype
 local winbar_type_exclude = {
-    "dashboard",
     "no-neck-pain",
 }
 
@@ -47,6 +46,12 @@ local custom_bars = {
             return "Terminal"
         end,
     },
+    dashboard = {
+        icon = " ",
+        name = function()
+            return U.get_short_cwd()
+        end
+    }
 }
 
 local function excludes()

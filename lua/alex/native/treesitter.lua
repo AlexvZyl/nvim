@@ -14,6 +14,7 @@ local ignore = {
     "no-neck-pain",
     "cmp_menu",
     "cmp_docs",
+    "oil_preview",
 }
 
 vim.api.nvim_create_autocmd("FileType", {

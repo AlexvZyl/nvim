@@ -232,7 +232,6 @@ require("lualine").setup({
     },
     options = {
         theme = "auto",
-        disabled_filetypes = { "dashboard" },
         globalstatus = true,
         section_separators = { left = " ", right = " " },
         component_separators = { left = "", right = "" },
@@ -258,7 +257,6 @@ id = vim.api.nvim_create_autocmd({ "BufWinEnter", "TermEnter", "TermOpen" }, {
             end
 
             local excludes = {
-                "dashboard",
                 "lazy",
                 "noice",
                 "nofile",

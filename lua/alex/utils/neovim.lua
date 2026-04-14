@@ -186,4 +186,8 @@ function M.get_git_root()
     end
 end
 
+function M.is_intro_screen()
+    return M.current_buffer_type() == "" and M.current_buffer_name() == "" and M.current_buffer_filetype() == ""
+end
+
 return M

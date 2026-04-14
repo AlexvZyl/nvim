@@ -9,6 +9,13 @@ function M.setup()
             skipEnteringNoNeckPainBuffer = true,
         }
     })
+
+    vim.api.nvim_create_autocmd("FileType", {
+        once = true,
+        callback = function(_)
+            M.enable()
+        end,
+    })
 end
 
 function M.toggle()

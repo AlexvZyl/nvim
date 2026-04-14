@@ -9,3 +9,5 @@ vim.on_key(function(key, typed)
         require("alex.native.winbar").set_winbar()
     end
 end)
+
+require("alex.plugins.no-neck-pain").enable()

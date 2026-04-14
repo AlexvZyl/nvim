@@ -36,7 +36,10 @@ return {
     },
     {
         "stevearc/oil.nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
+        dependencies = {
+            "nvim-tree/nvim-web-devicons",
+            "shortcuts/no-neck-pain.nvim" -- Need this to load with oil so we can use it.
+        },
         config = function()
             require("alex.plugins.oil-nvim")
         end,

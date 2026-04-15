@@ -133,12 +133,23 @@ local function create_buffer_autocmds()
         end,
     })
 
-    vim.api.nvim_create_autocmd({ "BufLeave", "BufWipeout", "BufDelete", "TextChangedI" }, {
+    vim.api.nvim_create_autocmd({ "BufLeave", "BufWipeout", "BufDelete" }, {
         buffer = 0,
         once = true,
         callback = M.destroy,
     })
 
+    -- Only allow normal and cmdline modes.
+    vim.api.nvim_create_autocmd("ModeChanged", {
+        buffer = 0,
+        callback = function()
+            if not vim.v.event.new_mode:match("[nc]") then
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+            end
+        end,
+    })
+
+    -- Keep floating windows at correct spot.
     vim.api.nvim_create_autocmd("VimResized", {
         group = vim.api.nvim_create_augroup("dashboard_resize", { clear = true }),
         callback = function()
@@ -166,6 +177,7 @@ function M.setup()
     end
 
     vim.bo[0].filetype = "dashboard"
+    vim.bo[0].modifiable = false
     setup_cursor()
     create_buffer_autocmds()
 end

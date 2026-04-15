@@ -23,4 +23,6 @@ function M.setup()
     vim.opt.shell = "fish"
 end
 
+M.setup()
+
 return M

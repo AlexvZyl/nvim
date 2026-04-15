@@ -144,7 +144,11 @@ local function create_buffer_autocmds()
         buffer = 0,
         callback = function()
             if not vim.v.event.new_mode:match("[nc]") then
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+                vim.api.nvim_feedkeys(
+                    vim.api.nvim_replace_termcodes("<Esc>", true, false, true),
+                    "n",
+                    false
+                )
             end
         end,
     })

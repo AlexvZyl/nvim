@@ -14,7 +14,7 @@ M.ignore_filetypes = {
     "oil_preview",
     "qf",
     "netrw",
-    "DiffviewFiles"
+    "DiffviewFiles",
 }
 
 function M.setup()

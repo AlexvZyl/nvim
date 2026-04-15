@@ -20,6 +20,7 @@ function M.init()
     M.editing()
     M.lsp()
     M.treesitter_textobjects()
+    M.lazy()
 
     -- Lazyload dependents:
     M.telescope()
@@ -57,8 +58,10 @@ function M.lsp()
     keymap(n, "]E", function()
         require("alex.native.lsp").next_error()
     end, default_settings)
+end
 
-    keymap(n, "<leader>l", "<Cmd>checkhealth lsp<CR>", default_settings)
+function M.lazy()
+    keymap(n, "<leader>l", "<Cmd>Lazy<CR>", default_settings)
 end
 
 function M.blame()
@@ -101,6 +104,7 @@ function M.native()
     keymap(t, "<C-l>", "<C-\\><C-n><C-w>l", default_settings)
 
     -- Misc
+    keymap(n, "<leader>i", "<Cmd>Inspect<CR>", default_settings)
     keymap(n, "<Esc>", "<Cmd>noh<CR>", allow_remap)
     keymap(n_v, "<C-e>", "j<C-e>", default_settings)
     keymap(n_v, "<C-y>", "k<C-y>", default_settings)

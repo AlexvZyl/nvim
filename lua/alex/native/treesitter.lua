@@ -13,9 +13,11 @@ M.ignore_filetypes = {
     "cmp_docs",
     "oil_preview",
     "qf",
+    "netrw",
 }
 
 function M.setup()
+    -- Tell neovim where to look for parsers.
     local parsers = vim.fn.glob("/nix/store/*-nvim-treesitter-grammars/parser", true, true)
     for _, path in ipairs(parsers) do
         vim.opt.runtimepath:prepend(vim.fn.fnamemodify(path, ":h"))

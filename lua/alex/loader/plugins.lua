@@ -2,7 +2,7 @@ return {
     -- General UI/UX
     {
         "shortcuts/no-neck-pain.nvim",
-        cmd = { "NoNeckPain" },
+        event = { "VeryLazy" },
         config = function()
             require("alex.plugins.no-neck-pain").setup()
         end,
@@ -36,14 +36,13 @@ return {
     },
     {
         "stevearc/oil.nvim",
+        event = { "VeryLazy" },
         dependencies = {
             "nvim-tree/nvim-web-devicons",
-            "shortcuts/no-neck-pain.nvim" -- Need this to load with oil so we can use it.
         },
         config = function()
             require("alex.plugins.oil-nvim")
         end,
-        lazy = false,
     },
     {
         "nvim-telescope/telescope.nvim",

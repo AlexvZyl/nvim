@@ -126,6 +126,8 @@ local function create_buffer_autocmds()
 end
 
 function M.setup()
+    -- Probably opening a file, so don't mess with dashboard.
+    -- TODO: This is probably not very reliable.
     if vim.fn.argc() > 0 then return end
 
     vim.bo[0].filetype = "dashboard"

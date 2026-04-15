@@ -7,7 +7,7 @@ function M.setup()
         width = 140,
         autocmds = {
             skipEnteringNoNeckPainBuffer = true,
-        }
+        },
     })
 
     -- This means we did not start with a dashboard.

@@ -50,8 +50,8 @@ local custom_bars = {
         icon = " ",
         name = function()
             return U.get_short_cwd()
-        end
-    }
+        end,
+    },
 }
 
 local function excludes()

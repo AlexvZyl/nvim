@@ -12,7 +12,7 @@ M.ignore_filetypes = {
     "cmp_menu",
     "cmp_docs",
     "oil_preview",
-    "qf"
+    "qf",
 }
 
 function M.setup()

@@ -4,9 +4,9 @@ local plugins = require("alex.loader.plugins")
 
 local opts = {
     ui = { border = "rounded" },
-    defaults = { lazy = false },
+    defaults = { lazy = false }, -- TODO: Is this smart?
     checker = {
-        notify = false,
+        notify = true,
         enabled = true,
     },
 }

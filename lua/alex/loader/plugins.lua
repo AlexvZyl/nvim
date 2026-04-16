@@ -74,7 +74,9 @@ return {
     {
         "folke/noice.nvim",
         dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
-        event = { "VeryLazy" },
+        -- Can't be lazy as we want notifications to be able to run on startup.
+        -- TODO: Could probably have just nvim-notify load.
+        lazy = false,
         config = function()
             require("alex.plugins.noice")
         end,

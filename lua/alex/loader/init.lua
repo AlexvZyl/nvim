@@ -6,7 +6,7 @@ local opts = {
     ui = { border = "rounded" },
     defaults = { lazy = false }, -- TODO: Is this smart?
     checker = {
-        notify = true,
+        notify = false,
         enabled = true,
     },
 }

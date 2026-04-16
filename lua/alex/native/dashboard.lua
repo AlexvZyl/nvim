@@ -12,29 +12,32 @@ local function close_overlay()
     state.win, state.buf = nil, nil
 end
 
+local function get_num_updates()
+    local updates = 0
+    for _, plugin in pairs(require("lazy.core.config").plugins) do
+        if plugin._.updates then
+            updates = updates + 1
+        end
+    end
+    return updates
+end
+
 local function cover_intro_bottom()
     close_overlay()
 
-    local width = 43
     local s = require("lazy").stats()
     local lines = {
-        string.format(" Startup: %.2fms", s.startuptime),
-        string.format("Plugins: %d/%d", s.loaded, s.count),
+        string.format("              Startup: %.2fms              ", s.startuptime),
+        string.format("               Plugins: %d/%d", s.loaded, s.count),
+        string.format("                 Updates: %d", get_num_updates()),
     }
 
     local buf = vim.api.nvim_create_buf(false, true)
-    local ns = vim.api.nvim_create_namespace("dashboard")
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "", "" })
-    for i, line in ipairs(lines) do
-        local pad = math.floor((width - vim.api.nvim_strwidth(line)) / 2)
-        vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
-            virt_text = { { string.rep(" ", pad) .. line, "Comment" } },
-            virt_text_pos = "overlay",
-        })
-    end
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modifiable = false
 
     state.buf = buf
+    local width = 44
     state.win = vim.api.nvim_open_win(buf, false, {
         relative = "editor",
         row = math.floor(vim.o.lines / 2) + 7,
@@ -45,6 +48,7 @@ local function cover_intro_bottom()
         border = "none",
         focusable = false,
     })
+    vim.wo[state.win].winhighlight = "Normal:Comment"
 end
 
 function M.destroy()
@@ -116,6 +120,16 @@ local function create_buffer_autocmds()
                 return
             end
             cover_intro_bottom()
+        end,
+    })
+
+    vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyRender",
+        group = state.augroup,
+        callback = function()
+            if vim.bo.filetype == "dashboard" then
+                cover_intro_bottom()
+            end
         end,
     })
 end

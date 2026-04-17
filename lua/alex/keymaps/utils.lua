@@ -3,11 +3,7 @@ local U = require("alex.utils.neovim")
 local M = {}
 
 function M.save_file()
-    if vim.api.nvim_buf_get_option(0, "readonly") then
-        return
-    end
-    local buftype = vim.api.nvim_buf_get_option(0, "buftype")
-    if buftype == "nofile" or buftype == "prompt" then
+    if U.current_buffer_name() == "" then
         return
     end
 
@@ -30,7 +26,6 @@ function M.delete_buffer()
 end
 
 function M.toggle_oil()
-    local U = require("alex.utils.neovim")
     if U.current_buffer_filetype() == "oil" then
         pcall(vim.api.nvim_command, "b#")
     else

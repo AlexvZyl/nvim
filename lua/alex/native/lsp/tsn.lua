@@ -59,18 +59,26 @@ local function get_lsp_command()
         map_dest = "/app/dev/box4"
     end
 
+    -- NOTE: Depending on how you setup the repos this might break.  I always linked the compile commands
+    -- file to one in the root of the dirrectory.  A bit manual but it works.
     local compile_commands_dir = map_dest .. curr_dir:gsub(git_root, "")
     local cmd = {
         "env",
+        -- NOTE: This is important.  The default script args do not work.
         "RUN_ARGS=-i",
         docker_path .. "/" .. SCRIPT_FILE,
         dockerfile,
         "clangd",
         "--background-index",
+        -- NOTE: Because I use NixOS this causes jumping to system source files to not
+        -- work (NixOS does not use a posix filesystem).  Mileage may vary.
         "--path-mappings=" .. map_source .. "=" .. map_dest,
         "--compile-commands-dir=" .. compile_commands_dir,
     }
 
+    -- Displays this at runtime to:
+    -- 1. Show me this actually ran.
+    -- 2. Allows me to easily debug if something in the command seems off.
     vim.defer_fn(function()
         vim.notify(vim.inspect(cmd))
     end, TIMEOUT_MS)

@@ -1,9 +1,12 @@
 local U = require("alex.utils")
 
--- WARN:  Check the commit timestamp for when this was setup.  While I was working at TSN the
+-- WARN: Check the commit timestamp for when this was setup.  While I was working at TSN the
 -- docker stuff changed quite a bit, I have no idea how stable this config will be.
 --
 -- This also uses utils from the rest of my config.  Might have to copy them.
+--
+-- NOTE: I use `https://github.com/neovim/nvim-lspconfig` to setup the servers.  This might or might not still
+-- be relevant by the time you read this, just check that.
 --
 -- Goodluck ;)
 

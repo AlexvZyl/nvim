@@ -89,14 +89,18 @@ vim.lsp.config("clangd", {
     cmd = get_lsp_command(),
 })
 
--- Get the docker lsp running with the TSN dockerfiles.
+vim.lsp.enable("clangd")
 
-vim.lsp.config("dockerls", {
-    filetypes = { "dockerfile" },
-})
+-- Get the docker lsp running with the TSN dockerfiles.
 
 vim.filetype.add({
     pattern = {
         [".*/Dockerfiles/[^.]+"] = "dockerfile",
     },
 })
+
+vim.lsp.config("dockerls", {
+    filetypes = { "dockerfile" },
+})
+
+vim.lsp.enable("dockerls")

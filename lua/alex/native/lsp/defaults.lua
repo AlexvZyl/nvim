@@ -41,12 +41,6 @@ vim.lsp.config("cmake", {
     root_dir = LU.root_pattern("CMakeLists.txt"),
 })
 
-vim.lsp.config("dockerls", {
-    root_dir = LU.root_pattern({
-        "[dD]ockerfile*",
-    }),
-})
-
 vim.lsp.config("docker_compose_language_service", {
     root_dir = LU.root_pattern({
         "docker-compose.ya?ml",

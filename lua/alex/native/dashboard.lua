@@ -27,7 +27,7 @@ local function cover_intro_bottom()
 
     local s = require("lazy").stats()
     local lines = {
-        string.format("               Startup: %.2fms            ", s.startuptime),
+        string.format("              󰥔 Startup: %.2fms            ", s.startuptime),
         string.format("                Plugins: %d/%d", s.loaded, s.count),
         string.format("                  Updates: %d", get_num_updates()),
     }

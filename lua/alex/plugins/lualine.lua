@@ -113,7 +113,7 @@ local default_x = {
     },
     {
         function()
-            return " "
+            return " "
         end,
         color = get_zen_mode_color,
         padding = 0,

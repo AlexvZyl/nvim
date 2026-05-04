@@ -1,5 +1,4 @@
 require("alex.native.lsp.defaults")
-require("alex.native.lsp.tsn")
 
 local M = {}
 

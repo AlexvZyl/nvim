@@ -174,7 +174,7 @@ return {
         "romus204/tree-sitter-manager.nvim",
         config = function()
             require("alex.plugins.tree-sitter-manager")
-        end
+        end,
     },
 
     -- Other.

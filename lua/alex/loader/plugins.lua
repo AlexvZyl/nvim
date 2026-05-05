@@ -170,6 +170,12 @@ return {
             require("alex.plugins.autopairs")
         end,
     },
+    {
+        "romus204/tree-sitter-manager.nvim",
+        config = function()
+            require("alex.plugins.tree-sitter-manager")
+        end
+    },
 
     -- Other.
     {

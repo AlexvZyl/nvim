@@ -91,27 +91,6 @@ return {
         end,
         lazy = false,
     },
-    {
-        "sindrets/diffview.nvim",
-        cmd = { "DiffviewClose", "DiffviewOpen" },
-        config = function()
-            require("alex.plugins.diffview")
-        end,
-    },
-    {
-        "f-person/git-blame.nvim",
-        keys = { "<leader>b" },
-        config = function()
-            require("alex.plugins.git-blame")
-        end,
-    },
-    {
-        "folke/which-key.nvim",
-        event = { "VeryLazy" },
-        config = function()
-            require("alex.plugins.which-key")
-        end,
-    },
 
     -- Editing / movement.
     {

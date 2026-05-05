@@ -247,6 +247,9 @@ local id
 id = vim.api.nvim_create_autocmd({ "BufWinEnter", "TermEnter", "TermOpen" }, {
     callback = function(args)
         vim.defer_fn(function()
+            if not vim.api.nvim_buf_is_valid(args.buf) then
+                return
+            end
             if vim.bo[args.buf].buftype == "terminal" then
                 require("lualine").setup({})
                 if id then

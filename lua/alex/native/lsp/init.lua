@@ -5,7 +5,7 @@ local M = {}
 local U = require("alex.utils")
 
 -- Enable logging.
-vim.lsp.log.set_level("error")
+vim.lsp.log.set_level("warn")
 
 -- This command got removed from lsp-config.  Re-add.
 vim.api.nvim_create_user_command("LspLog", function()

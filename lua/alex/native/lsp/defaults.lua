@@ -55,3 +55,7 @@ vim.lsp.config("bashls", {
         },
     },
 })
+
+vim.lsp.config("kotlin_lsp", {
+    cmd = { "kotlin-lsp", "--stdio" },
+})

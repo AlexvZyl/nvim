@@ -45,7 +45,7 @@ function M.toggle_virtual_diagnostics()
         DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics },
         DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics },
     })
-    require("alex.plugins.lualine").refresh_statusline()
+    require("alex.native.statusline").refresh()
 end
 
 -- Setup diags.
@@ -149,7 +149,7 @@ end
 M.format_enabled = false
 function M.toggle_format_enabled()
     M.format_enabled = not M.format_enabled
-    require("alex.plugins.lualine").refresh_statusline()
+    require("alex.native.statusline").refresh()
 end
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {

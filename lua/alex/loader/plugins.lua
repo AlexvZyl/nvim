@@ -64,15 +64,6 @@ return {
         end,
     },
     {
-        "nvim-lualine/lualine.nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        lazy = false,
-        priority = 1000,
-        config = function()
-            require("alex.plugins.lualine")
-        end,
-    },
-    {
         "folke/noice.nvim",
         dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
         -- Can't be lazy as we want notifications to be able to run on startup.

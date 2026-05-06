@@ -1,5 +1,7 @@
 local M = {}
 
+-- TODO: Vibe coded, revisit.
+
 local state = { win = nil, buf = nil, guicursor = nil, augroup = nil }
 
 local function close_overlay()

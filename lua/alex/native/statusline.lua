@@ -1,56 +1,88 @@
 local C = require("default.palette")
+local U = require("alex.utils")
+local lsp_state = require("alex.native.lsp")
+local nnp = require("alex.plugins.no-neck-pain")
+
+-- TODO: Vibe coded, revisit.
+
+local SEP_L, SEP_R = "\u{e0b6}", "\u{e0b4}"
 
 local M = {}
 
-vim.api.nvim_set_hl(0, "StlOn", { fg = C.green })
-vim.api.nvim_set_hl(0, "StlOff", { fg = C.gray2 })
-vim.api.nvim_set_hl(0, "StlDiagError", { fg = C.red })
-vim.api.nvim_set_hl(0, "StlDiagWarn", { fg = C.yellow })
-vim.api.nvim_set_hl(0, "StlDiagInfo", { fg = C.blue })
-vim.api.nvim_set_hl(0, "StlDiagHint", { fg = C.green })
-vim.api.nvim_set_hl(0, "StlRecording", { fg = C.red })
+local mode_map = {}
+local fallback_mode
 
-local mode_map = {
-    ["n"] = { "NORMAL", C.blue },
-    ["i"] = { "INSERT", C.green },
-    ["v"] = { "VISUAL", C.red },
-    ["V"] = { "V-LINE", C.red },
-    ["\22"] = { "V-BLCK", C.red },
-    ["s"] = { "SELECT", C.red },
-    ["S"] = { "S-LINE", C.red },
-    ["\19"] = { "S-BLCK", C.red },
-    ["c"] = { "COMMND", C.orange },
-    ["r"] = { "PROMPT", C.magenta },
-    ["R"] = { "RPLACE", C.red },
-    ["t"] = { "TERMNL", C.yellow },
-    ["!"] = { "SHELL", C.yellow },
+local diag_levels = {
+    { vim.diagnostic.severity.ERROR, "StlDiagError", "error" },
+    { vim.diagnostic.severity.WARN,  "StlDiagWarn",  "warn" },
+    { vim.diagnostic.severity.INFO,  "StlDiagInfo",  "info" },
+    { vim.diagnostic.severity.HINT,  "StlDiagHint",  "hint" },
 }
 
-local function hl_name(prefix, color)
-    return prefix .. color:gsub("#", "")
+local function hl_suffix(color)
+    return (color:gsub("#", ""))
 end
 
-for _, info in pairs(mode_map) do
-    local color = info[2]
-    vim.api.nvim_set_hl(0, hl_name("StlMode_", color), { fg = C.bg_dark, bg = color, bold = true })
-    vim.api.nvim_set_hl(0, hl_name("StlModeSep_", color), { fg = color, bg = C.bg_dark })
+local function make_mode(label, color)
+    local suffix = hl_suffix(color)
+    return {
+        label = label,
+        color = color,
+        mode_hl = "StlMode_" .. suffix,
+        sep_hl = "StlModeSep_" .. suffix,
+    }
 end
 
-local function segment(content, color)
-    color = color or C.green
-    local mode_hl = hl_name("StlMode_", color)
-    local sep_hl = hl_name("StlModeSep_", color)
-    return ("%%#%s#\u{e0b6}%%#%s# %s %%#%s#\u{e0b4}%%*"):format(sep_hl, mode_hl, content, sep_hl)
+local function build_mode_map()
+    mode_map = {
+        n       = make_mode("NORMAL", C.blue),
+        i       = make_mode("INSERT", C.green),
+        v       = make_mode("VISUAL", C.red),
+        V       = make_mode("V-LINE", C.red),
+        ["\22"] = make_mode("V-BLCK", C.red),
+        s       = make_mode("SELECT", C.red),
+        S       = make_mode("S-LINE", C.red),
+        ["\19"] = make_mode("S-BLCK", C.red),
+        c       = make_mode("COMMND", C.orange),
+        r       = make_mode("PROMPT", C.magenta),
+        R       = make_mode("RPLACE", C.red),
+        t       = make_mode("TERMNL", C.yellow),
+        ["!"]   = make_mode("SHELL ", C.yellow),
+    }
+    fallback_mode = make_mode("??????", C.green)
 end
 
-local function mode()
-    local info = mode_map[vim.api.nvim_get_mode().mode] or { "??????", C.green }
-    return segment(" " .. info[1], info[2])
+local function apply_highlights()
+    local hls = {
+        StlOn = { fg = C.green },
+        StlOff = { fg = C.gray2 },
+        StlDiagError = { fg = C.red },
+        StlDiagWarn = { fg = C.yellow },
+        StlDiagInfo = { fg = C.blue },
+        StlDiagHint = { fg = C.green },
+        StlRecording = { fg = C.red },
+    }
+    local seen = {}
+    for _, info in pairs(mode_map) do
+        if not seen[info.color] then
+            seen[info.color] = true
+            hls[info.mode_hl] = { fg = C.bg_dark, bg = info.color, bold = true }
+            hls[info.sep_hl] = { fg = info.color, bg = C.bg_dark }
+        end
+    end
+    for name, opts in pairs(hls) do
+        vim.api.nvim_set_hl(0, name, opts)
+    end
 end
 
-local function pos()
-    local info = mode_map[vim.api.nvim_get_mode().mode] or { "??????", C.green }
-    return segment(" %3l:%-2c  %3p%%", info[2])
+local function current_mode()
+    return mode_map[vim.api.nvim_get_mode().mode] or fallback_mode
+end
+
+local function segment(content, info)
+    return ("%%#%s#%s%%#%s# %s %%#%s#%s%%*"):format(
+        info.sep_hl, SEP_L, info.mode_hl, content, info.sep_hl, SEP_R
+    )
 end
 
 local function icon(active, text)
@@ -58,7 +90,7 @@ local function icon(active, text)
 end
 
 local function lsp_clients()
-    local names = require("alex.utils").current_buffer_lsp()
+    local names = U.current_buffer_lsp()
     if names == "" then
         return ""
     end
@@ -66,7 +98,6 @@ local function lsp_clients()
 end
 
 local function recording()
-    local U = require("alex.utils")
     if not U.is_recording() then
         return ""
     end
@@ -74,18 +105,13 @@ local function recording()
 end
 
 local function diagnostics()
-    local signs = require("alex.utils").diagnostic_signs
-    local levels = {
-        { vim.diagnostic.severity.ERROR, "StlDiagError", signs.error },
-        { vim.diagnostic.severity.WARN,  "StlDiagWarn",  signs.warn },
-        { vim.diagnostic.severity.INFO,  "StlDiagInfo",  signs.info },
-        { vim.diagnostic.severity.HINT,  "StlDiagHint",  signs.hint },
-    }
+    local signs = U.diagnostic_signs
+    local counts = vim.diagnostic.count(0)
     local parts = {}
-    for _, l in ipairs(levels) do
-        local n = #vim.diagnostic.get(0, { severity = l[1] })
+    for _, l in ipairs(diag_levels) do
+        local n = counts[l[1]] or 0
         if n > 0 then
-            table.insert(parts, ("%%#%s#%s%d%%*"):format(l[2], l[3], n))
+            parts[#parts + 1] = ("%%#%s#%s%d%%*"):format(l[2], signs[l[3]], n)
         end
     end
     if #parts == 0 then
@@ -94,34 +120,43 @@ local function diagnostics()
     return "  " .. table.concat(parts, " ")
 end
 
-function _G.alex_statusline()
-    local lsp = require("alex.native.lsp")
-    local nnp = require("alex.plugins.no-neck-pain")
-    return mode()
+function M.render()
+    local m = current_mode()
+    return segment(" " .. m.label, m)
         .. lsp_clients()
         .. diagnostics()
         .. "%="
         .. recording()
         .. " "
-        .. icon(lsp.virtual_diagnostics, " ")
+        .. icon(lsp_state.virtual_diagnostics, " ")
         .. icon(nnp.enabled, " ")
-        .. icon(lsp.format_enabled, "󰉼 ")
+        .. icon(lsp_state.format_enabled, "󰉼 ")
         .. " "
-        .. pos()
+        .. segment("  %4l:%-2c  %3p%%", m)
 end
-
-vim.o.laststatus = 3
-vim.o.statusline = "%{%v:lua.alex_statusline()%}"
-
-vim.api.nvim_create_autocmd({ "RecordingEnter", "RecordingLeave" }, {
-    group = vim.api.nvim_create_augroup("AlexStatuslineRecording", { clear = true }),
-    callback = function()
-        vim.cmd.redrawstatus()
-    end,
-})
 
 function M.refresh()
     vim.cmd.redrawstatus()
 end
+
+function M.setup()
+    build_mode_map()
+    apply_highlights()
+
+    vim.o.laststatus = 3
+    vim.o.statusline = "%{%v:lua.require'alex.native.statusline'.render()%}"
+
+    local group = vim.api.nvim_create_augroup("AlexStatusline", { clear = true })
+    vim.api.nvim_create_autocmd({ "RecordingEnter", "RecordingLeave" }, {
+        group = group,
+        callback = M.refresh,
+    })
+    vim.api.nvim_create_autocmd("ColorScheme", {
+        group = group,
+        callback = apply_highlights,
+    })
+end
+
+M.setup()
 
 return M

@@ -14,9 +14,9 @@ local fallback_mode
 
 local diag_levels = {
     { vim.diagnostic.severity.ERROR, "StlDiagError", "error" },
-    { vim.diagnostic.severity.WARN,  "StlDiagWarn",  "warn" },
-    { vim.diagnostic.severity.INFO,  "StlDiagInfo",  "info" },
-    { vim.diagnostic.severity.HINT,  "StlDiagHint",  "hint" },
+    { vim.diagnostic.severity.WARN, "StlDiagWarn", "warn" },
+    { vim.diagnostic.severity.INFO, "StlDiagInfo", "info" },
+    { vim.diagnostic.severity.HINT, "StlDiagHint", "hint" },
 }
 
 local function hl_suffix(color)
@@ -35,19 +35,19 @@ end
 
 local function build_mode_map()
     mode_map = {
-        n       = make_mode("NORMAL", C.blue),
-        i       = make_mode("INSERT", C.green),
-        v       = make_mode("VISUAL", C.red),
-        V       = make_mode("V-LINE", C.red),
+        n = make_mode("NORMAL", C.blue),
+        i = make_mode("INSERT", C.green),
+        v = make_mode("VISUAL", C.red),
+        V = make_mode("V-LINE", C.red),
         ["\22"] = make_mode("V-BLCK", C.red),
-        s       = make_mode("SELECT", C.red),
-        S       = make_mode("S-LINE", C.red),
+        s = make_mode("SELECT", C.red),
+        S = make_mode("S-LINE", C.red),
         ["\19"] = make_mode("S-BLCK", C.red),
-        c       = make_mode("COMMND", C.orange),
-        r       = make_mode("PROMPT", C.magenta),
-        R       = make_mode("RPLACE", C.red),
-        t       = make_mode("TERMNL", C.yellow),
-        ["!"]   = make_mode("SHELL ", C.yellow),
+        c = make_mode("COMMND", C.orange),
+        r = make_mode("PROMPT", C.magenta),
+        R = make_mode("RPLACE", C.red),
+        t = make_mode("TERMNL", C.yellow),
+        ["!"] = make_mode("SHELL ", C.yellow),
     }
     fallback_mode = make_mode("??????", C.green)
 end
@@ -81,7 +81,12 @@ end
 
 local function segment(content, info)
     return ("%%#%s#%s%%#%s# %s %%#%s#%s%%*"):format(
-        info.sep_hl, SEP_L, info.mode_hl, content, info.sep_hl, SEP_R
+        info.sep_hl,
+        SEP_L,
+        info.mode_hl,
+        content,
+        info.sep_hl,
+        SEP_R
     )
 end
 

@@ -57,5 +57,6 @@ vim.lsp.config("bashls", {
 })
 
 vim.lsp.config("kotlin_lsp", {
-    cmd = { "kotlin-lsp", "--stdio" },
+    cmd = { vim.fn.expand("$HOME/.local/opt/kotlin-lsp/kotlin-lsp.sh"), "--stdio" },
+    root_markers = { ".git" },
 })

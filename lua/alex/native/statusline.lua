@@ -137,7 +137,7 @@ function M.render()
         .. icon(nnp.enabled, " ")
         .. icon(lsp_state.format_enabled, "󰉼 ")
         .. " "
-        .. segment("  %4l:%-2c  %3p%%", m)
+        .. segment(" %4l:%-2c  %3p%%", m)
 end
 
 function M.refresh()
@@ -155,10 +155,6 @@ function M.setup()
     vim.api.nvim_create_autocmd({ "RecordingEnter", "RecordingLeave" }, {
         group = group,
         callback = M.refresh,
-    })
-    vim.api.nvim_create_autocmd("ColorScheme", {
-        group = group,
-        callback = apply_highlights,
     })
 end
 

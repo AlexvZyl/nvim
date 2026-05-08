@@ -14,7 +14,9 @@ end
 
 vim.api.nvim_create_autocmd("BufLeave", {
     callback = function(args)
-        if vim.bo[args.buf].filetype ~= "lazy" then return end
+        if vim.bo[args.buf].filetype ~= "lazy" then
+            return
+        end
         vim.schedule(function()
             for _, win in ipairs(vim.api.nvim_list_wins()) do
                 local buf = vim.api.nvim_win_get_buf(win)

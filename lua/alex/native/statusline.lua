@@ -12,9 +12,9 @@ local fallback_mode
 
 local diag_levels = {
     { vim.diagnostic.severity.ERROR, "StlDiagError", "error" },
-    { vim.diagnostic.severity.WARN,  "StlDiagWarn",  "warn" },
-    { vim.diagnostic.severity.INFO,  "StlDiagInfo",  "info" },
-    { vim.diagnostic.severity.HINT,  "StlDiagHint",  "hint" },
+    { vim.diagnostic.severity.WARN, "StlDiagWarn", "warn" },
+    { vim.diagnostic.severity.INFO, "StlDiagInfo", "info" },
+    { vim.diagnostic.severity.HINT, "StlDiagHint", "hint" },
 }
 
 local function hl_suffix(color)

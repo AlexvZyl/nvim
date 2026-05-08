@@ -35,11 +35,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
                     local abbr = item.label
                     abbr = abbr:gsub("%b()", ""):gsub("%b{}", "")
                     abbr = abbr:match("[%w_.]+.*") or abbr
-                    abbr = #abbr > ABBR_MAX_WIDTH and abbr:sub(1, ABBR_MAX_WIDTH - 1) .. "…" or abbr
-                    abbr = #abbr < ABBR_MIN_WIDTH and abbr .. pad:sub(1, ABBR_MIN_WIDTH - #abbr) or abbr
+                    abbr = #abbr > ABBR_MAX_WIDTH and abbr:sub(1, ABBR_MAX_WIDTH - 1) .. "…"
+                        or abbr
+                    abbr = #abbr < ABBR_MIN_WIDTH and abbr .. pad:sub(1, ABBR_MIN_WIDTH - #abbr)
+                        or abbr
 
                     local menu = item.detail or ""
-                    menu = #menu > MENU_MAX_WIDTH and menu:sub(1, MENU_MAX_WIDTH - 1) .. "…" or menu
+                    menu = #menu > MENU_MAX_WIDTH and menu:sub(1, MENU_MAX_WIDTH - 1) .. "…"
+                        or menu
 
                     local kind = kind_icons[kind_names[item.kind]] or unknown_icon
 

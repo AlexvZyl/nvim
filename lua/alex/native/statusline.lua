@@ -91,13 +91,6 @@ local function lsp_clients()
     return "  %#StlOff#󰒍 " .. names .. "%*"
 end
 
-local function recording()
-    if not U.is_recording() then
-        return ""
-    end
-    return ("%%#StlRecording#%s%s%%* "):format(U.kind_icons.Recording, vim.fn.reg_recording())
-end
-
 local function diagnostics()
     local signs = U.diagnostic_signs
     local counts = vim.diagnostic.count(0)
@@ -120,9 +113,8 @@ function M.render()
         .. lsp_clients()
         .. diagnostics()
         .. "%="
-        .. recording()
         .. " "
-        .. icon(vim.o.relativenumber, " ")
+        .. icon(require("alex.native.statuscolumn").relative, " ")
         .. icon(lsp_state.virtual_diagnostics, " ")
         .. icon(nnp.enabled, " ")
         .. icon(lsp_state.format_enabled, "󰉼 ")

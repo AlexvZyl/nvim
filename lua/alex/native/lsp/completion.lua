@@ -4,6 +4,7 @@ vim.opt.autocomplete = true
 vim.opt.pumheight = 10
 vim.opt.completeopt = { "menuone", "noselect", "fuzzy", "popup" }
 vim.opt.pumborder = "rounded"
+vim.opt.complete = "o"
 
 local ABBR_MIN_WIDTH = 50
 local ABBR_MAX_WIDTH = 25
@@ -33,7 +34,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         assert(client)
         if client:supports_method("textDocument/completion") then
             vim.lsp.completion.enable(true, client.id, ev.buf, {
-                autotrigger = false,
+                autotrigger = true,
                 convert = function(item)
                     local abbr = item.label
                     abbr = abbr:gsub("%b()", ""):gsub("%b{}", "")
@@ -60,7 +61,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
-vim.opt.complete:append("o")
 
 -- VIBE CODED SHUOLD PROBABLY BE REMOVED.
 

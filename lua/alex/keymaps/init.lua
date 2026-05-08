@@ -58,7 +58,6 @@ function M.lsp()
     keymap(n, "]E", function()
         require("alex.native.lsp").next_error()
     end, default_settings)
-
 end
 
 function M.lazy()

@@ -61,7 +61,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
-
 -- VIBE CODED SHUOLD PROBABLY BE REMOVED.
 
 local orig_open_floating_preview = vim.lsp.util.open_floating_preview

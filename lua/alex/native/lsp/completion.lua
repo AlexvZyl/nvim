@@ -35,6 +35,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         if client:supports_method("textDocument/completion") then
             vim.lsp.completion.enable(true, client.id, ev.buf, {
                 autotrigger = true,
+                -- Formatting.
                 convert = function(item)
                     local abbr = item.label
                     abbr = abbr:gsub("%b()", ""):gsub("%b{}", "")
@@ -62,6 +63,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- VIBE CODED SHUOLD PROBABLY BE REMOVED.
+-- Adds borders to hover doc.
 
 local orig_open_floating_preview = vim.lsp.util.open_floating_preview
 

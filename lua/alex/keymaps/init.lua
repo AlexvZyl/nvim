@@ -102,6 +102,10 @@ function M.native()
         require("alex.native.lsp").toggle_format_enabled()
     end, default_settings)
     keymap(n, "gm", "<Cmd>vertical Man<CR>", default_settings)
+    keymap(n, "<leader>r", function()
+        vim.o.relativenumber = not vim.o.relativenumber
+        require("alex.native.statusline").refresh()
+    end, default_settings)
 
     -- Buffers
     keymap(n, "Q", function()

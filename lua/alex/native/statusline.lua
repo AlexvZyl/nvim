@@ -122,8 +122,9 @@ function M.render()
         .. "%="
         .. recording()
         .. " "
+        .. icon(vim.o.relativenumber, " ")
         .. icon(lsp_state.virtual_diagnostics, " ")
-        .. icon(nnp.enabled, " ")
+        .. icon(nnp.enabled, " ")
         .. icon(lsp_state.format_enabled, "󰉼 ")
         .. " "
         .. segment(" %4l:%-2c  %3p%%", m)

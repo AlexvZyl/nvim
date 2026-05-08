@@ -12,9 +12,9 @@ local fallback_mode
 
 local diag_levels = {
     { vim.diagnostic.severity.ERROR, "StlDiagError", "error" },
-    { vim.diagnostic.severity.WARN, "StlDiagWarn", "warn" },
-    { vim.diagnostic.severity.INFO, "StlDiagInfo", "info" },
-    { vim.diagnostic.severity.HINT, "StlDiagHint", "hint" },
+    { vim.diagnostic.severity.WARN,  "StlDiagWarn",  "warn" },
+    { vim.diagnostic.severity.INFO,  "StlDiagInfo",  "info" },
+    { vim.diagnostic.severity.HINT,  "StlDiagHint",  "hint" },
 }
 
 local function hl_suffix(color)
@@ -34,6 +34,7 @@ local function build_mode_map()
     mode_map = {
         n = make_mode("NORMAL", C.blue),
         i = make_mode("INSERT", C.green),
+        ic = make_mode("INSERT", C.green),
         v = make_mode("VISUAL", C.red),
         V = make_mode("V-LINE", C.red),
         ["\22"] = make_mode("V-BLCK", C.red),
@@ -72,7 +73,15 @@ local function apply_highlights()
 end
 
 local function current_mode()
-    return mode_map[vim.api.nvim_get_mode().mode] or fallback_mode
+    local native_mode = vim.api.nvim_get_mode().mode
+    local m = mode_map[native_mode]
+    if m == nil then
+        vim.schedule(function()
+            vim.notify("Unknown mode: " .. native_mode, vim.log.levels.ERROR)
+        end)
+        m = fallback_mode
+    end
+    return m
 end
 
 local function segment(content, info)

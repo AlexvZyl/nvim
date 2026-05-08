@@ -1,8 +1,9 @@
+local U = require("alex.utils")
+
 require("alex.native.lsp.defaults")
+require("alex.native.lsp.completion")
 
 local M = {}
-
-local U = require("alex.utils")
 
 -- Enable logging.
 vim.lsp.log.set_level("error")

@@ -10,19 +10,7 @@ function M.setup()
         },
     })
 
-    -- This means we did not start with a dashboard.
-    -- Enable no-neck-pain.
-    if vim.bo.filetype ~= "lazy" then
-        M.enable()
-    else
-        -- Started with dashboard, setup event for starting no-neck-pain.
-        vim.api.nvim_create_autocmd("BufReadPost", {
-            once = true,
-            callback = function()
-                M.enable()
-            end,
-        })
-    end
+    M.enable()
 end
 
 function M.toggle()

@@ -1,6 +1,5 @@
 require("alex.native.options")
 require("alex.native.statusline")
-require("alex.native.dashboard")
 require("alex.native.treesitter")
 require("alex.native.terminal")
 require("alex.native.statuscolumn")

@@ -42,8 +42,8 @@ function M.toggle_virtual_diagnostics()
         severity_sort = true,
     })
     U.merge_highlights_table({
-        DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics },
-        DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics },
+        DiagnosticUnderlineError = { underline = not M.virtual_diagnostics },
+        DiagnosticUnderlineWarn = { underline = not M.virtual_diagnostics },
     })
     require("alex.native.statusline").refresh()
 end
@@ -57,11 +57,11 @@ vim.diagnostic.config({
     severity_sort = true,
 })
 U.merge_highlights_table({
-    DiagnosticUnderlineError = { undercurl = not M.virtual_diagnostics, underline = false },
-    DiagnosticUnderlineWarn = { undercurl = not M.virtual_diagnostics, underline = false },
-    DiagnosticUnderlineHint = { undercurl = false, underline = false },
-    DiagnosticUnderlineOk = { undercurl = false, underline = false },
-    DiagnosticUnderlineInfo = { undercurl = false, underline = false },
+    DiagnosticUnderlineError = { underline = not M.virtual_diagnostics, undercurl = false },
+    DiagnosticUnderlineWarn = { underline = not M.virtual_diagnostics, undercurl = false },
+    DiagnosticUnderlineHint = { underline = false, undercurl = false },
+    DiagnosticUnderlineOk = { underline = false, undercurl = false },
+    DiagnosticUnderlineInfo = { underline = false, undercurl = false },
 })
 
 -- TODO: For some reason this is still required for telescope stuff.

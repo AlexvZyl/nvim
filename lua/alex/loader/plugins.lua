@@ -8,13 +8,6 @@ return {
         end,
     },
     {
-        "karb94/neoscroll.nvim",
-        event = { "WinScrolled" },
-        config = function()
-            require("alex.plugins.neoscroll-nvim").init()
-        end,
-    },
-    {
         "lukas-reineke/indent-blankline.nvim",
         event = { "VeryLazy" },
         config = function()
@@ -64,16 +57,6 @@ return {
         end,
     },
     {
-        "folke/noice.nvim",
-        dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
-        -- Can't be lazy as we want notifications to be able to run on startup.
-        -- TODO: Could probably have just nvim-notify load.
-        lazy = false,
-        config = function()
-            require("alex.plugins.noice")
-        end,
-    },
-    {
         -- This plugin has issues when lazy.
         "lewis6991/gitsigns.nvim",
         -- event = { "VeryLazy" },
@@ -112,26 +95,6 @@ return {
         dependencies = { "Bilal2453/luvit-meta" },
         ft = "lua",
         event = { "LspAttach" },
-    },
-    {
-        "hrsh7th/nvim-cmp",
-        event = { "VeryLazy" },
-        config = function()
-            require("alex.plugins.completion")
-        end,
-        dependencies = {
-            "hrsh7th/cmp-omni",
-            "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-buffer",
-            "hrsh7th/cmp-path",
-            "hrsh7th/cmp-cmdline",
-            "saadparwaiz1/cmp_luasnip",
-            {
-                "L3MON4D3/LuaSnip",
-                dependencies = { "rafamadriz/friendly-snippets" },
-                build = "make install_jsregexp",
-            },
-        },
     },
     {
         "windwp/nvim-autopairs",

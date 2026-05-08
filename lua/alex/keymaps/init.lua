@@ -58,6 +58,10 @@ function M.lsp()
     keymap(n, "]E", function()
         require("alex.native.lsp").next_error()
     end, default_settings)
+
+    keymap(i, "<CR>", function()
+        return vim.fn.pumvisible() == 1 and "<C-y>" or "<CR>"
+    end, default_expr)
 end
 
 function M.lazy()
@@ -70,24 +74,6 @@ end
 
 function M.no_neck_pain()
     keymap(n, "<leader>n", require("alex.plugins.no-neck-pain").toggle, default_settings)
-end
-
-function M.noice()
-    local duration = require("alex.plugins.neoscroll-nvim").scroll_duration
-
-    keymap({ "n", "i", "s" }, "<C-d>", function()
-        if not require("noice.lsp").scroll(4) then
-            require("neoscroll").ctrl_d({ duration = duration })
-        end
-    end, { silent = true })
-
-    keymap({ "n", "i", "s" }, "<C-u>", function()
-        if not require("noice.lsp").scroll(-4) then
-            return require("neoscroll").ctrl_u({ duration = duration })
-        end
-    end, { silent = true })
-
-    keymap(n, "<C-m>", "<Cmd>NoiceDismiss<CR>", default_settings)
 end
 
 function M.native()

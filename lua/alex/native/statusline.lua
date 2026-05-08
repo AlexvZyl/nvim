@@ -5,8 +5,6 @@ local nnp = require("alex.plugins.no-neck-pain")
 
 -- TODO: Vibe coded, revisit.
 
-local SEP_L, SEP_R = "\u{e0b6}", "\u{e0b4}"
-
 local M = {}
 
 local mode_map = {}
@@ -29,7 +27,6 @@ local function make_mode(label, color)
         label = label,
         color = color,
         mode_hl = "StlMode_" .. suffix,
-        sep_hl = "StlModeSep_" .. suffix,
     }
 end
 
@@ -67,7 +64,6 @@ local function apply_highlights()
         if not seen[info.color] then
             seen[info.color] = true
             hls[info.mode_hl] = { fg = C.bg_dark, bg = info.color, bold = true }
-            hls[info.sep_hl] = { fg = info.color, bg = C.bg_dark }
         end
     end
     for name, opts in pairs(hls) do
@@ -80,14 +76,7 @@ local function current_mode()
 end
 
 local function segment(content, info)
-    return ("%%#%s#%s%%#%s# %s %%#%s#%s%%*"):format(
-        info.sep_hl,
-        SEP_L,
-        info.mode_hl,
-        content,
-        info.sep_hl,
-        SEP_R
-    )
+    return ("%%#%s# %s %%*"):format(info.mode_hl, content)
 end
 
 local function icon(active, text)

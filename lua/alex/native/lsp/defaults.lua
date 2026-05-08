@@ -1,17 +1,18 @@
 local LU = require("lspconfig.util")
 
--- Disable the cycling between function params using <Tab>, very irritating.
-vim.lsp.config("*", {
-    capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
-        textDocument = {
-            completion = {
-                completionItem = {
-                    snippetSupport = false,
-                },
-            },
-        },
-    }),
+
+
+vim.api.nvim_create_autocmd("LspAttach", {
+    group = vim.api.nvim_create_augroup("AlexLspAutocomplete", { clear = true }),
+    callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client and client:supports_method("textDocument/completion") then
+            vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+        end
+    end,
 })
+
+vim.opt.completeopt = { "menuone", "noselect", "popup", "fuzzy" }
 
 -- These LSPs use the configs provided by `nvim-lspconfig`.
 

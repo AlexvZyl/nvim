@@ -174,5 +174,4 @@ vim.api.nvim_create_autocmd("User", {
 })
 
 -- Extensions.
-TS.load_extension("notify")
 TS.load_extension("ui-select")

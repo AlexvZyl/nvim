@@ -30,8 +30,10 @@ vim.opt.wrap = false
 vim.opt.showtabline = 0
 
 vim.opt.inccommand = "nosplit"
+vim.opt.showmode = false
+vim.opt.showcmd = false
 
-vim.opt.cmdheight = 0
+vim.opt.cmdheight = 1
 vim.g.VM_set_statusline = 0
 vim.g.VM_silent_exit = 1
 

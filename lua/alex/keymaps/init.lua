@@ -255,24 +255,4 @@ function M.leap()
     vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
 end
 
-function M.completion()
-    local cmp = require("cmp")
-    cmp.setup({
-        mapping = cmp.mapping.preset.insert({
-            ["<C-u>"] = cmp.mapping.scroll_docs(-4),
-            ["<C-d>"] = cmp.mapping.scroll_docs(4),
-            ["<C-Space>"] = cmp.mapping.complete(),
-            ["<C-e>"] = cmp.mapping.abort(),
-            ["<CR>"] = cmp.mapping.confirm({
-                select = false,
-                behavior = cmp.ConfirmBehavior.Insert,
-            }),
-        }),
-    })
-
-    keymap(c, "<C-Space>", function()
-        require("cmp").complete()
-    end, default_settings)
-end
-
 return M

@@ -26,6 +26,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         -- TODO: Not sure why this has to be in the callback.
         vim.keymap.set("i", "<C-Space>", vim.lsp.completion.get)
+        vim.keymap.set("i", "<CR>", function()
+            return vim.fn.pumvisible() == 1 and "<C-y>" or "<CR>"
+        end, { buffer = ev.buf, expr = true })
 
         assert(client)
         if client:supports_method("textDocument/completion") then

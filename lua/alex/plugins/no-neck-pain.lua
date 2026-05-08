@@ -9,8 +9,6 @@ function M.setup()
             skipEnteringNoNeckPainBuffer = true,
         },
     })
-
-    M.enable()
 end
 
 function M.toggle()

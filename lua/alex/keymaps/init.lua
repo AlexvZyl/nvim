@@ -36,7 +36,7 @@ function M.lsp()
         pcall(vim.lsp.buf.hover)
     end, default_settings)
     keymap(n_i, "<C-\\>", function()
-        pcall(vim.lsp.buf.signature_help)
+        pcall(vim.lsp.buf.signature_help, { anchor_bias = "above" })
     end, default_settings)
 
     keymap(n_v, "ca", function()
@@ -59,9 +59,6 @@ function M.lsp()
         require("alex.native.lsp").next_error()
     end, default_settings)
 
-    keymap(i, "<CR>", function()
-        return vim.fn.pumvisible() == 1 and "<C-y>" or "<CR>"
-    end, default_expr)
 end
 
 function M.lazy()

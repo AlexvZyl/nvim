@@ -175,3 +175,4 @@ vim.api.nvim_create_autocmd("User", {
 
 -- Extensions.
 TS.load_extension("ui-select")
+TS.load_extension("fzf")

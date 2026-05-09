@@ -125,16 +125,6 @@ function M.current_buffer_lsp()
         end
     end
 
-    -- Add linters
-    local current_filetype = M.current_buffer_filetype()
-    local linters = require("lint").linters_by_ft[current_filetype]
-
-    if linters then
-        for _, linter in ipairs(linters) do
-            result = result .. linter .. sep
-        end
-    end
-
     -- Remove trailing separator
     if result ~= "" and result:sub(-#sep) == sep then
         result = result:sub(1, -#sep - 1)

@@ -1,6 +1,6 @@
 local C = require("default.palette")
 local U = require("alex.utils")
-local lsp_state = require("alex.native.lsp")
+local lsp_state = require("alex.native.lang")
 local nnp = require("alex.plugins.no-neck-pain")
 
 -- TODO: Vibe coded, revisit.

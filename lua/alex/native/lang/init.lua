@@ -1,7 +1,7 @@
 local U = require("alex.utils")
 
-require("alex.native.lsp.defaults")
-require("alex.native.lsp.completion")
+require("alex.native.lang.lsp-configs")
+require("alex.native.lang.completion")
 
 local M = {}
 
@@ -155,7 +155,7 @@ end
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     callback = function()
-        local L = require("alex.native.lsp")
+        local L = require("alex.native.lang.init")
         if L.format_enabled then
             L.format_buffer()
         end

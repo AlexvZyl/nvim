@@ -82,15 +82,6 @@ return {
 
     -- Language.
     {
-        "mfussenegger/nvim-lint",
-        -- Does not make sense to have a linter without a LSP.
-        -- This will have to change if that ever happens.
-        event = { "LspAttach" },
-        config = function()
-            require("alex.plugins.linter")
-        end,
-    },
-    {
         "folke/lazydev.nvim",
         dependencies = { "Bilal2453/luvit-meta" },
         ft = "lua",

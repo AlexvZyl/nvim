@@ -38,6 +38,7 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("docker_compose_language_service")
 vim.lsp.enable("zls")
 vim.lsp.enable("kotlin_lsp")
+vim.lsp.enable("efm")
 
 -- Override some of the configs.
 
@@ -73,4 +74,19 @@ vim.lsp.config("lua_ls", {
 vim.lsp.config("kotlin_lsp", {
     cmd = { vim.fn.expand("$HOME/.local/opt/kotlin-lsp/kotlin-lsp.sh"), "--stdio" },
     root_markers = { ".git" },
+})
+
+vim.lsp.config("efm", {
+    filetypes = { "kotlin" },
+    settings = {
+        languages = {
+            kotlin = {
+                {
+                    lintCommand = "ktlint --relative --reporter=plain ${INPUT}",
+                    lintFormats = { "%f:%l:%c: %m" },
+                    lintSource = "ktlint",
+                },
+            },
+        },
+    },
 })

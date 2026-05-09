@@ -86,7 +86,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
                 autotrigger = false,
                 convert = format_item,
             })
-        else
+        elseif client.name ~= "efm" then
             vim.schedule(function()
                 vim.notify("LSP does not support auto complete", vim.log.levels.WARN)
             end)

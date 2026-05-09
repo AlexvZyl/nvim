@@ -82,12 +82,6 @@ return {
 
     -- Language.
     {
-        "folke/lazydev.nvim",
-        dependencies = { "Bilal2453/luvit-meta" },
-        ft = "lua",
-        event = { "LspAttach" },
-    },
-    {
         "romus204/tree-sitter-manager.nvim",
         config = function()
             require("alex.plugins.tree-sitter-manager")

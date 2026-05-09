@@ -1,5 +1,22 @@
 local LU = require("lspconfig.util")
 
+vim.lsp.commands = vim.lsp.commands or {}
+vim.lsp.commands["editor.action.triggerParameterHints"] = function()
+    vim.lsp.buf.signature_help()
+end
+
+vim.lsp.config("*", {
+    capabilities = {
+        textDocument = {
+            completion = {
+                completionItem = {
+                    snippetSupport = true,
+                },
+            },
+        },
+    },
+})
+
 -- These LSPs use the configs provided by `nvim-lspconfig`.
 
 vim.lsp.enable("cssls")
@@ -39,6 +56,16 @@ vim.lsp.config("bashls", {
     settings = {
         bashIde = {
             shellcheckArguments = { "-x" },
+        },
+    },
+})
+
+vim.lsp.config("lua_ls", {
+    settings = {
+        Lua = {
+            completion = {
+                callSnippet = "Replace",
+            },
         },
     },
 })

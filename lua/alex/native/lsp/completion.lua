@@ -2,7 +2,7 @@ local chars = require("alex.utils.chars")
 
 vim.opt.autocomplete = true
 vim.opt.pumheight = 10
-vim.opt.completeopt = { "menuone", "fuzzy", "popup", "noinsert", "noselect" }
+vim.opt.completeopt = { "menuone", "fuzzy", "popup", "noselect" }
 vim.opt.pumborder = "rounded"
 vim.opt.complete = "o"
 

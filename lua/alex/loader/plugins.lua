@@ -38,12 +38,12 @@ return {
         end,
     },
     {
-        'nvim-telescope/telescope.nvim',
-        cmd = {"Telescope"},
+        "nvim-telescope/telescope.nvim",
+        cmd = { "Telescope" },
         dependencies = {
-            'nvim-lua/plenary.nvim',
+            "nvim-lua/plenary.nvim",
             "nvim-telescope/telescope-ui-select.nvim",
-            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+            { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
             {
                 "stevearc/quicker.nvim",
                 config = function()

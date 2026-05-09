@@ -1,6 +1,6 @@
 local chars = require("alex.utils.chars")
 
-vim.opt.autocomplete = true
+vim.opt.autocomplete = false
 vim.opt.pumheight = 10
 vim.opt.completeopt = { "menuone", "fuzzy", "popup", "noselect" }
 vim.opt.pumborder = "rounded"
@@ -14,6 +14,55 @@ local kind_names = vim.lsp.protocol.CompletionItemKind
 local kind_icons = chars.kind_icons
 local unknown_icon = kind_icons.Unknown
 local pad = string.rep(" ", ABBR_MIN_WIDTH)
+
+local kind_hl = {
+    Text = "@string",
+    Method = "@function.method",
+    Function = "@function",
+    Constructor = "@constructor",
+    Field = "@variable.member",
+    Variable = "@variable",
+    Class = "@type",
+    Interface = "@type",
+    Module = "@module",
+    Property = "@property",
+    Unit = "@number",
+    Value = "@constant",
+    Enum = "@type",
+    Keyword = "@keyword",
+    Snippet = "@string.special",
+    Color = "@constant",
+    File = "@string.special.path",
+    Reference = "@variable",
+    Folder = "@string.special.path",
+    EnumMember = "@constant",
+    Constant = "@constant",
+    Struct = "@type",
+    Event = "@function",
+    Operator = "@operator",
+    TypeParameter = "@type.definition",
+}
+
+local function format_item(item)
+    local abbr = item.label
+    abbr = abbr:gsub("%b()", ""):gsub("%b{}", "")
+    abbr = abbr:match("[%w_.]+.*") or abbr
+    abbr = #abbr > ABBR_MAX_WIDTH and abbr:sub(1, ABBR_MAX_WIDTH - 1) .. "…" or abbr
+    abbr = #abbr < ABBR_MIN_WIDTH and abbr .. pad:sub(1, ABBR_MIN_WIDTH - #abbr) or abbr
+
+    local menu = item.detail or ""
+    menu = #menu > MENU_MAX_WIDTH and menu:sub(1, MENU_MAX_WIDTH - 1) .. "…" or menu
+
+    local kind_name = kind_names[item.kind] or "Unknown"
+    local kind = kind_icons[kind_name] or unknown_icon
+
+    return {
+        abbr = abbr,
+        menu = menu,
+        kind = kind,
+        kind_hlgroup = kind_hl[kind_name],
+    }
+end
 
 vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(ev)
@@ -34,25 +83,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
         assert(client)
         if client:supports_method("textDocument/completion") then
             vim.lsp.completion.enable(true, client.id, ev.buf, {
-                autotrigger = true,
-                -- Formatting.
-                convert = function(item)
-                    local abbr = item.label
-                    abbr = abbr:gsub("%b()", ""):gsub("%b{}", "")
-                    abbr = abbr:match("[%w_.]+.*") or abbr
-                    abbr = #abbr > ABBR_MAX_WIDTH and abbr:sub(1, ABBR_MAX_WIDTH - 1) .. "…"
-                        or abbr
-                    abbr = #abbr < ABBR_MIN_WIDTH and abbr .. pad:sub(1, ABBR_MIN_WIDTH - #abbr)
-                        or abbr
-
-                    local menu = item.detail or ""
-                    menu = #menu > MENU_MAX_WIDTH and menu:sub(1, MENU_MAX_WIDTH - 1) .. "…"
-                        or menu
-
-                    local kind = kind_icons[kind_names[item.kind]] or unknown_icon
-
-                    return { abbr = abbr, menu = menu, kind = kind }
-                end,
+                autotrigger = false,
+                convert = format_item,
             })
         else
             vim.schedule(function()
@@ -62,7 +94,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
--- VIBE CODED SHUOLD PROBABLY BE REMOVED.
+-- VIBE CODED SHOULD BE REMOVED WHEN ON MASTER.
 -- Adds borders to hover doc.
 
 local orig_open_floating_preview = vim.lsp.util.open_floating_preview

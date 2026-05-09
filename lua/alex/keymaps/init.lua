@@ -3,7 +3,7 @@
 
 local U = require("alex.utils")
 
-local n, i, v, t, c = "n", "i", "v", "t", "c"
+local n, i, v, t = "n", "i", "v", "t"
 local ex_t = { n, i, v }
 local n_i = { n, i }
 local n_v = { n, v }
@@ -44,19 +44,19 @@ function M.lsp()
     end, default_settings)
 
     keymap(n, "ge", function()
-        require("alex.native.lang.init").open_diagnostics_float()
+        require("alex.native.lang").open_diagnostics_float()
     end, default_settings)
     keymap(n, "[e", function()
-        require("alex.native.lang.init").prev_diag()
+        require("alex.native.lang").prev_diag()
     end, default_settings)
     keymap(n, "]e", function()
-        require("alex.native.lang.init").next_diag()
+        require("alex.native.lang").next_diag()
     end, default_settings)
     keymap(n, "[E", function()
-        require("alex.native.lang.init").prev_error()
+        require("alex.native.lang").prev_error()
     end, default_settings)
     keymap(n, "]E", function()
-        require("alex.native.lang.init").next_error()
+        require("alex.native.lang").next_error()
     end, default_settings)
 end
 
@@ -92,10 +92,10 @@ function M.native()
     keymap(n_v, "<C-y>", "k<C-y>", default_settings)
     keymap(n, "K", "<nop>", default_settings)
     keymap(n, "<leader>d", function()
-        require("alex.native.lang.init").toggle_virtual_diagnostics()
+        require("alex.native.lang").toggle_virtual_diagnostics()
     end, default_settings)
     keymap(n, "<leader>f", function()
-        require("alex.native.lang.init").toggle_format_enabled()
+        require("alex.native.lang").toggle_format_enabled()
     end, default_settings)
     keymap(n, "gm", "<Cmd>vertical Man<CR>", default_settings)
     keymap(n, "<leader>r", function()

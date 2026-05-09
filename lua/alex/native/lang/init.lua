@@ -19,10 +19,10 @@ vim.hl.priorities.semantic_tokens = 99
 
 local signs = {
     text = {
-        [vim.diagnostic.severity.ERROR] = "",
-        [vim.diagnostic.severity.WARN] = "",
-        [vim.diagnostic.severity.INFO] = "",
-        [vim.diagnostic.severity.HINT] = "",
+        [vim.diagnostic.severity.ERROR] = U.diagnostic_signs.error,
+        [vim.diagnostic.severity.WARN] = U.diagnostic_signs.warn,
+        [vim.diagnostic.severity.INFO] = U.diagnostic_signs.info,
+        [vim.diagnostic.severity.HINT] = U.diagnostic_signs.hint,
     },
     numhl = {
         [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",

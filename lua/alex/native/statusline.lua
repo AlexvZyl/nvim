@@ -107,7 +107,7 @@ local function diagnostics()
     for _, l in ipairs(diag_levels) do
         local n = counts[l[1]] or 0
         if n > 0 then
-            parts[#parts + 1] = ("%%#%s#%s%d%%*"):format(l[2], signs[l[3]], n)
+            parts[#parts + 1] = ("%%#%s#%s%d%%*"):format(l[2], signs[l[3]] .. " ", n)
         end
     end
     if #parts == 0 then

@@ -3,7 +3,7 @@ local M = {}
 M.relative = true
 
 function M.default()
-    vim.opt.numberwidth = 5
+    vim.opt.numberwidth = 4
     vim.o.relativenumber = M.relative
     vim.opt.statuscolumn = " %s%=%{v:relnum?v:relnum:v:lnum}%#WinSeparator#  "
 end

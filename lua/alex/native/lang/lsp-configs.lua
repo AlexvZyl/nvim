@@ -77,16 +77,22 @@ vim.lsp.config("kotlin_lsp", {
 })
 
 vim.lsp.config("efm", {
+    cmd = { "efm-langserver", "-loglevel", "1" },
     filetypes = { "kotlin" },
     settings = {
+        rootMarkers = { ".git/" },
+        lintDebounce = "500ms",
         languages = {
             kotlin = {
                 {
-                    lintCommand = "ktlint --relative --reporter=plain ${INPUT}",
+                    lintCommand = "ktlint --reporter=plain --stdin",
+                    lintStdin = true,
                     lintFormats = { "%f:%l:%c: %m" },
                     lintSource = "ktlint",
+                    lintAfterOpen = true,
                 },
             },
         },
     },
+    init_options = { documentFormatting = false },
 })

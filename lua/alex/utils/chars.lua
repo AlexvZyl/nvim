@@ -54,6 +54,15 @@ M.diagnostic_signs = {
     hint = " ",
     other = " ",
 }
+M.diagnostic_signs = {
+    error = "●",
+    warning = "●",
+    warn = "●",
+    info = "●",
+    information = "●",
+    hint = "●",
+    other = "●",
+}
 M.kind_icons = {
     Text = " ",
     Method = " ",

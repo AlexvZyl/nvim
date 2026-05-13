@@ -19,8 +19,6 @@ function M.setup()
     })
 
     vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
-
-    vim.opt.shell = "fish"
 end
 
 M.setup()

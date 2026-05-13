@@ -16,7 +16,7 @@ return {
     },
     {
         "folke/todo-comments.nvim",
-        -- This needs to be at stratup so that we can get the highliting.
+        -- This needs to be at startup so that we can get the highliting.
         event = { "VeryLazy" },
         dependencies = {
             "nvim-lua/plenary.nvim",
@@ -29,13 +29,13 @@ return {
     },
     {
         "stevearc/oil.nvim",
-        event = { "VeryLazy" },
         dependencies = {
             "nvim-tree/nvim-web-devicons",
         },
         config = function()
             require("alex.plugins.oil-nvim")
         end,
+        lazy = false
     },
     {
         "nvim-telescope/telescope.nvim",

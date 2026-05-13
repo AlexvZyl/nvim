@@ -35,7 +35,7 @@ return {
         config = function()
             require("alex.plugins.oil-nvim")
         end,
-        lazy = false
+        lazy = false,
     },
     {
         "nvim-telescope/telescope.nvim",

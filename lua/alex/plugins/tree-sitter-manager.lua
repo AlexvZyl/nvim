@@ -9,6 +9,6 @@ require("tree-sitter-manager").setup({
         "cpp",
         "toml",
         "xml",
-        "yaml"
+        "yaml",
     },
 })

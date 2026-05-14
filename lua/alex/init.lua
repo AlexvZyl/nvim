@@ -7,7 +7,7 @@ end
 require("alex.native.options")
 require("alex.loader")
 require("alex.native")
-require("alex.keymaps").init()
+require("lua.alex.keymaps").init()
 
 -- For diffs.
 vim.cmd("packadd nvim.difftool")

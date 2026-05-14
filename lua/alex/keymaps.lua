@@ -15,7 +15,6 @@ local default_expr = { noremap = true, expr = true }
 
 local M = {}
 
-
 function M.save_file()
     if U.current_buffer_name() == "" then
         return
@@ -46,7 +45,6 @@ function M.toggle_oil()
         vim.cmd("Oil")
     end
 end
-
 
 function M.init()
     M.native()

@@ -270,4 +270,6 @@ function M.leap()
     vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
 end
 
+M.init()
+
 return M

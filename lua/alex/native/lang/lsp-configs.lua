@@ -38,7 +38,7 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("docker_compose_language_service")
 vim.lsp.enable("zls")
 vim.lsp.enable("kotlin_lsp")
--- vim.lsp.enable("efm")
+vim.lsp.enable("efm")
 
 -- Override some of the configs.
 
@@ -79,11 +79,16 @@ vim.lsp.config("kotlin_lsp", {
 vim.lsp.config("efm", {
     cmd = { "efm-langserver", "-loglevel", "1" },
     filetypes = { "kotlin" },
+    init_options = { documentFormatting = true, documentRangeFormatting = true },
     settings = {
         rootMarkers = { ".git/" },
         lintDebounce = "500ms",
         languages = {
             kotlin = {
+                {
+                    formatCommand = "ktlint --format --stdin --log-level=none",
+                    formatStdin = true,
+                },
                 {
                     lintCommand = "ktlint --reporter=plain --stdin",
                     lintStdin = true,
@@ -91,8 +96,15 @@ vim.lsp.config("efm", {
                     lintSource = "ktlint",
                     lintAfterOpen = true,
                 },
+                {
+                    lintCommand = "detekt --input ${INPUT}",
+                    lintStdin = false,
+                    lintFormats = { "%f:%l:%c: %t%*[^:]: %m" },
+                    lintSource = "detekt",
+                    lintAfterOpen = true,
+                    rootMarkers = { "detekt.yml", ".git/" },
+                },
             },
         },
     },
-    init_options = { documentFormatting = false },
 })

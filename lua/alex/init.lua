@@ -4,10 +4,7 @@ if not require("alex.environments").should_setup then
     return
 end
 
-require("alex.native.options")
-require("alex.loader")
+require("alex.options")
+require("alex.lazy")
 require("alex.native")
-require("alex.keymaps").init()
-
--- For diffs.
-vim.cmd("packadd nvim.difftool")
+require("alex.keymaps")

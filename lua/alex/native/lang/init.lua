@@ -136,7 +136,17 @@ function M.remove_trailing_whitespace()
 end
 
 function M.format_via_lsp()
-    local status, _ = pcall(vim.lsp.buf.format)
+    local is_kotlin = vim.bo.filetype == "kotlin"
+    local status, _ = pcall(vim.lsp.buf.format, {
+        async = is_kotlin,
+        timeout_ms = 10000,
+        filter = function(client)
+            if is_kotlin then
+                return client.name == "efm"
+            end
+            return true
+        end,
+    })
     if not status then
         vim.notify("Format failed")
     end

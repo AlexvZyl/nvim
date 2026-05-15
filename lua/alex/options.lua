@@ -58,3 +58,6 @@ vim.opt.pumblend = 0
 vim.opt.pumheight = 10
 
 vim.cmd("filetype plugin indent on")
+
+-- For diffs.
+vim.cmd("packadd nvim.difftool")

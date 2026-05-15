@@ -34,13 +34,12 @@ local function build_mode_map()
     mode_map = {
         n = make_mode("NORMAL", C.blue),
         i = make_mode("INSERT", C.green),
-        ic = make_mode("INSERT", C.green),
         v = make_mode("VISUAL", C.red),
         V = make_mode("V-LINE", C.red),
-        ["\22"] = make_mode("V-BLCK", C.red),
+        [vim.keycode("<C-V>")] = make_mode("V-BLCK", C.red),
         s = make_mode("SELECT", C.red),
         S = make_mode("S-LINE", C.red),
-        ["\19"] = make_mode("S-BLCK", C.red),
+        [vim.keycode("<C-S>")] = make_mode("S-BLCK", C.red),
         c = make_mode("COMMND", C.orange),
         r = make_mode("PROMPT", C.magenta),
         R = make_mode("RPLACE", C.red),
@@ -58,7 +57,6 @@ local function apply_highlights()
         StlDiagWarn = { fg = C.yellow },
         StlDiagInfo = { fg = C.blue },
         StlDiagHint = { fg = C.green },
-        StlRecording = { fg = C.red },
     }
     local seen = {}
     for _, info in pairs(mode_map) do
@@ -74,10 +72,10 @@ end
 
 local function current_mode()
     local native_mode = vim.api.nvim_get_mode().mode
-    local m = mode_map[native_mode]
+    local m = mode_map[native_mode] or mode_map[native_mode:sub(1, 1)]
     if m == nil then
         vim.schedule(function()
-            vim.notify("Unknown mode: " .. native_mode, vim.log.levels.ERROR)
+            vim.notify_once("Unknown mode: " .. native_mode, vim.log.levels.ERROR)
         end)
         m = fallback_mode
     end
@@ -116,19 +114,29 @@ local function diagnostics()
     return "  " .. table.concat(parts, " ")
 end
 
+local toggles = {
+    { function() return vim.o.relativenumber end, " " },
+    { function() return lsp_state.virtual_diagnostics end, " " },
+    { function() return nnp.enabled end, " " },
+    { function() return lsp_state.format_enabled end, "󰉼 " },
+}
+
 function M.render()
     local m = current_mode()
-    return segment(" " .. m.label, m)
-        .. lsp_clients()
-        .. diagnostics()
-        .. "%="
-        .. " "
-        .. icon(vim.o.relativenumber, " ")
-        .. icon(lsp_state.virtual_diagnostics, " ")
-        .. icon(nnp.enabled, " ")
-        .. icon(lsp_state.format_enabled, "󰉼 ")
-        .. " "
-        .. segment(" %4l:%-2c  %3p%%", m)
+    local toggle_parts = {}
+    for i, t in ipairs(toggles) do
+        toggle_parts[i] = icon(t[1](), t[2])
+    end
+    return table.concat({
+        segment(" " .. m.label, m),
+        lsp_clients(),
+        diagnostics(),
+        "%=",
+        " ",
+        table.concat(toggle_parts),
+        " ",
+        segment(" %4l:%-2c  %3p%%", m),
+    })
 end
 
 function M.refresh()
@@ -141,12 +149,6 @@ function M.setup()
 
     vim.o.laststatus = 3
     vim.o.statusline = "%{%v:lua.require'alex.native.statusline'.render()%}"
-
-    local group = vim.api.nvim_create_augroup("AlexStatusline", { clear = true })
-    vim.api.nvim_create_autocmd({ "RecordingEnter", "RecordingLeave" }, {
-        group = group,
-        callback = M.refresh,
-    })
 end
 
 M.setup()

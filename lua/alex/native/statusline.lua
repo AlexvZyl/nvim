@@ -123,7 +123,7 @@ function M.render()
         .. diagnostics()
         .. "%="
         .. " "
-        .. icon(require("alex.native.statuscolumn").relative, " ")
+        .. icon(vim.o.relativenumber, " ")
         .. icon(lsp_state.virtual_diagnostics, " ")
         .. icon(nnp.enabled, " ")
         .. icon(lsp_state.format_enabled, "󰉼 ")

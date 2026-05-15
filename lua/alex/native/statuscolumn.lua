@@ -1,11 +1,15 @@
 local M = {}
 
-M.relative = true
-
-function M.default()
+function M.relative()
     vim.opt.numberwidth = 4
-    vim.o.relativenumber = M.relative
+    vim.o.relativenumber = true
     vim.opt.statuscolumn = " %s%=%{v:relnum?v:relnum:v:lnum}%#WinSeparator#  "
+end
+
+function M.absolute()
+    vim.opt.numberwidth = 4
+    vim.o.relativenumber = false
+    vim.opt.statuscolumn = " %s%=%{v:lnum}%#WinSeparator#  "
 end
 
 function M.terminal()
@@ -18,14 +22,17 @@ function M.refresh()
 end
 
 function M.toggle_relative()
-    M.relative = not M.relative
-    M.default()
+    if vim.o.relativenumber then
+        M.absolute()
+    else
+        M.relative()
+    end
     M.refresh()
 end
 
 vim.opt.signcolumn = "yes"
 vim.opt.number = true
 
-M.default()
+M.relative()
 
 return M

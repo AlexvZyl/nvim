@@ -115,10 +115,30 @@ local function diagnostics()
 end
 
 local toggles = {
-    { function() return vim.o.relativenumber end, " " },
-    { function() return lsp_state.virtual_diagnostics end, " " },
-    { function() return nnp.enabled end, " " },
-    { function() return lsp_state.format_enabled end, "󰉼 " },
+    {
+        function()
+            return vim.o.relativenumber
+        end,
+        " ",
+    },
+    {
+        function()
+            return lsp_state.virtual_diagnostics
+        end,
+        " ",
+    },
+    {
+        function()
+            return nnp.enabled
+        end,
+        " ",
+    },
+    {
+        function()
+            return lsp_state.format_enabled
+        end,
+        "󰉼 ",
+    },
 }
 
 function M.render()

@@ -147,15 +147,16 @@ function M.render()
     for i, t in ipairs(toggles) do
         toggle_parts[i] = icon(t[1](), t[2])
     end
+
     return table.concat({
-        segment(" " .. m.label, m),
+        segment(" " .. m.label, m),
         lsp_clients(),
         diagnostics(),
         "%=",
         " ",
         table.concat(toggle_parts),
         " ",
-        segment(" %4l:%-2c  %3p%%", m),
+        segment(" %4l:%-2c  %3p%%", m)
     })
 end
 

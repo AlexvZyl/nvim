@@ -15,7 +15,7 @@ local default_expr = { noremap = true, expr = true }
 
 local M = {}
 
-function M.save_file()
+function save_file()
     if U.current_buffer_name() == "" then
         return
     end
@@ -25,20 +25,11 @@ function M.save_file()
     end
 end
 
-function M.toggle_diffview()
-    local view = require("diffview.lib").get_current_view()
-    if view then
-        vim.cmd("DiffviewClose")
-    else
-        vim.cmd("DiffviewOpen")
-    end
-end
-
-function M.delete_buffer()
+function delete_buffer()
     vim.cmd([[:bdelete]])
 end
 
-function M.toggle_oil()
+function toggle_oil()
     if U.current_buffer_filetype() == "oil" then
         pcall(vim.api.nvim_command, "b#")
     else
@@ -132,7 +123,7 @@ function M.native()
 
     -- Buffers
     keymap(n, "Q", function()
-        require("alex.keymaps.utils").delete_buffer()
+        delete_buffer()
     end, default_settings)
 
     keymap("n", "yp", '<Cmd>let @+ = expand("%")<CR>')
@@ -166,7 +157,7 @@ end
 
 function M.oil()
     keymap(n, "<leader>e", function()
-        require("alex.keymaps.utils").toggle_oil()
+        toggle_oil()
     end)
     require("oil").setup({
         keymaps = {
@@ -180,7 +171,7 @@ end
 function M.editing()
     keymap(i, "<Esc>", "<Esc>`^", default_settings)
     keymap(ex_t, "<C-s>", function()
-        require("alex.keymaps.utils").save_file()
+        save_file()
     end, default_settings)
     keymap(v, "i", "I", default_settings)
     keymap(n, "s", function()
@@ -188,9 +179,6 @@ function M.editing()
     end)
     keymap(n, "S", function()
         require("leap").leap({ backward = true })
-    end)
-    keymap(n, "<leader>v", function()
-        require("alex.keymaps.utils").toggle_diffview()
     end)
 end
 

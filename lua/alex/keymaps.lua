@@ -15,7 +15,7 @@ local default_expr = { noremap = true, expr = true }
 
 local M = {}
 
-function save_file()
+local function save_file()
     if U.current_buffer_name() == "" then
         return
     end
@@ -25,11 +25,11 @@ function save_file()
     end
 end
 
-function delete_buffer()
+local function delete_buffer()
     vim.cmd([[:bdelete]])
 end
 
-function toggle_oil()
+local function toggle_oil()
     if U.current_buffer_filetype() == "oil" then
         pcall(vim.api.nvim_command, "b#")
     else
@@ -126,8 +126,10 @@ function M.native()
         delete_buffer()
     end, default_settings)
 
-    keymap("n", "yp", '<Cmd>let @+ = expand("%")<CR>')
-    keymap("n", "yP", '<Cmd>let @+ = expand("%:p")<CR>')
+    keymap(n, "yp", [[<Cmd>let @+ = expand("%") . ":" . line(".")<CR>]])
+    keymap(n, "yP", [[<Cmd>let @+ = expand("%:p") . ":" . line(".")<CR>]])
+    keymap(v, "yp", [[:<C-u>let @+ = expand("%") . ":" . line("'<") . "-" . line("'>")<CR>]])
+    keymap(v, "yP", [[:<C-u>let @+ = expand("%:p") . ":" . line("'<") . "-" . line("'>")<CR>]])
 
     -- Quickfix.
     keymap(n, "}", "<Cmd>cnext<CR>zz_", default_settings)

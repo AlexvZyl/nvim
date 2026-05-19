@@ -23,7 +23,7 @@ local signs = {
         [vim.diagnostic.severity.WARN] = U.diagnostic_signs.warn,
         [vim.diagnostic.severity.INFO] = U.diagnostic_signs.info,
         [vim.diagnostic.severity.HINT] = U.diagnostic_signs.hint,
-    }
+    },
 }
 
 M.virtual_diagnostics = false

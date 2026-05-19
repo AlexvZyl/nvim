@@ -156,7 +156,7 @@ function M.render()
         " ",
         table.concat(toggle_parts),
         " ",
-        segment(" %4l:%-2c  %3p%%", m)
+        segment(" %4l:%-2c  %3p%%", m),
     })
 end
 

@@ -1,2 +1,2 @@
 require("leap")
-require("alex.keymaps.init").leap()
+require("alex.keymaps").leap()

@@ -23,13 +23,7 @@ local signs = {
         [vim.diagnostic.severity.WARN] = U.diagnostic_signs.warn,
         [vim.diagnostic.severity.INFO] = U.diagnostic_signs.info,
         [vim.diagnostic.severity.HINT] = U.diagnostic_signs.hint,
-    },
-    numhl = {
-        [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
-        [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
-        [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
-        [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
-    },
+    }
 }
 
 M.virtual_diagnostics = false
@@ -128,6 +122,7 @@ function M.prev_diag()
     })
 end
 
+-- TODO: This does not make sense to be here.
 function M.remove_trailing_whitespace()
     local cursor_position = vim.api.nvim_win_get_cursor(0)
     vim.api.nvim_exec([[%s/\s\+$//e]], false)

@@ -68,16 +68,16 @@ function M.lsp()
     keymap(n, "ge", function()
         require("alex.native.lang").open_diagnostics_float()
     end, default_settings)
-    keymap(n, "[e", function()
+    keymap(n, "[d", function()
         require("alex.native.lang").prev_diag()
     end, default_settings)
-    keymap(n, "]e", function()
+    keymap(n, "]d", function()
         require("alex.native.lang").next_diag()
     end, default_settings)
-    keymap(n, "[E", function()
+    keymap(n, "[D", function()
         require("alex.native.lang").prev_error()
     end, default_settings)
-    keymap(n, "]E", function()
+    keymap(n, "]D", function()
         require("alex.native.lang").next_error()
     end, default_settings)
 end
@@ -126,10 +126,8 @@ function M.native()
         delete_buffer()
     end, default_settings)
 
-    keymap(n, "yp", [[<Cmd>let @+ = expand("%") . ":" . line(".")<CR>]])
-    keymap(n, "yP", [[<Cmd>let @+ = expand("%:p") . ":" . line(".")<CR>]])
-    keymap(v, "yp", [[:<C-u>let @+ = expand("%") . ":" . line("'<") . "-" . line("'>")<CR>]])
-    keymap(v, "yP", [[:<C-u>let @+ = expand("%:p") . ":" . line("'<") . "-" . line("'>")<CR>]])
+    keymap(n, "Y", [[<Cmd>let @+ = expand("%") . ":" . line(".")<CR>]])
+    keymap(v, "Y", [[:<C-u>let @+ = expand("%") . ":" . line("'<") . "-" . line("'>")<CR>]])
 
     -- Quickfix.
     keymap(n, "}", "<Cmd>cnext<CR>zz_", default_settings)
@@ -138,23 +136,6 @@ function M.native()
     -- HACK: Don't copy selected region back into registers.
     vim.keymap.set(v, "p", '"_dP', default_settings)
     vim.keymap.set(v, "P", '"_dP', default_settings)
-
-    -- Custom cmdline backspace behavior.
-    vim.keymap.set("c", "<BS>", function()
-        local cmd = vim.fn.getcmdline()
-
-        -- Don't close on empty.
-        if #cmd == 0 then
-            return ""
-        end
-
-        -- Stay in modes.
-        if cmd:match("^!$") or cmd:match("^lua $") or cmd:match("^h $") then
-            return ""
-        end
-
-        return "<BS>"
-    end, default_expr)
 end
 
 function M.oil()

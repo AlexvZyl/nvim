@@ -85,17 +85,17 @@ vim.lsp.config("efm", {
         lintDebounce = "500ms",
         languages = {
             kotlin = {
-                {
-                    formatCommand = "ktlint --format --stdin --log-level=none",
-                    formatStdin = true,
-                },
-                {
-                    lintCommand = "ktlint --reporter=plain --stdin",
-                    lintStdin = true,
-                    lintFormats = { "%f:%l:%c: %m" },
-                    lintSource = "ktlint",
-                    lintAfterOpen = true,
-                },
+                -- {
+                --     formatCommand = "ktlint --format --stdin --log-level=none",
+                --     formatStdin = true,
+                -- },
+                -- {
+                --     lintCommand = "ktlint --reporter=plain --stdin",
+                --     lintStdin = true,
+                --     lintFormats = { "%f:%l:%c: %m" },
+                --     lintSource = "ktlint",
+                --     lintAfterOpen = true,
+                -- },
                 {
                     lintCommand = "detekt --input ${INPUT}",
                     lintStdin = false,

@@ -78,7 +78,7 @@ vim.lsp.config("kotlin_lsp", {
 
 vim.lsp.config("efm", {
     cmd = { "efm-langserver", "-loglevel", "1" },
-    filetypes = { "kotlin" },
+    filetypes = { "kotlin", "rust" },
     init_options = { documentFormatting = true, documentRangeFormatting = true },
     settings = {
         rootMarkers = { ".git/" },
@@ -103,6 +103,16 @@ vim.lsp.config("efm", {
                     lintSource = "detekt",
                     lintAfterOpen = true,
                     rootMarkers = { "detekt.yml", ".git/" },
+                },
+            },
+            rust = {
+                {
+                    lintCommand = "cargo clippy --message-format=short --quiet",
+                    lintStdin = false,
+                    lintFormats = { "%f:%l:%c: %t%*[^:]: %m" },
+                    lintSource = "clippy",
+                    lintAfterOpen = true,
+                    rootMarkers = { "Cargo.toml", ".git/" },
                 },
             },
         },

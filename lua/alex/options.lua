@@ -8,6 +8,7 @@ vim.opt.winborder = "rounded"
 vim.opt.showmode = false
 vim.opt.mouse = ""
 vim.opt.hlsearch = true
+vim.opt.fixeol = true
 
 vim.opt.swapfile = false
 vim.opt.autowrite = false

@@ -72,7 +72,7 @@ vim.lsp.config("lua_ls", {
 })
 
 vim.lsp.config("kotlin_lsp", {
-    cmd = { vim.fn.expand("$HOME/.local/opt/kotlin-lsp/kotlin-lsp.sh"), "--stdio" },
+    cmd = { vim.fn.expand("$HOME/.local/opt/kotlin-lsp/bin/intellij-server"), "--stdio" },
     root_markers = { ".git" },
 })
 

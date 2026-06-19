@@ -104,6 +104,9 @@ function M.native()
     keymap(t, "<C-l>", "<C-\\><C-n><C-w>l", default_settings)
 
     -- Misc
+    keymap(n, "<leader>b", function()
+        require("alex.native.git").show_line_commit()
+    end, default_settings)
     keymap(n, "<leader>i", "<Cmd>Inspect<CR>", default_settings)
     keymap(n, "<Esc>", "<Cmd>noh<CR>", allow_remap)
     keymap(n_v, "<C-e>", "j<C-e>", default_settings)

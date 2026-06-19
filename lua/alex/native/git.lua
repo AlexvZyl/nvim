@@ -14,7 +14,8 @@ function M.show_line_commit()
     end
     local line = vim.api.nvim_win_get_cursor(0)[1]
     local file_dir = vim.fn.fnamemodify(file, ":h")
-    local blame = git(file_dir, "blame", "-L", string.format("%d,%d", line, line), "--porcelain", file)
+    local blame =
+        git(file_dir, "blame", "-L", string.format("%d,%d", line, line), "--porcelain", file)
     if not blame or #blame == 0 then
         return vim.notify("Not in a git repository", vim.log.levels.WARN)
     end

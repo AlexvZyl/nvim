@@ -10,6 +10,6 @@ require("tree-sitter-manager").setup({
         "toml",
         "xml",
         "yaml",
-        "dockerfile"
+        "dockerfile",
     },
 })

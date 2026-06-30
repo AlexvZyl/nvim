@@ -160,7 +160,7 @@ end
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     callback = function()
-        local L = require("alex.native.lang.init")
+        local L = require("alex.native.lang")
         if L.format_enabled then
             L.format_buffer()
         end

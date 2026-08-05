@@ -102,6 +102,7 @@ local plugins = {
         config = function()
             require("alex.plugins.tree-sitter-manager")
         end,
+        branch ="develop"
     },
 
     -- Other.

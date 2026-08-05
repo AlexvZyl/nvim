@@ -11,5 +11,7 @@ require("tree-sitter-manager").setup({
         "xml",
         "yaml",
         "dockerfile",
+        "typescript",
+        "json"
     },
 })

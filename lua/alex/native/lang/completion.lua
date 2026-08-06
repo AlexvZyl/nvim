@@ -5,6 +5,11 @@ vim.opt.pumheight = 10
 vim.opt.completeopt = { "menuone", "fuzzy", "popup", "noselect" }
 vim.opt.pumborder = "rounded"
 vim.opt.complete = "o"
+vim.opt.previewpopup = {
+    border = "rounded",
+    height = nil,
+    width = nil
+}
 
 local ABBR_MIN_WIDTH = 50
 local ABBR_MAX_WIDTH = 25
@@ -74,8 +79,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
             return
         end
 
-        -- TODO: Not sure why this has to be in the callback.
-        vim.keymap.set("i", "<C-Space>", vim.lsp.completion.get)
+        vim.keymap.set("i", "<C-Space>", vim.lsp.completion.get, { buffer = ev.buf })
         vim.keymap.set("i", "<CR>", function()
             return vim.fn.pumvisible() == 1 and "<C-y>" or "<CR>"
         end, { buffer = ev.buf, expr = true })
@@ -94,37 +98,30 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
--- VIBE CODED SHOULD BE REMOVED WHEN ON MASTER.
--- Adds borders to hover doc.
 
-local orig_open_floating_preview = vim.lsp.util.open_floating_preview
+-- AI SLOP.  But it works.
+-- Remove when support is in natively.
 
-vim.lsp.util.open_floating_preview = function(contents, syntax, opts, ...)
-    opts = opts or {}
-    opts.border = opts.border or "rounded"
-    return orig_open_floating_preview(contents, syntax, opts, ...)
-end
-
-local function set_popup_border(winid)
-    if winid and winid >= 0 and vim.api.nvim_win_is_valid(winid) then
+-- The completion docs popup is a native info window not covered by 'previewpopup'.
+-- Docs usually arrive async via completionItem/resolve, which creates the window
+-- through nvim__complete_set; border it there so even the first window gets one.
+local function border_info_win(winid)
+    if winid and winid > 0 and vim.api.nvim_win_is_valid(winid) then
         pcall(vim.api.nvim_win_set_config, winid, { border = "rounded" })
     end
 end
-
-vim.api.nvim_create_autocmd("CompleteChanged", {
-    group = vim.api.nvim_create_augroup("CompletionPopupBorder", { clear = true }),
-    callback = function()
-        vim.schedule(function()
-            set_popup_border(vim.fn.complete_info({ "preview_winid" }).preview_winid)
-        end)
-    end,
-})
-
 if vim.api.nvim__complete_set then
     local orig = vim.api.nvim__complete_set
     vim.api.nvim__complete_set = function(index, opts)
-        local windata = orig(index, opts)
-        set_popup_border(windata and windata.winid)
-        return windata
+        local data = orig(index, opts)
+        border_info_win(data and data.winid)
+        return data
     end
 end
+vim.api.nvim_create_autocmd("CompleteChanged", {
+    callback = function()
+        vim.schedule(function()
+            border_info_win(vim.fn.complete_info({ "selected" }).preview_winid)
+        end)
+    end,
+})

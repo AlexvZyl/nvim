@@ -13,5 +13,7 @@ require("tree-sitter-manager").setup({
         "dockerfile",
         "typescript",
         "json",
+        "terraform",
+        "gdscript"
     },
 })

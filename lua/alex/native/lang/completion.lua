@@ -8,7 +8,7 @@ vim.opt.complete = "o"
 vim.opt.previewpopup = {
     border = "rounded",
     height = nil,
-    width = nil
+    width = nil,
 }
 
 local ABBR_MIN_WIDTH = 50
@@ -97,7 +97,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
         end
     end,
 })
-
 
 -- AI SLOP.  But it works.
 -- Remove when support is in natively.

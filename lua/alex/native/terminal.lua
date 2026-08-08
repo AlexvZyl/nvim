@@ -14,7 +14,7 @@ function M.setup()
                 return
             end
             vim.cmd("startinsert")
-        end
+        end,
     })
 
     -- Close the buffer when the terminal exits.

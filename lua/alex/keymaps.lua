@@ -256,12 +256,6 @@ function M.leap()
     keymap({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
 end
 
-function M.godot()
-    keymap(n, "<leader>g", function()
-        vim.fn.system("godot .")
-    end, default_settings)
-end
-
 M.init()
 
 return M

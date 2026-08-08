@@ -19,10 +19,10 @@ local function save_file()
     if U.current_buffer_name() == "" then
         return
     end
-
-    if U.current_buffer_modifiable() then
-        vim.cmd("w!")
+    if not U.current_buffer_modified() then
+        return
     end
+    vim.cmd("w!")
 end
 
 local function delete_buffer()
@@ -252,8 +252,12 @@ function M.treesitter_textobjects()
 end
 
 function M.leap()
-    vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)")
-    vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
+    keymap({ "n", "x", "o" }, "s", "<Plug>(leap-forward)")
+    keymap({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
+end
+
+function M.godot() 
+    keymap(n, "<leader>g", function() vim.fn.system("godot .") end, default_settings)
 end
 
 M.init()

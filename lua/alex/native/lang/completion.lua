@@ -5,11 +5,14 @@ vim.opt.pumheight = 10
 vim.opt.completeopt = { "menuone", "fuzzy", "popup", "noselect" }
 vim.opt.pumborder = "rounded"
 vim.opt.complete = "o"
-vim.opt.previewpopup = {
-    border = "rounded",
-    height = nil,
-    width = nil,
-}
+
+if pcall(vim.api.nvim_get_option_info2, "previewpopup", {}) then
+    vim.opt.previewpopup = {
+        border = "rounded",
+        height = nil,
+        width = nil,
+    }
+end
 
 local ABBR_MIN_WIDTH = 50
 local ABBR_MAX_WIDTH = 25

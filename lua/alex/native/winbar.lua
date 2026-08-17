@@ -105,7 +105,7 @@ function M.set_winbar()
 end
 
 vim.api.nvim_create_autocmd(
-    { "BufWritePost", "BufWinEnter", "BufFilePost", "BufModifiedSet", "WinEnter", "TermOpen" },
+    { "BufWritePost", "BufWinEnter", "BufFilePost", "BufModifiedSet", "WinEnter", "TermOpen", "BufReadPost" },
     {
         callback = function()
             require("alex.native.winbar").set_winbar()

@@ -15,5 +15,6 @@ require("tree-sitter-manager").setup({
         "json",
         "terraform",
         "gdscript",
+        "sql"
     },
 })

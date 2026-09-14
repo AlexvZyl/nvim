@@ -1,6 +1,6 @@
 # "${HOME}/.config/nvim"
 
-Configuration files and custom modules for Neovim.  This is a submodule for my [Linux](https://github.com/AlexvZyl/.dotfiles) dotfiles.
+Configuration files and custom modules for Neovim.
 
 I do not use a distro becuase:
 1. They are fragile.

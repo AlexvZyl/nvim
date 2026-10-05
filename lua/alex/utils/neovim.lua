@@ -121,7 +121,22 @@ function M.current_buffer_lsp()
     -- Add LSP clients
     if next(clients) ~= nil then
         for _, client in ipairs(clients) do
-            result = result .. client.name .. sep
+            local names = { client.name }
+            if client.name == "efm" then
+                local langs = vim.tbl_get(client.config, "settings", "languages", vim.bo.filetype) or {}
+                local sources = {}
+                for _, tool in ipairs(langs) do
+                    if tool.lintSource then
+                        sources[#sources + 1] = tool.lintSource
+                    end
+                end
+                if #sources > 0 then
+                    names = sources
+                end
+            end
+            for _, name in ipairs(names) do
+                result = result .. name .. sep
+            end
         end
     end
 

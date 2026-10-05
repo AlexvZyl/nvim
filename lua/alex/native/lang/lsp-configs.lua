@@ -99,7 +99,7 @@ vim.lsp.config("efm", {
                 --     lintAfterOpen = true,
                 -- },
                 {
-                    lintCommand = "detekt --input ${INPUT}",
+                    lintCommand = "detekt --input ${INPUT} $([ -f detekt.yml ] && echo --config detekt.yml --build-upon-default-config)",
                     lintStdin = false,
                     lintFormats = { "%f:%l:%c: %t%*[^:]: %m" },
                     lintSource = "detekt",

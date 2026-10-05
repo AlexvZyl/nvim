@@ -95,7 +95,7 @@ local function lsp_clients()
     if names == "" then
         return ""
     end
-    return "  %#StlOff#󰒍 " .. names .. "%*"
+    return "  %#StlOff# " .. names .. "%*"
 end
 
 local function diagnostics()

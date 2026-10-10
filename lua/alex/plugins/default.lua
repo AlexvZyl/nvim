@@ -10,5 +10,8 @@ require("default").load({
             fg = P.white3,
             italic = false,
         },
+        ["@string.special.url.gdscript"] = {
+            underline = false,
+        }
     },
 })

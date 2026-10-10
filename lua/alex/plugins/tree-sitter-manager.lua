@@ -16,5 +16,7 @@ require("tree-sitter-manager").setup({
         "terraform",
         "gdscript",
         "sql",
+        "glsl",
+        "gdshader"
     },
 })

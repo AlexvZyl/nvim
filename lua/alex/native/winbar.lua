@@ -109,7 +109,7 @@ vim.api.nvim_create_autocmd(
         "BufWritePost",
         "BufWinEnter",
         "BufFilePost",
-        "BufModifiedSet",
+        -- "BufModifiedSet",
         "WinEnter",
         "TermOpen",
         "BufReadPost",

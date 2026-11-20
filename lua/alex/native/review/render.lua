@@ -5,7 +5,7 @@ local M = {}
 local namespace = vim.api.nvim_create_namespace("review")
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
 local buffer_hunks = {}
-local SIGN = "│"
+local SIGN = "▏"
 
 local function parse_hunks(patch)
     local hunks = {}
@@ -26,20 +26,71 @@ local function parse_hunks(patch)
     return hunks
 end
 
+local function highlight_deleted(lang, hunk)
+    hunk.highlights = {}
+    local query = lang and vim.treesitter.query.get(lang, "highlights")
+    if not query or #hunk.deleted == 0 then
+        return
+    end
+    local source = table.concat(hunk.deleted, "\n")
+    local ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
+    if not ok then
+        return
+    end
+    for id, node in query:iter_captures(parser:parse()[1]:root(), source) do
+        local name = query.captures[id]
+        if not name:find("^_") and name ~= "spell" and name ~= "nospell" then
+            local start_row, start_col, end_row, end_col = node:range()
+            for row = start_row, math.min(end_row, #hunk.deleted - 1) do
+                local line = hunk.highlights[row + 1] or {}
+                hunk.highlights[row + 1] = line
+                local last = row == end_row and end_col or #hunk.deleted[row + 1]
+                for col = (row == start_row and start_col or 0) + 1, last do
+                    line[col] = "@" .. name .. "." .. lang
+                end
+            end
+        end
+    end
+end
+
+local function deleted_chunks(text, highlights, leftcol, tabstop)
+    local chunks, shown, byte = {}, 0, 1
+    for char in text:gmatch("[^\128-\191][\128-\191]*") do
+        local group = highlights[byte] and { "ReviewDelete", highlights[byte] } or "ReviewDelete"
+        byte = byte + #char
+        for _ = 1, char == "\t" and tabstop or 1 do
+            shown = shown + 1
+            if shown > leftcol then
+                local last = chunks[#chunks]
+                if last and last[2] == group then
+                    last[1] = last[1] .. (char == "\t" and " " or char)
+                else
+                    table.insert(chunks, { char == "\t" and " " or char, group })
+                end
+            end
+        end
+    end
+    table.insert(chunks, { string.rep(" ", math.max(vim.o.columns - shown + leftcol, 0)), "ReviewDelete" })
+    return chunks
+end
+
 local function render_deleted(buf)
     vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-    local tab = string.rep(" ", vim.bo[buf].tabstop)
     local win = vim.fn.win_findbuf(buf)[1] or vim.api.nvim_get_current_win()
     local textoff = vim.fn.getwininfo(win)[1].textoff
     local leftcol = vim.api.nvim_win_call(win, vim.fn.winsaveview).leftcol
     local gutter = SIGN .. string.rep(" ", textoff - 2)
+    local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
     for _, hunk in ipairs(buffer_hunks[buf] or {}) do
+        if not hunk.highlights then
+            highlight_deleted(lang, hunk)
+        end
         if #hunk.deleted > 0 then
             local virt_lines = {}
-            for _, text in ipairs(hunk.deleted) do
-                text = vim.fn.strcharpart((text:gsub("\t", tab)), leftcol)
-                local padded = text .. string.rep(" ", math.max(vim.o.columns - #text, 0))
-                table.insert(virt_lines, { { " ", "LineNr" }, { gutter, "ReviewSignDelete" }, { padded, "ReviewDelete" } })
+            for i, text in ipairs(hunk.deleted) do
+                local line = { { " ", "LineNr" }, { gutter, "ReviewSignDelete" } }
+                vim.list_extend(line, deleted_chunks(text, hunk.highlights[i] or {}, leftcol, vim.bo[buf].tabstop))
+                table.insert(virt_lines, line)
             end
             vim.api.nvim_buf_set_extmark(buf, deleted_namespace, math.max(hunk.start - 1, 0), 0, {
                 virt_lines = virt_lines,

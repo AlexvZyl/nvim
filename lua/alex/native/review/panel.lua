@@ -145,12 +145,16 @@ local function select()
     if not file then
         return
     end
+    local marked = state.changed(file.key) or state.new(file.key)
+    if marked then
+        state.clear(file.key)
+    end
     local target = target_window()
     if vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":p") then
+        if marked then
+            draw(line)
+        end
         return
-    end
-    if state.changed(file.key) or state.new(file.key) then
-        state.clear(file.key)
     end
     selected = file.key
     draw(line)

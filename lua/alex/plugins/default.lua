@@ -1,6 +1,9 @@
 local P = require("default.palette")
 local U = require("default.utils")
 
+
+local green_dim = 0.20
+
 require("default").load({
     overrides = {
         Comment = {
@@ -15,14 +18,14 @@ require("default").load({
             underline = false,
         },
         ReviewAdd = {
-            bg = U.blend(P.diff.add, 0.3, P.bg),
+            bg = U.blend(P.diff.add, green_dim, P.bg),
         },
         ReviewAddNr = {
             fg = P.gray2,
-            bg = U.blend(P.diff.add, 0.3, P.bg),
+            bg = U.blend(P.diff.add, green_dim, P.bg),
         },
         ReviewDelete = {
-            bg = U.blend(P.diff.delete, 0.6, P.bg),
+            bg = U.blend(P.diff.delete, 0.65, P.bg),
         },
         ReviewPanelLine = {
             bold = true,
@@ -42,7 +45,7 @@ require("default").load({
         },
         ReviewSignAdd = {
             fg = P.green,
-            bg = U.blend(P.diff.add, 0.3, P.bg),
+            bg = U.blend(P.diff.add, green_dim, P.bg),
             bold = true,
         },
         ReviewSignLocal = {
@@ -51,7 +54,7 @@ require("default").load({
         },
         ReviewSignDelete = {
             fg = P.red,
-            bg = U.blend(P.diff.delete, 0.6, P.bg),
+            bg = U.blend(P.diff.delete, 0.65, P.bg),
             bold = true,
         },
     },

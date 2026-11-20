@@ -64,7 +64,7 @@ local plugins = {
             {
                 "stevearc/quicker.nvim",
                 cond = function()
-                    return require("alex.native.review").ref == nil
+                    return not require("alex.native.review").active()
                 end,
                 config = function()
                     require("alex.plugins.quicker")
@@ -80,7 +80,7 @@ local plugins = {
         "lewis6991/gitsigns.nvim",
         -- event = { "VeryLazy" },
         cond = function()
-            return require("alex.native.review").ref == nil
+            return not require("alex.native.review").active()
         end,
         config = function()
             require("alex.plugins.gitsigns")

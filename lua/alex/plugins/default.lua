@@ -15,7 +15,7 @@ require("default").load({
             underline = false,
         },
         ReviewAdd = {
-            bg = U.blend(P.diff.add, 0.25, P.bg),
+            bg = U.blend(P.diff.add, 0.3, P.bg),
         },
         ReviewDelete = {
             bg = U.blend(P.diff.delete, 0.6, P.bg),

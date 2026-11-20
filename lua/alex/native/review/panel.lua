@@ -129,10 +129,11 @@ local function create_buffer()
     end
     map("n", "<CR>", select)
     map("n", "<2-LeftMouse>", select)
-    map("n", "dd", function()
-        local line = vim.fn.line(".")
-        remove(line, line)
-    end)
+    vim.keymap.set("n", "d", function()
+        vim.o.operatorfunc = "v:lua.require'alex.native.review.panel'.operator"
+        return "g@"
+    end, { buffer = buf, expr = true })
+    map("o", "d", "_")
     map("n", "u", function()
         restore(state.undo)
     end)
@@ -144,6 +145,10 @@ local function create_buffer()
         vim.cmd("normal! \27")
         remove(math.min(first, last), math.max(first, last))
     end)
+end
+
+function M.operator()
+    remove(vim.fn.line("'["), vim.fn.line("']"))
 end
 
 function M.is_open()

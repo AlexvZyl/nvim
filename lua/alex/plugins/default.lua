@@ -17,6 +17,10 @@ require("default").load({
         ReviewAdd = {
             bg = U.blend(P.diff.add, 0.3, P.bg),
         },
+        ReviewAddNr = {
+            fg = P.gray2,
+            bg = U.blend(P.diff.add, 0.3, P.bg),
+        },
         ReviewDelete = {
             bg = U.blend(P.diff.delete, 0.6, P.bg),
         },
@@ -38,6 +42,7 @@ require("default").load({
         },
         ReviewSignAdd = {
             fg = P.green,
+            bg = U.blend(P.diff.add, 0.3, P.bg),
             bold = true,
         },
         ReviewSignLocal = {
@@ -46,6 +51,7 @@ require("default").load({
         },
         ReviewSignDelete = {
             fg = P.red,
+            bg = U.blend(P.diff.delete, 0.6, P.bg),
             bold = true,
         },
     },

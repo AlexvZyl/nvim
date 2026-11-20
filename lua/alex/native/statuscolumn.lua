@@ -2,12 +2,12 @@ local M = {}
 
 function M.relative()
     vim.o.relativenumber = true
-    vim.opt.statuscolumn = " %s%=%{v:relnum?v:relnum:v:lnum}%#WinSeparator#  "
+    vim.opt.statuscolumn = "%#LineNr# %*%s%=%{v:relnum?v:relnum:v:lnum}%*  "
 end
 
 function M.absolute()
     vim.o.relativenumber = false
-    vim.opt.statuscolumn = " %s%=%{v:lnum}%#WinSeparator#  "
+    vim.opt.statuscolumn = "%#LineNr# %*%s%=%{v:lnum}%*  "
 end
 
 function M.terminal()

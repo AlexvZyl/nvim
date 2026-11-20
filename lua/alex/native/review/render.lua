@@ -32,14 +32,14 @@ local function render_deleted(buf)
     local win = vim.fn.win_findbuf(buf)[1] or vim.api.nvim_get_current_win()
     local textoff = vim.fn.getwininfo(win)[1].textoff
     local leftcol = vim.api.nvim_win_call(win, vim.fn.winsaveview).leftcol
-    local gutter = " " .. SIGN .. string.rep(" ", textoff - 2)
+    local gutter = SIGN .. string.rep(" ", textoff - 2)
     for _, hunk in ipairs(buffer_hunks[buf] or {}) do
         if #hunk.deleted > 0 then
             local virt_lines = {}
             for _, text in ipairs(hunk.deleted) do
                 text = vim.fn.strcharpart((text:gsub("\t", tab)), leftcol)
                 local padded = text .. string.rep(" ", math.max(vim.o.columns - #text, 0))
-                table.insert(virt_lines, { { gutter, "ReviewSignDelete" }, { padded, "ReviewDelete" } })
+                table.insert(virt_lines, { { " ", "LineNr" }, { gutter, "ReviewSignDelete" }, { padded, "ReviewDelete" } })
             end
             vim.api.nvim_buf_set_extmark(buf, deleted_namespace, math.max(hunk.start - 1, 0), 0, {
                 virt_lines = virt_lines,
@@ -68,6 +68,7 @@ local function render(buf, hunks, local_hunks)
             if not local_lines[line] then
                 vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
                     line_hl_group = "ReviewAdd",
+                    number_hl_group = "ReviewAddNr",
                     sign_text = SIGN,
                     sign_hl_group = "ReviewSignAdd",
                 })

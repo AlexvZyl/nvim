@@ -21,9 +21,23 @@ M.panel = guarded(function()
 end)
 
 M.files = guarded(function()
-    if git.load() then
-        require("alex.native.review.picker").open()
-    end
+    require("telescope")
+    local templates = require("alex.plugins.telescope")
+    require("telescope.builtin").find_files(vim.tbl_extend("force", templates.large_no_preview, {
+        prompt_title = "Review files",
+        find_command = {
+            "git",
+            "-c",
+            "core.quotePath=false",
+            "diff",
+            "--name-only",
+            "--relative",
+            "--diff-filter=d",
+            "--no-renames",
+            "--merge-base",
+            session.ref,
+        },
+    }))
 end)
 
 M.reset = guarded(function()
@@ -33,14 +47,10 @@ M.reset = guarded(function()
     end
     require("alex.native.review.state").reset()
     if panel.is_open() then
-        vim.cmd("cclose")
+        panel.close()
         panel.toggle()
     end
 end)
-
-function M.quickfix_winbar()
-    return require("alex.native.review.panel").winbar()
-end
 
 function M.setup()
     if vim.fn.argv(0) ~= "diff" then

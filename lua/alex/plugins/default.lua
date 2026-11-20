@@ -20,10 +20,10 @@ require("default").load({
         ReviewDelete = {
             bg = U.blend(P.diff.delete, 0.6, P.bg),
         },
-        ReviewQuickFixLine = {
+        ReviewPanelLine = {
             bold = true,
         },
-        ReviewQuickFixNr = {
+        ReviewPanelNr = {
             fg = P.white0,
             bold = true,
         },

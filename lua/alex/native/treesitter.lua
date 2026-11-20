@@ -13,6 +13,7 @@ M.ignore_filetypes = {
     "cmp_docs",
     "oil_preview",
     "qf",
+    "review",
     "netrw",
     "DiffviewFiles",
 }

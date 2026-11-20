@@ -18,8 +18,9 @@ local custom_bars = {
     review = {
         icon = "",
         name = function()
-            return "%{%v:lua.require'alex.native.review'.quickfix_winbar()%}"
+            return "%{%v:lua.require'alex.native.review.panel'.winbar()%}"
         end,
+        hide_modified = true,
     },
     netrw = {
         icon = "",
@@ -81,11 +82,8 @@ function M.get_winbar()
     local filetype = U.current_buffer_filetype()
     local buftype = vim.bo.buftype
     local custom_bar = custom_bars[filetype] or custom_bars[buftype]
-    if filetype == "qf" and require("alex.native.review").quickfix_winbar() then
-        custom_bar = custom_bars.review
-    end
     if custom_bar ~= nil then
-        return prefix .. custom_bar.icon .. " " .. custom_bar.name() .. mod_icon
+        return prefix .. custom_bar.icon .. " " .. custom_bar.name() .. (custom_bar.hide_modified and "" or mod_icon)
     end
 
     local file_icon = U.current_buffer_icon()

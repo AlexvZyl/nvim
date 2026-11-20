@@ -145,12 +145,16 @@ local function select()
     if not file then
         return
     end
+    local target = target_window()
+    if vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":p") then
+        return
+    end
     if state.changed(file.key) or state.new(file.key) then
         state.clear(file.key)
     end
     selected = file.key
     draw(line)
-    vim.api.nvim_set_current_win(target_window())
+    vim.api.nvim_set_current_win(target)
     vim.cmd.edit(vim.fn.fnameescape(file.path))
     local first = render.first_hunk(vim.api.nvim_get_current_buf())
     if first then

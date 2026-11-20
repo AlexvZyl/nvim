@@ -23,6 +23,9 @@ require("default").load({
         ReviewPanelLine = {
             bold = true,
         },
+        ReviewPanelDir = {
+            fg = P.gray2,
+        },
         ReviewPanelNr = {
             fg = P.white0,
             bold = true,

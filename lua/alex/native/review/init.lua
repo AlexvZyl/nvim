@@ -66,6 +66,11 @@ function M.setup()
     vim.api.nvim_buf_set_name(0, "")
 
     vim.api.nvim_create_user_command("ReviewReset", M.reset, {})
+    vim.api.nvim_create_autocmd("BufEnter", {
+        callback = function(args)
+            require("alex.native.review.panel").follow(args.buf)
+        end,
+    })
     vim.api.nvim_create_autocmd("WinScrolled", {
         callback = function()
             require("alex.native.review.render").scrolled()

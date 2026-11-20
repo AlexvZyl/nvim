@@ -15,6 +15,11 @@ function M.terminal()
     vim.opt_local.statuscolumn = " "
 end
 
+function M.review()
+    vim.opt_local.signcolumn = "no"
+    vim.opt_local.statuscolumn = "  %=%{%v:lua.require'alex.native.review.panel'.number()%}%#WinSeparator#  "
+end
+
 function M.toggle_relative()
     if vim.o.relativenumber then
         M.absolute()

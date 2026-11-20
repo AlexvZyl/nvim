@@ -36,6 +36,7 @@ function M.load()
     end
     session.prefix = vim.trim(M.run("rev-parse", "--show-prefix") or "")
     session.files = {}
+    session.by_key = {}
     session.total_changes = 0
     for _, line in ipairs(vim.split(numstat, "\0", { trimempty = true })) do
         local added, deleted, path = line:match("^(%S+)\t(%S+)\t(.+)$")
@@ -45,6 +46,7 @@ function M.load()
             changes = (tonumber(added) or 0) + (tonumber(deleted) or 0),
         }
         table.insert(session.files, file)
+        session.by_key[file.key] = file
         session.total_changes = session.total_changes + file.changes
     end
     session.source = vim.trim(M.run("rev-parse", "--abbrev-ref", "HEAD") or "HEAD")

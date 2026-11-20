@@ -15,6 +15,12 @@ local custom_bars = {
             return "QuickFix"
         end,
     },
+    review = {
+        icon = "",
+        name = function()
+            return "%{%v:lua.require'alex.native.review'.quickfix_winbar()%}"
+        end,
+    },
     netrw = {
         icon = "",
         name = function()
@@ -75,6 +81,9 @@ function M.get_winbar()
     local filetype = U.current_buffer_filetype()
     local buftype = vim.bo.buftype
     local custom_bar = custom_bars[filetype] or custom_bars[buftype]
+    if filetype == "qf" and require("alex.native.review").quickfix_winbar() then
+        custom_bar = custom_bars.review
+    end
     if custom_bar ~= nil then
         return prefix .. custom_bar.icon .. " " .. custom_bar.name() .. mod_icon
     end
@@ -109,7 +118,7 @@ vim.api.nvim_create_autocmd(
         "BufWritePost",
         "BufWinEnter",
         "BufFilePost",
-        -- "BufModifiedSet",
+        "BufModifiedSet",
         "WinEnter",
         "TermOpen",
         "BufReadPost",

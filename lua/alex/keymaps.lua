@@ -200,6 +200,12 @@ function M.telescope()
     end, default_settings)
 
     keymap(n, "<C-n>", "<Cmd>Telescope buffers previewer=false<CR>", default_settings)
+    keymap(n, "fg", function()
+        require("alex.native.review").files()
+    end, default_settings)
+    keymap(n, "<leader>j", function()
+        require("alex.native.review").panel()
+    end, default_settings)
     keymap(n, "fd", "<Cmd>Telescope diagnostics line_width=full bufnr=0<CR>", default_settings)
     keymap(n, "fD", "<Cmd>Telescope diagnostics line_width=full<CR>", default_settings)
 

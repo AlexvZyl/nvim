@@ -1,4 +1,5 @@
 local P = require("default.palette")
+local U = require("default.utils")
 
 require("default").load({
     overrides = {
@@ -12,6 +13,37 @@ require("default").load({
         },
         ["@string.special.url.gdscript"] = {
             underline = false,
-        }
+        },
+        ReviewAdd = {
+            bg = U.blend(P.diff.add, 0.25, P.bg),
+        },
+        ReviewDelete = {
+            bg = U.blend(P.diff.delete, 0.6, P.bg),
+        },
+        ReviewQuickFixLine = {
+            bold = true,
+        },
+        ReviewQuickFixNr = {
+            fg = P.white0,
+            bold = true,
+        },
+        ReviewChanged = {
+            fg = P.yellow,
+        },
+        ReviewNew = {
+            fg = P.green,
+        },
+        ReviewSignAdd = {
+            fg = P.green,
+            bold = true,
+        },
+        ReviewSignLocal = {
+            fg = P.yellow,
+            bold = true,
+        },
+        ReviewSignDelete = {
+            fg = P.red,
+            bold = true,
+        },
     },
 })

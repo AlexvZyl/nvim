@@ -63,6 +63,9 @@ local plugins = {
             { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
             {
                 "stevearc/quicker.nvim",
+                cond = function()
+                    return require("alex.native.review").ref == nil
+                end,
                 config = function()
                     require("alex.plugins.quicker")
                 end,
@@ -76,6 +79,9 @@ local plugins = {
         -- This plugin has issues when lazy.
         "lewis6991/gitsigns.nvim",
         -- event = { "VeryLazy" },
+        cond = function()
+            return require("alex.native.review").ref == nil
+        end,
         config = function()
             require("alex.plugins.gitsigns")
         end,

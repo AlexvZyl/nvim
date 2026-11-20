@@ -36,6 +36,7 @@ vim.opt.showcmd = false
 
 vim.opt.cmdheight = 1
 vim.g.VM_set_statusline = 0
+vim.g.qf_disable_statusline = 1
 vim.g.VM_silent_exit = 1
 
 vim.opt.fillchars = {

@@ -176,3 +176,8 @@ vim.api.nvim_create_autocmd("User", {
 -- Extensions.
 TS.load_extension("ui-select")
 TS.load_extension("fzf")
+
+return {
+    large_no_preview = large_no_preview,
+    small_no_preview = small_no_preview,
+}

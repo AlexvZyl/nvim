@@ -4,6 +4,7 @@ if not require("alex.environments").should_setup then
     return
 end
 
+require("alex.native.review")
 require("alex.cwd")
 require("alex.options")
 require("alex.lazy")

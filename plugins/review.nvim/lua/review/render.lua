@@ -155,6 +155,17 @@ function M.attach(buf)
         return
     end
     local hunks = parse_hunks(patch)
+    if #hunks == 0 then
+        -- Not part of the diff (anymore), drop anything from a previous attach.
+        if buffer_hunks[buf] then
+            buffer_hunks[buf] = nil
+            vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
+            vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
+            pcall(vim.keymap.del, "n", "]h", { buffer = buf })
+            pcall(vim.keymap.del, "n", "[h", { buffer = buf })
+        end
+        return
+    end
     buffer_hunks[buf] = hunks
     local local_hunks = parse_hunks(git.run("diff", "-U0", "HEAD", "--", file) or "")
     vim.schedule(function()

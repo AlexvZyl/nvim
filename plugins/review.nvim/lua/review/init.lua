@@ -63,6 +63,11 @@ function M.setup()
         end
     end
     vim.api.nvim_buf_set_name(0, "")
+    -- Renaming keeps the old name as the alternate buffer.
+    local alternate = vim.fn.bufnr("#")
+    if alternate ~= -1 and alternate ~= vim.api.nvim_get_current_buf() then
+        vim.api.nvim_buf_delete(alternate, { force = true })
+    end
 
     vim.api.nvim_create_user_command("ReviewReset", M.reset, {})
     vim.api.nvim_create_autocmd("BufEnter", {

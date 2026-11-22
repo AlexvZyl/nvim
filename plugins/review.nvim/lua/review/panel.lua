@@ -8,6 +8,9 @@ local M = {}
 local namespace = vim.api.nvim_create_namespace("review_panel")
 local WIDTH = 60
 local MARK = "●"
+-- Fills up as the review progresses.
+local PROGRESS = { "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤" }
+local EMPTY, DONE = "󰝦", "󰄴"
 local FOLDER = ""
 local buf, win, selected
 local rows = {}
@@ -263,7 +266,8 @@ function M.winbar()
     end
     local total = session.total_changes
     local percent = total > 0 and math.floor((total - remaining) / total * 100 + 0.5) or 0
-    local metrics = string.format(" %d%%", percent)
+    local icon = percent == 0 and EMPTY or percent == 100 and DONE or PROGRESS[math.ceil(percent * #PROGRESS / 100)]
+    local metrics = string.format("%s %d%%", icon, percent)
     local branches = string.format("%s  %s", session.source, session.ref)
     if vim.fn.strdisplaywidth(branches .. metrics) + 7 > vim.api.nvim_win_get_width(0) then
         branches = " " .. session.ref

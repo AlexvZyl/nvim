@@ -11,4 +11,4 @@ nvim diff [ref]
 - `]h` / `[h`: Jump between hunks.
 - `:ReviewReset`: Clear the review state.
 
-Set the `Review*` highlight groups yourself.
+The `Review*` highlight groups link to builtin groups by default.

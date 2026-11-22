@@ -51,10 +51,32 @@ M.reset = guarded(function()
     end
 end)
 
+local highlights = {
+    ReviewAdd = "DiffAdd",
+    ReviewAddNr = "DiffAdd",
+    ReviewDelete = "DiffDelete",
+    ReviewSignAdd = "Added",
+    ReviewSignLocal = "Changed",
+    ReviewSignDelete = "Removed",
+    ReviewPanelLine = "CursorLine",
+    ReviewPanelDir = "Directory",
+    ReviewPanelNr = "CursorLineNr",
+    ReviewChanged = "Changed",
+    ReviewNew = "Added",
+}
+
+local function set_highlights()
+    for group, link in pairs(highlights) do
+        vim.api.nvim_set_hl(0, group, { link = link, default = true })
+    end
+end
+
 function M.setup()
     if vim.fn.argv(0) ~= "diff" then
         return
     end
+    set_highlights()
+    vim.api.nvim_create_autocmd("ColorScheme", { callback = set_highlights })
     session.ref = vim.fn.argc() > 1 and vim.fn.argv(1) or "dev"
     vim.cmd("%argdelete")
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do

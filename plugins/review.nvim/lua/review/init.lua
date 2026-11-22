@@ -74,8 +74,26 @@ function M.setup()
     if vim.fn.argv(0) ~= "diff" then
         return
     end
+
+    -- A failing callback would error on every event, stop review on the first one instead.
+    local group = vim.api.nvim_create_augroup("review", { clear = true })
+    local function autocmd(event, opts)
+        local callback = opts.callback
+        opts.group = group
+        opts.callback = function(args)
+            local ok, err = pcall(callback, args)
+            if not ok then
+                pcall(vim.api.nvim_del_augroup_by_id, group)
+                vim.schedule(function()
+                    vim.notify("review.nvim stopped after an error, restart to resume:\n" .. err, vim.log.levels.ERROR)
+                end)
+            end
+        end
+        vim.api.nvim_create_autocmd(event, opts)
+    end
+
     set_highlights()
-    vim.api.nvim_create_autocmd("ColorScheme", { callback = set_highlights })
+    autocmd("ColorScheme", { callback = set_highlights })
     session.ref = vim.fn.argc() > 1 and vim.fn.argv(1) or "dev"
     vim.cmd("%argdelete")
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -91,22 +109,22 @@ function M.setup()
     end
 
     vim.api.nvim_create_user_command("ReviewReset", M.reset, {})
-    vim.api.nvim_create_autocmd("BufEnter", {
+    autocmd("BufEnter", {
         callback = function(args)
             require("review.panel").follow(args.buf)
         end,
     })
-    vim.api.nvim_create_autocmd("WinScrolled", {
+    autocmd("WinScrolled", {
         callback = function()
             require("review.render").scrolled()
         end,
     })
-    vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+    autocmd({ "BufReadPost", "BufWritePost" }, {
         callback = function(args)
             require("review.render").attach(args.buf)
         end,
     })
-    vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+    autocmd({ "TextChanged", "TextChangedI" }, {
         callback = function(args)
             require("review.render").update(args.buf)
         end,
@@ -124,8 +142,8 @@ function M.setup()
             end
         end
     end
-    vim.api.nvim_create_autocmd("VimEnter", { once = true, callback = disable_gitsigns })
-    vim.api.nvim_create_autocmd("User", {
+    autocmd("VimEnter", { once = true, callback = disable_gitsigns })
+    autocmd("User", {
         pattern = "LazyLoad",
         callback = function(args)
             if args.data == "gitsigns.nvim" then

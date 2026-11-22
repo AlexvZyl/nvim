@@ -107,6 +107,11 @@ function M.setup()
             require("review.render").attach(args.buf)
         end,
     })
+    vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+        callback = function(args)
+            require("review.render").update(args.buf)
+        end,
+    })
 end
 
 return M

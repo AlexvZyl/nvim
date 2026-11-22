@@ -5,6 +5,7 @@ local M = {}
 local namespace = vim.api.nvim_create_namespace("review")
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
 local buffer_hunks = {}
+local sources = {}
 local SIGN = "▏"
 
 local function parse_hunks(patch)
@@ -145,41 +146,84 @@ local function jump(hunks, forward)
     end
 end
 
+local function buffer_text(buf)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    if #lines == 1 and lines[1] == "" then
+        return ""
+    end
+    return table.concat(lines, "\n") .. "\n"
+end
+
+local function diff(from, to)
+    return parse_hunks(vim.text.diff(from, to, { ctxlen = 0, indent_heuristic = true }) or "")
+end
+
+local function detach(buf)
+    if not buffer_hunks[buf] then
+        return
+    end
+    buffer_hunks[buf] = nil
+    vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
+    pcall(vim.keymap.del, "n", "]h", { buffer = buf })
+    pcall(vim.keymap.del, "n", "[h", { buffer = buf })
+end
+
+-- Diffs the buffer against the merge base and HEAD, in memory, so edits show up while typing.
+function M.update(buf, defer)
+    local source = sources[buf]
+    if not source or not vim.api.nvim_buf_is_valid(buf) then
+        return
+    end
+    local text = buffer_text(buf)
+    local hunks = diff(source.base, text)
+    if #hunks == 0 then
+        return detach(buf)
+    end
+    -- Treesitter highlights of deleted lines only change when the deleted text does.
+    local cached = {}
+    for _, hunk in ipairs(buffer_hunks[buf] or {}) do
+        cached[table.concat(hunk.deleted, "\n")] = hunk.highlights
+    end
+    for _, hunk in ipairs(hunks) do
+        hunk.highlights = cached[table.concat(hunk.deleted, "\n")]
+    end
+    if not buffer_hunks[buf] then
+        vim.keymap.set("n", "]h", function()
+            jump(buffer_hunks[buf] or {}, true)
+        end, { buffer = buf })
+        vim.keymap.set("n", "[h", function()
+            jump(buffer_hunks[buf] or {}, false)
+        end, { buffer = buf })
+    end
+    buffer_hunks[buf] = hunks
+    local local_hunks = diff(source.head, text)
+    if not defer then
+        return render(buf, hunks, local_hunks)
+    end
+    vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(buf) and buffer_hunks[buf] == hunks then
+            render(buf, hunks, local_hunks)
+        end
+    end)
+end
+
 function M.attach(buf)
     local file = vim.api.nvim_buf_get_name(buf)
     if vim.bo[buf].buftype ~= "" or vim.fn.filereadable(file) == 0 then
         return
     end
-    local patch = git.diff("-U0", "--", file)
-    if not patch then
-        return
+    local merge_base = git.merge_base()
+    local base = merge_base ~= "" and git.show(merge_base, file) or nil
+    local head = git.show("HEAD", file)
+    local binary = (base or ""):find("\0", 1, true) or (head or ""):find("\0", 1, true)
+    if (not base and not head) or binary then
+        -- Untracked, outside the repo or binary.
+        sources[buf] = nil
+        return detach(buf)
     end
-    local hunks = parse_hunks(patch)
-    if #hunks == 0 then
-        -- Not part of the diff (anymore), drop anything from a previous attach.
-        if buffer_hunks[buf] then
-            buffer_hunks[buf] = nil
-            vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
-            vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-            pcall(vim.keymap.del, "n", "]h", { buffer = buf })
-            pcall(vim.keymap.del, "n", "[h", { buffer = buf })
-        end
-        return
-    end
-    buffer_hunks[buf] = hunks
-    local local_hunks = parse_hunks(git.run("diff", "-U0", "HEAD", "--", file) or "")
-    vim.schedule(function()
-        if not vim.api.nvim_buf_is_valid(buf) then
-            return
-        end
-        render(buf, hunks, local_hunks)
-    end)
-    vim.keymap.set("n", "]h", function()
-        jump(hunks, true)
-    end, { buffer = buf })
-    vim.keymap.set("n", "[h", function()
-        jump(hunks, false)
-    end, { buffer = buf })
+    sources[buf] = { base = base or "", head = head or "" }
+    M.update(buf, true)
 end
 
 function M.scrolled()

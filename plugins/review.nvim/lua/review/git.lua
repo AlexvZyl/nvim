@@ -12,6 +12,15 @@ function M.diff(...)
     return M.run("diff", "--merge-base", session.ref, ...)
 end
 
+function M.merge_base()
+    return vim.trim(M.run("merge-base", "HEAD", session.ref) or "")
+end
+
+-- Contents of a file at a revision, nil when it does not exist there.
+function M.show(rev, file)
+    return M.run("show", rev .. ":./" .. vim.fn.fnamemodify(file, ":."))
+end
+
 function M.git_dir()
     return vim.trim(M.run("rev-parse", "--absolute-git-dir") or "")
 end

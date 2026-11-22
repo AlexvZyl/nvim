@@ -13,4 +13,24 @@ I do not use a distro becuase:
 - I try to keep all of the key bindings in [one file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/keymaps.lua) so that it is easier to keep track of everything and prevent conflicts.
 - You can add more LSPs to the end of [this file](https://github.com/AlexvZyl/nvim/blob/main/lua/alex/native/lang/lsp-configs.lua).
 
+## Plugins
+
+I keep my own plugins in [plugins](plugins).  To load them with lazy:
+
+```lua
+{
+    "AlexvZyl/nvim",
+    lazy = true,
+    priority = 1000,
+    init = function(plugin)
+        vim.opt.rtp:prepend(plugin.dir .. "/plugins/default.nvim")
+        vim.opt.rtp:prepend(plugin.dir .. "/plugins/review.nvim")
+        require("default").load()
+        require("review").setup()
+    end,
+},
+```
+
+Keep `lazy = true`, otherwise the rest of my config gets loaded too.
+
 <img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/9df1727d-fbc1-4987-93db-0f0e8f55c228" />

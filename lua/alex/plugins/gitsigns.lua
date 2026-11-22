@@ -17,3 +17,11 @@ require("gitsigns").setup({
     numhl = false,
     signs_staged_enable = true,
 })
+
+-- Review draws its own signs.
+vim.api.nvim_create_autocmd("User", {
+    pattern = { "ReviewStart", "ReviewStop" },
+    callback = function(args)
+        require("gitsigns").toggle_signs(args.match == "ReviewStop")
+    end,
+})

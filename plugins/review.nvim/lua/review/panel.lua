@@ -262,7 +262,7 @@ function M.winbar()
         remaining = remaining + row.changes
     end
     local total = session.total_changes
-    local percent = total > 0 and math.floor(remaining / total * 100 + 0.5) or 0
+    local percent = total > 0 and math.floor((total - remaining) / total * 100 + 0.5) or 0
     local metrics = string.format(" %d%%", percent)
     local branches = string.format("%s  %s", session.source, session.ref)
     if vim.fn.strdisplaywidth(branches .. metrics) + 7 > vim.api.nvim_win_get_width(0) then

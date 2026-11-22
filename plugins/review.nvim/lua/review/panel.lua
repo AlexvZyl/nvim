@@ -254,7 +254,7 @@ function M.toggle()
     wo.spell = false
     wo.winfixwidth = true
     wo.signcolumn = "no"
-    wo.statuscolumn = " %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator#   "
+    wo.statuscolumn = " %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator#  "
     draw(1)
 end
 

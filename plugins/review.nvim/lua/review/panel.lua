@@ -39,7 +39,8 @@ local function build_groups()
     local groups, dirs = {}, {}
     for _, file in ipairs(session.files) do
         if state.pending(file.key) then
-            local dir = file.path:match("^([^/]+)/") or ""
+            -- Group by the first two directory levels.
+            local dir = file.path:match("^([^/]+/[^/]+)/") or file.path:match("^([^/]+)/") or ""
             if not groups[dir] then
                 groups[dir] = {}
                 table.insert(dirs, dir)

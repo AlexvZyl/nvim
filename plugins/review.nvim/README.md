@@ -10,5 +10,3 @@ nvim diff [ref]
 - `require("review").files(opts)`: Telescope picker over the changed files.
 - `]h` / `[h`: Jump between hunks.
 - `:ReviewReset`: Clear the review state.
-
-The `Review*` highlight groups link to builtin groups by default.

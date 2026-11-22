@@ -157,7 +157,7 @@ local function detach(buf)
 end
 
 -- Diffs the buffer against the merge base in memory, so edits show up while typing.
-function M.update(buf, defer)
+function M.update(buf)
     local source = sources[buf]
     if not source or not vim.api.nvim_buf_is_valid(buf) then
         return
@@ -184,9 +184,7 @@ function M.update(buf, defer)
         end, { buffer = buf })
     end
     buffer_hunks[buf] = hunks
-    if not defer then
-        return render(buf, hunks)
-    end
+    -- After the edit is processed, so the window's textoff is up to date for the deleted lines.
     vim.schedule(function()
         if vim.api.nvim_buf_is_valid(buf) and buffer_hunks[buf] == hunks then
             render(buf, hunks)
@@ -209,7 +207,7 @@ function M.attach(buf)
         return detach(buf)
     end
     sources[buf] = { base = base or "" }
-    M.update(buf, true)
+    M.update(buf)
 end
 
 function M.scrolled()

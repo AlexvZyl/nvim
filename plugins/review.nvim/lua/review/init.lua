@@ -4,10 +4,12 @@ local session = require("review.session")
 
 local M = {}
 
+local group = vim.api.nvim_create_augroup("review", { clear = true })
+
 local function guarded(fn)
     return function(...)
         if not session.active() then
-            return vim.notify("Not in diff mode", vim.log.levels.WARN)
+            return vim.notify("No review running, start one with :Review", vim.log.levels.WARN)
         end
         fn(...)
     end
@@ -33,93 +35,107 @@ M.reset = guarded(function()
     end
 end)
 
-function M.setup(opts)
-    config.set(opts)
-    if vim.fn.argv(0) ~= "diff" then
-        return
-    end
-
-    -- A failing callback would error on every event, stop review on the first one instead.
-    local group = vim.api.nvim_create_augroup("review", { clear = true })
-    local function autocmd(event, opts)
-        local callback = opts.callback
-        opts.group = group
-        opts.callback = function(args)
-            local ok, err = pcall(callback, args)
-            if not ok then
-                pcall(vim.api.nvim_del_augroup_by_id, group)
-                vim.schedule(function()
-                    vim.notify("review.nvim stopped after an error, restart to resume:\n" .. err, vim.log.levels.ERROR)
-                end)
-            end
+-- A failing callback would error on every event, stop the review on the first one instead.
+local function autocmd(event, opts)
+    local callback = opts.callback
+    opts.group = group
+    opts.callback = function(args)
+        local ok, err = pcall(callback, args)
+        if not ok then
+            pcall(M.stop)
+            vim.schedule(function()
+                vim.notify("review.nvim stopped after an error, run :Review to resume:\n" .. err, vim.log.levels.ERROR)
+            end)
         end
-        vim.api.nvim_create_autocmd(event, opts)
     end
+    vim.api.nvim_create_autocmd(event, opts)
+end
 
-    highlights.set()
+local function create_autocmds()
+    local panel = require("review.panel")
+    local render = require("review.render")
     autocmd("ColorScheme", { callback = highlights.set })
-    session.start(vim.fn.argc() > 1 and vim.fn.argv(1) or config.options.base)
-    vim.cmd("%argdelete")
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if buf ~= vim.api.nvim_get_current_buf() then
-            vim.api.nvim_buf_delete(buf, { force = true })
-        end
-    end
-    vim.api.nvim_buf_set_name(0, "")
-    -- Renaming keeps the old name as the alternate buffer.
-    local alternate = vim.fn.bufnr("#")
-    if alternate ~= -1 and alternate ~= vim.api.nvim_get_current_buf() then
-        vim.api.nvim_buf_delete(alternate, { force = true })
-    end
-
-    vim.api.nvim_create_user_command("ReviewReset", M.reset, {})
     autocmd("BufEnter", {
         callback = function(args)
-            require("review.panel").follow(args.buf)
+            panel.follow(args.buf)
         end,
     })
-    autocmd("WinScrolled", {
-        callback = function()
-            require("review.render").scrolled()
-        end,
-    })
+    autocmd("WinScrolled", { callback = render.scrolled })
     autocmd({ "BufReadPost", "BufWritePost" }, {
         callback = function(args)
-            require("review.render").attach(args.buf)
+            render.attach(args.buf)
         end,
     })
     autocmd("BufWipeout", {
         callback = function(args)
-            require("review.render").detach(args.buf)
+            render.detach(args.buf)
         end,
     })
     autocmd({ "TextChanged", "TextChangedI" }, {
         callback = function(args)
-            require("review.render").update(args.buf)
+            render.update(args.buf)
         end,
     })
+end
 
-    -- Gitsigns draws over the review signs, turn it off once it is set up.
-    local function disable_gitsigns()
-        if not package.loaded.gitsigns then
+local function teardown()
+    require("review.panel").close()
+    vim.api.nvim_clear_autocmds({ group = group })
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        require("review.render").detach(buf)
+    end
+end
+
+-- Starts reviewing against the ref, or switches to it, and opens the panel.
+function M.start(ref)
+    local panel = require("review.panel")
+    ref = ref or session.ref or config.options.base
+    if ref ~= session.ref then
+        local switching = session.active()
+        -- Keeps the current review when the ref is invalid.
+        if not session.start(ref) then
             return
         end
-        local gitsigns = require("gitsigns")
-        for _, toggle in ipairs({ "toggle_signs", "toggle_numhl", "toggle_linehl", "toggle_word_diff", "toggle_deleted" }) do
-            if gitsigns[toggle] then
-                pcall(gitsigns[toggle], false)
+        teardown()
+        highlights.set()
+        create_autocmds()
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_is_loaded(buf) then
+                require("review.render").attach(buf)
             end
         end
+        if not switching then
+            vim.api.nvim_exec_autocmds("User", { pattern = "ReviewStart" })
+        end
     end
-    autocmd("VimEnter", { once = true, callback = disable_gitsigns })
-    autocmd("User", {
-        pattern = "LazyLoad",
-        callback = function(args)
-            if args.data == "gitsigns.nvim" then
-                vim.schedule(disable_gitsigns)
-            end
+    if not panel.is_open() then
+        panel.toggle()
+    end
+end
+
+function M.stop()
+    if not session.active() then
+        return
+    end
+    teardown()
+    session.stop()
+    vim.api.nvim_exec_autocmds("User", { pattern = "ReviewStop" })
+end
+
+function M.setup(opts)
+    config.set(opts)
+    vim.api.nvim_create_user_command("Review", function(args)
+        M.start(args.args ~= "" and args.args or nil)
+    end, {
+        nargs = "?",
+        complete = function(lead)
+            return vim.tbl_filter(function(ref)
+                return vim.startswith(ref, lead)
+            end, require("review.git").refs())
         end,
     })
+    vim.api.nvim_create_user_command("ReviewStop", M.stop, {})
+    vim.api.nvim_create_user_command("ReviewReset", M.reset, {})
 end
 
 return M

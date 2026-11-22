@@ -29,6 +29,12 @@ function M.git_dir()
     return trimmed("rev-parse", "--absolute-git-dir") or ""
 end
 
+-- Branches, remote branches and tags.
+function M.refs()
+    local refs = M.run("for-each-ref", "--format=%(refname:short)", "refs/heads", "refs/remotes", "refs/tags") or ""
+    return vim.split(refs, "\n", { trimempty = true })
+end
+
 -- Contents of a file at a revision, nil when it does not exist there.
 function M.show(rev, file)
     return M.run("show", rev .. ":./" .. vim.fn.fnamemodify(file, ":."))

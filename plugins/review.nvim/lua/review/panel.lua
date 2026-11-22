@@ -267,12 +267,11 @@ function M.winbar()
     local total = session.total_changes
     local percent = total > 0 and math.floor((total - remaining) / total * 100 + 0.5) or 0
     local icon = percent == 0 and EMPTY or percent == 100 and DONE or PROGRESS[math.ceil(percent * #PROGRESS / 100)]
-    local metrics = string.format("%s %d%%", icon, percent)
     local branches = string.format("%s  %s", session.source, session.ref)
-    if vim.fn.strdisplaywidth(branches .. metrics) + 7 > vim.api.nvim_win_get_width(0) then
+    if vim.fn.strdisplaywidth(branches .. icon) + 7 > vim.api.nvim_win_get_width(0) then
         branches = " " .. session.ref
     end
-    return branches .. "%=" .. metrics:gsub("%%", "%%%%") .. " "
+    return branches .. "%=" .. icon .. " "
 end
 
 function M.number()

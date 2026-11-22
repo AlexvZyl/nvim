@@ -63,9 +63,7 @@ local function draw(cursor)
     group_ends = {}
     local lines, marks, headers = {}, {}, {}
     for _, group in ipairs(groups) do
-        if group.dir ~= "" then
-            headers[#rows + 1] = group.dir
-        end
+        headers[#rows + 1] = group.dir
         for _, file in ipairs(group.files) do
             table.insert(rows, file)
             local name = vim.fn.fnamemodify(file.path, ":t")
@@ -82,7 +80,7 @@ local function draw(cursor)
     end
     top_header = headers[1] ~= nil
     for line, dir in pairs(headers) do
-        marks[line].virt_lines = { { { " " .. FOLDER .. " " .. dir, "ReviewPanelDir" } } }
+        marks[line].virt_lines = { { { " " .. FOLDER .. (dir ~= "" and " " .. dir or ""), "ReviewPanelDir" } } }
         marks[line].virt_lines_above = true
         marks[line].virt_lines_leftcol = true
     end

@@ -12,6 +12,8 @@ local FOLDER = ""
 local buf, win, selected
 local rows = {}
 local top_header = false
+-- Rows that end their directory group.
+local group_ends = {}
 
 local function mark_text(key)
     if state.changed(key) then
@@ -58,6 +60,7 @@ local function draw(cursor)
     local devicons = require("nvim-web-devicons")
     local groups = build_groups()
     rows = {}
+    group_ends = {}
     local lines, marks, headers = {}, {}, {}
     for _, group in ipairs(groups) do
         if group.dir ~= "" then
@@ -75,6 +78,7 @@ local function draw(cursor)
                 virt_text = mark_text(file.key),
             })
         end
+        group_ends[#rows] = true
     end
     top_header = headers[1] ~= nil
     for line, dir in pairs(headers) do
@@ -274,7 +278,7 @@ function M.number()
     if not file then
         return ""
     end
-    return (file.key == selected and "%#ReviewPanelNr#" or "") .. "󰘍"
+    return (file.key == selected and "%#ReviewPanelNr#" or "") .. (group_ends[vim.v.lnum] and "└─" or "├─")
 end
 
 return M

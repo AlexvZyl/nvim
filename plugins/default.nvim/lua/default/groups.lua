@@ -36,7 +36,7 @@ return {
     -- Syntax tweaks.
     MatchParen = { bg = U.get_bg(P.bg), underline = true },
     Statement = { fg = P.orange, bold = false },
-    Comment = { fg = P.gray3, bold = false },
+    Comment = { fg = P.gray2, bold = false, italic = true },
     Title = { fg = P.yellow, bold = true },
     Constant = { bold = true },
     Number = { fg = P.magenta },
@@ -48,6 +48,7 @@ return {
     ["@keyword.directive"] = { fg = P.red },
     ["@keyword.import"] = { link = "@keyword.directive" },
     ["@boolean"] = { link = "Number" },
+    ["@string.special.url.gdscript"] = { underline = false },
 
     ["@markup.heading.1"] = { fg = P.yellow, bold = true },
     ["@markup.heading.2"] = { fg = P.orange, bold = true },
@@ -72,6 +73,7 @@ return {
     DiagnosticSignHint = { fg = P.green, bold = true },
     DiagnosticSignOk = { fg = P.green, bold = true },
     DiagnosticSignInfo = { fg = P.blue, bold = true },
+    DiagnosticUnnecessary = { fg = P.white3, italic = false },
     DiagnosticUnderlineError = { sp = P.red, underline = true, undercurl = false },
     DiagnosticUnderlineWarn = { sp = P.yellow, underline = true, undercurl = false },
     DiagnosticUnderlineHint = { sp = P.green, underline = true, undercurl = false },

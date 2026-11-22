@@ -1,5 +1,5 @@
-local git = require("alex.native.review.git")
-local session = require("alex.native.review.session")
+local git = require("review.git")
+local session = require("review.session")
 
 local M = {}
 

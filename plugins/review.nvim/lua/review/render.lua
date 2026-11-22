@@ -1,4 +1,4 @@
-local git = require("alex.native.review.git")
+local git = require("review.git")
 
 local M = {}
 

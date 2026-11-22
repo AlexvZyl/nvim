@@ -1,7 +1,7 @@
-local git = require("alex.native.review.git")
-local render = require("alex.native.review.render")
-local session = require("alex.native.review.session")
-local state = require("alex.native.review.state")
+local git = require("review.git")
+local render = require("review.render")
+local session = require("review.session")
+local state = require("review.state")
 
 local M = {}
 
@@ -178,7 +178,7 @@ local function create_buffer()
     map("n", "<CR>", select)
     map("n", "<2-LeftMouse>", select)
     vim.keymap.set("n", "d", function()
-        vim.o.operatorfunc = "v:lua.require'alex.native.review.panel'.operator"
+        vim.o.operatorfunc = "v:lua.require'review.panel'.operator"
         return "g@"
     end, { buffer = buf, expr = true })
     map("o", "d", "_")
@@ -242,7 +242,8 @@ function M.toggle()
     wo.list = false
     wo.spell = false
     wo.winfixwidth = true
-    require("alex.native.statuscolumn").review()
+    wo.signcolumn = "no"
+    wo.statuscolumn = "  %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator#  "
     draw(1)
 end
 

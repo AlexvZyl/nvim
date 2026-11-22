@@ -1,14 +1,14 @@
-local git = require("alex.native.review.git")
-local session = require("alex.native.review.session")
+local git = require("review.git")
+local session = require("review.session")
 
 local M = {}
 
 local function guarded(fn)
-    return function()
+    return function(...)
         if not session.ref then
             return vim.notify("Not in diff mode", vim.log.levels.WARN)
         end
-        fn()
+        fn(...)
     end
 end
 
@@ -17,13 +17,12 @@ function M.active()
 end
 
 M.panel = guarded(function()
-    require("alex.native.review.panel").toggle()
+    require("review.panel").toggle()
 end)
 
-M.files = guarded(function()
+M.files = guarded(function(opts)
     require("telescope")
-    local templates = require("alex.plugins.telescope")
-    require("telescope.builtin").find_files(vim.tbl_extend("force", templates.large_no_preview, {
+    require("telescope.builtin").find_files(vim.tbl_extend("force", opts or {}, {
         prompt_title = "Review files",
         find_command = {
             "git",
@@ -41,11 +40,11 @@ M.files = guarded(function()
 end)
 
 M.reset = guarded(function()
-    local panel = require("alex.native.review.panel")
+    local panel = require("review.panel")
     if not git.load() then
         return
     end
-    require("alex.native.review.state").reset()
+    require("review.state").reset()
     if panel.is_open() then
         panel.close()
         panel.toggle()
@@ -68,17 +67,17 @@ function M.setup()
     vim.api.nvim_create_user_command("ReviewReset", M.reset, {})
     vim.api.nvim_create_autocmd("BufEnter", {
         callback = function(args)
-            require("alex.native.review.panel").follow(args.buf)
+            require("review.panel").follow(args.buf)
         end,
     })
     vim.api.nvim_create_autocmd("WinScrolled", {
         callback = function()
-            require("alex.native.review.render").scrolled()
+            require("review.render").scrolled()
         end,
     })
     vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
         callback = function(args)
-            require("alex.native.review.render").attach(args.buf)
+            require("review.render").attach(args.buf)
         end,
     })
 end

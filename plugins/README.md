@@ -14,7 +14,9 @@ Lazy clones this whole repo, but only the plugin directories get added to the ru
     priority = 1000,
     init = function(plugin)
         vim.opt.rtp:prepend(plugin.dir .. "/plugins/default.nvim")
+        vim.opt.rtp:prepend(plugin.dir .. "/plugins/review.nvim")
         require("default").load()
+        require("review").setup()
     end,
 },
 ```
@@ -22,3 +24,4 @@ Lazy clones this whole repo, but only the plugin directories get added to the ru
 ## Plugins
 
 - [default.nvim](default.nvim): The default neovim theme, but with some minor improvements.
+- [review.nvim](review.nvim): Review the diff of the current branch against a base ref.

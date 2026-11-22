@@ -1,4 +1,4 @@
-local session = require("alex.native.review.session")
+local session = require("review.session")
 
 local M = {}
 

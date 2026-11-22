@@ -18,7 +18,7 @@ local custom_bars = {
     review = {
         icon = "",
         name = function()
-            return "%{%v:lua.require'alex.native.review.panel'.winbar()%}"
+            return "%{%v:lua.require'review.panel'.winbar()%}"
         end,
         hide_modified = true,
     },

@@ -64,7 +64,7 @@ local plugins = {
             {
                 "stevearc/quicker.nvim",
                 cond = function()
-                    return not require("alex.native.review").active()
+                    return not require("review").active()
                 end,
                 config = function()
                     require("alex.plugins.quicker")
@@ -80,7 +80,7 @@ local plugins = {
         "lewis6991/gitsigns.nvim",
         -- event = { "VeryLazy" },
         cond = function()
-            return not require("alex.native.review").active()
+            return not require("review").active()
         end,
         config = function()
             require("alex.plugins.gitsigns")
@@ -131,6 +131,14 @@ local plugins = {
         -- Loaded by the native config.
         "neovim/nvim-lspconfig",
         lazy = true,
+    },
+
+    -- Own plugins.
+    {
+        -- Setup happens in `alex.init`, this only keeps it on the rtp.
+        dir = vim.fn.stdpath("config") .. "/plugins/review.nvim",
+        name = "review.nvim",
+        lazy = false,
     },
 
     -- Themes.

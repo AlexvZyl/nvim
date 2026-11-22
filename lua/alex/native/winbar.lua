@@ -21,6 +21,8 @@ local custom_bars = {
             return "%{%v:lua.require'review.panel'.winbar()%}"
         end,
         hide_modified = true,
+        -- Lines up with the panel's tree.
+        prefix = " ",
     },
     netrw = {
         icon = "",
@@ -83,7 +85,7 @@ function M.get_winbar()
     local buftype = vim.bo.buftype
     local custom_bar = custom_bars[filetype] or custom_bars[buftype]
     if custom_bar ~= nil then
-        return prefix .. custom_bar.icon .. " " .. custom_bar.name() .. (custom_bar.hide_modified and "" or mod_icon)
+        return (custom_bar.prefix or prefix) .. custom_bar.icon .. " " .. custom_bar.name() .. (custom_bar.hide_modified and "" or mod_icon)
     end
 
     local file_icon = U.current_buffer_icon()

@@ -142,26 +142,12 @@ local function draw(cursor)
     show_done()
 end
 
-local function sync()
-    local source = session.source
-    if not session.load() then
-        return false
-    end
-    if source == session.source then
-        return true
-    end
-    state.load()
-    draw(1)
-    vim.notify("Branch changed to " .. session.source .. ", review state reloaded", vim.log.levels.WARN)
-    return false
-end
-
 local function remove(first, last)
     local keys = {}
     for i = first, math.min(last, #rows) do
         table.insert(keys, rows[i].key)
     end
-    if #keys == 0 or not sync() then
+    if #keys == 0 then
         return
     end
     state.review(keys, first)
@@ -169,9 +155,6 @@ local function remove(first, last)
 end
 
 local function restore(step)
-    if not sync() then
-        return
-    end
     local cursor = step(vim.fn.line("."))
     if cursor then
         draw(cursor)
@@ -193,9 +176,6 @@ local function target_window()
 end
 
 local function select()
-    if not sync() then
-        return
-    end
     local line = vim.fn.line(".")
     local file = rows[line]
     if not file then
@@ -261,6 +241,13 @@ function M.follow(buf)
         return
     end
     selected = key
+    if M.is_open() then
+        draw(vim.api.nvim_win_get_cursor(win)[1])
+    end
+end
+
+-- Redraws with the session as it is now, keeping the cursor.
+function M.refresh()
     if M.is_open() then
         draw(vim.api.nvim_win_get_cursor(win)[1])
     end

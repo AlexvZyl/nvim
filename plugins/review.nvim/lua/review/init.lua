@@ -112,6 +112,28 @@ function M.setup()
             require("review.render").update(args.buf)
         end,
     })
+
+    -- Gitsigns draws over the review signs, turn it off once it is set up.
+    local function disable_gitsigns()
+        if not package.loaded.gitsigns then
+            return
+        end
+        local gitsigns = require("gitsigns")
+        for _, toggle in ipairs({ "toggle_signs", "toggle_numhl", "toggle_linehl", "toggle_word_diff", "toggle_deleted" }) do
+            if gitsigns[toggle] then
+                pcall(gitsigns[toggle], false)
+            end
+        end
+    end
+    vim.api.nvim_create_autocmd("VimEnter", { once = true, callback = disable_gitsigns })
+    vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyLoad",
+        callback = function(args)
+            if args.data == "gitsigns.nvim" then
+                vim.schedule(disable_gitsigns)
+            end
+        end,
+    })
 end
 
 return M

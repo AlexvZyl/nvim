@@ -274,7 +274,7 @@ function M.number()
     if not file then
         return ""
     end
-    return (file.key == selected and "%#ReviewPanelNr#" or "") .. vim.v.lnum
+    return (file.key == selected and "%#ReviewPanelNr#" or "") .. "󰘍"
 end
 
 return M

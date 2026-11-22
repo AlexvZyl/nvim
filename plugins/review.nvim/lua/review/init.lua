@@ -20,25 +20,6 @@ M.panel = guarded(function()
     require("review.panel").toggle()
 end)
 
-M.files = guarded(function(opts)
-    require("telescope")
-    require("telescope.builtin").find_files(vim.tbl_extend("force", opts or {}, {
-        prompt_title = "Review files",
-        find_command = {
-            "git",
-            "-c",
-            "core.quotePath=false",
-            "diff",
-            "--name-only",
-            "--relative",
-            "--diff-filter=d",
-            "--no-renames",
-            "--merge-base",
-            session.ref,
-        },
-    }))
-end)
-
 M.reset = guarded(function()
     local panel = require("review.panel")
     if not git.load() then

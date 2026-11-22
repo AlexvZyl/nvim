@@ -1,5 +1,7 @@
 # "${HOME}/.config/nvim"
 
+<img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/9df1727d-fbc1-4987-93db-0f0e8f55c228" />
+
 Configuration files and custom modules for Neovim.
 
 I do not use a distro becuase:
@@ -20,7 +22,7 @@ I keep my own plugins in [plugins](plugins).  To load them with lazy:
 ```lua
 {
     "AlexvZyl/nvim",
-    lazy = true,
+    lazy = true, -- Prevent my entire config from loading.
     priority = 1000,
     init = function(plugin)
         vim.opt.rtp:prepend(plugin.dir .. "/plugins/default.nvim")
@@ -30,7 +32,3 @@ I keep my own plugins in [plugins](plugins).  To load them with lazy:
     end,
 },
 ```
-
-Keep `lazy = true`, otherwise the rest of my config gets loaded too.
-
-<img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/9df1727d-fbc1-4987-93db-0f0e8f55c228" />

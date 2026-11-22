@@ -140,6 +140,8 @@ local function draw(cursor)
     vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor, #rows), 1), 0 })
     show_top_header()
     show_done()
+    -- The winbar only redraws by itself on window events.
+    vim.cmd.redrawstatus({ bang = true })
 end
 
 local function remove(first, last)
@@ -307,9 +309,10 @@ function M.winbar()
         remaining = remaining + row.changes
     end
     local total = session.total_changes
-    local percent = total > 0 and math.floor((total - remaining) / total * 100) or 0
-    -- Only done once nothing is left, however small.
-    local icon = remaining == 0 and total > 0 and DONE
+    -- Only done once no files are left, however small, so binary files and an empty diff count too.
+    local done = #rows == 0
+    local percent = done and 100 or total > 0 and math.min(math.floor((total - remaining) / total * 100), 99) or 0
+    local icon = done and DONE
         or percent == 0 and EMPTY
         or PROGRESS[math.max(math.ceil(percent * #PROGRESS / 100), 1)]
     local metrics = string.format("%d%%%% %s", percent, icon)

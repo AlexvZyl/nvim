@@ -44,7 +44,7 @@ return {
     Type = { fg = P.yellow },
     PreProc = { link = "Function" },
 
-    ["@module"] = { italic = true },
+    ["@module"] = { italic = true, fg = P.fg },
     ["@keyword.directive"] = { fg = P.red },
     ["@keyword.import"] = { link = "@keyword.directive" },
     ["@boolean"] = { link = "Number" },
@@ -133,4 +133,7 @@ return {
 
     -- Leap.
     LeapLabel = { bg = P.yellow, fg = P.bg_dark, bold = true },
+
+    -- Rust things.
+    ["module.rust"] = { link = "@module" }
 }

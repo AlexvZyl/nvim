@@ -12,6 +12,7 @@ local MARK = "●"
 local PROGRESS = { "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤" }
 local EMPTY, DONE = "󰝦", "󰄴"
 local FOLDER = ""
+local ICON = ""
 local buf, win, selected
 local rows = {}
 local top_header = false
@@ -309,6 +310,7 @@ function M.toggle()
     wo.winfixwidth = true
     wo.signcolumn = "no"
     wo.statuscolumn = " %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator# "
+    wo.winbar = " " .. ICON .. " %{%v:lua.require'review.panel'.winbar()%}"
     draw(1)
 end
 

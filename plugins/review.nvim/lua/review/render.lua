@@ -102,29 +102,16 @@ local function render_deleted(buf)
     end
 end
 
-local function render(buf, hunks, local_hunks)
+local function render(buf, hunks)
     vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
-    local local_lines = {}
-    for _, hunk in ipairs(local_hunks) do
-        local last = math.max(hunk.start + hunk.count - 1, hunk.start)
-        for line = math.max(hunk.start, 1), last do
-            local_lines[line] = true
-            vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
-                sign_text = SIGN,
-                sign_hl_group = "ReviewSignLocal",
-            })
-        end
-    end
     for _, hunk in ipairs(hunks) do
         for line = hunk.start, hunk.start + hunk.count - 1 do
-            if not local_lines[line] then
-                vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
-                    line_hl_group = "ReviewAdd",
-                    number_hl_group = "ReviewAddNr",
-                    sign_text = SIGN,
-                    sign_hl_group = "ReviewSignAdd",
-                })
-            end
+            vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
+                line_hl_group = "ReviewAdd",
+                number_hl_group = "ReviewAddNr",
+                sign_text = SIGN,
+                sign_hl_group = "ReviewSignAdd",
+            })
         end
     end
     render_deleted(buf)
@@ -169,7 +156,7 @@ local function detach(buf)
     pcall(vim.keymap.del, "n", "[h", { buffer = buf })
 end
 
--- Diffs the buffer against the merge base and HEAD, in memory, so edits show up while typing.
+-- Diffs the buffer against the merge base in memory, so edits show up while typing.
 function M.update(buf, defer)
     local source = sources[buf]
     if not source or not vim.api.nvim_buf_is_valid(buf) then
@@ -197,13 +184,12 @@ function M.update(buf, defer)
         end, { buffer = buf })
     end
     buffer_hunks[buf] = hunks
-    local local_hunks = diff(source.head, text)
     if not defer then
-        return render(buf, hunks, local_hunks)
+        return render(buf, hunks)
     end
     vim.schedule(function()
         if vim.api.nvim_buf_is_valid(buf) and buffer_hunks[buf] == hunks then
-            render(buf, hunks, local_hunks)
+            render(buf, hunks)
         end
     end)
 end
@@ -222,7 +208,7 @@ function M.attach(buf)
         sources[buf] = nil
         return detach(buf)
     end
-    sources[buf] = { base = base or "", head = head or "" }
+    sources[buf] = { base = base or "" }
     M.update(buf, true)
 end
 

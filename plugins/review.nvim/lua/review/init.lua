@@ -56,7 +56,6 @@ local highlights = {
     ReviewAddNr = "DiffAdd",
     ReviewDelete = "DiffDelete",
     ReviewSignAdd = "Added",
-    ReviewSignLocal = "Changed",
     ReviewSignDelete = "Removed",
     ReviewPanelLine = "CursorLine",
     ReviewPanelDir = "Directory",

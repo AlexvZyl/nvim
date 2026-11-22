@@ -11,6 +11,7 @@ local MARK = "●"
 local FOLDER = ""
 local buf, win, selected
 local rows = {}
+local top_header = false
 
 local function mark_text(key)
     if state.changed(key) then
@@ -22,6 +23,10 @@ local function mark_text(key)
 end
 
 local function show_top_header()
+    -- Without a header above the first row the filler would be drawn as a diff filler line.
+    if not top_header then
+        return
+    end
     vim.api.nvim_win_call(win, function()
         local view = vim.fn.winsaveview()
         if view.topline == 1 and view.topfill == 0 then
@@ -70,6 +75,7 @@ local function draw(cursor)
             })
         end
     end
+    top_header = headers[1] ~= nil
     for line, dir in pairs(headers) do
         marks[line].virt_lines = { { { " " .. FOLDER .. " " .. dir, "ReviewPanelDir" } } }
         marks[line].virt_lines_above = true

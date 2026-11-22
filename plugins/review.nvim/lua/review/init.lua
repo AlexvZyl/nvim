@@ -1,11 +1,11 @@
-local git = require("review.git")
+local config = require("review.config")
 local session = require("review.session")
 
 local M = {}
 
 local function guarded(fn)
     return function(...)
-        if not session.ref then
+        if not session.active() then
             return vim.notify("Not in diff mode", vim.log.levels.WARN)
         end
         fn(...)
@@ -13,7 +13,7 @@ local function guarded(fn)
 end
 
 function M.active()
-    return session.ref ~= nil
+    return session.active()
 end
 
 M.panel = guarded(function()
@@ -22,7 +22,7 @@ end)
 
 M.reset = guarded(function()
     local panel = require("review.panel")
-    if not git.load() then
+    if not session.load() then
         return
     end
     require("review.state").reset()
@@ -51,7 +51,8 @@ local function set_highlights()
     end
 end
 
-function M.setup()
+function M.setup(opts)
+    config.set(opts)
     if vim.fn.argv(0) ~= "diff" then
         return
     end
@@ -75,7 +76,7 @@ function M.setup()
 
     set_highlights()
     autocmd("ColorScheme", { callback = set_highlights })
-    session.ref = vim.fn.argc() > 1 and vim.fn.argv(1) or "dev"
+    session.start(vim.fn.argc() > 1 and vim.fn.argv(1) or config.options.base)
     vim.cmd("%argdelete")
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
         if buf ~= vim.api.nvim_get_current_buf() then
@@ -103,6 +104,11 @@ function M.setup()
     autocmd({ "BufReadPost", "BufWritePost" }, {
         callback = function(args)
             require("review.render").attach(args.buf)
+        end,
+    })
+    autocmd("BufWipeout", {
+        callback = function(args)
+            require("review.render").detach(args.buf)
         end,
     })
     autocmd({ "TextChanged", "TextChangedI" }, {

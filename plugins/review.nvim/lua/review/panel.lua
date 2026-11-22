@@ -1,4 +1,4 @@
-local git = require("review.git")
+local config = require("review.config")
 local render = require("review.render")
 local session = require("review.session")
 local state = require("review.state")
@@ -6,7 +6,6 @@ local state = require("review.state")
 local M = {}
 
 local namespace = vim.api.nvim_create_namespace("review_panel")
-local WIDTH = 60
 local MARK = "●"
 -- Fills up as the review progresses.
 local PROGRESS = { "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤" }
@@ -40,12 +39,21 @@ local function show_top_header()
     end)
 end
 
+-- The first directories of a path up to the configured depth, empty for files in the root.
+local function group_dir(path)
+    local dir = vim.fs.dirname(path)
+    if dir == "." then
+        return ""
+    end
+    local parts = vim.split(dir, "/", { plain = true })
+    return table.concat(parts, "/", 1, math.min(config.options.depth, #parts))
+end
+
 local function build_groups()
     local groups, dirs = {}, {}
     for _, file in ipairs(session.files) do
         if state.pending(file.key) then
-            -- Group by the first two directory levels.
-            local dir = file.path:match("^([^/]+/[^/]+)/") or file.path:match("^([^/]+)/") or ""
+            local dir = group_dir(file.path)
             if not groups[dir] then
                 groups[dir] = {}
                 table.insert(dirs, dir)
@@ -100,7 +108,7 @@ end
 
 local function sync()
     local source = session.source
-    if not git.load() then
+    if not session.load() then
         return false
     end
     if source == session.source then
@@ -236,14 +244,14 @@ function M.toggle()
     if M.is_open() then
         return M.close()
     end
-    if not git.load() then
+    if not session.load() then
         return
     end
     state.load()
     if not (buf and vim.api.nvim_buf_is_valid(buf)) then
         create_buffer()
     end
-    vim.cmd("topleft vertical " .. WIDTH .. "split")
+    vim.cmd("topleft vertical " .. config.options.width .. "split")
     win = vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_buf(win, buf)
     local wo = vim.wo[win][0]

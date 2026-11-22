@@ -1,12 +1,13 @@
 local git = require("review.git")
+local session = require("review.session")
 
 local M = {}
 
 local namespace = vim.api.nvim_create_namespace("review")
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
-local buffer_hunks = {}
-local sources = {}
 local SIGN = "▏"
+-- Attached buffers, with the file at the merge base and the current hunks against it.
+local buffers = {}
 
 local function parse_hunks(patch)
     local hunks = {}
@@ -16,6 +17,7 @@ local function parse_hunks(patch)
         if start then
             current = {
                 start = tonumber(start),
+                -- A missing count means a single line.
                 count = count == "" and 1 or tonumber(count),
                 deleted = {},
             }
@@ -27,72 +29,98 @@ local function parse_hunks(patch)
     return hunks
 end
 
-local function highlight_deleted(lang, hunk)
-    hunk.highlights = {}
+-- Treesitter highlight of every byte of the deleted lines, by line.
+local function highlight_deleted(lang, deleted)
+    local highlights = {}
     local query = lang and vim.treesitter.query.get(lang, "highlights")
-    if not query or #hunk.deleted == 0 then
-        return
+    if not query then
+        return highlights
     end
-    local source = table.concat(hunk.deleted, "\n")
+    local source = table.concat(deleted, "\n")
     local ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
     if not ok then
-        return
+        return highlights
     end
     for id, node in query:iter_captures(parser:parse()[1]:root(), source) do
         local name = query.captures[id]
         if not name:find("^_") and name ~= "spell" and name ~= "nospell" then
             local start_row, start_col, end_row, end_col = node:range()
-            for row = start_row, math.min(end_row, #hunk.deleted - 1) do
-                local line = hunk.highlights[row + 1] or {}
-                hunk.highlights[row + 1] = line
-                local last = row == end_row and end_col or #hunk.deleted[row + 1]
+            for row = start_row, math.min(end_row, #deleted - 1) do
+                local line = highlights[row + 1] or {}
+                highlights[row + 1] = line
+                local last = row == end_row and end_col or #deleted[row + 1]
                 for col = (row == start_row and start_col or 0) + 1, last do
                     line[col] = "@" .. name .. "." .. lang
                 end
             end
         end
     end
+    return highlights
 end
 
+-- Shared so neighbouring characters with the same highlight merge into one chunk.
+local delete_groups = {}
+
+local function delete_group(name)
+    if not name then
+        return "ReviewDelete"
+    end
+    delete_groups[name] = delete_groups[name] or { "ReviewDelete", name }
+    return delete_groups[name]
+end
+
+-- Virtual text of a deleted line, scrolled by leftcol and padded to the edge like a line highlight.
 local function deleted_chunks(text, highlights, leftcol, tabstop)
-    local chunks, shown, byte = {}, 0, 1
-    for char in text:gmatch("[^\128-\191][\128-\191]*") do
-        local group = highlights[byte] and { "ReviewDelete", highlights[byte] } or "ReviewDelete"
-        byte = byte + #char
-        for _ = 1, char == "\t" and tabstop or 1 do
-            shown = shown + 1
-            if shown > leftcol then
-                local last = chunks[#chunks]
-                if last and last[2] == group then
-                    last[1] = last[1] .. (char == "\t" and " " or char)
-                else
-                    table.insert(chunks, { char == "\t" and " " or char, group })
-                end
-            end
+    local chunks, width = {}, 0
+    local function add(char, group)
+        width = width + 1
+        if width <= leftcol then
+            return
+        end
+        local last = chunks[#chunks]
+        if last and last[2] == group then
+            last[1] = last[1] .. char
+        else
+            table.insert(chunks, { char, group })
         end
     end
-    table.insert(chunks, { string.rep(" ", math.max(vim.o.columns - shown + leftcol, 0)), "ReviewDelete" })
+    local byte = 1
+    -- A UTF-8 lead byte followed by its continuation bytes.
+    for char in text:gmatch("[^\128-\191][\128-\191]*") do
+        local group = delete_group(highlights[byte])
+        byte = byte + #char
+        if char == "\t" then
+            for _ = 1, tabstop do
+                add(" ", group)
+            end
+        else
+            add(char, group)
+        end
+    end
+    table.insert(chunks, { string.rep(" ", math.max(vim.o.columns - width + leftcol, 0)), "ReviewDelete" })
     return chunks
 end
 
+-- Drawn separately from the added lines, since they depend on the window's scroll and gutter.
 local function render_deleted(buf)
     vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
     local win = vim.fn.win_findbuf(buf)[1] or vim.api.nvim_get_current_win()
     local textoff = vim.fn.getwininfo(win)[1].textoff
     local leftcol = vim.api.nvim_win_call(win, vim.fn.winsaveview).leftcol
-    local gutter = SIGN .. string.rep(" ", textoff - 2)
     local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
-    for _, hunk in ipairs(buffer_hunks[buf] or {}) do
-        if not hunk.highlights then
-            highlight_deleted(lang, hunk)
-        end
+    local tabstop = vim.bo[buf].tabstop
+    -- Virtual lines have no number or sign column, so draw them in.
+    local number = { " ", "LineNr" }
+    local sign = { SIGN .. string.rep(" ", textoff - 2), "ReviewSignDelete" }
+    for _, hunk in ipairs(buffers[buf].hunks) do
         if #hunk.deleted > 0 then
+            hunk.highlights = hunk.highlights or highlight_deleted(lang, hunk.deleted)
             local virt_lines = {}
             for i, text in ipairs(hunk.deleted) do
-                local line = { { " ", "LineNr" }, { gutter, "ReviewSignDelete" } }
-                vim.list_extend(line, deleted_chunks(text, hunk.highlights[i] or {}, leftcol, vim.bo[buf].tabstop))
-                table.insert(virt_lines, line)
+                local chunks = deleted_chunks(text, hunk.highlights[i] or {}, leftcol, tabstop)
+                table.insert(virt_lines, vim.list_extend({ number, sign }, chunks))
             end
+            -- A pure deletion starts at the line before it, so goes below that line unless it is at the top.
             vim.api.nvim_buf_set_extmark(buf, deleted_namespace, math.max(hunk.start - 1, 0), 0, {
                 virt_lines = virt_lines,
                 virt_lines_above = hunk.count > 0 or hunk.start == 0,
@@ -102,9 +130,9 @@ local function render_deleted(buf)
     end
 end
 
-local function render(buf, hunks)
+local function render(buf)
     vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
-    for _, hunk in ipairs(hunks) do
+    for _, hunk in ipairs(buffers[buf].hunks) do
         for line = hunk.start, hunk.start + hunk.count - 1 do
             vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
                 line_hl_group = "ReviewAdd",
@@ -117,10 +145,10 @@ local function render(buf, hunks)
     render_deleted(buf)
 end
 
-local function jump(hunks, forward)
+local function jump(buf, forward)
     local current = vim.api.nvim_win_get_cursor(0)[1]
     local target
-    for _, hunk in ipairs(hunks) do
+    for _, hunk in ipairs(buffers[buf] and buffers[buf].hunks or {}) do
         local line = math.max(hunk.start, 1)
         if forward and line > current then
             target = target or line
@@ -141,53 +169,27 @@ local function buffer_text(buf)
     return table.concat(lines, "\n") .. "\n"
 end
 
-local function diff(from, to)
-    return parse_hunks(vim.text.diff(from, to, { ctxlen = 0, indent_heuristic = true }) or "")
-end
-
-local function detach(buf)
-    if not buffer_hunks[buf] then
-        return
-    end
-    buffer_hunks[buf] = nil
-    vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
-    vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-    pcall(vim.keymap.del, "n", "]h", { buffer = buf })
-    pcall(vim.keymap.del, "n", "[h", { buffer = buf })
-end
-
 -- Diffs the buffer against the merge base in memory, so edits show up while typing.
 function M.update(buf)
-    local source = sources[buf]
-    if not source or not vim.api.nvim_buf_is_valid(buf) then
+    local attached = buffers[buf]
+    if not attached or not vim.api.nvim_buf_is_valid(buf) then
         return
     end
-    local text = buffer_text(buf)
-    local hunks = diff(source.base, text)
-    if #hunks == 0 then
-        return detach(buf)
-    end
+    local patch = vim.text.diff(attached.base, buffer_text(buf), { ctxlen = 0, indent_heuristic = true })
+    local hunks = parse_hunks(patch or "")
     -- Treesitter highlights of deleted lines only change when the deleted text does.
     local cached = {}
-    for _, hunk in ipairs(buffer_hunks[buf] or {}) do
+    for _, hunk in ipairs(attached.hunks) do
         cached[table.concat(hunk.deleted, "\n")] = hunk.highlights
     end
     for _, hunk in ipairs(hunks) do
         hunk.highlights = cached[table.concat(hunk.deleted, "\n")]
     end
-    if not buffer_hunks[buf] then
-        vim.keymap.set("n", "]h", function()
-            jump(buffer_hunks[buf] or {}, true)
-        end, { buffer = buf })
-        vim.keymap.set("n", "[h", function()
-            jump(buffer_hunks[buf] or {}, false)
-        end, { buffer = buf })
-    end
-    buffer_hunks[buf] = hunks
+    attached.hunks = hunks
     -- After the edit is processed, so the window's textoff is up to date for the deleted lines.
     vim.schedule(function()
-        if vim.api.nvim_buf_is_valid(buf) and buffer_hunks[buf] == hunks then
-            render(buf, hunks)
+        if buffers[buf] == attached and attached.hunks == hunks and vim.api.nvim_buf_is_valid(buf) then
+            render(buf)
         end
     end)
 end
@@ -197,17 +199,38 @@ function M.attach(buf)
     if vim.bo[buf].buftype ~= "" or vim.fn.filereadable(file) == 0 then
         return
     end
-    local merge_base = git.merge_base()
-    local base = merge_base ~= "" and git.show(merge_base, file) or nil
+    local base = session.merge_base and git.show(session.merge_base, file)
     local head = git.show("HEAD", file)
     local binary = (base or ""):find("\0", 1, true) or (head or ""):find("\0", 1, true)
     if (not base and not head) or binary then
         -- Untracked, outside the repo or binary.
-        sources[buf] = nil
-        return detach(buf)
+        return M.detach(buf)
     end
-    sources[buf] = { base = base or "" }
+    if not buffers[buf] then
+        buffers[buf] = { hunks = {} }
+        vim.keymap.set("n", "]h", function()
+            jump(buf, true)
+        end, { buffer = buf })
+        vim.keymap.set("n", "[h", function()
+            jump(buf, false)
+        end, { buffer = buf })
+    end
+    -- No base when the file was added since the merge base.
+    buffers[buf].base = base or ""
     M.update(buf)
+end
+
+function M.detach(buf)
+    if not buffers[buf] then
+        return
+    end
+    buffers[buf] = nil
+    if vim.api.nvim_buf_is_valid(buf) then
+        vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
+        vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
+        pcall(vim.keymap.del, "n", "]h", { buffer = buf })
+        pcall(vim.keymap.del, "n", "[h", { buffer = buf })
+    end
 end
 
 function M.scrolled()
@@ -215,7 +238,7 @@ function M.scrolled()
         local id = tonumber(win)
         if id and delta.leftcol ~= 0 and vim.api.nvim_win_is_valid(id) then
             local buf = vim.api.nvim_win_get_buf(id)
-            if buffer_hunks[buf] then
+            if buffers[buf] then
                 render_deleted(buf)
             end
         end
@@ -223,7 +246,7 @@ function M.scrolled()
 end
 
 function M.first_hunk(buf)
-    return (buffer_hunks[buf] or {})[1]
+    return buffers[buf] and buffers[buf].hunks[1]
 end
 
 return M

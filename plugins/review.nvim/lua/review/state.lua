@@ -1,11 +1,17 @@
-local git = require("review.git")
 local session = require("review.session")
 
 local M = {}
 
+local function empty()
+    return { reviewed = {}, seen = {}, undo = {}, redo = {} }
+end
+
+-- Blob each file was reviewed at, files already seen and the undo history.
+local data = empty()
+
 local function path()
     local name = (session.source .. ".." .. session.ref):gsub("/", "%%")
-    return git.git_dir() .. "/review/" .. name .. ".json"
+    return session.git_dir .. "/review/" .. name .. ".json"
 end
 
 local function valid_history(stack)
@@ -20,102 +26,100 @@ end
 
 function M.load()
     local ok, lines = pcall(vim.fn.readfile, path())
-    local decoded, data = pcall(vim.json.decode, ok and table.concat(lines, "\n") or "")
-    data = decoded and type(data) == "table" and data or {}
-    local seen = type(data.seen) == "table" and data.seen
+    local decoded, saved = pcall(vim.json.decode, ok and table.concat(lines, "\n") or "")
+    saved = decoded and type(saved) == "table" and saved or {}
+    -- Without saved state nothing is new yet.
+    local seen = type(saved.seen) == "table" and saved.seen
         or vim.tbl_map(function(file)
             return file.key
         end, session.files)
-    session.state = {
-        reviewed = type(data.reviewed) == "table" and data.reviewed or {},
+    data = {
+        reviewed = type(saved.reviewed) == "table" and saved.reviewed or {},
         seen = {},
-        undo = valid_history(data.undo),
-        redo = valid_history(data.redo),
+        undo = valid_history(saved.undo),
+        redo = valid_history(saved.redo),
     }
     for _, key in ipairs(seen) do
-        session.state.seen[key] = true
+        data.seen[key] = true
     end
 end
 
 function M.save()
     local file = path()
-    local state = session.state
-    local data = {
-        reviewed = as_dict(state.reviewed),
-        seen = vim.tbl_keys(state.seen),
-        undo = state.undo,
-        redo = state.redo,
-    }
+    local encoded = vim.json.encode({
+        reviewed = as_dict(data.reviewed),
+        seen = vim.tbl_keys(data.seen),
+        undo = data.undo,
+        redo = data.redo,
+    })
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
-    vim.fn.writefile({ vim.json.encode(data) }, file .. ".tmp")
+    vim.fn.writefile({ encoded }, file .. ".tmp")
     vim.uv.fs_rename(file .. ".tmp", file)
 end
 
 function M.reset()
     os.remove(path())
-    session.state = { reviewed = {}, seen = {}, undo = {}, redo = {} }
+    data = empty()
 end
 
-function M.blob(key)
+local function blob(key)
     return session.blobs[key] or ""
 end
 
 function M.pending(key)
-    return session.state.reviewed[key] ~= M.blob(key)
+    return data.reviewed[key] ~= blob(key)
 end
 
 function M.changed(key)
-    local reviewed = session.state.reviewed[key]
-    return reviewed ~= nil and reviewed ~= M.blob(key)
+    local reviewed = data.reviewed[key]
+    return reviewed ~= nil and reviewed ~= blob(key)
 end
 
 function M.new(key)
-    return not session.state.seen[key]
+    return not data.seen[key]
 end
 
 local function capture(keys, cursor)
-    local state = session.state
     local changes = {}
     for _, key in ipairs(keys) do
-        changes[key] = { reviewed = state.reviewed[key] or false, seen = state.seen[key] or false }
+        changes[key] = { reviewed = data.reviewed[key] or false, seen = data.seen[key] or false }
     end
     return { changes = changes, cursor = cursor }
 end
 
 function M.review(keys, cursor)
-    local state = session.state
-    table.insert(state.undo, capture(keys, cursor))
-    state.redo = {}
+    table.insert(data.undo, capture(keys, cursor))
+    data.redo = {}
     for _, key in ipairs(keys) do
-        state.reviewed[key] = M.blob(key)
-        state.seen[key] = true
+        data.reviewed[key] = blob(key)
+        data.seen[key] = true
     end
     M.save()
 end
 
 function M.clear(key)
-    session.state.reviewed[key] = nil
-    session.state.seen[key] = true
+    data.reviewed[key] = nil
+    data.seen[key] = true
     M.save()
 end
 
 local function restore(from, to, cursor)
-    local state = session.state
-    if #state[from] == 0 then
+    if #data[from] == 0 then
         return nil
     end
+    -- Skip entries that no longer change anything.
     local entry, changed
     repeat
-        entry = table.remove(state[from])
-        table.insert(state[to], capture(vim.tbl_keys(entry.changes), cursor))
+        entry = table.remove(data[from])
+        table.insert(data[to], capture(vim.tbl_keys(entry.changes), cursor))
         for key, change in pairs(entry.changes) do
             changed = changed
-                or (state.reviewed[key] or false) ~= change.reviewed
-                or (state.seen[key] or false) ~= change.seen
-            state.reviewed[key] = change.reviewed or nil
-            state.seen[key] = change.seen or nil
+                or (data.reviewed[key] or false) ~= change.reviewed
+                or (data.seen[key] or false) ~= change.seen
+            data.reviewed[key] = change.reviewed or nil
+            data.seen[key] = change.seen or nil
         end
-    until changed or #state[from] == 0
+    until changed or #data[from] == 0
     M.save()
     return entry.cursor
 end

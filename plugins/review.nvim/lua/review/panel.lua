@@ -6,6 +6,7 @@ local state = require("review.state")
 local M = {}
 
 local namespace = vim.api.nvim_create_namespace("review_panel")
+local done_namespace = vim.api.nvim_create_namespace("review_panel_done")
 local MARK = "●"
 -- Fills up as the review progresses.
 local PROGRESS = { "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤" }
@@ -67,6 +68,38 @@ local function build_groups()
     end, dirs)
 end
 
+-- Centered in the panel once no files are left.
+local function show_done()
+    vim.api.nvim_buf_clear_namespace(buf, done_namespace, 0, -1)
+    if #rows > 0 then
+        return
+    end
+    local message = { { DONE, "ReviewSignAdd" } }
+    if #session.files == 0 then
+        table.insert(message, { "Nothing to review", "Comment" })
+    else
+        local count = #session.files
+        table.insert(message, { "Review complete", "Normal" })
+        table.insert(message, { string.format("%d file%s reviewed", count, count == 1 and "" or "s"), "Comment" })
+        local undo = config.options.keymaps.undo
+        if undo then
+            table.insert(message, { "", "Comment" })
+            table.insert(message, { undo .. " to undo", "Comment" })
+        end
+    end
+    local width, height = vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win)
+    -- The empty buffer line takes the first row.
+    local virt_lines = {}
+    for _ = 1, math.floor((height - #message) / 2) - 1 do
+        table.insert(virt_lines, { { "", "Normal" } })
+    end
+    for _, chunk in ipairs(message) do
+        local pad = math.max(math.floor((width - vim.fn.strdisplaywidth(chunk[1])) / 2), 0)
+        table.insert(virt_lines, { { string.rep(" ", pad) .. chunk[1], chunk[2] } })
+    end
+    vim.api.nvim_buf_set_extmark(buf, done_namespace, 0, 0, { virt_lines = virt_lines, virt_lines_leftcol = true })
+end
+
 local function draw(cursor)
     local devicons = require("nvim-web-devicons")
     local groups = build_groups()
@@ -104,6 +137,7 @@ local function draw(cursor)
     end
     vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor, #rows), 1), 0 })
     show_top_header()
+    show_done()
 end
 
 local function sync()
@@ -227,6 +261,12 @@ function M.follow(buf)
     selected = key
     if M.is_open() then
         draw(vim.api.nvim_win_get_cursor(win)[1])
+    end
+end
+
+function M.resized()
+    if M.is_open() and vim.tbl_contains(vim.v.event.windows, win) then
+        show_done()
     end
 end
 

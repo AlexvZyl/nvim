@@ -61,6 +61,7 @@ local function create_autocmds()
         end,
     })
     autocmd("WinScrolled", { callback = render.scrolled })
+    autocmd("WinResized", { callback = panel.resized })
     autocmd({ "BufReadPost", "BufWritePost" }, {
         callback = function(args)
             render.attach(args.buf)

@@ -63,9 +63,6 @@ local plugins = {
             { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
             {
                 "stevearc/quicker.nvim",
-                cond = function()
-                    return not require("review").active()
-                end,
                 config = function()
                     require("alex.plugins.quicker")
                 end,
@@ -79,9 +76,6 @@ local plugins = {
         -- This plugin has issues when lazy.
         "lewis6991/gitsigns.nvim",
         -- event = { "VeryLazy" },
-        cond = function()
-            return not require("review").active()
-        end,
         config = function()
             require("alex.plugins.gitsigns")
         end,
@@ -135,10 +129,12 @@ local plugins = {
 
     -- Own plugins.
     {
-        -- Setup happens in `alex.init`, this only keeps it on the rtp.
         dir = vim.fn.stdpath("config") .. "/plugins/review.nvim",
         name = "review.nvim",
         lazy = false,
+        config = function()
+            require("alex.plugins.review")
+        end,
     },
 
     -- Themes.

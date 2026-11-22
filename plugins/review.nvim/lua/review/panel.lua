@@ -95,7 +95,8 @@ local function show_done()
     end
     for _, chunk in ipairs(message) do
         local pad = math.max(math.floor((width - vim.fn.strdisplaywidth(chunk[1])) / 2), 0)
-        table.insert(virt_lines, { { string.rep(" ", pad) .. chunk[1], chunk[2] } })
+        -- Padding in its own chunk, so it does not get the text's background.
+        table.insert(virt_lines, { { string.rep(" ", pad), "Normal" }, chunk })
     end
     vim.api.nvim_buf_set_extmark(buf, done_namespace, 0, 0, { virt_lines = virt_lines, virt_lines_leftcol = true })
 end

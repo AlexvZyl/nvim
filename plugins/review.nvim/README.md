@@ -11,4 +11,4 @@ nvim diff [ref]
 - `]h` / `[h`: Jump between hunks.
 - `:ReviewReset`: Clear the review state.
 
-Needs `nvim-web-devicons`, and `telescope.nvim` for `files()`.  Set the `Review*` highlight groups yourself.
+Set the `Review*` highlight groups yourself.

@@ -111,16 +111,21 @@ function M.set_winbar()
     vim.opt_local.winbar = M.get_winbar()
 end
 
+local events = {
+    "BufWritePost",
+    "BufWinEnter",
+    "BufFilePost",
+    "WinEnter",
+    "TermOpen",
+    "BufReadPost",
+}
+-- Not available in all versions.
+if vim.fn.exists("##BufModifiedSet") == 1 then
+    table.insert(events, "BufModifiedSet")
+end
+
 vim.api.nvim_create_autocmd(
-    {
-        "BufWritePost",
-        "BufWinEnter",
-        "BufFilePost",
-        "BufModifiedSet",
-        "WinEnter",
-        "TermOpen",
-        "BufReadPost",
-    },
+    events,
     {
         callback = function()
             require("alex.native.winbar").set_winbar()

@@ -324,7 +324,7 @@ function M.winbar()
         or percent == 0 and EMPTY
         or PROGRESS[math.max(math.ceil(percent * #PROGRESS / 100), 1)]
     local metrics = string.format("%d%%%% %s", percent, icon)
-    local branches = string.format("%s %s", session.source, session.ref)
+    local branches = string.format("%s  %s", session.source, session.ref)
     if vim.fn.strdisplaywidth(branches .. metrics) + 7 > vim.api.nvim_win_get_width(0) then
         branches = " " .. session.ref
     end

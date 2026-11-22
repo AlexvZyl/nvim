@@ -135,7 +135,8 @@ local plugins = {
 
     -- Themes.
     {
-        "AlexvZyl/default.nvim",
+        dir = vim.fn.stdpath("config") .. "/plugins/default.nvim",
+        name = "default.nvim",
         lazy = false,
         priority = 1000,
         config = function()

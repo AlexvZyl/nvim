@@ -191,24 +191,28 @@ end
 local function create_buffer()
     buf = vim.api.nvim_create_buf(false, true)
     vim.bo[buf].filetype = "review"
-    local function map(mode, lhs, rhs)
-        vim.keymap.set(mode, lhs, rhs, { buffer = buf })
+    local keys = config.options.keymaps
+    local function map(mode, lhs, rhs, opts)
+        if lhs then
+            vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", { buffer = buf }, opts or {}))
+        end
     end
     vim.api.nvim_create_autocmd("CursorMoved", { buffer = buf, callback = show_top_header })
-    map("n", "<CR>", select)
+    map("n", keys.open, select)
     map("n", "<2-LeftMouse>", select)
-    vim.keymap.set("n", "d", function()
+    map("n", keys.review, function()
         vim.o.operatorfunc = "v:lua.require'review.panel'.operator"
         return "g@"
-    end, { buffer = buf, expr = true })
-    map("o", "d", "_")
-    map("n", "u", function()
+    end, { expr = true })
+    -- Doubling the key reviews the current line, like dd.
+    map("o", keys.review, "_")
+    map("n", keys.undo, function()
         restore(state.undo)
     end)
-    map("n", "<C-r>", function()
+    map("n", keys.redo, function()
         restore(state.redo)
     end)
-    map("x", "d", function()
+    map("x", keys.review, function()
         local first, last = vim.fn.line("v"), vim.fn.line(".")
         vim.cmd("normal! \27")
         remove(math.min(first, last), math.max(first, last))

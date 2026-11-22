@@ -1,3 +1,4 @@
+local config = require("review.config")
 local git = require("review.git")
 local session = require("review.session")
 
@@ -208,12 +209,17 @@ function M.attach(buf)
     end
     if not buffers[buf] then
         buffers[buf] = { hunks = {} }
-        vim.keymap.set("n", "]h", function()
-            jump(buf, true)
-        end, { buffer = buf })
-        vim.keymap.set("n", "[h", function()
-            jump(buf, false)
-        end, { buffer = buf })
+        local keys = config.options.keymaps
+        if keys.next_hunk then
+            vim.keymap.set("n", keys.next_hunk, function()
+                jump(buf, true)
+            end, { buffer = buf })
+        end
+        if keys.prev_hunk then
+            vim.keymap.set("n", keys.prev_hunk, function()
+                jump(buf, false)
+            end, { buffer = buf })
+        end
     end
     -- No base when the file was added since the merge base.
     buffers[buf].base = base or ""
@@ -228,8 +234,11 @@ function M.detach(buf)
     if vim.api.nvim_buf_is_valid(buf) then
         vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
         vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-        pcall(vim.keymap.del, "n", "]h", { buffer = buf })
-        pcall(vim.keymap.del, "n", "[h", { buffer = buf })
+        for _, key in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
+            if key then
+                pcall(vim.keymap.del, "n", key, { buffer = buf })
+            end
+        end
     end
 end
 

@@ -1,7 +1,7 @@
 local config = require("review.config")
 local highlights = require("review.highlights")
 local session = require("review.session")
-local state = require("review.state")
+local watch = require("review.watch")
 
 local M = {}
 
@@ -55,62 +55,6 @@ local function autocmd(event, opts)
     vim.api.nvim_create_autocmd(event, opts)
 end
 
--- Reloads from git after HEAD or the working tree changed.
-local function refresh()
-    local source, merge_base = session.source, session.merge_base
-    if not session.load() then
-        return
-    end
-    if session.source ~= source then
-        state.load()
-        vim.notify("Reviewing " .. session.source .. " against " .. session.ref)
-    end
-    if session.merge_base ~= merge_base then
-        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-            if vim.api.nvim_buf_is_loaded(buf) then
-                require("review.render").attach(buf)
-            end
-        end
-    end
-    require("review.panel").refresh()
-end
-
-local timer, watcher
-
--- Once for a burst of changes, a rebase moves HEAD for every commit.
-local function schedule_refresh()
-    timer:stop()
-    timer:start(200, 0, vim.schedule_wrap(safely(refresh)))
-end
-
--- Git appends to the HEAD reflog whenever HEAD moves, and the merge base only changes when HEAD does.
-local function watch()
-    timer = vim.uv.new_timer()
-    watcher = vim.uv.new_fs_event()
-    local reflog = session.git_dir .. "/logs/HEAD"
-    local function start()
-        watcher:start(reflog, {}, function(err)
-            if err then
-                return
-            end
-            -- Restarted in case git replaced the file.
-            watcher:stop()
-            start()
-            schedule_refresh()
-        end)
-    end
-    start()
-end
-
-local function unwatch()
-    for _, handle in ipairs({ timer, watcher }) do
-        if handle and not handle:is_closing() then
-            handle:close()
-        end
-    end
-    timer, watcher = nil, nil
-end
-
 local function create_autocmds()
     local panel = require("review.panel")
     local render = require("review.render")
@@ -128,11 +72,7 @@ local function create_autocmds()
         end,
     })
     -- Saves and outside tools change what is in the diff without moving HEAD.
-    autocmd({ "BufWritePost", "FocusGained" }, {
-        callback = function()
-            schedule_refresh()
-        end,
-    })
+    autocmd({ "BufWritePost", "FocusGained" }, { callback = watch.schedule })
     autocmd("BufWipeout", {
         callback = function(args)
             render.detach(args.buf)
@@ -146,7 +86,7 @@ local function create_autocmds()
 end
 
 local function teardown()
-    unwatch()
+    watch.stop()
     require("review.panel").close()
     vim.api.nvim_clear_autocmds({ group = group })
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -167,7 +107,7 @@ function M.start(ref)
         teardown()
         highlights.set()
         create_autocmds()
-        watch()
+        watch.start(safely)
         for _, buf in ipairs(vim.api.nvim_list_bufs()) do
             if vim.api.nvim_buf_is_loaded(buf) then
                 require("review.render").attach(buf)

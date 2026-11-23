@@ -286,12 +286,13 @@ local function keep_cursor(buf, fn)
             end
         elseif mark then
             show_top(win, settled)
-            -- Deleting down from the cursor, like a selection up, leaves the cursor on the line it was on. The lines
-            -- deleted below that would push it down, so the deleted lines end where it was instead.
+            -- Deleting down from the cursor, like a selection up, puts the cursor below all the deleted lines. It
+            -- goes on the line above them instead, so it stays at the top.
             local cursor = vim.api.nvim_win_get_cursor(win)[1]
             local below = settled.count - vim.api.nvim_buf_line_count(buf) - 1
-            if deleted and cursor == settled.line and below > 0 then
-                scroll_to(win, cursor, line_row(win, cursor) - below)
+            if deleted and cursor == settled.line and below > 0 and cursor > 1 then
+                local text = vim.api.nvim_buf_get_lines(buf, cursor - 2, cursor - 1, true)[1]
+                vim.api.nvim_win_set_cursor(win, { cursor - 1, #text:match("^%s*") })
             end
         end
         settle(win, buf)

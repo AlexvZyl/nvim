@@ -129,12 +129,13 @@ function T.deleting_a_selection_down_keeps_the_screen_in_place()
     edit("d", keeps_top, nil, "Vjj")
 end
 
-function T.deleting_a_selection_up_keeps_the_cursor_in_place()
-    -- The cursor goes a row below where it was, the deleted lines ending there, and undo puts them back in place.
-    -- Lines deleted by commits that sit above the cursor come on top of that.
+function T.deleting_a_selection_up_puts_the_cursor_above_it()
     edit("d", function(before, after)
-        local committed = committed_above(after.line) - before.committed
-        return after.row ~= before.row + 1 + committed and describe(before, after) or nil
+        local line = math.max(before.line - 1, 1)
+        -- Unless the selection starts at the top, where the line above has to be scrolled to.
+        local top = before.top == before.line and line or before.top
+        local moved = after.top ~= top or after.line ~= line
+        return moved and describe(before, after) .. " line " .. after.line or nil
     end, nil, "Vkk", function(after, undone)
         return after.top ~= undone.top and describe(after, undone) or nil
     end)

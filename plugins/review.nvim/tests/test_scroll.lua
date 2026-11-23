@@ -50,8 +50,19 @@ local function describe(a, b)
     return ("top %d/%d row %d -> top %d/%d row %d"):format(a.top, a.fill, a.row, b.top, b.fill, b.row)
 end
 
+-- Rows of lines deleted by commits shown right above the line.
+local function committed_above(line)
+    local rows = 0
+    for _, mark in ipairs(h.marks(0, "review_deleted", line, line)) do
+        for _, virt in ipairs(h.virt_lines(mark)) do
+            rows = rows + (virt.group == "ReviewSignDelete" and 1 or 0)
+        end
+    end
+    return rows
+end
+
 -- An edit then its undo, checking the view after both. The selection is made first, as it can scroll.
-local function edit(keys, check, settle, select)
+local function edit(keys, check, settle, select, undo_check)
     setup()
     each_position(function()
         if select then
@@ -60,16 +71,21 @@ local function edit(keys, check, settle, select)
             require("review.render").settled()
         end
         local before = h.view()
+        before.committed = committed_above(before.line)
         h.keys(keys, settle)
         local after = h.view()
         local err = check(before, after)
+        h.keys("u", settle)
         if err then
             return keys .. ": " .. err
         end
-        h.keys("u", settle)
         local undone = h.view()
-        if not same_top(before, undone) then
-            return "undo: " .. describe(before, undone)
+        local undo_err = undo_check and undo_check(after, undone)
+        if undo_check == nil and not same_top(before, undone) then
+            undo_err = describe(before, undone)
+        end
+        if undo_err then
+            return "undo: " .. undo_err
         end
     end)
 end
@@ -113,8 +129,15 @@ function T.deleting_a_selection_down_keeps_the_screen_in_place()
     edit("d", keeps_top, nil, "Vjj")
 end
 
-function T.deleting_a_selection_up_keeps_the_screen_in_place()
-    edit("d", keeps_top, nil, "Vkk")
+function T.deleting_a_selection_up_keeps_the_cursor_in_place()
+    -- The cursor goes a row below where it was, the deleted lines ending there, and undo puts them back in place.
+    -- Lines deleted by commits that sit above the cursor come on top of that.
+    edit("d", function(before, after)
+        local committed = committed_above(after.line) - before.committed
+        return after.row ~= before.row + 1 + committed and describe(before, after) or nil
+    end, nil, "Vkk", function(after, undone)
+        return after.top ~= undone.top and describe(after, undone) or nil
+    end)
 end
 
 function T.opening_a_line_below_moves_the_cursor_down()

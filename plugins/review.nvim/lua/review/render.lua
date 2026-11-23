@@ -230,6 +230,7 @@ local function settle(win, buf)
     settled_rows[win] = {
         buf = buf,
         line = line,
+        count = vim.api.nvim_buf_line_count(buf),
         row = line_row(win, line),
         topline = view.topline,
         topfill = view.topfill,
@@ -259,9 +260,11 @@ local function keep_cursor(buf, fn)
         local mark = settled
             and settled.buf == buf
             and vim.api.nvim_buf_get_extmark_by_id(buf, anchor_namespace, win, { details = true })
+        -- Not found once invalidated.
+        local deleted = mark and (not mark[1] or mark[3].invalid)
         -- Only when the edit was on or after the line. Otherwise nothing moves, like the deleted lines taking the
         -- place of the line with the cursor below them, or an undo putting lines back in place of deleted ones.
-        if mark and mark[1] and not mark[3].invalid and mark[1] + 1 == settled.line then
+        if mark and not deleted and mark[1] + 1 == settled.line then
             local line = mark[1] + 1
             local row = line_row(win, line)
             -- Off screen when the mark was, which is left to Vim.
@@ -270,6 +273,13 @@ local function keep_cursor(buf, fn)
             end
         elseif mark then
             show_top(win, settled)
+            -- Deleting down from the cursor, like a selection up, leaves the cursor on the line it was on. The lines
+            -- deleted below that would push it down, so the deleted lines end where it was instead.
+            local cursor = vim.api.nvim_win_get_cursor(win)[1]
+            local below = settled.count - vim.api.nvim_buf_line_count(buf) - 1
+            if deleted and cursor == settled.line and below > 0 then
+                scroll_to(win, cursor, line_row(win, cursor) - below)
+            end
         end
         settle(win, buf)
     end

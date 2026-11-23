@@ -8,5 +8,5 @@ Review the current branch against a base ref (default `dev`).  Requires [telesco
 - `require("review").panel()`: Toggle the file panel.  `<CR>` opens, `d` marks reviewed, `u` / `<C-r>` undo/redo.
 - `require("review").files()` / `:Telescope review`: Pick a changed file with Telescope, mapped to `fg` (`keymaps.files`, `false` to unmap).  Configure it with `extensions.review` in the telescope setup and load it with `require("telescope").load_extension("review")`.
 - `]h` / `[h`: Jump between hunks.
-- Committed changes are highlighted with `ReviewAdd` / `ReviewDelete`, uncommitted ones with `ReviewLocal` and a `ReviewSignLocal` sign.
+- Committed changes are highlighted with `ReviewAdd` / `ReviewDelete`, uncommitted ones with `ReviewLocalAdd` / `ReviewLocalDelete` (linked to those by default) and a dashed `╎` sign (`ReviewSignLocalAdd` / `ReviewSignLocalDelete`).
 - `:ReviewReset`: Clear the review state.

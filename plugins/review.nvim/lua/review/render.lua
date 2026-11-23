@@ -6,6 +6,7 @@ local M = {}
 
 local namespace = vim.api.nvim_create_namespace("review")
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
+local anchor_namespace = vim.api.nvim_create_namespace("review_anchor")
 local SIGN = "│"
 -- Sets uncommitted changes apart from committed ones.
 local LOCAL_SIGN = "╎"
@@ -166,34 +167,19 @@ local function fill(win, line)
     return height(win, line, line) - height(win, line, line, 0)
 end
 
--- Screen rows between the top of the window and the cursor line's text, with and without the deleted lines.
-local function cursor_row(win)
+-- Screen rows between the top of the window and the line's text, negative above the window.
+local function line_row(win, line)
     local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
-    local cursor = vim.api.nvim_win_get_cursor(win)[1]
-    -- topfill is stale until the next redraw when the virtual lines above the top line go away.
-    local topfill = math.min(view.topfill, fill(win, view.topline))
-    local hidden = fill(win, view.topline) - topfill
-    local row = height(win, view.topline, cursor) - height(win, cursor, cursor, 0) - hidden
-    local deleted = 0
-    local buf = vim.api.nvim_win_get_buf(win)
-    local marks = vim.api.nvim_buf_get_extmarks(buf, deleted_namespace, { view.topline - 1, 0 }, { cursor - 1, 0 }, { details = true })
-    for _, mark in ipairs(marks) do
-        local line, details = mark[2] + 1, mark[4]
-        local count = #details.virt_lines
-        if not details.virt_lines_above then
-            deleted = deleted + (line < cursor and count or 0)
-        elseif line == view.topline then
-            deleted = deleted + math.min(count, topfill)
-        else
-            deleted = deleted + count
-        end
+    if line < view.topline then
+        return -height(win, line, view.topline - 1, 0)
     end
-    return row, row - deleted
+    -- topfill is stale until the next redraw when the virtual lines above the top line go away.
+    local hidden = math.max(fill(win, view.topline) - view.topfill, 0)
+    return height(win, view.topline, line) - height(win, line, line, 0) - hidden
 end
 
--- Scrolls so the cursor line's text is the given number of screen rows below the top of the window.
-local function scroll_to(win, rows)
-    local line = vim.api.nvim_win_get_cursor(win)[1]
+-- Scrolls so the line's text is the given number of screen rows below the top of the window.
+local function scroll_to(win, line, rows)
     local view
     while not view do
         local above = fill(win, line)
@@ -203,7 +189,7 @@ local function scroll_to(win, rows)
             rows = rows - above
             line = line - 1
             local text = height(win, line, line, 0)
-            -- Short of the whole of a wrapped line, the cursor ends up a little lower.
+            -- Short of the whole of a wrapped line, the line ends up a little lower.
             if rows <= text then
                 view = { topline = line, topfill = 0 }
             end
@@ -215,27 +201,41 @@ local function scroll_to(win, rows)
     end)
 end
 
--- The cursor's screen rows by window, as last seen with the hunks rendered. Measured once an edit is made, the
--- stale virtual lines have already moved with the text.
+-- By window, the screen row of the cursor line as last seen with the hunks rendered, and a mark at its start
+-- that moves with the edits. Measured once an edit is made, the stale virtual lines have already moved.
 local settled_rows = {}
 
 local function settle(win, buf)
-    local row, text = cursor_row(win)
-    settled_rows[win] = { buf = buf, row = row, text = text }
+    local line = vim.api.nvim_win_get_cursor(win)[1]
+    -- Over the whole line with its line break, so it is only invalidated when the line is deleted.
+    local last = line == vim.api.nvim_buf_line_count(buf)
+    vim.api.nvim_buf_set_extmark(buf, anchor_namespace, line - 1, 0, {
+        id = win,
+        end_row = last and line - 1 or line,
+        end_col = last and #vim.api.nvim_buf_get_lines(buf, line - 1, line, true)[1] or 0,
+        invalidate = true,
+        undo_restore = false,
+    })
+    settled_rows[win] = { buf = buf, line = line, row = line_row(win, line) }
 end
 
--- Scrolls so the deleted lines added or removed above the cursor do not move it on screen, while the edit
--- itself still can.
+-- Scrolls so the line the cursor was on stays in place on screen when edited. The deleted lines added or removed
+-- above it then do not move it, while the cursor still moves with the edit.
 local function keep_cursor(buf, fn)
     fn()
     for _, win in ipairs(vim.fn.win_findbuf(buf)) do
         local settled = settled_rows[win]
-        if settled and settled.buf == buf then
-            local row, text = cursor_row(win)
-            local target = settled.row + text - settled.text
-            -- Off screen when the edit jumped away, which is left to Vim.
-            if row ~= target and target >= 0 and target < vim.api.nvim_win_get_height(win) then
-                scroll_to(win, target)
+        local mark = settled
+            and settled.buf == buf
+            and vim.api.nvim_buf_get_extmark_by_id(buf, anchor_namespace, win, { details = true })
+        -- Only when the edit was on or after the line. Otherwise nothing moves, like the deleted lines taking the
+        -- place of the line with the cursor below them, or an undo putting lines back in place of deleted ones.
+        if mark and mark[1] and not mark[3].invalid and mark[1] + 1 == settled.line then
+            local line = mark[1] + 1
+            local row = line_row(win, line)
+            -- Off screen when the mark was, which is left to Vim.
+            if row ~= settled.row and settled.row >= 0 and settled.row < vim.api.nvim_win_get_height(win) then
+                scroll_to(win, line, settled.row)
             end
         end
         settle(win, buf)
@@ -392,6 +392,7 @@ function M.detach(buf)
     if vim.api.nvim_buf_is_valid(buf) then
         vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
         vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
+        vim.api.nvim_buf_clear_namespace(buf, anchor_namespace, 0, -1)
         for _, key in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
             if key then
                 pcall(vim.keymap.del, "n", key, { buffer = buf })

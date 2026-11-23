@@ -70,7 +70,8 @@ local function create_autocmds()
             panel.follow(args.buf)
         end,
     })
-    autocmd("BufWinEnter", { callback = panel.guard })
+    -- BufEnter as well: for a file not loaded yet, focus is put back after BufWinEnter.
+    autocmd({ "BufEnter", "BufWinEnter" }, { callback = panel.guard })
     autocmd("WinScrolled", { callback = render.scrolled })
     autocmd("SafeState", { callback = render.settled })
     vim.on_key(safely(render.key), key_namespace)

@@ -249,34 +249,27 @@ local function create_buffer()
 end
 
 -- Another buffer opened in the panel, like with :edit or a picker while it is focused, goes to the window focused
--- before it instead. Scheduled, so whatever opened it is done moving the cursor in it.
+-- before it instead. Right away, so it never shows in the panel. Focusing that window means whatever opened it
+-- moves the cursor there after, like :edit +line or a picker.
 function M.guard()
     if not (win and vim.api.nvim_win_is_valid(win) and buf and vim.api.nvim_buf_is_valid(buf)) then
         return
     end
-    if vim.api.nvim_win_get_buf(win) == buf then
+    local opened = vim.api.nvim_win_get_buf(win)
+    if opened == buf then
         return
     end
-    vim.schedule(function()
-        if not (vim.api.nvim_win_is_valid(win) and vim.api.nvim_buf_is_valid(buf)) then
-            return
-        end
-        local opened = vim.api.nvim_win_get_buf(win)
-        if opened == buf then
-            return
-        end
-        local cursor = vim.api.nvim_win_get_cursor(win)
-        vim.api.nvim_win_set_buf(win, buf)
-        if view then
-            vim.api.nvim_win_call(win, function()
-                vim.fn.winrestview(view)
-            end)
-        end
-        local target = target_window()
-        vim.api.nvim_win_set_buf(target, opened)
-        vim.api.nvim_win_set_cursor(target, cursor)
-        vim.api.nvim_set_current_win(target)
-    end)
+    local cursor = vim.api.nvim_win_get_cursor(win)
+    local target = target_window()
+    vim.api.nvim_win_set_buf(win, buf)
+    if view then
+        vim.api.nvim_win_call(win, function()
+            vim.fn.winrestview(view)
+        end)
+    end
+    vim.api.nvim_win_set_buf(target, opened)
+    vim.api.nvim_win_set_cursor(target, cursor)
+    vim.api.nvim_set_current_win(target)
 end
 
 function M.follow(buf)

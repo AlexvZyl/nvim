@@ -110,6 +110,7 @@ local function render_deleted(buf)
     local leftcol = vim.api.nvim_win_call(win, vim.fn.winsaveview).leftcol
     local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
     local tabstop = vim.bo[buf].tabstop
+    local line_count = vim.api.nvim_buf_line_count(buf)
     -- Virtual lines have no number or sign column, so draw them in.
     local number = { " ", "LineNr" }
     local sign = { SIGN .. string.rep(" ", textoff - 2), "ReviewSignDelete" }
@@ -121,14 +122,83 @@ local function render_deleted(buf)
                 local chunks = deleted_chunks(text, hunk.highlights[i] or {}, leftcol, tabstop)
                 table.insert(virt_lines, vim.list_extend({ number, sign }, chunks))
             end
-            -- A pure deletion starts at the line before it, so goes below that line unless it is at the top.
-            vim.api.nvim_buf_set_extmark(buf, deleted_namespace, math.max(hunk.start - 1, 0), 0, {
+            -- A pure deletion starts at the line before it, so goes above the line after it unless it is at the end.
+            local row = hunk.count > 0 and hunk.start - 1 or hunk.start
+            local above = row < line_count
+            -- Left gravity keeps lines inserted at the mark, like an undone delete, below the deleted lines.
+            vim.api.nvim_buf_set_extmark(buf, deleted_namespace, above and row or line_count - 1, 0, {
                 virt_lines = virt_lines,
-                virt_lines_above = hunk.count > 0 or hunk.start == 0,
+                virt_lines_above = above,
                 virt_lines_leftcol = true,
+                right_gravity = false,
             })
         end
     end
+end
+
+-- Screen rows of the lines, starting at the text of the first one when vcol is given.
+local function height(win, first, last, vcol)
+    return vim.api.nvim_win_text_height(win, { start_row = first - 1, end_row = last - 1, start_vcol = vcol }).all
+end
+
+-- Virtual lines above the line.
+local function fill(win, line)
+    return height(win, line, line) - height(win, line, line, 0)
+end
+
+-- Screen rows between the top of the window and the cursor line's text.
+local function cursor_row(win)
+    local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
+    local cursor = vim.api.nvim_win_get_cursor(win)[1]
+    -- topfill is stale until the next redraw when the virtual lines above the top line go away.
+    local hidden = math.max(fill(win, view.topline) - view.topfill, 0)
+    return height(win, view.topline, cursor) - height(win, cursor, cursor, 0) - hidden
+end
+
+-- Scrolls so the cursor line's text is the given number of screen rows below the top of the window.
+local function scroll_to(win, rows)
+    local line = vim.api.nvim_win_get_cursor(win)[1]
+    local view
+    while not view do
+        local above = fill(win, line)
+        if rows <= above or line == 1 then
+            view = { topline = line, topfill = math.min(rows, above) }
+        else
+            rows = rows - above
+            line = line - 1
+            local text = height(win, line, line, 0)
+            -- Short of the whole of a wrapped line, the cursor ends up a little lower.
+            if rows <= text then
+                view = { topline = line, topfill = 0 }
+            end
+            rows = rows - text
+        end
+    end
+    vim.api.nvim_win_call(win, function()
+        vim.fn.winrestview(view)
+    end)
+end
+
+-- The cursor's screen row by window, as last seen with the hunks rendered. Measured once an edit is made, the
+-- stale virtual lines have already moved with the text.
+local settled_rows = {}
+
+local function settle(buf)
+    for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+        settled_rows[win] = { buf = buf, row = cursor_row(win) }
+    end
+end
+
+-- Scrolls so the virtual lines added or removed above the cursor do not move it on screen.
+local function keep_cursor(buf, fn)
+    fn()
+    for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+        local settled = settled_rows[win]
+        if settled and settled.buf == buf and cursor_row(win) ~= settled.row then
+            scroll_to(win, settled.row)
+        end
+    end
+    settle(buf)
 end
 
 local function render(buf)
@@ -190,9 +260,27 @@ function M.update(buf)
     -- After the edit is processed, so the window's textoff is up to date for the deleted lines.
     vim.schedule(function()
         if buffers[buf] == attached and attached.hunks == hunks and vim.api.nvim_buf_is_valid(buf) then
-            render(buf)
+            keep_cursor(buf, function()
+                render(buf)
+            end)
+            attached.rendered = hunks
         end
     end)
+end
+
+-- Once the screen shows the rendered hunks, so cursor moves and scrolls are kept by the next render.
+function M.settled()
+    local rows = settled_rows
+    settled_rows = {}
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        local attached = buffers[buf]
+        if attached and attached.rendered == attached.hunks then
+            settled_rows[win] = { buf = buf, row = cursor_row(win) }
+        else
+            settled_rows[win] = rows[win]
+        end
+    end
 end
 
 function M.attach(buf)

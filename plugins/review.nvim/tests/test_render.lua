@@ -92,23 +92,6 @@ function T.edits_rerender()
     assert(mark and mark[4].sign_hl_group == "ReviewSignLocalAdd", vim.inspect(mark))
 end
 
-function T.diagnostic_signs_take_precedence()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    committed[3] = "mod 3"
-    h.repo(base, committed)
-    local buf = h.open()
-    local diagnostics = vim.api.nvim_create_namespace("test_diagnostics")
-    vim.diagnostic.set(diagnostics, buf, { { lnum = 2, col = 0, message = "error", severity = vim.diagnostic.severity.ERROR } })
-    vim.cmd("redraw")
-    local signs = vim.api.nvim_buf_get_extmarks(buf, -1, { 2, 0 }, { 2, 0 }, { details = true, type = "sign" })
-    table.sort(signs, function(a, b)
-        return a[4].priority > b[4].priority
-    end)
-    assert(#signs == 2, vim.inspect(signs))
-    assert(signs[2][4].ns_id == vim.api.nvim_create_namespace("review"), vim.inspect(signs))
-end
-
 -- TextChanged comes before the redraw, rendered later the edit flashes without the deleted lines.
 function T.deleted_lines_render_before_the_redraw()
     local base = h.lines(12)

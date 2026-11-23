@@ -64,6 +64,51 @@ function T.uncommitted_deletions_are_shown_with_a_dashed_sign()
     assert(by_text["line 10"] and by_text["line 10"].group == "ReviewSignDelete", vim.inspect(deleted))
 end
 
+-- The text of all deleted lines from the top, in the order they show.
+local function deleted_texts(buf)
+    local texts = {}
+    for _, mark in ipairs(h.marks(buf, "review_deleted", 1, vim.api.nvim_buf_line_count(buf))) do
+        for _, line in ipairs(h.virt_lines(mark)) do
+            table.insert(texts, line.text)
+        end
+    end
+    return texts
+end
+
+function T.deleted_lines_show_in_order_when_deleted_before_committed_deletions()
+    local base = h.lines(12)
+    local committed = vim.deepcopy(base)
+    table.remove(committed, 7)
+    table.remove(committed, 6)
+    local working = vim.deepcopy(committed)
+    table.remove(working, 5)
+    h.repo(base, committed, working)
+    local texts = deleted_texts(h.open())
+    assert(vim.deep_equal(texts, { "line 5", "line 6", "line 7" }), vim.inspect(texts))
+end
+
+function T.deleted_lines_show_in_order_when_deleted_after_committed_deletions()
+    local base = h.lines(12)
+    local committed = vim.deepcopy(base)
+    table.remove(committed, 6)
+    local working = vim.deepcopy(committed)
+    table.remove(working, 6)
+    h.repo(base, committed, working)
+    local texts = deleted_texts(h.open())
+    assert(vim.deep_equal(texts, { "line 6", "line 7" }), vim.inspect(texts))
+end
+
+function T.deleted_lines_show_in_order_when_a_committed_change_is_deleted()
+    local base = h.lines(12)
+    local committed = vim.deepcopy(base)
+    committed[6] = "mod 6"
+    local working = vim.deepcopy(committed)
+    table.remove(working, 6)
+    h.repo(base, committed, working)
+    local texts = deleted_texts(h.open())
+    assert(vim.deep_equal(texts, { "line 6", "mod 6" }), vim.inspect(texts))
+end
+
 function T.deleting_everything_renders()
     local base = h.lines(3)
     h.repo(base, base, {})

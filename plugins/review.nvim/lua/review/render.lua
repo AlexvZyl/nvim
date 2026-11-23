@@ -136,34 +136,47 @@ local function render_deleted(buf)
         [true] = { LOCAL_SIGN .. padding, "ReviewSignLocalDelete" },
     }
     local committed = buffers[buf].committed_deletions
+    -- The deleted lines by where they go, each with where it was in HEAD to order them by.
+    local anchors, rows = {}, {}
     -- Deleted by commits against the base, and everything deleted against HEAD as uncommitted.
-    local function draw(hunk, uncommitted)
-        local virt_lines = {}
+    local function add(hunk, uncommitted)
+        -- A pure deletion starts at the line before it, so goes above the line after it unless it is at the end.
+        local row = hunk.count > 0 and hunk.start - 1 or hunk.start
         for i, text in ipairs(hunk.deleted) do
-            if uncommitted or committed[hunk.old + i - 1] then
+            local key = uncommitted and hunk.old + i - 1 or committed[hunk.old + i - 1]
+            if key then
                 hunk.highlights = hunk.highlights or highlight_deleted(lang, hunk.deleted)
                 local chunks = deleted_chunks(text, hunk.highlights[i] or {}, uncommitted, leftcol, tabstop)
-                table.insert(virt_lines, vim.list_extend({ number, signs[uncommitted] }, chunks))
+                if not anchors[row] then
+                    anchors[row] = {}
+                    table.insert(rows, row)
+                end
+                local lines = anchors[row]
+                table.insert(lines, { key = key, order = #lines, chunks = vim.list_extend({ number, signs[uncommitted] }, chunks) })
             end
-        end
-        if #virt_lines > 0 then
-            -- A pure deletion starts at the line before it, so goes above the line after it unless it is at the end.
-            local row = hunk.count > 0 and hunk.start - 1 or hunk.start
-            local above = row < line_count
-            -- Left gravity keeps lines inserted at the mark, like an undone delete, below the deleted lines.
-            vim.api.nvim_buf_set_extmark(buf, deleted_namespace, above and row or line_count - 1, 0, {
-                virt_lines = virt_lines,
-                virt_lines_above = above,
-                virt_lines_leftcol = true,
-                right_gravity = false,
-            })
         end
     end
     for _, hunk in ipairs(buffers[buf].hunks) do
-        draw(hunk, false)
+        add(hunk, false)
     end
     for _, hunk in ipairs(buffers[buf].local_hunks) do
-        draw(hunk, true)
+        add(hunk, true)
+    end
+    for _, row in ipairs(rows) do
+        local lines = anchors[row]
+        table.sort(lines, function(a, b)
+            return a.key == b.key and a.order < b.order or a.key < b.key
+        end)
+        local above = row < line_count
+        -- Left gravity keeps lines inserted at the mark, like an undone delete, below the deleted lines.
+        vim.api.nvim_buf_set_extmark(buf, deleted_namespace, above and row or line_count - 1, 0, {
+            virt_lines = vim.tbl_map(function(line)
+                return line.chunks
+            end, lines),
+            virt_lines_above = above,
+            virt_lines_leftcol = true,
+            right_gravity = false,
+        })
     end
 end
 
@@ -424,11 +437,13 @@ function M.attach(buf)
     local attached = buffers[buf]
     attached.base = base or ""
     attached.head = head or ""
-    -- Lines of the base deleted by commits, other deleted lines are only deleted locally.
+    -- Lines of the base deleted by commits, other deleted lines are only deleted locally. With where they were
+    -- between the lines of HEAD: after the line before them, or before the lines that replaced them.
     attached.committed_deletions = {}
     for _, hunk in ipairs(diff(attached.base, attached.head)) do
+        local key = hunk.count == 0 and hunk.start + 0.5 or hunk.start - 0.5
         for i = 1, #hunk.deleted do
-            attached.committed_deletions[hunk.old + i - 1] = true
+            attached.committed_deletions[hunk.old + i - 1] = key
         end
     end
     M.update(buf)

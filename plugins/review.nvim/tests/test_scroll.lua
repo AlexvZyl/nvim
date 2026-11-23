@@ -141,6 +141,36 @@ function T.deleting_a_selection_up_puts_the_cursor_above_it()
     end)
 end
 
+-- Typed fast the screen does not settle in visual mode, only the key handler sees where the cursor was.
+local function delete_selection_fast(select)
+    setup()
+    local results = {}
+    for _, line in ipairs({ 30, 60, 80 }) do
+        h.place(line, 10)
+        local before = h.view()
+        vim.cmd("normal! " .. select)
+        require("review.render").key()
+        h.keys("d")
+        table.insert(results, { before = before, after = h.view() })
+        h.keys("u")
+    end
+    return results
+end
+
+function T.deleting_a_selection_down_typed_fast_keeps_the_screen_in_place()
+    for _, result in ipairs(delete_selection_fast("Vjj")) do
+        local before, after = result.before, result.after
+        assert(after.top == before.top and after.line == before.line, describe(before, after))
+    end
+end
+
+function T.deleting_a_selection_up_typed_fast_puts_the_cursor_above_it()
+    for _, result in ipairs(delete_selection_fast("Vkk")) do
+        local before, after = result.before, result.after
+        assert(after.top == before.top and after.line == before.line - 3, describe(before, after))
+    end
+end
+
 function T.opening_a_line_below_moves_the_cursor_down()
     edit("o", moves_down)
 end

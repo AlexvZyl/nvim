@@ -6,6 +6,7 @@ local watch = require("review.watch")
 local M = {}
 
 local group = vim.api.nvim_create_augroup("review", { clear = true })
+local key_namespace = vim.api.nvim_create_namespace("review_keys")
 
 local function guarded(fn)
     return function(...)
@@ -71,6 +72,7 @@ local function create_autocmds()
     })
     autocmd("WinScrolled", { callback = render.scrolled })
     autocmd("SafeState", { callback = render.settled })
+    vim.on_key(safely(render.key), key_namespace)
     autocmd("WinResized", { callback = panel.resized })
     autocmd({ "BufReadPost", "BufWritePost" }, {
         callback = function(args)
@@ -95,6 +97,7 @@ local function teardown()
     watch.stop()
     require("review.panel").close()
     vim.api.nvim_clear_autocmds({ group = group })
+    vim.on_key(nil, key_namespace)
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
         require("review.render").detach(buf)
     end

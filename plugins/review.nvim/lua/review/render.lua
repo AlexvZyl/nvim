@@ -290,7 +290,7 @@ local function keep_cursor(buf, fn)
             -- goes on the line above them instead, so it stays at the top.
             local cursor = vim.api.nvim_win_get_cursor(win)[1]
             local below = settled.count - vim.api.nvim_buf_line_count(buf) - 1
-            if deleted and cursor == settled.line and below > 0 and cursor > 1 then
+            if deleted and cursor == (settled.visual or settled.line) and below > 0 and cursor > 1 then
                 local text = vim.api.nvim_buf_get_lines(buf, cursor - 2, cursor - 1, true)[1]
                 vim.api.nvim_win_set_cursor(win, { cursor - 1, #text:match("^%s*") })
             end
@@ -391,6 +391,16 @@ function M.update(buf)
             end
         end
     end)
+end
+
+-- Before every key, where the cursor is in visual mode, so which end of the selection it was on is known once an
+-- operator deletes it. Typed fast, the screen does not settle in between to see it, and once visual mode ends
+-- the cursor has already moved to the start.
+function M.key()
+    local settled = settled_rows[vim.api.nvim_get_current_win()]
+    if settled and vim.api.nvim_get_mode().mode:match("^[vV\22]") then
+        settled.visual = vim.api.nvim_win_get_cursor(0)[1]
+    end
 end
 
 -- Once the screen shows the rendered hunks, so cursor moves and scrolls are kept by the next render.

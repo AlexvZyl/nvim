@@ -14,6 +14,8 @@ local EMPTY, DONE = "󰝦", "󰄴"
 local FOLDER = ""
 local ICON = ""
 local buf, win, selected
+-- Of the panel when another buffer was last opened in it.
+local view
 local rows = {}
 local top_header = false
 -- Rows that end their directory group.
@@ -216,6 +218,15 @@ local function create_buffer()
         end
     end
     vim.api.nvim_create_autocmd("CursorMoved", { buffer = buf, callback = show_top_header })
+    -- To put it back as it was when another buffer is opened in the panel.
+    vim.api.nvim_create_autocmd("BufWinLeave", {
+        buffer = buf,
+        callback = function()
+            if vim.api.nvim_get_current_win() == win then
+                view = vim.fn.winsaveview()
+            end
+        end,
+    })
     map("n", keys.open, select)
     map("n", "<2-LeftMouse>", select)
     map("n", keys.review, function()
@@ -256,6 +267,11 @@ function M.guard()
         end
         local cursor = vim.api.nvim_win_get_cursor(win)
         vim.api.nvim_win_set_buf(win, buf)
+        if view then
+            vim.api.nvim_win_call(win, function()
+                vim.fn.winrestview(view)
+            end)
+        end
         local target = target_window()
         vim.api.nvim_win_set_buf(target, opened)
         vim.api.nvim_win_set_cursor(target, cursor)

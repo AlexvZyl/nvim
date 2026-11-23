@@ -14,9 +14,10 @@ local function parse_hunks(patch)
     local hunks = {}
     local current
     for _, line in ipairs(vim.split(patch, "\n", { plain = true })) do
-        local start, count = line:match("^@@ %-%d+,?%d* %+(%d+),?(%d*) @@")
+        local old, start, count = line:match("^@@ %-(%d+),?%d* %+(%d+),?(%d*) @@")
         if start then
             current = {
+                old = tonumber(old),
                 start = tonumber(start),
                 -- A missing count means a single line.
                 count = count == "" and 1 or tonumber(count),
@@ -115,13 +116,16 @@ local function render_deleted(buf)
     local number = { " ", "LineNr" }
     local sign = { SIGN .. string.rep(" ", textoff - 2), "ReviewSignDelete" }
     for _, hunk in ipairs(buffers[buf].hunks) do
-        if #hunk.deleted > 0 then
-            hunk.highlights = hunk.highlights or highlight_deleted(lang, hunk.deleted)
-            local virt_lines = {}
-            for i, text in ipairs(hunk.deleted) do
+        local virt_lines = {}
+        for i, text in ipairs(hunk.deleted) do
+            -- Uncommitted deletions only get a sign.
+            if buffers[buf].committed_deletions[hunk.old + i - 1] then
+                hunk.highlights = hunk.highlights or highlight_deleted(lang, hunk.deleted)
                 local chunks = deleted_chunks(text, hunk.highlights[i] or {}, leftcol, tabstop)
                 table.insert(virt_lines, vim.list_extend({ number, sign }, chunks))
             end
+        end
+        if #virt_lines > 0 then
             -- A pure deletion starts at the line before it, so goes above the line after it unless it is at the end.
             local row = hunk.count > 0 and hunk.start - 1 or hunk.start
             local above = row < line_count
@@ -203,14 +207,34 @@ end
 
 local function render(buf)
     vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
+    local uncommitted = {}
+    for _, hunk in ipairs(buffers[buf].local_hunks) do
+        for line = hunk.start, hunk.start + hunk.count - 1 do
+            uncommitted[line] = true
+        end
+        -- A pure deletion starts at the line before it, so gets marked on that line.
+        local first = math.max(hunk.start, 1)
+        for line = first, math.max(hunk.start + hunk.count - 1, first) do
+            vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
+                line_hl_group = uncommitted[line] and "ReviewLocal" or nil,
+                number_hl_group = uncommitted[line] and "ReviewLocalNr" or nil,
+                sign_text = SIGN,
+                sign_hl_group = "ReviewSignLocal",
+                -- Over the sign of a committed change on the same line.
+                priority = 11,
+            })
+        end
+    end
     for _, hunk in ipairs(buffers[buf].hunks) do
         for line = hunk.start, hunk.start + hunk.count - 1 do
-            vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
-                line_hl_group = "ReviewAdd",
-                number_hl_group = "ReviewAddNr",
-                sign_text = SIGN,
-                sign_hl_group = "ReviewSignAdd",
-            })
+            if not uncommitted[line] then
+                vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
+                    line_hl_group = "ReviewAdd",
+                    number_hl_group = "ReviewAddNr",
+                    sign_text = SIGN,
+                    sign_hl_group = "ReviewSignAdd",
+                })
+            end
         end
     end
     render_deleted(buf)
@@ -240,14 +264,19 @@ local function buffer_text(buf)
     return table.concat(lines, "\n") .. "\n"
 end
 
+local function diff(from, to)
+    return parse_hunks(vim.text.diff(from, to, { ctxlen = 0, indent_heuristic = true }) or "")
+end
+
 -- Diffs the buffer against the merge base in memory, so edits show up while typing.
 function M.update(buf)
     local attached = buffers[buf]
     if not attached or not vim.api.nvim_buf_is_valid(buf) then
         return
     end
-    local patch = vim.text.diff(attached.base, buffer_text(buf), { ctxlen = 0, indent_heuristic = true })
-    local hunks = parse_hunks(patch or "")
+    local text = buffer_text(buf)
+    local hunks = diff(attached.base, text)
+    attached.local_hunks = diff(attached.head, text)
     -- Treesitter highlights of deleted lines only change when the deleted text does.
     local cached = {}
     for _, hunk in ipairs(attached.hunks) do
@@ -309,8 +338,17 @@ function M.attach(buf)
             end, { buffer = buf })
         end
     end
-    -- No base when the file was added since the merge base.
-    buffers[buf].base = base or ""
+    -- No base when the file was added since the merge base, no head when it was added since HEAD.
+    local attached = buffers[buf]
+    attached.base = base or ""
+    attached.head = head or ""
+    -- Lines of the base deleted by commits, other deleted lines are only deleted locally.
+    attached.committed_deletions = {}
+    for _, hunk in ipairs(diff(attached.base, attached.head)) do
+        for i = 1, #hunk.deleted do
+            attached.committed_deletions[hunk.old + i - 1] = true
+        end
+    end
     M.update(buf)
 end
 

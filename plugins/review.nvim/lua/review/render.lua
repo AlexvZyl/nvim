@@ -226,7 +226,28 @@ local function settle(win, buf)
         invalidate = true,
         undo_restore = false,
     })
-    settled_rows[win] = { buf = buf, line = line, row = line_row(win, line) }
+    local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
+    settled_rows[win] = {
+        buf = buf,
+        line = line,
+        row = line_row(win, line),
+        topline = view.topline,
+        topfill = view.topfill,
+        fill = fill(win, view.topline),
+    }
+end
+
+-- Shows the deleted lines that came above the top line, like when the lines at the top are deleted, and hides
+-- them again once they go, like when that is undone.
+local function show_top(win, settled)
+    local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
+    local above = fill(win, view.topline)
+    if view.topline == settled.topline and above ~= settled.fill then
+        local topfill = math.max(math.min(settled.topfill + above - settled.fill, above), 0)
+        vim.api.nvim_win_call(win, function()
+            vim.fn.winrestview({ topline = view.topline, topfill = topfill })
+        end)
+    end
 end
 
 -- Scrolls so the line the cursor was on stays in place on screen when edited. The deleted lines added or removed
@@ -247,6 +268,8 @@ local function keep_cursor(buf, fn)
             if row ~= settled.row and settled.row >= 0 and settled.row < vim.api.nvim_win_get_height(win) then
                 scroll_to(win, line, settled.row)
             end
+        elseif mark then
+            show_top(win, settled)
         end
         settle(win, buf)
     end

@@ -74,8 +74,9 @@ local function edit(keys, check, settle, select)
     end)
 end
 
+-- Showing more above the top line when the deleted lines come there.
 local function keeps_top(before, after)
-    return not same_top(before, after) and describe(before, after) or nil
+    return (before.top ~= after.top or after.fill < before.fill) and describe(before, after) or nil
 end
 
 local function keeps_row(before, after)
@@ -93,6 +94,19 @@ end
 
 function T.deleting_a_line_keeps_the_screen_in_place()
     edit("dd", keeps_top)
+end
+
+function T.deleting_at_the_top_shows_the_deleted_lines()
+    setup()
+    for _, line in ipairs({ 5, 30, 70 }) do
+        h.place(line, 0)
+        h.keys("dd")
+        local view = h.view()
+        assert(view.top == line and view.fill == 1 and view.row == 2, line .. ": " .. vim.inspect(view))
+        h.keys("u")
+        view = h.view()
+        assert(view.top == line and view.fill == 0 and view.row == 1, line .. " undo: " .. vim.inspect(view))
+    end
 end
 
 function T.deleting_a_selection_down_keeps_the_screen_in_place()

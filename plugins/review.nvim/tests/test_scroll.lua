@@ -69,6 +69,7 @@ local function edit(keys, check, settle, select, undo_check)
             vim.cmd("normal! " .. select)
             vim.cmd("redraw")
             require("review.render").settled()
+            require("review.render").key()
         end
         local before = h.view()
         before.committed = committed_above(before.line)
@@ -123,6 +124,12 @@ function T.deleting_at_the_top_shows_the_deleted_lines()
         view = h.view()
         assert(view.top == line and view.fill == 0 and view.row == 1, line .. " undo: " .. vim.inspect(view))
     end
+end
+
+function T.deleting_down_with_a_motion_drops_the_cursor_below()
+    edit("dj", function(before, after)
+        return (keeps_top(before, after) or after.line ~= before.line) and describe(before, after) or nil
+    end)
 end
 
 function T.deleting_a_selection_down_keeps_the_screen_in_place()

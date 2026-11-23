@@ -122,7 +122,8 @@ end
 local function render_deleted(buf)
     vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
     local win = window(buf)
-    local width = textoff(buf)
+    -- As last seen after a redraw. Right after an edit, before the redraw, a statuscolumn is not measured yet.
+    local width = buffers[buf].textoff or textoff(buf)
     buffers[buf].textoff = width
     local leftcol = vim.api.nvim_win_call(win, vim.fn.winsaveview).leftcol
     local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
@@ -384,10 +385,12 @@ function M.update(buf)
         render(buf)
     end)
     attached.rendered = hunks
-    -- The signs can change the width of the gutter, which the deleted lines draw in, after the redraw.
+    -- The width of the gutter the deleted lines draw in is only right after the redraw.
     vim.schedule(function()
         if buffers[buf] == attached and attached.hunks == hunks and vim.api.nvim_buf_is_valid(buf) then
-            if attached.textoff ~= textoff(buf) then
+            local width = textoff(buf)
+            if attached.textoff ~= width then
+                attached.textoff = width
                 render_deleted(buf)
             end
         end

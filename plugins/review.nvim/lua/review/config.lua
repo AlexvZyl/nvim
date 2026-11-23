@@ -7,6 +7,8 @@ local defaults = {
     width = 60,
     -- Directory levels the panel groups files by.
     depth = 2,
+    -- Of the signs, under the diagnostic signs at 10.
+    sign_priority = 6,
     -- False leaves a key unmapped.
     keymaps = {
         -- Everywhere, picks a changed file with Telescope.

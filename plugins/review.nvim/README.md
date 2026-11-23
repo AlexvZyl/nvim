@@ -4,7 +4,7 @@ Review the current branch against a base ref (default `dev`).  Requires [telesco
 
 - `:Review [ref]`: Start reviewing, or switch to another ref, and open the panel.  Fires `User ReviewStart`.
 - `:ReviewStop`: Stop reviewing.  Fires `User ReviewStop`.
-- `require("review").setup(opts)`: Defaults and keymaps are in [config.lua](lua/review/config.lua).
+- `require("review").setup(opts)`: Defaults and keymaps are in [config.lua](lua/review/config.lua).  Signs are under diagnostic signs (`sign_priority`).
 - `require("review").panel()`: Toggle the file panel.  `<CR>` opens, `d` marks reviewed, `u` / `<C-r>` undo/redo.
 - `require("review").files()` / `:Telescope review`: Pick a changed file with Telescope, mapped to `fg` (`keymaps.files`, `false` to unmap).  Configure it with `extensions.review` in the telescope setup and load it with `require("telescope").load_extension("review")`.
 - `]h` / `[h`: Jump between hunks.

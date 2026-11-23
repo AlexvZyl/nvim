@@ -263,6 +263,7 @@ local function render(buf)
                 number_hl_group = "ReviewLocalAddNr",
                 sign_text = LOCAL_SIGN,
                 sign_hl_group = "ReviewSignLocalAdd",
+                priority = config.options.sign_priority,
             })
         end
     end
@@ -274,6 +275,7 @@ local function render(buf)
                     number_hl_group = "ReviewAddNr",
                     sign_text = SIGN,
                     sign_hl_group = "ReviewSignAdd",
+                    priority = config.options.sign_priority,
                 })
             end
         end

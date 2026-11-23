@@ -132,6 +132,25 @@ function T.deleting_down_with_a_motion_drops_the_cursor_below()
     end)
 end
 
+-- Like a selection up, the cursor goes on the line above the deleted lines.
+local function deletes_up(keys, count)
+    edit(keys, function(before, after)
+        local line = math.max(before.line - count, 1)
+        local top = before.top > line and line or before.top
+        return (after.top ~= top or after.line ~= line) and describe(before, after) .. " line " .. after.line or nil
+    end, nil, nil, function(after, undone)
+        return after.top ~= undone.top and describe(after, undone) or nil
+    end)
+end
+
+function T.deleting_up_with_a_motion_puts_the_cursor_above()
+    deletes_up("dk", 2)
+end
+
+function T.deleting_up_with_a_count_puts_the_cursor_above()
+    deletes_up("d2k", 3)
+end
+
 function T.deleting_a_selection_down_keeps_the_screen_in_place()
     edit("d", keeps_top, nil, "Vjj")
 end

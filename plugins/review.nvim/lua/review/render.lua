@@ -286,11 +286,12 @@ local function keep_cursor(buf, fn)
             end
         elseif mark then
             show_top(win, settled)
-            -- A selection up puts the cursor below all the deleted lines. It goes on the line above them instead, so
-            -- it stays at the top. Deleting down with a motion leaves it below them.
+            -- Deleting up, from the last of the deleted lines like `dk` or a selection up, goes on the line above
+            -- them so the cursor stays at the top. Deleting down leaves it below them.
             local cursor = vim.api.nvim_win_get_cursor(win)[1]
-            local below = settled.count - vim.api.nvim_buf_line_count(buf) - 1
-            if deleted and cursor == settled.visual and below > 0 and cursor > 1 then
+            local removed = settled.count - vim.api.nvim_buf_line_count(buf)
+            local start = settled.visual or settled.line
+            if deleted and removed > 1 and start == cursor + removed - 1 and cursor > 1 then
                 local text = vim.api.nvim_buf_get_lines(buf, cursor - 2, cursor - 1, true)[1]
                 vim.api.nvim_win_set_cursor(win, { cursor - 1, #text:match("^%s*") })
             end
@@ -393,13 +394,12 @@ function M.update(buf)
     end)
 end
 
--- Before every key, where the cursor is in visual mode, so which end of the selection it was on is known once an
--- operator deletes it. Typed fast, the screen does not settle in between to see it, and once visual mode ends
--- the cursor has already moved to the start.
+-- Before every key in visual mode, where the selection started, so once an operator deletes it whether it went
+-- up or down is known. Once visual mode ends that is gone.
 function M.key()
     local settled = settled_rows[vim.api.nvim_get_current_win()]
     if settled and vim.api.nvim_get_mode().mode:match("^[vV\22]") then
-        settled.visual = vim.api.nvim_win_get_cursor(0)[1]
+        settled.visual = vim.fn.line("v")
     end
 end
 

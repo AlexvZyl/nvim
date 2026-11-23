@@ -1,0 +1,28 @@
+name: review.nvim
+
+on:
+  push:
+    paths:
+      - "plugins/review.nvim/**"
+      - ".github/workflows/review.yml"
+  pull_request:
+    paths:
+      - "plugins/review.nvim/**"
+      - ".github/workflows/review.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [stable, nightly]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Neovim
+        run: |
+          curl -sSfL https://github.com/neovim/neovim/releases/download/${{ matrix.version }}/nvim-linux-x86_64.tar.gz | tar -xz -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+      - name: Test
+        working-directory: plugins/review.nvim
+        run: nvim --clean --headless -c "luafile tests/run.lua"

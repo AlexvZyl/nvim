@@ -1,0 +1,162 @@
+local h = require("tests.helpers")
+
+local T = {}
+
+-- Committed hunks of every kind: lines deleted, modified, added, and modified with more lines added.
+local function setup()
+    local base = h.lines(100)
+    local committed = {}
+    for i, line in ipairs(base) do
+        if i == 20 or i == 21 then
+            -- Deleted.
+        elseif i == 31 or i == 32 then
+            table.insert(committed, "mod " .. i)
+        elseif i == 50 then
+            vim.list_extend(committed, { "mod 50", "add 50" })
+        else
+            table.insert(committed, line)
+            if i == 40 then
+                vim.list_extend(committed, { "add 40a", "add 40b" })
+            end
+        end
+    end
+    h.repo(base, committed)
+    return h.open()
+end
+
+-- Lines around each hunk, and how far below the top of the window the cursor starts.
+local LINES = { 5, 18, 19, 20, 28, 29, 30, 31, 33, 38, 39, 40, 41, 42, 47, 48, 49, 50, 51, 70 }
+local OFFSETS = { 0, 1, 2, 5, 30 }
+
+local function each_position(fn)
+    local failures = {}
+    for _, line in ipairs(LINES) do
+        for _, offset in ipairs(OFFSETS) do
+            h.place(line, offset)
+            local err = fn(line, offset)
+            if err then
+                table.insert(failures, ("line %d offset %d: %s"):format(line, offset, err))
+            end
+        end
+    end
+    assert(#failures == 0, #failures .. " failed\n" .. table.concat(failures, "\n"))
+end
+
+local function same_top(a, b)
+    return a.top == b.top and a.fill == b.fill
+end
+
+local function describe(a, b)
+    return ("top %d/%d row %d -> top %d/%d row %d"):format(a.top, a.fill, a.row, b.top, b.fill, b.row)
+end
+
+-- An edit then its undo, checking the view after both. The selection is made first, as it can scroll.
+local function edit(keys, check, settle, select)
+    setup()
+    each_position(function()
+        if select then
+            vim.cmd("normal! " .. select)
+            vim.cmd("redraw")
+            require("review.render").settled()
+        end
+        local before = h.view()
+        h.keys(keys, settle)
+        local after = h.view()
+        local err = check(before, after)
+        if err then
+            return keys .. ": " .. err
+        end
+        h.keys("u", settle)
+        local undone = h.view()
+        if not same_top(before, undone) then
+            return "undo: " .. describe(before, undone)
+        end
+    end)
+end
+
+local function keeps_top(before, after)
+    return not same_top(before, after) and describe(before, after) or nil
+end
+
+local function keeps_row(before, after)
+    return before.row ~= after.row and describe(before, after) or nil
+end
+
+-- With the top in place, and further when deleted lines come to sit above the new line.
+local function moves_down(before, after)
+    return (after.row <= before.row or not same_top(before, after)) and describe(before, after) or nil
+end
+
+function T.typing_keeps_the_line_in_place()
+    edit("Ax", keeps_row)
+end
+
+function T.deleting_a_line_keeps_the_screen_in_place()
+    edit("dd", keeps_top)
+end
+
+function T.deleting_a_selection_down_keeps_the_screen_in_place()
+    edit("d", keeps_top, nil, "Vjj")
+end
+
+function T.deleting_a_selection_up_keeps_the_screen_in_place()
+    edit("d", keeps_top, nil, "Vkk")
+end
+
+function T.opening_a_line_below_moves_the_cursor_down()
+    edit("o", moves_down)
+end
+
+function T.opening_a_line_above_keeps_the_screen_above_in_place()
+    edit("O", keeps_top)
+end
+
+function T.pasting_below_moves_the_cursor_down()
+    setup()
+    vim.cmd("normal! 1Gyy")
+    each_position(function()
+        local before = h.view()
+        h.keys("p")
+        local err = moves_down(before, h.view())
+        h.keys("u")
+        return err
+    end)
+end
+
+function T.pasting_above_keeps_the_screen_above_in_place()
+    setup()
+    vim.cmd("normal! 1Gyy")
+    each_position(function()
+        local before = h.view()
+        h.keys("P")
+        local err = keeps_top(before, h.view())
+        h.keys("u")
+        return err
+    end)
+end
+
+-- Spamming dd and u must not scroll the buffer away, settled between keys or not.
+local function no_drift(settle)
+    setup()
+    each_position(function()
+        local before = h.view()
+        for _ = 1, 3 do
+            h.keys("dd", settle)
+            h.keys("u", settle)
+        end
+        local after = h.view()
+        if not same_top(before, after) or before.row ~= after.row then
+            return describe(before, after)
+        end
+    end)
+end
+
+function T.delete_and_undo_does_not_drift()
+    no_drift(true)
+end
+
+function T.delete_and_undo_typed_fast_does_not_drift()
+    no_drift(false)
+end
+
+return T

@@ -10,3 +10,5 @@ Review the current branch against a base ref (default `dev`).  Requires [telesco
 - `]h` / `[h`: Jump between hunks.
 - Committed changes are highlighted with `ReviewAdd` / `ReviewDelete`, uncommitted ones with `ReviewLocalAdd` / `ReviewLocalDelete` (linked to those by default) and a dashed `╎` sign (`ReviewSignLocalAdd` / `ReviewSignLocalDelete`).
 - `:ReviewReset`: Clear the review state.
+
+Tests: `nvim --clean --headless -c "luafile tests/run.lua"`, with `FILTER=text` to only run the tests with it in their name.

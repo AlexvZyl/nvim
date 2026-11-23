@@ -24,7 +24,7 @@ I keep my own plugins in [plugins](plugins).  To load them with lazy:
     "AlexvZyl/nvim",
     lazy = true, -- Prevent my entire config from loading.
     priority = 1000,
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "nvim-telescope/telescope.nvim" },
     init = function(plugin)
         vim.opt.rtp:prepend(plugin.dir .. "/plugins/default.nvim")
         vim.opt.rtp:prepend(plugin.dir .. "/plugins/review.nvim")

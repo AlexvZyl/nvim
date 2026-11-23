@@ -9,6 +9,8 @@ local defaults = {
     depth = 2,
     -- False leaves a key unmapped.
     keymaps = {
+        -- Everywhere, picks a changed file with Telescope.
+        files = "fg",
         -- In the panel.
         open = "<CR>",
         review = "d",

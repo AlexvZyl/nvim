@@ -25,8 +25,8 @@ M.panel = guarded(function()
     require("review.panel").toggle()
 end)
 
-M.files = guarded(function()
-    require("review.picker").open()
+M.files = guarded(function(opts)
+    require("review.picker").open(opts)
 end)
 
 M.reset = guarded(function()

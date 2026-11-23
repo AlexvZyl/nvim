@@ -163,6 +163,7 @@ TS.setup({
         ["ui-select"] = {
             require("telescope.themes").get_dropdown({}),
         },
+        review = small_no_preview,
     },
 })
 

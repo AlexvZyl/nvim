@@ -92,4 +92,15 @@ function T.edits_rerender()
     assert(mark and mark[4].sign_hl_group == "ReviewSignLocalAdd", vim.inspect(mark))
 end
 
+-- TextChanged comes before the redraw, rendered later the edit flashes without the deleted lines.
+function T.deleted_lines_render_before_the_redraw()
+    local base = h.lines(12)
+    h.repo(base, base)
+    local buf = h.open()
+    vim.cmd("normal! 5Gdd")
+    require("review.render").update(buf)
+    local deleted = h.virt_lines(h.marks(buf, "review_deleted", 1, 12)[1] or { 0, 0, 0, {} })
+    assert(#deleted == 1 and deleted[1].text == "line 5", vim.inspect(deleted))
+end
+
 return T

@@ -109,18 +109,28 @@ local function deleted_chunks(text, highlights, uncommitted, leftcol, tabstop)
     return chunks
 end
 
+local function window(buf)
+    return vim.fn.win_findbuf(buf)[1] or vim.api.nvim_get_current_win()
+end
+
+-- Width of the gutter.
+local function textoff(buf)
+    return vim.fn.getwininfo(window(buf))[1].textoff
+end
+
 -- Drawn separately from the added lines, since they depend on the window's scroll and gutter.
 local function render_deleted(buf)
     vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-    local win = vim.fn.win_findbuf(buf)[1] or vim.api.nvim_get_current_win()
-    local textoff = vim.fn.getwininfo(win)[1].textoff
+    local win = window(buf)
+    local width = textoff(buf)
+    buffers[buf].textoff = width
     local leftcol = vim.api.nvim_win_call(win, vim.fn.winsaveview).leftcol
     local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
     local tabstop = vim.bo[buf].tabstop
     local line_count = vim.api.nvim_buf_line_count(buf)
     -- Virtual lines have no number or sign column, so draw them in.
     local number = { " ", "LineNr" }
-    local padding = string.rep(" ", textoff - 2)
+    local padding = string.rep(" ", width - 2)
     local signs = {
         [false] = { SIGN .. padding, "ReviewSignDelete" },
         [true] = { LOCAL_SIGN .. padding, "ReviewSignLocalDelete" },
@@ -318,13 +328,18 @@ function M.update(buf)
     end
     attached.hunks = hunks
     attached.local_hunks = local_hunks
-    -- After the edit is processed, so the window's textoff is up to date for the deleted lines.
+    -- Right away, as TextChanged comes before the redraw: scheduled, the edit would show without the deleted
+    -- lines for a moment.
+    keep_cursor(buf, function()
+        render(buf)
+    end)
+    attached.rendered = hunks
+    -- The signs can change the width of the gutter, which the deleted lines draw in, after the redraw.
     vim.schedule(function()
         if buffers[buf] == attached and attached.hunks == hunks and vim.api.nvim_buf_is_valid(buf) then
-            keep_cursor(buf, function()
-                render(buf)
-            end)
-            attached.rendered = hunks
+            if attached.textoff ~= textoff(buf) then
+                render_deleted(buf)
+            end
         end
     end)
 end

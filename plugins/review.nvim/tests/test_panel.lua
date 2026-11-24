@@ -128,6 +128,32 @@ function T.reviewing_from_a_directory_lists_the_files_under_it()
     assert(vim.deep_equal(reviewed, { "" }) and saved:find('"sub/inner.txt"', 1, true), vim.inspect({ reviewed, saved }))
 end
 
+-- Grouped by their first two directories, with any characters in their names.
+function T.files_are_grouped_by_directory_whatever_their_names()
+    h.repo(h.lines(5), h.lines(5))
+    vim.fn.mkdir("a/b/c", "p")
+    vim.fn.writefile({ "x" }, "a/b/c/with space.txt")
+    vim.fn.writefile({ "x" }, "é.txt")
+    h.git("add", ".")
+    h.git("commit", "-qm", "names")
+    local main, _, panel_buf = h.review()
+    local listed = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
+    local headers = vim.tbl_map(function(mark)
+        return vim.trim(mark[4].virt_lines[1][1][1])
+    end, vim.tbl_filter(function(mark)
+        return mark[4].virt_lines ~= nil
+    end, h.marks(panel_buf, "review_panel", 1, #listed)))
+    vim.fn.cursor(vim.fn.search("with space"), 1)
+    vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
+    local opened = vim.api.nvim_win_get_buf(main)
+    local name, lines = vim.api.nvim_buf_get_name(opened), vim.api.nvim_buf_get_lines(opened, 0, -1, false)
+    local signed = #h.marks(opened, "review", 1, 1)
+    teardown()
+    assert(#listed == 2 and listed[1]:match("é.txt$") and listed[2]:match("with space.txt$"), vim.inspect(listed))
+    assert(#headers == 2 and not headers[1]:find("%w") and headers[2]:match(" a/b$"), vim.inspect(headers))
+    assert(name:match("a/b/c/with space.txt$") and lines[1] == "x" and signed == 1, vim.inspect({ name, lines, signed }))
+end
+
 -- What the saved state has of use is kept, the rest ignored, and an emptied state saves and loads again.
 function T.broken_saved_state_loads_what_it_can()
     h.repo(h.lines(5), h.lines(6))

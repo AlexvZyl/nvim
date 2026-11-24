@@ -154,6 +154,34 @@ function T.files_are_grouped_by_directory_whatever_their_names()
     assert(name:match("a/b/c/with space.txt$") and lines[1] == "x" and signed == 1, vim.inspect({ name, lines, signed }))
 end
 
+-- Progress counts changed lines, so a small file left is a little of the review.
+function T.progress_counts_the_changed_lines_reviewed()
+    h.repo(h.lines(5), h.lines(6))
+    vim.fn.writefile({ "a", "b", "c" }, "other.txt")
+    h.git("add", ".")
+    h.git("commit", "-qm", "other")
+    h.review()
+    local panel = require("review.panel")
+    local function percent()
+        return panel.winbar():match("(%d+)%%%%")
+    end
+    local before = percent()
+    vim.fn.cursor(vim.fn.search("other.txt$"), 1)
+    vim.api.nvim_feedkeys("dd", "x", false)
+    local after = percent()
+    teardown()
+    assert(before == "0" and after == "75", vim.inspect({ before, after }))
+end
+
+function T.an_empty_review_is_done()
+    h.repo(h.lines(5), h.lines(5))
+    local _, _, panel_buf = h.review()
+    local message = h.marks(panel_buf, "review_panel_done", 1, 1)[1][4].virt_lines
+    local winbar = require("review.panel").winbar()
+    teardown()
+    assert(message[#message][2][1] == "Nothing to review" and winbar:find("100%%"), vim.inspect({ message, winbar }))
+end
+
 -- What the saved state has of use is kept, the rest ignored, and an emptied state saves and loads again.
 function T.broken_saved_state_loads_what_it_can()
     h.repo(h.lines(5), h.lines(6))

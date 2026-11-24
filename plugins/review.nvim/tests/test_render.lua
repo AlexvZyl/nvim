@@ -228,7 +228,9 @@ function T.diagnostic_signs_on_changed_lines_get_the_review_background()
     vim.api.nvim_set_hl(0, "ReviewSignLocalAdd", { fg = "#00ff00", bg = "#003300" })
     vim.api.nvim_set_hl(0, "DiagnosticSignError", { fg = "#ff0000" })
     local ns = vim.api.nvim_create_namespace("test_diagnostics")
-    vim.diagnostic.config({ signs = true }, ns)
+    vim.api.nvim_set_hl(0, "ReviewAdd", { bg = "#004400" })
+    vim.api.nvim_set_hl(0, "DiagnosticVirtualTextError", { fg = "#ff0000", bg = "#110000" })
+    vim.diagnostic.config({ signs = true, virtual_text = true }, ns)
     local error = vim.diagnostic.severity.ERROR
     vim.diagnostic.set(ns, buf, {
         { lnum = 9, col = 0, message = "changed", severity = error },
@@ -242,6 +244,14 @@ function T.diagnostic_signs_on_changed_lines_get_the_review_background()
         end
         return found
     end
+    local function texts(line)
+        local virt_ns = vim.diagnostic.get_namespace(ns).user_data.virt_text_ns
+        local mark = vim.api.nvim_buf_get_extmarks(buf, virt_ns, { line - 1, 0 }, { line - 1, -1 }, { details = true })[1]
+        return vim.tbl_map(function(chunk)
+            return chunk[2] or "none"
+        end, mark[4].virt_text)
+    end
+    local virt = texts(10)
     local signs = groups()
     local hl = vim.api.nvim_get_hl(0, { name = signs[10] })
     local ok = signs[2] == "DiagnosticSignError" and hl.fg == 0xff0000 and hl.bg == 0x002200
@@ -250,10 +260,58 @@ function T.diagnostic_signs_on_changed_lines_get_the_review_background()
     local local_bg = vim.api.nvim_get_hl(0, { name = edited[2] }).bg
     require("review").stop()
     local stopped = groups()
+    local stopped_virt = texts(10)
     vim.diagnostic.reset(ns)
     assert(ok, vim.inspect({ signs, hl }))
     assert(local_bg == 0x003300, vim.inspect(edited))
     assert(stopped[2] == "DiagnosticSignError" and stopped[10] == "DiagnosticSignError", vim.inspect(stopped))
+    for _, group in ipairs(virt) do
+        assert(vim.api.nvim_get_hl(0, { name = group, link = false }).bg == 0x004400, vim.inspect(virt))
+    end
+    assert(vim.tbl_contains(stopped_virt, "DiagnosticVirtualTextError"), vim.inspect(stopped_virt))
+    assert(vim.api.nvim_get_hl(0, { name = virt[#virt], link = false }).fg == 0xff0000, vim.inspect(virt))
+end
+
+function T.diagnostic_virtual_lines_on_changed_lines_get_the_review_background()
+    local base = h.lines(12)
+    local committed = vim.deepcopy(base)
+    committed[10] = "mod 10"
+    h.repo(base, committed)
+    vim.cmd("silent! only | enew | silent! %bwipeout!")
+    local main = vim.api.nvim_get_current_win()
+    h.start()
+    vim.api.nvim_set_current_win(main)
+    vim.cmd.edit("file.txt")
+    local buf = vim.api.nvim_get_current_buf()
+    vim.api.nvim_set_hl(0, "ReviewAdd", { bg = "#004400" })
+    vim.api.nvim_set_hl(0, "DiagnosticVirtualLinesError", { fg = "#ff0000" })
+    local ns = vim.api.nvim_create_namespace("test_virtual_lines")
+    vim.diagnostic.config({ virtual_lines = true, virtual_text = false }, ns)
+    vim.diagnostic.set(ns, buf, { { lnum = 9, col = 0, message = "changed", severity = vim.diagnostic.severity.ERROR } })
+    local function chunks()
+        local virt_ns = vim.diagnostic.get_namespace(ns).user_data.virt_lines_ns
+        local mark = vim.api.nvim_buf_get_extmarks(buf, virt_ns, 0, -1, { details = true })[1]
+        return mark[4].virt_lines
+    end
+    local changed = chunks()
+    require("review.diagnostics").apply(buf)
+    local shown_again = #chunks()[1]
+    require("review").stop()
+    local stopped = chunks()
+    vim.diagnostic.reset(ns)
+    for _, line in ipairs(changed) do
+        for _, chunk in ipairs(line) do
+            local hl = vim.api.nvim_get_hl(0, { name = chunk[2], link = false })
+            assert(hl.bg == 0x004400, vim.inspect(changed))
+        end
+        assert(line[#line][1]:match("^ +$"), "not padded")
+    end
+    assert(shown_again == #changed[1], "padded twice")
+    for _, line in ipairs(stopped) do
+        for _, chunk in ipairs(line) do
+            assert(not (chunk[2] or ""):match("^Review"), vim.inspect(stopped))
+        end
+    end
 end
 
 function T.untracked_and_binary_files_are_not_rendered()

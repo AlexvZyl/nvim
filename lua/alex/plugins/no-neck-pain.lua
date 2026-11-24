@@ -14,7 +14,7 @@ end
 function M.toggle()
     M.enabled = not M.enabled
     vim.cmd.NoNeckPain()
-    require("alex.native.statusline").refresh()
+    require("statusline").refresh()
 end
 
 function M.enable()

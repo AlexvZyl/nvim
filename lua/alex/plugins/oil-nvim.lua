@@ -13,6 +13,6 @@ end)
 vim.api.nvim_create_autocmd("User", {
     pattern = "OilEnter",
     callback = function()
-        require("alex.native.winbar").set_winbar()
+        require("winbar").set_winbar()
     end,
 })

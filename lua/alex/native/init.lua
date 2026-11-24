@@ -1,7 +1,5 @@
-require("alex.native.statusline")
 require("alex.native.treesitter")
 require("alex.native.terminal")
 require("alex.native.statuscolumn")
-require("alex.native.winbar")
 require("alex.native.lang")
 require("alex.native.godot")

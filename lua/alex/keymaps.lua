@@ -121,7 +121,7 @@ function M.native()
     keymap(n, "gm", "<Cmd>vertical Man<CR>", default_settings)
     keymap(n, "<leader>r", function()
         require("alex.native.statuscolumn").toggle_relative()
-        require("alex.native.statusline").refresh()
+        require("statusline").refresh()
     end, default_settings)
 
     -- Buffers

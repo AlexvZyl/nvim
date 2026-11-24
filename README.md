@@ -25,6 +25,8 @@ I keep my own plugins in [plugins](plugins).
 |---|---|
 | [default.nvim](https://github.com/AlexvZyl/nvim/tree/main/plugins/default.nvim) | The default Neovim theme, slightly improved. |
 | [review.nvim](https://github.com/AlexvZyl/nvim/tree/main/plugins/review.nvim) | Review a branch against a base ref, in place. |
+| [statusline.nvim](https://github.com/AlexvZyl/nvim/tree/main/plugins/statusline.nvim) | A minimal global statusline. |
+| [winbar.nvim](https://github.com/AlexvZyl/nvim/tree/main/plugins/winbar.nvim) | A winbar with the file's icon and name. |
 
 To load them with lazy:
 
@@ -37,8 +39,12 @@ To load them with lazy:
     init = function(plugin)
         vim.opt.rtp:prepend(plugin.dir .. "/plugins/default.nvim")
         vim.opt.rtp:prepend(plugin.dir .. "/plugins/review.nvim")
+        vim.opt.rtp:prepend(plugin.dir .. "/plugins/statusline.nvim")
+        vim.opt.rtp:prepend(plugin.dir .. "/plugins/winbar.nvim")
         require("default").load()
         require("review").setup()
+        require("statusline").setup()
+        require("winbar").setup()
     end,
 },
 ```

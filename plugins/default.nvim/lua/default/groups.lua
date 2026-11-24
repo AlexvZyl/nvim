@@ -149,6 +149,22 @@ return {
     ReviewSignAdd = { fg = P.green, bg = U.blend(P.diff.add, 0.2, P.bg), bold = true },
     ReviewSignDelete = { fg = P.red, bg = U.blend(P.diff.delete, 0.65, P.bg), bold = true },
 
+    -- Statusline.
+    StatuslineModeNormal = { fg = P.bg_dark, bg = P.blue, bold = true },
+    StatuslineModeInsert = { fg = P.bg_dark, bg = P.green, bold = true },
+    StatuslineModeVisual = { fg = P.bg_dark, bg = P.red, bold = true },
+    StatuslineModeCommand = { fg = P.bg_dark, bg = P.orange, bold = true },
+    StatuslineModePrompt = { fg = P.bg_dark, bg = P.magenta, bold = true },
+    StatuslineModeReplace = { fg = P.bg_dark, bg = P.red, bold = true },
+    StatuslineModeTerminal = { fg = P.bg_dark, bg = P.yellow, bold = true },
+    StatuslineModeUnknown = { fg = P.bg_dark, bg = P.green, bold = true },
+    StatuslineOn = { fg = P.green },
+    StatuslineOff = { fg = P.gray2 },
+    StatuslineDiagError = { fg = P.red },
+    StatuslineDiagWarn = { fg = P.yellow },
+    StatuslineDiagInfo = { fg = P.blue },
+    StatuslineDiagHint = { fg = P.green },
+
     -- Rust things.
     ["module.rust"] = { link = "@module" }
 }

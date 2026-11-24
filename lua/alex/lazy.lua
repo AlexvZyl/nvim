@@ -129,6 +129,23 @@ local plugins = {
 
     -- Own plugins.
     {
+        dir = vim.fn.stdpath("config") .. "/plugins/statusline.nvim",
+        name = "statusline.nvim",
+        lazy = false,
+        config = function()
+            require("alex.plugins.statusline")
+        end,
+    },
+    {
+        dir = vim.fn.stdpath("config") .. "/plugins/winbar.nvim",
+        name = "winbar.nvim",
+        lazy = false,
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("alex.plugins.winbar")
+        end,
+    },
+    {
         dir = vim.fn.stdpath("config") .. "/plugins/review.nvim",
         name = "review.nvim",
         lazy = false,

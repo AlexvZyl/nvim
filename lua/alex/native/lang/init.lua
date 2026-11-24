@@ -40,7 +40,7 @@ function M.toggle_virtual_diagnostics()
         DiagnosticUnderlineError = { underline = not M.virtual_diagnostics },
         DiagnosticUnderlineWarn = { underline = not M.virtual_diagnostics },
     })
-    require("alex.native.statusline").refresh()
+    require("statusline").refresh()
 end
 
 -- Setup diags.
@@ -155,7 +155,7 @@ end
 M.format_enabled = false
 function M.toggle_format_enabled()
     M.format_enabled = not M.format_enabled
-    require("alex.native.statusline").refresh()
+    require("statusline").refresh()
 end
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {

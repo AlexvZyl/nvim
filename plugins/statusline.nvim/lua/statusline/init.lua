@@ -8,14 +8,14 @@ local M = {}
 function M.render()
     local m = mode.current()
     return table.concat({
-        parts.segment(" " .. m.label, m),
+        parts.segment(" " .. m.label, m),
         parts.lsp_clients(),
         parts.diagnostics(),
         "%=",
         " ",
         parts.toggles(),
         " ",
-        parts.segment(" %4l:%-2c  %3p%%", m),
+        parts.segment(" %4l:%-2c  %3p%%", m),
     })
 end
 

@@ -42,7 +42,7 @@ function M.lsp_clients()
     else
         previous_lsp = result
     end
-    return "  %#StatuslineOff# [" .. result .. "]%*"
+    return "  %#StatuslineOff# [" .. result .. "]%*"
 end
 
 function M.diagnostics()

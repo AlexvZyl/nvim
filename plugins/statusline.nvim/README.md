@@ -11,7 +11,7 @@ require("statusline").setup({
             enabled = function()
                 return vim.o.relativenumber
             end,
-            icon = " ",
+            icon = " ",
         },
     },
 })

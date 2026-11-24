@@ -4,19 +4,19 @@ require("statusline").setup({
             enabled = function()
                 return vim.o.relativenumber
             end,
-            icon = " ",
+            icon = " ",
         },
         {
             enabled = function()
                 return require("alex.native.lang").virtual_diagnostics
             end,
-            icon = " ",
+            icon = " ",
         },
         {
             enabled = function()
                 return require("alex.plugins.no-neck-pain").enabled
             end,
-            icon = " ",
+            icon = " ",
         },
         {
             enabled = function()

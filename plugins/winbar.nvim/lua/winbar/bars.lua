@@ -3,19 +3,19 @@ local buffer = require("winbar.buffer")
 -- Built-in bars by filetype or buftype.
 return {
     qf = {
-        icon = "",
+        icon = "",
         name = function()
             return "QuickFix"
         end,
     },
     netrw = {
-        icon = "",
+        icon = "",
         name = function()
             return "Netrw"
         end,
     },
     oil = {
-        icon = " ",
+        icon = " ",
         name = function()
             return (vim.fn.expand("%"):gsub("oil://", ""))
         end,
@@ -33,13 +33,13 @@ return {
         end,
     },
     terminal = {
-        icon = "",
+        icon = "",
         name = function()
             return "Terminal"
         end,
     },
     dashboard = {
-        icon = " ",
+        icon = " ",
         name = function()
             return vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
         end,

@@ -9,7 +9,7 @@ require("winbar").setup({
     exclude = { "help" },
     bars = {
         fugitive = {
-            icon = "",
+            icon = "",
             name = function()
                 return "Git"
             end,

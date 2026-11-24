@@ -7,7 +7,7 @@ function M.get_winbar()
     local prefix = "  "
     local modified = ""
     if not buffer.modifiable() then
-        modified = " "
+        modified = " "
     elseif vim.bo.modified then
         modified = " ●"
     end
@@ -22,7 +22,7 @@ function M.get_winbar()
     local name = buffer.filename()
     if name == "" then
         name = "[No Name]"
-        icon = " "
+        icon = " "
     end
     return prefix .. icon .. " " .. buffer.parent() .. name .. modified
 end

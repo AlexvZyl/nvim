@@ -190,6 +190,19 @@ function T.deleted_lines_keep_the_gutter_width_while_editing()
     assert(drawn == width, ("gutter %d, window %d"):format(drawn, width))
 end
 
+function T.deleted_lines_follow_the_gutter_when_numbers_are_shown()
+    h.repo(h.lines(20), h.lines(20))
+    local buf = h.open()
+    h.keys("5Gdd")
+    vim.wo.number = true
+    vim.cmd("redraw")
+    require("review.render").settled()
+    local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    local drawn = gutter(buf)
+    vim.wo.number = false
+    assert(drawn == width, ("gutter %d, window %d"):format(drawn, width))
+end
+
 -- With signcolumn=auto the first sign widens the gutter only once it is drawn, after the render.
 function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
     h.repo(h.lines(20), h.lines(20))

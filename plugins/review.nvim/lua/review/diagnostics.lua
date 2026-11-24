@@ -27,6 +27,50 @@ local function combine(group, line, background)
     return name
 end
 
+-- Gives the diagnostic mark the background of the changed line it is on, or puts its own back without one.
+local function restyle(buf, id, mark, line)
+    local details, update = vim.api.nvim_buf_get_extmark_by_id(buf, id, mark[1], { details = true })[3], false
+    if details.sign_hl_group then
+        local group = combine(details.sign_hl_group, line, line and "ReviewSign" .. line:sub(7))
+        update, details.sign_hl_group = group ~= details.sign_hl_group, group
+    end
+    local gutter = details.virt_lines_leftcol
+    for _, chunks in ipairs(details.virt_lines or { details.virt_text }) do
+        -- Virtual lines get the gutter and are padded to the edge like the line highlight, which both go again with
+        -- it.
+        local last = chunks[#chunks]
+        if details.virt_lines and last and last[1]:match("^ +$") and (last[2] or ""):match("^Review%a*Add$") then
+            table.remove(chunks)
+            update = true
+        end
+        if gutter and (chunks[2] and chunks[2][2] or ""):match("^ReviewSign") then
+            table.remove(chunks, 1)
+            table.remove(chunks, 1)
+            update = true
+        end
+        for _, chunk in ipairs(chunks) do
+            if type(chunk[2]) ~= "table" then
+                local group = combine(chunk[2], line, line)
+                update, chunk[2] = update or group ~= chunk[2], group
+            end
+        end
+        if details.virt_lines and line then
+            table.insert(chunks, { string.rep(" ", vim.o.columns), line })
+            local columns = require("review.render").gutter(buf, line == "ReviewLocalAdd", "Add")
+            table.insert(chunks, 1, columns[2])
+            table.insert(chunks, 1, columns[1])
+        end
+    end
+    if details.virt_lines then
+        details.virt_lines_leftcol = line ~= nil
+        update = update or details.virt_lines_leftcol ~= (gutter or false)
+    end
+    if update then
+        details.id, details.ns_id = mark[1], nil
+        vim.api.nvim_buf_set_extmark(buf, id, mark[2], mark[3], details)
+    end
+end
+
 function M.apply(buf)
     local changed = {}
     for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, namespace, 0, -1, { details = true })) do
@@ -40,54 +84,17 @@ function M.apply(buf)
     for _, ns in pairs(vim.diagnostic.get_namespaces()) do
         for _, kind in ipairs({ "sign_ns", "virt_text_ns", "virt_lines_ns" }) do
             local id = ns.user_data[kind]
-            local before, after = restyled[buf][id] or {}, {}
-            for _, mark in ipairs(id and vim.api.nvim_buf_get_extmarks(buf, id, 0, -1, {}) or {}) do
-                local line, update = changed[mark[2]], false
-                -- Only the marks on changed lines, or restyled before, need their details.
-                local details = (line or before[mark[1]]) and vim.api.nvim_buf_get_extmark_by_id(buf, id, mark[1], { details = true })[3] or {}
-                after[mark[1]] = line and true or nil
-                if details.sign_hl_group then
-                    local group = combine(details.sign_hl_group, line, line and "ReviewSign" .. line:sub(7))
-                    update, details.sign_hl_group = group ~= details.sign_hl_group, group
-                end
-                local gutter = details.virt_lines_leftcol
-                for _, chunks in ipairs(details.virt_lines or { details.virt_text }) do
-                    -- Virtual lines get the gutter and are padded to the edge like the line highlight, which both
-                    -- go again with it.
-                    local last = chunks[#chunks]
-                    if details.virt_lines and last and last[1]:match("^ +$") and (last[2] or ""):match("^Review%a*Add$") then
-                        table.remove(chunks)
-                        update = true
-                    end
-                    if gutter and (chunks[2] and chunks[2][2] or ""):match("^ReviewSign") then
-                        table.remove(chunks, 1)
-                        table.remove(chunks, 1)
-                        update = true
-                    end
-                    for _, chunk in ipairs(chunks) do
-                        if type(chunk[2]) ~= "table" then
-                            local group = combine(chunk[2], line, line)
-                            update, chunk[2] = update or group ~= chunk[2], group
-                        end
-                    end
-                    if details.virt_lines and line then
-                        table.insert(chunks, { string.rep(" ", vim.o.columns), line })
-                        local columns = require("review.render").gutter(buf, line == "ReviewLocalAdd", "Add")
-                        table.insert(chunks, 1, columns[2])
-                        table.insert(chunks, 1, columns[1])
-                    end
-                end
-                if details.virt_lines then
-                    details.virt_lines_leftcol = line ~= nil
-                    update = update or details.virt_lines_leftcol ~= (gutter or false)
-                end
-                if update then
-                    details.id, details.ns_id = mark[1], nil
-                    vim.api.nvim_buf_set_extmark(buf, id, mark[2], mark[3], details)
-                end
-            end
             if id then
+                local before, after = restyled[buf][id] or {}, {}
                 restyled[buf][id] = after
+                for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, id, 0, -1, {})) do
+                    -- Only the marks on changed lines, or restyled before, need to be looked at.
+                    local line = changed[mark[2]]
+                    after[mark[1]] = line and true or nil
+                    if line or before[mark[1]] then
+                        restyle(buf, id, mark, line)
+                    end
+                end
             end
         end
     end

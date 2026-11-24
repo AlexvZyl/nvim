@@ -15,8 +15,15 @@ local function git(dir, ...)
     return result.stdout
 end
 
-local function write(path, lines)
-    vim.fn.writefile(lines, path)
+-- Writes the lines, or a string as it is, making the directories it is in.
+function M.write(path, content)
+    vim.fn.mkdir(vim.fs.dirname(path), "p")
+    if type(content) == "table" then
+        return vim.fn.writefile(content, path)
+    end
+    local file = assert(io.open(path, "wb"))
+    file:write(content)
+    file:close()
 end
 
 -- Lines "line 1" to "line n".
@@ -31,6 +38,15 @@ end
 -- Runs git in the cwd.
 function M.git(...)
     return git(vim.fn.getcwd(), ...)
+end
+
+-- Writes the files, by their path, and commits them.
+function M.commit(files)
+    for path, content in pairs(files) do
+        M.write(path, content)
+    end
+    M.git("add", ".")
+    M.git("commit", "-qm", "files")
 end
 
 -- A copy of the lines with the changes by line number: replaced by a line or lines, or deleted by false.
@@ -54,13 +70,13 @@ function M.repo(base, committed, working)
     git(dir, "init", "-q", "-b", "dev")
     git(dir, "config", "user.email", "test@test")
     git(dir, "config", "user.name", "test")
-    write(dir .. "/file.txt", base)
+    M.write(dir .. "/file.txt", base)
     git(dir, "add", ".")
     git(dir, "commit", "-qm", "base")
     git(dir, "checkout", "-qb", "branch")
-    write(dir .. "/file.txt", committed)
+    M.write(dir .. "/file.txt", committed)
     git(dir, "commit", "-qam", "committed", "--allow-empty")
-    write(dir .. "/file.txt", working or committed)
+    M.write(dir .. "/file.txt", working or committed)
     vim.cmd.cd(dir)
     return dir
 end

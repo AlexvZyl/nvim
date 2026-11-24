@@ -4,6 +4,11 @@ local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
 vim.opt.rtp:prepend(root)
 package.path = root .. "/?.lua;" .. package.path
 vim.o.showmode = false
+-- Messages would print in the middle of the results, like "5 fewer lines".
+vim.o.report = 10000
+vim.notify = function(message)
+    io.stdout:write("      " .. message .. "\n")
+end
 require("review").setup({})
 
 local filter = os.getenv("FILTER")

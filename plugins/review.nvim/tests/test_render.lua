@@ -118,10 +118,7 @@ end
 -- Without a line break at the end the last line is not changed.
 function T.a_file_without_a_line_break_at_the_end_is_unchanged()
     h.repo({ "a", "b" }, { "a", "b" })
-    local file = assert(io.open("file.txt", "wb"))
-    file:write("a\nb\nc")
-    file:close()
-    h.git("commit", "-qam", "no line break")
+    h.commit({ ["file.txt"] = "a\nb\nc" })
     local buf = h.open()
     local mark = h.marks(buf, "review", 3, 3)[1]
     assert(mark and mark[4].sign_text == "│ ", vim.inspect(mark))
@@ -337,16 +334,9 @@ end
 
 function T.untracked_and_binary_files_are_not_rendered()
     h.repo(h.lines(3), h.lines(4))
-    local function binary(text)
-        local file = assert(io.open("binary.bin", "wb"))
-        file:write(text)
-        file:close()
-    end
-    binary("a\0b")
-    h.git("add", "binary.bin")
-    h.git("commit", "-qm", "binary")
-    binary("c\0d")
-    vim.fn.writefile({ "new" }, "untracked.txt")
+    h.commit({ ["binary.bin"] = "a\0b" })
+    h.write("binary.bin", "c\0d")
+    h.write("untracked.txt", { "new" })
     h.open()
     for _, name in ipairs({ "binary.bin", "untracked.txt" }) do
         vim.cmd.edit(name)

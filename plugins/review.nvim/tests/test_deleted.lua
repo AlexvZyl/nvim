@@ -5,9 +5,7 @@ local T = {}
 -- file.txt deleted, committed or only locally, and other.txt added, with the review running.
 local function setup(committed)
     h.repo(h.lines(5), h.lines(5))
-    vim.fn.writefile({ "a" }, "other.txt")
-    h.git("add", ".")
-    h.git("commit", "-qm", "other")
+    h.commit({ ["other.txt"] = { "a" } })
     if committed then
         h.git("rm", "-q", "file.txt")
         h.git("commit", "-qm", "delete")

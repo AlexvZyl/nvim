@@ -4,17 +4,13 @@ local T = {}
 
 -- The panel open and focused over the file, with 80 changed files so it scrolls.
 local function setup()
+    h.repo(h.lines(5), h.lines(6))
     local files = {}
     for i = 1, 80 do
-        files["f" .. i .. ".txt"] = true
+        files["f" .. i .. ".txt"] = { "a" }
     end
-    h.repo(h.lines(5), h.lines(6))
-    for name in pairs(files) do
-        vim.fn.writefile({ "a" }, name)
-    end
-    h.git("add", ".")
-    h.git("commit", "-qm", "files")
-    vim.fn.writefile({ "a", "b", "c", "d", "e" }, "other.txt")
+    h.commit(files)
+    h.write("other.txt", { "a", "b", "c", "d", "e" })
     vim.o.lines = 40
     vim.o.columns = 200
     vim.cmd("silent! %bwipeout!")
@@ -107,10 +103,7 @@ end
 -- From a directory in the repo, only the files under it, by their path from there.
 function T.reviewing_from_a_directory_lists_the_files_under_it()
     local root = h.repo(h.lines(5), h.lines(6))
-    vim.fn.mkdir("sub", "p")
-    vim.fn.writefile({ "a" }, "sub/inner.txt")
-    h.git("add", ".")
-    h.git("commit", "-qm", "sub")
+    h.commit({ ["sub/inner.txt"] = { "a" } })
     vim.cmd.cd("sub")
     local main, panel, panel_buf = h.review()
     local listed = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
@@ -131,11 +124,7 @@ end
 -- Grouped by their first two directories, with any characters in their names.
 function T.files_are_grouped_by_directory_whatever_their_names()
     h.repo(h.lines(5), h.lines(5))
-    vim.fn.mkdir("a/b/c", "p")
-    vim.fn.writefile({ "x" }, "a/b/c/with space.txt")
-    vim.fn.writefile({ "x" }, "é.txt")
-    h.git("add", ".")
-    h.git("commit", "-qm", "names")
+    h.commit({ ["a/b/c/with space.txt"] = { "x" }, ["é.txt"] = { "x" } })
     local main, _, panel_buf = h.review()
     local listed = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
     local headers = vim.tbl_map(function(mark)
@@ -157,12 +146,7 @@ end
 -- Right aligned, what each file added in green and removed in red, and nothing for a binary file.
 function T.files_show_the_lines_they_added_and_removed()
     h.repo(h.lines(5), h.edit(h.lines(5), { [2] = "mod 2", [4] = false }))
-    vim.fn.writefile({ "a", "b", "c" }, "added.txt")
-    local binary_file = assert(io.open("binary.bin", "wb"))
-    binary_file:write("a\0b")
-    binary_file:close()
-    h.git("add", ".")
-    h.git("commit", "-qm", "files")
+    h.commit({ ["added.txt"] = { "a", "b", "c" }, ["binary.bin"] = "a\0b" })
     local _, _, panel_buf = h.review()
     local function counts(name)
         local row = vim.fn.search(name .. "$")
@@ -182,9 +166,7 @@ end
 -- Progress counts changed lines, so a small file left is a little of the review.
 function T.progress_counts_the_changed_lines_reviewed()
     h.repo(h.lines(5), h.lines(6))
-    vim.fn.writefile({ "a", "b", "c" }, "other.txt")
-    h.git("add", ".")
-    h.git("commit", "-qm", "other")
+    h.commit({ ["other.txt"] = { "a", "b", "c" } })
     h.review()
     local panel = require("review.panel")
     local function percent()

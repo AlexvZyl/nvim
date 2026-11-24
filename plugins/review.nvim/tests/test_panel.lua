@@ -104,6 +104,30 @@ function T.resetting_forgets_the_reviewed_files()
     assert(reviewed == all - 2 and reset == all and reloaded == all, vim.inspect({ all, reviewed, reset, reloaded }))
 end
 
+-- From a directory in the repo, only the files under it, by their path from there.
+function T.reviewing_from_a_directory_lists_the_files_under_it()
+    local root = h.repo(h.lines(5), h.lines(6))
+    vim.fn.mkdir("sub", "p")
+    vim.fn.writefile({ "a" }, "sub/inner.txt")
+    h.git("add", ".")
+    h.git("commit", "-qm", "sub")
+    vim.cmd.cd("sub")
+    local main, panel, panel_buf = h.review()
+    local listed = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
+    vim.fn.cursor(1, 1)
+    vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
+    local opened = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(main))
+    vim.api.nvim_set_current_win(panel)
+    vim.api.nvim_feedkeys("dd", "x", false)
+    local reviewed = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
+    local saved = vim.fn.readfile(root .. "/.git/review/branch..dev.json")[1]
+    teardown()
+    vim.cmd.cd(root)
+    assert(#listed == 1 and listed[1]:match("inner.txt$"), vim.inspect(listed))
+    assert(opened == vim.fs.normalize(root .. "/sub/inner.txt"), opened)
+    assert(vim.deep_equal(reviewed, { "" }) and saved:find('"sub/inner.txt"', 1, true), vim.inspect({ reviewed, saved }))
+end
+
 -- What the saved state has of use is kept, the rest ignored, and an emptied state saves and loads again.
 function T.broken_saved_state_loads_what_it_can()
     h.repo(h.lines(5), h.lines(6))

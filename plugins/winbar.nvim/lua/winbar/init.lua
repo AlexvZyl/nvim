@@ -39,15 +39,17 @@ end
 
 function M.setup(opts)
     config.set(opts)
-    local events = { "BufWritePost", "BufWinEnter", "BufFilePost", "WinEnter", "TermOpen", "BufReadPost" }
-    -- Not available in all versions.
-    if vim.fn.exists("##BufModifiedSet") == 1 then
-        table.insert(events, "BufModifiedSet")
-    end
-    vim.api.nvim_create_autocmd(events, {
-        group = vim.api.nvim_create_augroup("winbar", { clear = true }),
+    local group = vim.api.nvim_create_augroup("winbar", { clear = true })
+    vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter", "BufFilePost", "WinEnter", "TermOpen", "BufReadPost" }, {
+        group = group,
         callback = M.set_winbar,
     })
+    -- BufModifiedSet was removed in Neovim 0.13 for OptionSet, which before only fired for :set.
+    if vim.fn.exists("##BufModifiedSet") == 1 then
+        vim.api.nvim_create_autocmd("BufModifiedSet", { group = group, callback = M.set_winbar })
+    else
+        vim.api.nvim_create_autocmd("OptionSet", { group = group, pattern = "modified", callback = M.set_winbar })
+    end
 end
 
 return M

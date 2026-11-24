@@ -90,6 +90,20 @@ function T.reviewing_files_hides_them_until_undone()
     assert(#done == 1 and winbar:find("100%%"), vim.inspect({ done, winbar }))
 end
 
+function T.resetting_forgets_the_reviewed_files()
+    local _, _, panel_buf = setup()
+    local all = vim.api.nvim_buf_line_count(panel_buf)
+    vim.api.nvim_feedkeys("ggdj", "x", false)
+    local reviewed = vim.api.nvim_buf_line_count(panel_buf)
+    vim.cmd("ReviewReset")
+    local reset = vim.api.nvim_buf_line_count(panel_buf)
+    teardown()
+    h.review()
+    local reloaded = vim.api.nvim_buf_line_count(vim.api.nvim_get_current_buf())
+    teardown()
+    assert(reviewed == all - 2 and reset == all and reloaded == all, vim.inspect({ all, reviewed, reset, reloaded }))
+end
+
 -- What the saved state has of use is kept, the rest ignored, and an emptied state saves and loads again.
 function T.broken_saved_state_loads_what_it_can()
     h.repo(h.lines(5), h.lines(6))

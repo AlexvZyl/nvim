@@ -2,12 +2,8 @@ local session = require("review.session")
 
 local M = {}
 
-local function empty()
-    return { reviewed = {}, seen = {}, undo = {}, redo = {} }
-end
-
 -- Blob each file was reviewed at, files already seen and the undo history.
-local data = empty()
+local data = { reviewed = {}, seen = {}, undo = {}, redo = {} }
 
 local function path()
     local name = (session.source .. ".." .. session.ref):gsub("/", "%%")
@@ -46,9 +42,10 @@ function M.save()
     vim.uv.fs_rename(file .. ".tmp", file)
 end
 
+-- Forgets the saved state, like it was never saved.
 function M.reset()
     os.remove(path())
-    data = empty()
+    M.load()
 end
 
 local function blob(key)

@@ -40,13 +40,9 @@ M.files = guarded(function(opts)
 end)
 
 M.reset = guarded(function()
-    local panel = require("review.panel")
     if session.load() then
         require("review.state").reset()
-        if panel.is_open() then
-            panel.close()
-            panel.toggle()
-        end
+        require("review.panel").refresh()
     end
 end)
 

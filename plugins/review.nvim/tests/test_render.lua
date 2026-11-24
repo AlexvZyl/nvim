@@ -195,8 +195,7 @@ function T.deleted_lines_follow_the_gutter_when_numbers_are_shown()
     local buf = h.open()
     h.keys("5Gdd")
     vim.wo.number = true
-    vim.cmd("redraw")
-    require("review.render").settled()
+    h.flush()
     local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
     local drawn = gutter(buf)
     vim.wo.number = false

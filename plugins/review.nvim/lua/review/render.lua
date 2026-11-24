@@ -318,9 +318,8 @@ local function render(buf)
 end
 
 -- Draws the deleted lines again once how they are drawn changed without an edit, like the window scrolled sideways,
--- the gutter or the window changed width, or the filetype changed.
+-- the window changed width or the filetype changed.
 local function restyle(buf)
-    buffers[buf].textoff = textoff(buf)
     if style(buf) ~= buffers[buf].style then
         render_deleted(buf)
         require("review.diagnostics").apply(buf)
@@ -361,13 +360,31 @@ function M.update(buf)
     render(buf)
     keep_cursor(buf)
     attached.rendered = hunks
-    -- The width of the gutter the deleted lines draw in is only right after the redraw.
-    vim.schedule(function()
-        if buffers[buf] == attached and attached.hunks == hunks and vim.api.nvim_buf_is_valid(buf) then
-            restyle(buf)
-        end
-    end)
 end
+
+-- The gutter the deleted lines draw in is measured once a redraw drew it, as between an edit and the redraw a
+-- statuscolumn measures narrower. Until a redraw shows it changed, the deleted lines keep the width last drawn.
+local redrawn = {}
+vim.api.nvim_set_decoration_provider(deleted_namespace, {
+    on_win = function(_, win, buf)
+        redrawn[win] = buffers[buf] and buf or nil
+        return false
+    end,
+    on_end = function()
+        for win, buf in pairs(redrawn) do
+            local width = vim.fn.getwininfo(win)[1].textoff
+            if win == window(buf) and width ~= buffers[buf].textoff then
+                vim.schedule(function()
+                    if buffers[buf] and vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_win_is_valid(win) then
+                        buffers[buf].textoff = width
+                        restyle(buf)
+                    end
+                end)
+            end
+        end
+        redrawn = {}
+    end,
+})
 
 -- Before every key in visual mode, where the selection started, so once an operator deletes it whether it went
 -- up or down is known. Once visual mode ends that is gone.

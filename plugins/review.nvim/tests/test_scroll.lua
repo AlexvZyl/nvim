@@ -219,6 +219,15 @@ function T.pasting_above_keeps_the_screen_above_in_place()
     paste("P", keeps_top)
 end
 
+-- A held repeat key, in a main loop that redraws and scrolls between the keys, never draws the deleted lines out of
+-- the window's gutter.
+function T.repeating_a_delete_keeps_the_deleted_lines_in_the_gutter()
+    local script = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h") .. "/typed.lua"
+    local result = vim.system({ vim.v.progpath, "--clean", "--headless", "-c", "luafile " .. script }, { text = true, timeout = 10000 }):wait()
+    local ok, typed = pcall(vim.json.decode, result.stdout or "")
+    assert(ok and typed.redraws > 50 and typed.misdrawn == 0, (result.stdout or "") .. (result.stderr or ""))
+end
+
 -- Spamming dd and u must not scroll the buffer away, settled between keys or not.
 local function no_drift(settle)
     setup()

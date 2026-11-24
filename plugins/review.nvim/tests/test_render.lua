@@ -203,6 +203,20 @@ function T.deleted_lines_follow_the_gutter_when_numbers_are_shown()
     assert(drawn == width, ("gutter %d, window %d"):format(drawn, width))
 end
 
+function T.deleted_lines_are_padded_to_the_edge_after_a_resize()
+    h.repo(h.lines(5), h.lines(4))
+    local buf = h.open()
+    vim.o.columns = 260
+    vim.cmd("redraw")
+    require("review.render").settled()
+    local chunks = h.marks(buf, "review_deleted", 1, 5)[1][4].virt_lines[1]
+    local width = vim.fn.strdisplaywidth(table.concat(vim.tbl_map(function(chunk)
+        return chunk[1]
+    end, chunks)))
+    vim.o.columns = 200
+    assert(width >= 260, width)
+end
+
 -- With signcolumn=auto the first sign widens the gutter only once it is drawn, after the render.
 function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
     h.repo(h.lines(20), h.lines(20))

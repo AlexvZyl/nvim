@@ -312,11 +312,11 @@ local function render(buf)
     require("review.diagnostics").apply(buf)
 end
 
--- Draws the deleted lines again once the gutter they draw in changed width.
-local function follow_gutter(buf)
+-- Draws the deleted lines again once the gutter they draw in or the width they are padded to changed.
+local function follow_width(buf)
     local width = textoff(buf)
-    if buffers[buf].textoff ~= width then
-        buffers[buf].textoff = width
+    if buffers[buf].textoff ~= width or buffers[buf].columns ~= vim.o.columns then
+        buffers[buf].textoff, buffers[buf].columns = width, vim.o.columns
         render_deleted(buf)
         require("review.diagnostics").apply(buf)
     end
@@ -359,7 +359,7 @@ function M.update(buf)
     -- The width of the gutter the deleted lines draw in is only right after the redraw.
     vim.schedule(function()
         if buffers[buf] == attached and attached.hunks == hunks and vim.api.nvim_buf_is_valid(buf) then
-            follow_gutter(buf)
+            follow_width(buf)
         end
     end)
 end
@@ -374,14 +374,14 @@ function M.key()
 end
 
 -- Once the screen shows the rendered hunks, so cursor moves and scrolls are kept by the next render. The gutter
--- can also have changed without an edit, like with :set number.
+-- and the width can also have changed without an edit, like with :set number or a resize.
 function M.settled()
     local rows = settled_rows
     settled_rows = {}
     for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
         if buffers[buf] and buffers[buf].rendered == buffers[buf].hunks then
-            follow_gutter(buf)
+            follow_width(buf)
             settle(win, buf)
         else
             settled_rows[win] = rows[win]

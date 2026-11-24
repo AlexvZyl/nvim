@@ -195,6 +195,24 @@ function T.deleted_lines_keep_the_gutter_width_while_editing()
     assert(gutter == width, ("gutter %d, window %d"):format(gutter, width))
 end
 
+-- With signcolumn=auto the first sign widens the gutter only once it is drawn, after the render.
+function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
+    local base = h.lines(20)
+    h.repo(base, base)
+    vim.wo.number, vim.wo.signcolumn = true, "auto"
+    local buf = h.open()
+    local before = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    h.keys("5Gccx\27")
+    h.flush()
+    local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    local mark = h.marks(buf, "review_deleted", 1, 20)[1]
+    vim.wo.number, vim.wo.signcolumn = false, "yes"
+    assert(width > before, ("gutter did not widen: %d"):format(width))
+    local chunks = mark[4].virt_lines[1]
+    local gutter = vim.fn.strdisplaywidth(chunks[1][1] .. chunks[2][1])
+    assert(gutter == width, ("gutter %d, window %d"):format(gutter, width))
+end
+
 function T.untracked_and_binary_files_are_not_rendered()
     h.repo(h.lines(3), h.lines(4))
     local function binary(text)

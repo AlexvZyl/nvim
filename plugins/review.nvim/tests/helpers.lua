@@ -67,6 +67,8 @@ end
 
 -- Runs the scheduled render and redraws, like the main loop between keys.
 function M.flush()
+    -- The main loop redraws before it waits for keys, which is when scheduled callbacks run.
+    vim.cmd("redraw")
     vim.wait(1, function()
         return false
     end)

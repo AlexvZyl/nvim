@@ -154,6 +154,31 @@ function T.files_are_grouped_by_directory_whatever_their_names()
     assert(name:match("a/b/c/with space.txt$") and lines[1] == "x" and signed == 1, vim.inspect({ name, lines, signed }))
 end
 
+-- Right aligned, what each file added in green and removed in red, and nothing for a binary file.
+function T.files_show_the_lines_they_added_and_removed()
+    h.repo(h.lines(5), h.edit(h.lines(5), { [2] = "mod 2", [4] = false }))
+    vim.fn.writefile({ "a", "b", "c" }, "added.txt")
+    local binary_file = assert(io.open("binary.bin", "wb"))
+    binary_file:write("a\0b")
+    binary_file:close()
+    h.git("add", ".")
+    h.git("commit", "-qm", "files")
+    local _, _, panel_buf = h.review()
+    local function counts(name)
+        local row = vim.fn.search(name .. "$")
+        for _, mark in ipairs(h.marks(panel_buf, "review_panel", row, row)) do
+            if mark[4].virt_text_pos == "right_align" then
+                return mark[4].virt_text
+            end
+        end
+    end
+    local file, added, binary = counts("file.txt"), counts("added.txt"), counts("binary.bin")
+    teardown()
+    assert(vim.deep_equal(file, { { "+1 ", "ReviewPanelAdded" }, { "-2 ", "ReviewPanelRemoved" } }), vim.inspect(file))
+    assert(vim.deep_equal(added, { { "+3 ", "ReviewPanelAdded" } }), vim.inspect(added))
+    assert(binary == nil, vim.inspect(binary))
+end
+
 -- Progress counts changed lines, so a small file left is a little of the review.
 function T.progress_counts_the_changed_lines_reviewed()
     h.repo(h.lines(5), h.lines(6))

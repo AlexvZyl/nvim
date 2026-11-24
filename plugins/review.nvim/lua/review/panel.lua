@@ -59,6 +59,17 @@ local function show_done()
     vim.api.nvim_buf_set_extmark(buf, done_namespace, 0, 0, { virt_lines = virt_lines, virt_lines_leftcol = true })
 end
 
+-- Lines the file added and removed, right aligned. None for binary files.
+local function counts(file)
+    local chunks = {}
+    for _, count in ipairs({ { file.added, "+", "ReviewPanelAdded" }, { file.removed, "-", "ReviewPanelRemoved" } }) do
+        if (count[1] or 0) > 0 then
+            table.insert(chunks, { count[2] .. count[1] .. " ", count[3] })
+        end
+    end
+    return chunks
+end
+
 local function draw(cursor)
     -- Pending files grouped by their first directories up to the configured depth.
     local groups, dirs = {}, {}
@@ -103,6 +114,10 @@ local function draw(cursor)
         vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, mark)
         if rows[i].deleted then
             vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, mark.end_col + 1, { end_col = #lines[i], hl_group = "ReviewPanelDeleted" })
+        end
+        local count = counts(rows[i])
+        if #count > 0 then
+            vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, { virt_text = count, virt_text_pos = "right_align" })
         end
     end
     vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor, #rows), 1), 0 })

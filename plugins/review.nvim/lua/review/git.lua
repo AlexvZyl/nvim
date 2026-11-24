@@ -39,11 +39,14 @@ function M.changed_files(ref)
     end
     local files = {}
     for _, line in ipairs(vim.split(numstat, "\0", { trimempty = true })) do
-        local added, deleted, path = line:match("^(%S+)\t(%S+)\t(.+)$")
-        -- Binary files count as "-".
+        local added, removed, path = line:match("^(%S+)\t(%S+)\t(.+)$")
+        -- Binary files count as "-", which leaves them without counts.
+        added, removed = tonumber(added), tonumber(removed)
         table.insert(files, {
             path = path,
-            changes = (tonumber(added) or 0) + (tonumber(deleted) or 0),
+            added = added,
+            removed = removed,
+            changes = (added or 0) + (removed or 0),
             -- The diff is against the working tree, so a deleted file is one not on disk.
             deleted = vim.uv.fs_stat(path) == nil,
         })

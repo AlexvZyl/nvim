@@ -19,6 +19,8 @@ local groups = {
     ReviewPanelNr = "CursorLineNr",
     ReviewChanged = "Changed",
     ReviewNew = "Added",
+    ReviewPanelAdded = "Added",
+    ReviewPanelRemoved = "Removed",
     ReviewPanelDeleted = { strikethrough = true },
 }
 

@@ -6,31 +6,18 @@ function M.run(...)
     return result.code == 0 and result.stdout or nil
 end
 
-local function trimmed(...)
-    local output = M.run(...)
+-- Nil when HEAD and the ref share no history.
+function M.merge_base(ref)
+    local output = M.run("merge-base", "HEAD", ref)
     return output and vim.trim(output)
 end
 
--- Nil when HEAD and the ref share no history.
-function M.merge_base(ref)
-    return trimmed("merge-base", "HEAD", ref)
-end
-
-function M.head()
-    return trimmed("rev-parse", "HEAD")
-end
-
-function M.branch()
-    return trimmed("rev-parse", "--abbrev-ref", "HEAD") or "HEAD"
-end
-
--- Path of the cwd inside the repo.
-function M.prefix()
-    return trimmed("rev-parse", "--show-prefix") or ""
-end
-
-function M.git_dir()
-    return trimmed("rev-parse", "--absolute-git-dir") or ""
+-- HEAD, its branch, the path of the cwd inside the repo and the git dir. Nil outside a repo.
+function M.repo()
+    local output = M.run("rev-parse", "HEAD", "--abbrev-ref", "HEAD", "--show-prefix", "--absolute-git-dir")
+    if output then
+        return unpack(vim.split(output, "\n"))
+    end
 end
 
 -- Branches, remote branches and tags.

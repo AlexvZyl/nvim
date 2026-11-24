@@ -70,35 +70,25 @@ local function highlight_deleted(lang, deleted)
     return highlights
 end
 
--- Shared so neighbouring characters with the same highlight merge into one chunk.
-local delete_groups = { [false] = {}, [true] = {} }
-
 -- Virtual text of a deleted line, scrolled by leftcol and padded to the edge like a line highlight.
 local function deleted_chunks(text, highlights, uncommitted, leftcol, tabstop)
     local base = uncommitted and "ReviewLocalDelete" or "ReviewDelete"
-    local chunks, width, byte = {}, 0, 1
-    local function add(char, group)
-        width = width + 1
-        local last = chunks[#chunks]
-        if width <= leftcol then
-            return
-        elseif last and last[2] == group then
-            last[1] = last[1] .. char
-        else
-            table.insert(chunks, { char, group })
-        end
-    end
+    local chunks, width, byte, last = {}, 0, 1, nil
     -- A UTF-8 lead byte followed by its continuation bytes.
     for char in text:gmatch("[^\128-\191][\128-\191]*") do
         local name = highlights[byte]
-        local group = base
-        if name then
-            delete_groups[uncommitted][name] = delete_groups[uncommitted][name] or { base, name }
-            group = delete_groups[uncommitted][name]
-        end
-        byte = byte + #char
-        for _ = 1, char == "\t" and tabstop or 1 do
-            add(char == "\t" and " " or char, group)
+        local cells = char == "\t" and tabstop or 1
+        byte, width = byte + #char, width + cells
+        local shown = math.min(cells, width - leftcol)
+        if shown > 0 then
+            char = char == "\t" and string.rep(" ", shown) or char
+            -- Neighbouring characters with the same highlight go in one chunk.
+            if chunks[1] and name == last then
+                chunks[#chunks][1] = chunks[#chunks][1] .. char
+            else
+                table.insert(chunks, { char, name and { base, name } or base })
+            end
+            last = name
         end
     end
     table.insert(chunks, { string.rep(" ", math.max(vim.o.columns - width + leftcol, 0)), base })

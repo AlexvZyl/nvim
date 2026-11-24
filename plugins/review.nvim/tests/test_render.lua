@@ -97,6 +97,24 @@ function T.deletion_at_the_end_goes_below_the_last_line()
     assert(mark and mark[2] == 3 and not mark[4].virt_lines_above, vim.inspect(mark))
 end
 
+-- Tabs take the tabstop and the text scrolls with the window, a cell at a time.
+function T.deleted_lines_expand_tabs_and_scroll()
+    h.repo({ "\tcafé x", "keep" }, { "keep" })
+    local buf = h.open()
+    vim.bo[buf].tabstop, vim.wo.wrap = 4, false
+    local function text(leftcol)
+        vim.fn.winrestview({ leftcol = leftcol })
+        require("review.render").update(buf)
+        local chunks = h.marks(buf, "review_deleted", 1, 1)[1][4].virt_lines[1]
+        return table.concat(vim.tbl_map(function(chunk)
+            return chunk[1]
+        end, vim.list_slice(chunks, 3, #chunks - 1)))
+    end
+    local shown = { text(0), text(2), text(5) }
+    vim.wo.wrap = true
+    assert(vim.deep_equal(shown, { "    café x", "  café x", "afé x" }), vim.inspect(shown))
+end
+
 function T.edits_rerender()
     h.repo(h.lines(12), h.lines(12))
     local buf = h.open()

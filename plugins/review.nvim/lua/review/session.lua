@@ -30,10 +30,8 @@ function M.start(ref)
         return false
     end
     clear()
-    M.ref = ref
-    M.source = git.branch()
-    M.merge_base = merge_base
-    M.git_dir = git.git_dir()
+    M.ref, M.merge_base = ref, merge_base
+    M.head, M.source, M.prefix, M.git_dir = git.repo()
     return true
 end
 
@@ -50,10 +48,8 @@ function M.load()
         vim.notify("git diff " .. M.ref .. " failed", vim.log.levels.ERROR)
         return false
     end
-    M.source = git.branch()
     M.merge_base = git.merge_base(M.ref)
-    M.head = git.head()
-    M.prefix = git.prefix()
+    M.head, M.source, M.prefix = git.repo()
     M.files, M.by_key, M.total_changes = files, {}, 0
     for _, file in ipairs(files) do
         file.key = M.prefix .. file.path

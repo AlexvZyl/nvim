@@ -2,18 +2,25 @@ local config = require("statusline.config")
 
 local M = {}
 
+local severity = vim.diagnostic.severity
+-- With the letter shown when the diagnostic signs have no text.
 local diagnostic_levels = {
-    { vim.diagnostic.severity.ERROR, "StatuslineDiagError", "E" },
-    { vim.diagnostic.severity.WARN, "StatuslineDiagWarn", "W" },
-    { vim.diagnostic.severity.INFO, "StatuslineDiagInfo", "I" },
-    { vim.diagnostic.severity.HINT, "StatuslineDiagHint", "H" },
+    { severity = severity.ERROR, group = "StatuslineDiagError", letter = "E" },
+    { severity = severity.WARN, group = "StatuslineDiagWarn", letter = "W" },
+    { severity = severity.INFO, group = "StatuslineDiagInfo", letter = "I" },
+    { severity = severity.HINT, group = "StatuslineDiagHint", letter = "H" },
 }
 
 -- Buffers that show the clients of the buffer before them, like prompts.
 local keep_lsp_filetypes = { "noice", "TelescopePrompt", "" }
 
-function M.segment(content, m)
-    return ("%%#%s# %s %%*"):format(m.hl, content)
+local function highlight(group, text)
+    return "%#" .. group .. "#" .. text .. "%*"
+end
+
+-- Padded, in the colour of the mode.
+function M.segment(content, mode)
+    return highlight(mode.hl, " " .. content .. " ")
 end
 
 -- The linters of efm instead of efm itself.
@@ -42,7 +49,7 @@ function M.lsp_clients()
     else
         previous_lsp = result
     end
-    return "  %#StatuslineOff# [" .. result .. "]%*"
+    return "  " .. highlight("StatuslineOff", " [" .. result .. "]")
 end
 
 -- By buffer, as counting goes through every diagnostic, which is slow to do on every redraw.
@@ -59,9 +66,9 @@ function M.diagnostics()
     counts[buf] = counts[buf] or vim.diagnostic.count(buf)
     local parts = {}
     for _, level in ipairs(diagnostic_levels) do
-        local n = counts[buf][level[1]] or 0
-        if n > 0 then
-            table.insert(parts, ("%%#%s#%s %d%%*"):format(level[2], signs[level[1]] or level[3], n))
+        local count = counts[buf][level.severity] or 0
+        if count > 0 then
+            table.insert(parts, highlight(level.group, (signs[level.severity] or level.letter) .. " " .. count))
         end
     end
     if #parts == 0 then
@@ -73,7 +80,7 @@ end
 function M.toggles()
     local parts = {}
     for i, toggle in ipairs(config.options.toggles) do
-        parts[i] = "%#" .. (toggle.enabled() and "StatuslineOn" or "StatuslineOff") .. "#" .. toggle.icon .. "%*"
+        parts[i] = highlight(toggle.enabled() and "StatuslineOn" or "StatuslineOff", toggle.icon)
     end
     return table.concat(parts)
 end

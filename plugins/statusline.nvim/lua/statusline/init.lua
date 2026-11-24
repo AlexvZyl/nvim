@@ -1,21 +1,21 @@
 local config = require("statusline.config")
 local highlights = require("statusline.highlights")
-local mode = require("statusline.mode")
+local modes = require("statusline.mode")
 local parts = require("statusline.parts")
 
 local M = {}
 
 function M.render()
-    local m = mode.current()
+    local mode = modes.current()
     return table.concat({
-        parts.segment(" " .. m.label, m),
+        parts.segment(" " .. mode.label, mode),
         parts.lsp_clients(),
         parts.diagnostics(),
         "%=",
         " ",
         parts.toggles(),
         " ",
-        parts.segment(" %4l:%-2c  %3p%%", m),
+        parts.segment(" %4l:%-2c  %3p%%", mode),
     })
 end
 

@@ -518,6 +518,7 @@ function M.deleted_buffer(path)
     for i = 1, #lines do
         vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, {
             line_hl_group = uncommitted and "ReviewLocalDelete" or "ReviewDelete",
+            number_hl_group = uncommitted and "ReviewLocalDeleteNr" or "ReviewDeleteNr",
             sign_text = uncommitted and LOCAL_SIGN or SIGN,
             sign_hl_group = uncommitted and "ReviewSignLocalDelete" or "ReviewSignDelete",
             priority = config.options.sign_priority,

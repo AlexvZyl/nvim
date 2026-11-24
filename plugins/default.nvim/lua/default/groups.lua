@@ -140,6 +140,7 @@ return {
     ReviewAdd = { bg = U.blend(P.diff.add, 0.2, P.bg) },
     ReviewAddNr = { fg = P.gray2, bg = U.blend(P.diff.add, 0.2, P.bg) },
     ReviewDelete = { bg = U.blend(P.diff.delete, 0.65, P.bg) },
+    ReviewDeleteNr = { fg = P.gray2, bg = U.blend(P.diff.delete, 0.65, P.bg) },
     ReviewPanelLine = { bold = true },
     ReviewPanelDir = { fg = P.gray2 },
     ReviewPanelNr = { fg = P.white0, bold = true },

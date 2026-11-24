@@ -77,7 +77,10 @@ end
 local function create_autocmds()
     local panel = require("review.panel")
     local render = require("review.render")
-    autocmd("ColorScheme", highlights.set)
+    autocmd("ColorScheme", function()
+        highlights.set()
+        require("review.diagnostics").recolor()
+    end)
     autocmd("BufEnter", on_buf(panel.follow))
     -- BufEnter as well: for a file not loaded yet, focus is put back after BufWinEnter.
     autocmd({ "BufEnter", "BufWinEnter" }, panel.guard)

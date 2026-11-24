@@ -5,12 +5,7 @@ local M = {}
 
 function M.get_winbar()
     local prefix = "  "
-    local modified = ""
-    if not buffer.modifiable() then
-        modified = " "
-    elseif vim.bo.modified then
-        modified = " ●"
-    end
+    local modified = not buffer.modifiable() and " " or vim.bo.modified and " ●" or ""
 
     local bars = config.options.bars
     local bar = bars[vim.bo.filetype] or bars[vim.bo.buftype]
@@ -28,10 +23,8 @@ function M.get_winbar()
 end
 
 function M.set_winbar()
-    if vim.tbl_contains(config.options.exclude, vim.bo.filetype) then
-        return
-    end
-    if vim.api.nvim_win_get_config(0).relative ~= "" then
+    -- Floating windows have none.
+    if vim.tbl_contains(config.options.exclude, vim.bo.filetype) or vim.api.nvim_win_get_config(0).relative ~= "" then
         return
     end
     vim.opt_local.winbar = M.get_winbar()

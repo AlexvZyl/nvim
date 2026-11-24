@@ -108,6 +108,9 @@ local function teardown()
     vim.on_key(nil, key_namespace)
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
         require("review.render").detach(buf)
+        if vim.startswith(vim.api.nvim_buf_get_name(buf), "review://") then
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end
     end
 end
 

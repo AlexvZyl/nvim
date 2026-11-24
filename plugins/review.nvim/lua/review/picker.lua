@@ -23,6 +23,21 @@ function M.open(opts)
                 entry_maker = require("telescope.make_entry").gen_from_file(opts),
             }),
             sorter = conf.file_sorter(opts),
+            attach_mappings = function(prompt)
+                local actions = require("telescope.actions")
+                local state = require("telescope.actions.state")
+                local function deleted()
+                    local entry = state.get_selected_entry()
+                    local file = entry and session.by_key[session.prefix .. entry.value]
+                    return file and file.deleted
+                end
+                actions.select_default:replace_if(deleted, function()
+                    local path = state.get_selected_entry().value
+                    actions.close(prompt)
+                    vim.api.nvim_win_set_buf(0, require("review.render").deleted_buffer(path))
+                end)
+                return true
+            end,
         })
         :find()
 end

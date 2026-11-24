@@ -196,7 +196,7 @@ local function select()
         state.clear(file.key)
     end
     local target = target_window()
-    if vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":p") then
+    if render.path(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":.") then
         if marked then
             draw(line)
         end
@@ -205,6 +205,11 @@ local function select()
     selected = file.key
     draw(line)
     vim.api.nvim_set_current_win(target)
+    if file.deleted then
+        vim.api.nvim_win_set_buf(target, render.deleted_buffer(file.path))
+        vim.api.nvim_set_current_win(win)
+        return
+    end
     vim.cmd.edit(vim.fn.fnameescape(file.path))
     local first = render.first_hunk(vim.api.nvim_get_current_buf())
     if first then
@@ -280,7 +285,7 @@ function M.guard()
 end
 
 function M.follow(buf)
-    local key = session.prefix .. vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":.")
+    local key = session.prefix .. render.path(buf)
     if key == selected or not session.by_key[key] then
         return
     end

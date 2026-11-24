@@ -493,6 +493,45 @@ function M.scrolled()
     end
 end
 
+local DELETED_PREFIX = "review://"
+
+-- A read-only buffer with a deleted file as it was at the merge base, all marked deleted, so the cursor can go
+-- through it.
+function M.deleted_buffer(path)
+    local buf = vim.fn.bufadd(DELETED_PREFIX .. path)
+    if vim.api.nvim_buf_is_loaded(buf) then
+        return buf
+    end
+    vim.bo[buf].buftype = "nofile"
+    vim.bo[buf].bufhidden = "hide"
+    vim.bo[buf].swapfile = false
+    vim.fn.bufload(buf)
+    local lines = vim.split(git.show(session.merge_base, path) or "", "\n", { plain = true })
+    if lines[#lines] == "" and #lines > 1 then
+        table.remove(lines)
+    end
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    vim.bo[buf].modifiable = false
+    vim.bo[buf].filetype = vim.filetype.match({ filename = path, buf = buf }) or ""
+    -- Still in HEAD when only deleted locally.
+    local uncommitted = git.show("HEAD", path) ~= nil
+    for i = 1, #lines do
+        vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, {
+            line_hl_group = uncommitted and "ReviewLocalDelete" or "ReviewDelete",
+            sign_text = uncommitted and LOCAL_SIGN or SIGN,
+            sign_hl_group = uncommitted and "ReviewSignLocalDelete" or "ReviewSignDelete",
+            priority = config.options.sign_priority,
+        })
+    end
+    return buf
+end
+
+-- The path of a file from its buffer, also for a deleted file's.
+function M.path(buf)
+    local name = vim.api.nvim_buf_get_name(buf)
+    return vim.startswith(name, DELETED_PREFIX) and name:sub(#DELETED_PREFIX + 1) or vim.fn.fnamemodify(name, ":.")
+end
+
 -- Shows the deleted lines above the first line when the buffer is opened at the top, like for a deleted file.
 function M.reveal(buf)
     if not buffers[buf] then

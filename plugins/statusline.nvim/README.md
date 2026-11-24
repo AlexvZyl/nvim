@@ -19,6 +19,8 @@ require("statusline").setup({
 
 ## Commands
 
-| Function | Does |
-|---|---|
-| `require("statusline").refresh()` | Redraws the statusline. |
+| Command | Function | Does |
+|---|---|---|
+| | `require("statusline").setup(opts)` | Sets the statusline. |
+| | `require("statusline").render()` | The statusline string. |
+| | `require("statusline").refresh()` | Redraws the statusline. |

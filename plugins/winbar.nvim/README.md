@@ -20,6 +20,8 @@ require("winbar").setup({
 
 ## Commands
 
-| Function | Does |
-|---|---|
-| `require("winbar").set_winbar()` | Updates the winbar of the current window. |
+| Command | Function | Does |
+|---|---|---|
+| | `require("winbar").setup(opts)` | Sets the winbar on every window. |
+| | `require("winbar").get_winbar()` | The winbar string of the current window. |
+| | `require("winbar").set_winbar()` | Updates the winbar of the current window. |

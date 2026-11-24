@@ -4,52 +4,12 @@ function M.current_buffer_filetype()
     return vim.bo.filetype
 end
 
-function M.current_buffer_type()
-    return vim.bo.buftype
-end
-
 function M.current_buffer_modified()
     return vim.bo.modified
 end
 
-function M.current_window_floating()
-    return vim.api.nvim_win_get_config(0).relative ~= ""
-end
-
 function M.current_buffer_name()
     return vim.api.nvim_buf_get_name(0)
-end
-
-function M.current_dir()
-    return vim.fn.getcwd()
-end
-
-function M.current_work_dir()
-    return vim.fn.getcwd() .. "/"
-end
-
-function M.current_window()
-    return vim.api.nvim_get_current_win()
-end
-
-function M.current_window_hl(hl)
-    local win = M.current_window()
-    vim.api.nvim_win_set_option(win, "winhl", hl)
-end
-
-function M.current_buffer_modifiable()
-    local buftype = M.current_buffer_type()
-    if buftype == "nofile" or buftype == "prompt" or buftype == "help" then
-        return false
-    end
-    if vim.bo.readonly then
-        return false
-    end
-    return true
-end
-
-function M.set_highlight(hl, config)
-    vim.api.nvim_set_hl(0, hl, config)
 end
 
 function M.merge_highlights_table(table)
@@ -63,138 +23,8 @@ function M.merge_highlights_table(table)
     end
 end
 
-function M.current_buffer_filename()
-    local bufname = vim.api.nvim_buf_get_name(0)
-    return bufname ~= "" and vim.fn.fnamemodify(bufname, ":t") or ""
-end
-
-function M.get_short_cwd()
-    return vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
-end
-
-function M.current_buffer_icon()
-    local c = M.current_buffer_filetype()
-    if c == "help" then
-        return "󰞋"
-    end
-    return require("nvim-web-devicons").get_icon_by_filetype(c)
-end
-
-function M.current_buffer_parent()
-    local current_buffer = vim.api.nvim_get_current_buf()
-    local current_file = vim.api.nvim_buf_get_name(current_buffer)
-    local parent = vim.fn.fnamemodify(current_file, ":h:t")
-    if parent == "." then
-        return ""
-    end
-    return parent .. "/"
-end
-
 function M.current_buffer_file_relative()
     return vim.fn.expand("%")
-end
-
--- Check if cached value should be used.
-function M.keep_statusline_state()
-    -- TODO: Do this for diagnostics as well.
-    local keep_lsp_filetypes = {
-        "noice",
-        "TelescopePrompt",
-        "",
-    }
-
-    local force_skip_lsp_buftypes = {}
-
-    if vim.tbl_contains(force_skip_lsp_buftypes, M.current_buffer_type()) then
-        return false
-    end
-
-    return vim.tbl_contains(keep_lsp_filetypes, M.current_buffer_filetype())
-end
-
-M.previous_lsp_result = ""
-function M.current_buffer_lsp()
-    local clients = vim.lsp.get_clients({ bufnr = 0 })
-    local result = ""
-    local sep = "•"
-
-    -- Add LSP clients
-    if next(clients) ~= nil then
-        for _, client in ipairs(clients) do
-            local names = { client.name }
-            if client.name == "efm" then
-                local langs = vim.tbl_get(client.config, "settings", "languages", vim.bo.filetype) or {}
-                local sources = {}
-                for _, tool in ipairs(langs) do
-                    if tool.lintSource then
-                        sources[#sources + 1] = tool.lintSource
-                    end
-                end
-                if #sources > 0 then
-                    names = sources
-                end
-            end
-            for _, name in ipairs(names) do
-                result = result .. name .. sep
-            end
-        end
-    end
-
-    -- Remove trailing separator
-    if result ~= "" and result:sub(-#sep) == sep then
-        result = result:sub(1, -#sep - 1)
-    end
-
-    if M.keep_statusline_state() then
-        result = M.previous_lsp_result
-    else
-        M.previous_lsp_result = result
-    end
-
-    return "[" .. result .. "]"
-end
-
-function M.is_recording()
-    return vim.fn.reg_recording() ~= ""
-end
-
-function M.link_hl(target, link)
-    vim.api.nvim_set_hl(0, target, { link = link })
-end
-
-function M.is_nordic()
-    return vim.g.colors_name == "nordic"
-end
-
-function M.is_tokyonight()
-    return vim.g.colors_name == "tokyonight"
-end
-
-function M.is_default()
-    return vim.g.colors_name == "default" or vim.g.colors_name == nil
-end
-
-function M.hl_group_rgb(group)
-    return vim.api.nvim_get_hl(0, { name = group, link = false })
-end
-
-function M.get_hl_group(name)
-    return vim.api.nvim_get_hl(0, { name = name, link = false })
-end
-
-function M.get_git_root()
-    local handle = io.popen("git rev-parse --show-toplevel")
-    if handle then
-        local dir = handle:read("*a")
-        handle:close()
-        return dir:gsub("\n", "")
-    end
-end
-
-function M.is_intro_screen()
-    return M.current_buffer_type() == ""
-        and M.current_buffer_name() == ""
-        and M.current_buffer_filetype() == ""
 end
 
 function M.open_float(lines, filetype)

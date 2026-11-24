@@ -18,8 +18,7 @@ end
 -- Selects the deleted file in the panel.
 local function open(panel)
     vim.api.nvim_set_current_win(panel)
-    vim.fn.cursor(vim.fn.search("file.txt$"), 1)
-    vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
+    h.pick("file.txt")
 end
 
 local function selected(panel_buf)

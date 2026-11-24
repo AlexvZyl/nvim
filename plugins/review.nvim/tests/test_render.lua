@@ -157,8 +157,7 @@ end
 function T.lines_deleted_at_the_top_show_when_opened_from_the_panel()
     h.repo(h.lines(12), vim.list_slice(h.lines(12), 3))
     local main = h.review()
-    vim.fn.cursor(vim.fn.search("file.txt$"), 1)
-    vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
+    h.pick("file.txt")
     local topfill = vim.api.nvim_win_call(main, vim.fn.winsaveview).topfill
     require("review").stop()
     assert(topfill == 2, topfill)

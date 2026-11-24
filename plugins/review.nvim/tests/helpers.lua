@@ -116,6 +116,17 @@ function M.review(file)
     return main, panel, panel_buf
 end
 
+-- Types the keys, mapped like a person typing them.
+function M.press(keys)
+    vim.api.nvim_feedkeys(vim.keycode(keys), "x", false)
+end
+
+-- Opens the file from the panel, focused, by the end of its name.
+function M.pick(name)
+    vim.fn.cursor(vim.fn.search(name .. "$"), 1)
+    M.press("<CR>")
+end
+
 -- Runs the scheduled render and redraws, like the main loop between keys.
 function M.flush()
     -- The main loop redraws before it waits for keys, which is when scheduled callbacks run.

@@ -17,14 +17,13 @@ local function refresh()
     end
     local render = require("review.render")
     -- What is committed moves with HEAD, which decides which changes are local.
-    if session.merge_base ~= merge_base or session.head ~= head then
-        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-            if vim.api.nvim_buf_is_loaded(buf) then
-                render.attach(buf)
-            end
+    local moved = session.merge_base ~= merge_base or session.head ~= head
+    for _, buf in ipairs(moved and vim.api.nvim_list_bufs() or {}) do
+        if vim.api.nvim_buf_is_loaded(buf) then
+            render.attach(buf)
         end
     end
-    render.refresh_deleted(session.merge_base ~= merge_base or session.head ~= head)
+    render.refresh_deleted(moved)
     require("review.panel").refresh()
 end
 
@@ -58,9 +57,6 @@ function M.start(safe)
 end
 
 function M.stop()
-    if not timer then
-        return
-    end
     for _, handle in ipairs({ timer, watcher }) do
         if not handle:is_closing() then
             handle:close()

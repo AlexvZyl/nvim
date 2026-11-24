@@ -419,6 +419,14 @@ function M.attach(buf)
     M.update(buf)
 end
 
+function M.attach_all()
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_loaded(buf) then
+            M.attach(buf)
+        end
+    end
+end
+
 function M.detach(buf)
     if not buffers[buf] then
         return
@@ -430,6 +438,16 @@ function M.detach(buf)
         end
         for _, key in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
             pcall(vim.keymap.del, "n", key, { buffer = buf })
+        end
+    end
+end
+
+-- Detaches every buffer and wipes those of deleted files.
+function M.detach_all()
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        M.detach(buf)
+        if vim.startswith(vim.api.nvim_buf_get_name(buf), DELETED_PREFIX) then
+            vim.api.nvim_buf_delete(buf, { force = true })
         end
     end
 end

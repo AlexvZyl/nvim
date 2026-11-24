@@ -18,10 +18,8 @@ local function refresh()
     local render = require("review.render")
     -- What is committed moves with HEAD, which decides which changes are local.
     local moved = session.merge_base ~= merge_base or session.head ~= head
-    for _, buf in ipairs(moved and vim.api.nvim_list_bufs() or {}) do
-        if vim.api.nvim_buf_is_loaded(buf) then
-            render.attach(buf)
-        end
+    if moved then
+        render.attach_all()
     end
     render.refresh_deleted(moved)
     require("review.panel").refresh()

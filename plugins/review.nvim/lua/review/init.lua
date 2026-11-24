@@ -98,12 +98,7 @@ local function teardown()
     require("review.panel").close()
     vim.api.nvim_clear_autocmds({ group = group })
     vim.on_key(nil, key_namespace)
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        require("review.render").detach(buf)
-        if vim.startswith(vim.api.nvim_buf_get_name(buf), "review://") then
-            vim.api.nvim_buf_delete(buf, { force = true })
-        end
-    end
+    require("review.render").detach_all()
     require("review.diagnostics").stop()
 end
 
@@ -122,11 +117,7 @@ function M.start(ref)
         create_autocmds()
         require("review.diagnostics").start()
         watch.start(safely)
-        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-            if vim.api.nvim_buf_is_loaded(buf) then
-                require("review.render").attach(buf)
-            end
-        end
+        require("review.render").attach_all()
         if not switching then
             vim.api.nvim_exec_autocmds("User", { pattern = "ReviewStart" })
         end

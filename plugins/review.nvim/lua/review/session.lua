@@ -60,7 +60,9 @@ function M.load()
         M.by_key[file.key] = file
         M.total_changes = M.total_changes + file.changes
     end
-    M.blobs = git.head_blobs()
+    M.blobs = git.head_blobs(vim.tbl_map(function(file)
+        return file.path
+    end, files))
     return true
 end
 

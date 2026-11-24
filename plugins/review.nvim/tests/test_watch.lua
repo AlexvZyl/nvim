@@ -113,4 +113,21 @@ function T.committing_a_deletion_restyles_its_buffer()
     require("review").stop()
 end
 
+-- Reviewed at the blob in HEAD, so only a commit changing it again brings it back.
+function T.a_reviewed_file_comes_back_changed_once_committed_again()
+    h.repo(h.lines(5), h.lines(6))
+    local _, _, panel_buf = h.review()
+    vim.fn.cursor(vim.fn.search("file.txt$"), 1)
+    vim.api.nvim_feedkeys("dd", "x", false)
+    assert(not panel_lines():match("file.txt"), panel_lines())
+    vim.fn.writefile(h.lines(7), "file.txt")
+    h.git("commit", "-qam", "again")
+    wait(function()
+        return panel_lines():match("file.txt") ~= nil
+    end, "reviewed file not back")
+    local mark = h.marks(panel_buf, "review_panel", 1, 1)[1]
+    require("review").stop()
+    assert(mark and mark[4].virt_text and mark[4].virt_text[1][2] == "ReviewChanged", vim.inspect(mark))
+end
+
 return T

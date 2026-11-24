@@ -64,10 +64,11 @@ function M.changed_files(ref)
     return files
 end
 
--- Blob of every file in HEAD, by path from the repo root.
-function M.head_blobs()
+-- Blob of the files in HEAD, by path from the repo root, from their paths relative to the cwd.
+function M.head_blobs(paths)
     local blobs = {}
-    local tree = M.run("ls-tree", "-r", "-z", "--full-name", "HEAD") or ""
+    -- Without paths, the whole tree.
+    local tree = #paths > 0 and M.run("ls-tree", "-r", "-z", "--full-name", "HEAD", "--", unpack(paths)) or ""
     for _, line in ipairs(vim.split(tree, "\0", { trimempty = true })) do
         local sha, path = line:match("^%S+ blob (%S+)\t(.+)$")
         if sha then

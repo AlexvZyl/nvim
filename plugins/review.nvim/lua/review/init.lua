@@ -1,7 +1,17 @@
 local config = require("review.config")
-local highlights = require("review.highlights")
-local session = require("review.session")
-local watch = require("review.watch")
+
+-- Required on first use, so setup loads nothing until a review starts.
+local function lazy(name)
+    return setmetatable({}, {
+        __index = function(_, key)
+            return require(name)[key]
+        end,
+    })
+end
+
+local highlights = lazy("review.highlights")
+local session = lazy("review.session")
+local watch = lazy("review.watch")
 
 local M = {}
 

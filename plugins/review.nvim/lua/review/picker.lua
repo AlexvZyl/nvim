@@ -31,6 +31,8 @@ end
 
 -- Telescope picker of the changed files.
 function M.open(opts)
+    -- Loading the extension runs its setup with `extensions.review`, which sets the defaults.
+    pcall(require("telescope").load_extension, "review")
     opts = vim.tbl_deep_extend("force", defaults, opts or {})
     local conf = require("telescope.config").values
     require("telescope.pickers")

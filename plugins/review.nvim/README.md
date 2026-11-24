@@ -29,10 +29,10 @@ require("review").setup({
         prev_hunk = "[h",
     },
 })
-require("telescope").load_extension("review")
 ```
 
-The picker takes its options from `extensions.review` in the telescope setup.
+The picker takes its options from `extensions.review` in the telescope setup. Nothing loads until a review starts, so
+the plugin can be lazy loaded on its commands and keymaps.
 
 ## Commands
 

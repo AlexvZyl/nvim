@@ -458,13 +458,16 @@ local function fill_deleted(buf, path)
 end
 
 function M.deleted_buffer(path)
-    local buf = vim.fn.bufadd(DELETED_PREFIX .. path)
-    if not vim.api.nvim_buf_is_loaded(buf) then
-        vim.bo[buf].buftype, vim.bo[buf].bufhidden, vim.bo[buf].swapfile = "nofile", "hide", false
-        vim.fn.bufload(buf)
-        fill_deleted(buf, path)
-        vim.bo[buf].filetype = vim.filetype.match({ filename = path, buf = buf }) or ""
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_get_name(buf) == DELETED_PREFIX .. path then
+            return buf
+        end
     end
+    -- Not with bufadd, whose options are reset when it is first shown in a window.
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_name(buf, DELETED_PREFIX .. path)
+    fill_deleted(buf, path)
+    vim.bo[buf].filetype = vim.filetype.match({ filename = path, buf = buf }) or ""
     return buf
 end
 

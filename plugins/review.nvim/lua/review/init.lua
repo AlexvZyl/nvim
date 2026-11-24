@@ -90,7 +90,7 @@ local function create_autocmds()
     autocmd({ "BufWritePost", "FocusGained" }, watch.schedule)
     autocmd("BufWipeout", on_buf(render.detach))
     autocmd({ "TextChanged", "TextChangedI" }, on_buf(render.update))
-    vim.on_key(safely(render.key), key_namespace)
+    vim.on_key(safely(require("review.scroll").key), key_namespace)
 end
 
 local function teardown()
@@ -99,6 +99,7 @@ local function teardown()
     vim.api.nvim_clear_autocmds({ group = group })
     vim.on_key(nil, key_namespace)
     require("review.render").detach_all()
+    require("review.deleted").wipe()
     require("review.diagnostics").stop()
 end
 

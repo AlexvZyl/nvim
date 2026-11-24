@@ -56,7 +56,7 @@ function M.open(opts)
                 actions.select_default:replace_if(deleted, function()
                     local path = state.get_selected_entry().value
                     actions.close(prompt)
-                    vim.api.nvim_win_set_buf(0, require("review.render").deleted_buffer(path))
+                    vim.api.nvim_win_set_buf(0, require("review.deleted").open(path))
                 end)
                 return true
             end,

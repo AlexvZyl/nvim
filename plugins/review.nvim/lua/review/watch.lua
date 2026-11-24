@@ -21,7 +21,7 @@ local function refresh()
     if moved then
         render.attach_all()
     end
-    render.refresh_deleted(moved)
+    require("review.deleted").refresh(moved)
     require("review.panel").refresh()
 end
 

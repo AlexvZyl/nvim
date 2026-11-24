@@ -1,4 +1,5 @@
 local config = require("review.config")
+local deleted = require("review.deleted")
 local render = require("review.render")
 local session = require("review.session")
 local state = require("review.state")
@@ -173,14 +174,14 @@ local function select()
         state.clear(file.key)
     end
     local target = target_window()
-    if render.path(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":.") then
+    if deleted.path(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":.") then
         return marked and draw(line)
     end
     selected = file.key
     draw(line)
     vim.api.nvim_set_current_win(target)
     if file.deleted then
-        vim.api.nvim_win_set_buf(target, render.deleted_buffer(file.path))
+        vim.api.nvim_win_set_buf(target, deleted.open(file.path))
     else
         vim.cmd.edit(vim.fn.fnameescape(file.path))
         local first = render.first_hunk(vim.api.nvim_get_current_buf())
@@ -254,7 +255,7 @@ function M.guard()
 end
 
 function M.follow(opened)
-    local key = session.prefix .. render.path(opened)
+    local key = session.prefix .. deleted.path(opened)
     if key ~= selected and session.by_key[key] then
         selected = key
         M.refresh()

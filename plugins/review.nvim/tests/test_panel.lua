@@ -111,7 +111,7 @@ function T.deleted_files_show_struck_through_and_open_as_deleted_lines()
     assert(vim.deep_equal(vim.api.nvim_buf_get_lines(opened, 0, -1, false), h.lines(5)), "not the old contents")
     assert(not vim.bo[opened].modifiable, "modifiable")
     local marks = h.marks(opened, "review", 1, 6)
-    assert(#marks == 5 and marks[1][4].line_hl_group == "ReviewDelete", vim.inspect(marks))
+    assert(#marks == 1 and marks[1][4].end_row == 4 and marks[1][4].line_hl_group == "ReviewDelete", vim.inspect(marks))
     teardown()
 end
 

@@ -31,7 +31,6 @@ function M.active()
     return session.active()
 end
 
-
 M.panel = guarded(function()
     require("review.panel").toggle()
 end)
@@ -42,13 +41,12 @@ end)
 
 M.reset = guarded(function()
     local panel = require("review.panel")
-    if not session.load() then
-        return
-    end
-    require("review.state").reset()
-    if panel.is_open() then
-        panel.close()
-        panel.toggle()
+    if session.load() then
+        require("review.state").reset()
+        if panel.is_open() then
+            panel.close()
+            panel.toggle()
+        end
     end
 end)
 
@@ -65,50 +63,35 @@ local function safely(fn)
     end
 end
 
-local function autocmd(event, opts)
-    opts.group = group
-    opts.callback = safely(opts.callback)
-    vim.api.nvim_create_autocmd(event, opts)
+local function autocmd(event, callback)
+    vim.api.nvim_create_autocmd(event, { group = group, callback = safely(callback) })
+end
+
+-- Of the buffer the event is for.
+local function on_buf(fn)
+    return function(args)
+        fn(args.buf)
+    end
 end
 
 local function create_autocmds()
     local panel = require("review.panel")
     local render = require("review.render")
-    autocmd("ColorScheme", { callback = highlights.set })
-    autocmd("BufEnter", {
-        callback = function(args)
-            panel.follow(args.buf)
-        end,
-    })
+    autocmd("ColorScheme", highlights.set)
+    autocmd("BufEnter", on_buf(panel.follow))
     -- BufEnter as well: for a file not loaded yet, focus is put back after BufWinEnter.
-    autocmd({ "BufEnter", "BufWinEnter" }, { callback = panel.guard })
-    autocmd("BufWinEnter", {
-        callback = function(args)
-            render.reveal(args.buf)
-        end,
-    })
-    autocmd("WinScrolled", { callback = render.scrolled })
-    autocmd("SafeState", { callback = render.settled })
-    vim.on_key(safely(render.key), key_namespace)
-    autocmd("WinResized", { callback = panel.resized })
+    autocmd({ "BufEnter", "BufWinEnter" }, panel.guard)
+    autocmd("BufWinEnter", on_buf(render.reveal))
+    autocmd("WinScrolled", render.scrolled)
+    autocmd("SafeState", render.settled)
+    autocmd("WinResized", panel.resized)
     -- BufNewFile for deleted files.
-    autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, {
-        callback = function(args)
-            render.attach(args.buf)
-        end,
-    })
+    autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, on_buf(render.attach))
     -- Saves and outside tools change what is in the diff without moving HEAD.
-    autocmd({ "BufWritePost", "FocusGained" }, { callback = watch.schedule })
-    autocmd("BufWipeout", {
-        callback = function(args)
-            render.detach(args.buf)
-        end,
-    })
-    autocmd({ "TextChanged", "TextChangedI" }, {
-        callback = function(args)
-            render.update(args.buf)
-        end,
-    })
+    autocmd({ "BufWritePost", "FocusGained" }, watch.schedule)
+    autocmd("BufWipeout", on_buf(render.detach))
+    autocmd({ "TextChanged", "TextChangedI" }, on_buf(render.update))
+    vim.on_key(safely(render.key), key_namespace)
 end
 
 local function teardown()

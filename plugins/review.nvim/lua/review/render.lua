@@ -7,43 +7,59 @@ local M = {}
 local namespace = vim.api.nvim_create_namespace("review")
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
 local anchor_namespace = vim.api.nvim_create_namespace("review_anchor")
-local SIGN = "│"
--- Sets uncommitted changes apart from committed ones.
-local LOCAL_SIGN = "╎"
+-- Committed and uncommitted.
+local SIGNS = { [false] = "│", [true] = "╎" }
+local DELETED_PREFIX = "review://"
 -- Attached buffers, with the file at the merge base and the current hunks against it.
 local buffers = {}
 
 local function parse_hunks(patch)
     local hunks = {}
-    local current
     for _, line in ipairs(vim.split(patch, "\n", { plain = true })) do
         local old, start, count = line:match("^@@ %-(%d+),?%d* %+(%d+),?(%d*) @@")
         if start then
-            current = {
-                old = tonumber(old),
-                start = tonumber(start),
-                -- A missing count means a single line.
-                count = count == "" and 1 or tonumber(count),
-                deleted = {},
-            }
-            table.insert(hunks, current)
-        elseif current and line:sub(1, 1) == "-" then
-            table.insert(current.deleted, line:sub(2))
+            -- A missing count means a single line.
+            table.insert(hunks, { old = tonumber(old), start = tonumber(start), count = tonumber(count) or 1, deleted = {} })
+        elseif #hunks > 0 and line:sub(1, 1) == "-" then
+            table.insert(hunks[#hunks].deleted, line:sub(2))
         end
     end
     return hunks
+end
+
+local function diff(from, to)
+    return parse_hunks(vim.text.diff(from, to, { ctxlen = 0, indent_heuristic = true }) or "")
+end
+
+-- The highlight groups of a changed line, kind being Add or Delete.
+local function sign(buf, row, uncommitted, kind)
+    local scope = uncommitted and "Local" or ""
+    vim.api.nvim_buf_set_extmark(buf, namespace, row, 0, {
+        line_hl_group = "Review" .. scope .. kind,
+        number_hl_group = "Review" .. scope .. kind .. "Nr",
+        sign_text = SIGNS[uncommitted],
+        sign_hl_group = "ReviewSign" .. scope .. kind,
+        priority = config.options.sign_priority,
+    })
+end
+
+local function view(win)
+    return vim.api.nvim_win_call(win, vim.fn.winsaveview)
+end
+
+local function restore(win, saved)
+    vim.api.nvim_win_call(win, function()
+        vim.fn.winrestview(saved)
+    end)
 end
 
 -- Treesitter highlight of every byte of the deleted lines, by line.
 local function highlight_deleted(lang, deleted)
     local highlights = {}
     local query = lang and vim.treesitter.query.get(lang, "highlights")
-    if not query then
-        return highlights
-    end
     local source = table.concat(deleted, "\n")
     local ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
-    if not ok then
+    if not query or not ok then
         return highlights
     end
     for id, node in query:iter_captures(parser:parse()[1]:root(), source) do
@@ -51,11 +67,9 @@ local function highlight_deleted(lang, deleted)
         if not name:find("^_") and name ~= "spell" and name ~= "nospell" then
             local start_row, start_col, end_row, end_col = node:range()
             for row = start_row, math.min(end_row, #deleted - 1) do
-                local line = highlights[row + 1] or {}
-                highlights[row + 1] = line
-                local last = row == end_row and end_col or #deleted[row + 1]
-                for col = (row == start_row and start_col or 0) + 1, last do
-                    line[col] = "@" .. name .. "." .. lang
+                highlights[row + 1] = highlights[row + 1] or {}
+                for col = (row == start_row and start_col or 0) + 1, row == end_row and end_col or #deleted[row + 1] do
+                    highlights[row + 1][col] = "@" .. name .. "." .. lang
                 end
             end
         end
@@ -66,46 +80,35 @@ end
 -- Shared so neighbouring characters with the same highlight merge into one chunk.
 local delete_groups = { [false] = {}, [true] = {} }
 
-local function delete_group(name, uncommitted)
-    local base = uncommitted and "ReviewLocalDelete" or "ReviewDelete"
-    if not name then
-        return base
-    end
-    local groups = delete_groups[uncommitted]
-    groups[name] = groups[name] or { base, name }
-    return groups[name]
-end
-
 -- Virtual text of a deleted line, scrolled by leftcol and padded to the edge like a line highlight.
 local function deleted_chunks(text, highlights, uncommitted, leftcol, tabstop)
-    local chunks, width = {}, 0
+    local base = uncommitted and "ReviewLocalDelete" or "ReviewDelete"
+    local chunks, width, byte = {}, 0, 1
     local function add(char, group)
         width = width + 1
+        local last = chunks[#chunks]
         if width <= leftcol then
             return
-        end
-        local last = chunks[#chunks]
-        if last and last[2] == group then
+        elseif last and last[2] == group then
             last[1] = last[1] .. char
         else
             table.insert(chunks, { char, group })
         end
     end
-    local byte = 1
     -- A UTF-8 lead byte followed by its continuation bytes.
     for char in text:gmatch("[^\128-\191][\128-\191]*") do
-        local group = delete_group(highlights[byte], uncommitted)
+        local name = highlights[byte]
+        local group = base
+        if name then
+            delete_groups[uncommitted][name] = delete_groups[uncommitted][name] or { base, name }
+            group = delete_groups[uncommitted][name]
+        end
         byte = byte + #char
-        if char == "\t" then
-            for _ = 1, tabstop do
-                add(" ", group)
-            end
-        else
-            add(char, group)
+        for _ = 1, char == "\t" and tabstop or 1 do
+            add(char == "\t" and " " or char, group)
         end
     end
-    local pad = string.rep(" ", math.max(vim.o.columns - width + leftcol, 0))
-    table.insert(chunks, { pad, uncommitted and "ReviewLocalDelete" or "ReviewDelete" })
+    table.insert(chunks, { string.rep(" ", math.max(vim.o.columns - width + leftcol, 0)), base })
     return chunks
 end
 
@@ -121,22 +124,18 @@ end
 -- Drawn separately from the added lines, since they depend on the window's scroll and gutter.
 local function render_deleted(buf)
     vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-    local win = window(buf)
+    local attached = buffers[buf]
     -- As last seen after a redraw. Right after an edit, before the redraw, a statuscolumn is not measured yet.
-    local width = buffers[buf].textoff or textoff(buf)
-    buffers[buf].textoff = width
-    local leftcol = vim.api.nvim_win_call(win, vim.fn.winsaveview).leftcol
+    attached.textoff = attached.textoff or textoff(buf)
+    local leftcol = view(window(buf)).leftcol
     local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
-    local tabstop = vim.bo[buf].tabstop
     local line_count = vim.api.nvim_buf_line_count(buf)
     -- Virtual lines have no number or sign column, so draw them in.
-    local number = { " ", "LineNr" }
-    local padding = string.rep(" ", width - 2)
+    local padding = string.rep(" ", attached.textoff - 2)
     local signs = {
-        [false] = { SIGN .. padding, "ReviewSignDelete" },
-        [true] = { LOCAL_SIGN .. padding, "ReviewSignLocalDelete" },
+        [false] = { SIGNS[false] .. padding, "ReviewSignDelete" },
+        [true] = { SIGNS[true] .. padding, "ReviewSignLocalDelete" },
     }
-    local committed = buffers[buf].committed_deletions
     -- The deleted lines by where they go, each with where it was in HEAD to order them by.
     local anchors, rows = {}, {}
     -- Deleted by commits against the base, and everything deleted against HEAD as uncommitted.
@@ -144,23 +143,24 @@ local function render_deleted(buf)
         -- A pure deletion starts at the line before it, so goes above the line after it unless it is at the end.
         local row = hunk.count > 0 and hunk.start - 1 or hunk.start
         for i, text in ipairs(hunk.deleted) do
-            local key = uncommitted and hunk.old + i - 1 or committed[hunk.old + i - 1]
+            local key = uncommitted and hunk.old + i - 1 or attached.committed_deletions[hunk.old + i - 1]
             if key then
                 hunk.highlights = hunk.highlights or highlight_deleted(lang, hunk.deleted)
-                local chunks = deleted_chunks(text, hunk.highlights[i] or {}, uncommitted, leftcol, tabstop)
+                local chunks = deleted_chunks(text, hunk.highlights[i] or {}, uncommitted, leftcol, vim.bo[buf].tabstop)
                 if not anchors[row] then
                     anchors[row] = {}
                     table.insert(rows, row)
                 end
                 local lines = anchors[row]
-                table.insert(lines, { key = key, order = #lines, chunks = vim.list_extend({ number, signs[uncommitted] }, chunks) })
+                local line = vim.list_extend({ { " ", "LineNr" }, signs[uncommitted] }, chunks)
+                table.insert(lines, { key = key, order = #lines, chunks = line })
             end
         end
     end
-    for _, hunk in ipairs(buffers[buf].hunks) do
+    for _, hunk in ipairs(attached.hunks) do
         add(hunk, false)
     end
-    for _, hunk in ipairs(buffers[buf].local_hunks) do
+    for _, hunk in ipairs(attached.local_hunks) do
         add(hunk, true)
     end
     for _, row in ipairs(rows) do
@@ -193,36 +193,29 @@ end
 
 -- Screen rows between the top of the window and the line's text, negative above the window.
 local function line_row(win, line)
-    local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
-    if line < view.topline then
-        return -height(win, line, view.topline - 1, 0)
+    local top = view(win)
+    if line < top.topline then
+        return -height(win, line, top.topline - 1, 0)
     end
     -- topfill is stale until the next redraw when the virtual lines above the top line go away.
-    local hidden = math.max(fill(win, view.topline) - view.topfill, 0)
-    return height(win, view.topline, line) - height(win, line, line, 0) - hidden
+    local hidden = math.max(fill(win, top.topline) - top.topfill, 0)
+    return height(win, top.topline, line) - height(win, line, line, 0) - hidden
 end
 
 -- Scrolls so the line's text is the given number of screen rows below the top of the window.
 local function scroll_to(win, line, rows)
-    local view
-    while not view do
+    while true do
         local above = fill(win, line)
         if rows <= above or line == 1 then
-            view = { topline = line, topfill = math.min(rows, above) }
-        else
-            rows = rows - above
-            line = line - 1
-            local text = height(win, line, line, 0)
-            -- Short of the whole of a wrapped line, the line ends up a little lower.
-            if rows <= text then
-                view = { topline = line, topfill = 0 }
-            end
-            rows = rows - text
+            return restore(win, { topline = line, topfill = math.min(rows, above) })
+        end
+        line = line - 1
+        rows = rows - above - height(win, line, line, 0)
+        -- Short of the whole of a wrapped line, the line ends up a little lower.
+        if rows <= 0 then
+            return restore(win, { topline = line, topfill = 0 })
         end
     end
-    vim.api.nvim_win_call(win, function()
-        vim.fn.winrestview(view)
-    end)
 end
 
 -- By window, the screen row of the cursor line as last seen with the hunks rendered, and a mark at its start
@@ -240,35 +233,21 @@ local function settle(win, buf)
         invalidate = true,
         undo_restore = false,
     })
-    local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
+    local top = view(win)
     settled_rows[win] = {
         buf = buf,
         line = line,
         count = vim.api.nvim_buf_line_count(buf),
         row = line_row(win, line),
-        topline = view.topline,
-        topfill = view.topfill,
-        fill = fill(win, view.topline),
+        topline = top.topline,
+        topfill = top.topfill,
+        fill = fill(win, top.topline),
     }
-end
-
--- Shows the deleted lines that came above the top line, like when the lines at the top are deleted, and hides
--- them again once they go, like when that is undone.
-local function show_top(win, settled)
-    local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
-    local above = fill(win, view.topline)
-    if view.topline == settled.topline and above ~= settled.fill then
-        local topfill = math.max(math.min(settled.topfill + above - settled.fill, above), 0)
-        vim.api.nvim_win_call(win, function()
-            vim.fn.winrestview({ topline = view.topline, topfill = topfill })
-        end)
-    end
 end
 
 -- Scrolls so the line the cursor was on stays in place on screen when edited. The deleted lines added or removed
 -- above it then do not move it, while the cursor still moves with the edit.
-local function keep_cursor(buf, fn)
-    fn()
+local function keep_cursor(buf)
     for _, win in ipairs(vim.fn.win_findbuf(buf)) do
         local settled = settled_rows[win]
         local mark = settled
@@ -279,20 +258,23 @@ local function keep_cursor(buf, fn)
         -- Only when the edit was on or after the line. Otherwise nothing moves, like the deleted lines taking the
         -- place of the line with the cursor below them, or an undo putting lines back in place of deleted ones.
         if mark and not deleted and mark[1] + 1 == settled.line then
-            local line = mark[1] + 1
-            local row = line_row(win, line)
             -- Off screen when the mark was, which is left to Vim.
-            if row ~= settled.row and settled.row >= 0 and settled.row < vim.api.nvim_win_get_height(win) then
-                scroll_to(win, line, settled.row)
+            if line_row(win, settled.line) ~= settled.row and settled.row >= 0 and settled.row < vim.api.nvim_win_get_height(win) then
+                scroll_to(win, settled.line, settled.row)
             end
         elseif mark then
-            show_top(win, settled)
+            -- Shows the deleted lines that came above the top line, like when the lines at the top are deleted, and
+            -- hides them again once they go, like when that is undone.
+            local top = view(win)
+            local above = fill(win, top.topline)
+            if top.topline == settled.topline and above ~= settled.fill then
+                restore(win, { topline = top.topline, topfill = math.max(math.min(settled.topfill + above - settled.fill, above), 0) })
+            end
             -- Deleting up, from the last of the deleted lines like `dk` or a selection up, goes on the line above
             -- them so the cursor stays at the top. Deleting down leaves it below them.
             local cursor = vim.api.nvim_win_get_cursor(win)[1]
             local removed = settled.count - vim.api.nvim_buf_line_count(buf)
-            local start = settled.visual or settled.line
-            if deleted and removed > 1 and start == cursor + removed - 1 and cursor > 1 then
+            if deleted and removed > 1 and (settled.visual or settled.line) == cursor + removed - 1 and cursor > 1 then
                 local text = vim.api.nvim_buf_get_lines(buf, cursor - 2, cursor - 1, true)[1]
                 vim.api.nvim_win_set_cursor(win, { cursor - 1, #text:match("^%s*") })
             end
@@ -307,25 +289,13 @@ local function render(buf)
     for _, hunk in ipairs(buffers[buf].local_hunks) do
         for line = hunk.start, hunk.start + hunk.count - 1 do
             uncommitted[line] = true
-            vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
-                line_hl_group = "ReviewLocalAdd",
-                number_hl_group = "ReviewLocalAddNr",
-                sign_text = LOCAL_SIGN,
-                sign_hl_group = "ReviewSignLocalAdd",
-                priority = config.options.sign_priority,
-            })
+            sign(buf, line - 1, true, "Add")
         end
     end
     for _, hunk in ipairs(buffers[buf].hunks) do
         for line = hunk.start, hunk.start + hunk.count - 1 do
             if not uncommitted[line] then
-                vim.api.nvim_buf_set_extmark(buf, namespace, line - 1, 0, {
-                    line_hl_group = "ReviewAdd",
-                    number_hl_group = "ReviewAddNr",
-                    sign_text = SIGN,
-                    sign_hl_group = "ReviewSignAdd",
-                    priority = config.options.sign_priority,
-                })
+                sign(buf, line - 1, false, "Add")
             end
         end
     end
@@ -349,42 +319,28 @@ local function jump(buf, forward)
     end
 end
 
-local function buffer_text(buf)
-    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-    if #lines == 1 and lines[1] == "" then
-        return ""
-    end
-    return table.concat(lines, "\n") .. "\n"
-end
-
-local function diff(from, to)
-    return parse_hunks(vim.text.diff(from, to, { ctxlen = 0, indent_heuristic = true }) or "")
-end
-
 -- Diffs the buffer against the merge base in memory, so edits show up while typing.
 function M.update(buf)
     local attached = buffers[buf]
     if not attached or not vim.api.nvim_buf_is_valid(buf) then
         return
     end
-    local text = buffer_text(buf)
-    local hunks = diff(attached.base, text)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    local text = (#lines == 1 and lines[1] == "") and "" or table.concat(lines, "\n") .. "\n"
+    local hunks, local_hunks = diff(attached.base, text), diff(attached.head, text)
     -- Treesitter highlights of deleted lines only change when the deleted text does.
     local cached = {}
     for _, hunk in ipairs(vim.list_extend(vim.list_extend({}, attached.hunks), attached.local_hunks or {})) do
         cached[table.concat(hunk.deleted, "\n")] = hunk.highlights
     end
-    local local_hunks = diff(attached.head, text)
     for _, hunk in ipairs(vim.list_extend(vim.list_extend({}, hunks), local_hunks)) do
         hunk.highlights = cached[table.concat(hunk.deleted, "\n")]
     end
-    attached.hunks = hunks
-    attached.local_hunks = local_hunks
+    attached.hunks, attached.local_hunks = hunks, local_hunks
     -- Right away, as TextChanged comes before the redraw: scheduled, the edit would show without the deleted
     -- lines for a moment.
-    keep_cursor(buf, function()
-        render(buf)
-    end)
+    render(buf)
+    keep_cursor(buf)
     attached.rendered = hunks
     -- The width of the gutter the deleted lines draw in is only right after the redraw.
     vim.schedule(function()
@@ -413,8 +369,7 @@ function M.settled()
     settled_rows = {}
     for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
-        local attached = buffers[buf]
-        if attached and attached.rendered == attached.hunks then
+        if buffers[buf] and buffers[buf].rendered == buffers[buf].hunks then
             settle(win, buf)
         else
             settled_rows[win] = rows[win]
@@ -428,38 +383,31 @@ function M.attach(buf)
     if vim.bo[buf].buftype ~= "" or file == "" or vim.fn.isdirectory(file) == 1 then
         return
     end
+    -- No base when the file was added since the merge base, no head when it was added since HEAD.
     local base = session.merge_base and git.show(session.merge_base, file)
     local head = git.show("HEAD", file)
-    local binary = (base or ""):find("\0", 1, true) or (head or ""):find("\0", 1, true)
-    if (not base and not head) or binary then
+    if (not base and not head) or (base or ""):find("\0", 1, true) or (head or ""):find("\0", 1, true) then
         -- Untracked, outside the repo or binary.
         return M.detach(buf)
     end
     if not buffers[buf] then
         buffers[buf] = { hunks = {} }
-        local keys = config.options.keymaps
-        if keys.next_hunk then
-            vim.keymap.set("n", keys.next_hunk, function()
-                jump(buf, true)
-            end, { buffer = buf })
-        end
-        if keys.prev_hunk then
-            vim.keymap.set("n", keys.prev_hunk, function()
-                jump(buf, false)
-            end, { buffer = buf })
+        for key, forward in pairs({ next_hunk = true, prev_hunk = false }) do
+            if config.options.keymaps[key] then
+                vim.keymap.set("n", config.options.keymaps[key], function()
+                    jump(buf, forward)
+                end, { buffer = buf })
+            end
         end
     end
-    -- No base when the file was added since the merge base, no head when it was added since HEAD.
     local attached = buffers[buf]
-    attached.base = base or ""
-    attached.head = head or ""
+    attached.base, attached.head = base or "", head or ""
     -- Lines of the base deleted by commits, other deleted lines are only deleted locally. With where they were
     -- between the lines of HEAD: after the line before them, or before the lines that replaced them.
     attached.committed_deletions = {}
     for _, hunk in ipairs(diff(attached.base, attached.head)) do
-        local key = hunk.count == 0 and hunk.start + 0.5 or hunk.start - 0.5
         for i = 1, #hunk.deleted do
-            attached.committed_deletions[hunk.old + i - 1] = key
+            attached.committed_deletions[hunk.old + i - 1] = hunk.count == 0 and hunk.start + 0.5 or hunk.start - 0.5
         end
     end
     M.update(buf)
@@ -471,13 +419,11 @@ function M.detach(buf)
     end
     buffers[buf] = nil
     if vim.api.nvim_buf_is_valid(buf) then
-        vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
-        vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-        vim.api.nvim_buf_clear_namespace(buf, anchor_namespace, 0, -1)
+        for _, ns in ipairs({ namespace, deleted_namespace, anchor_namespace }) do
+            vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+        end
         for _, key in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
-            if key then
-                pcall(vim.keymap.del, "n", key, { buffer = buf })
-            end
+            pcall(vim.keymap.del, "n", key, { buffer = buf })
         end
     end
 end
@@ -485,16 +431,11 @@ end
 function M.scrolled()
     for win, delta in pairs(vim.v.event) do
         local id = tonumber(win)
-        if id and delta.leftcol ~= 0 and vim.api.nvim_win_is_valid(id) then
-            local buf = vim.api.nvim_win_get_buf(id)
-            if buffers[buf] then
-                render_deleted(buf)
-            end
+        if id and delta.leftcol ~= 0 and vim.api.nvim_win_is_valid(id) and buffers[vim.api.nvim_win_get_buf(id)] then
+            render_deleted(vim.api.nvim_win_get_buf(id))
         end
     end
 end
-
-local DELETED_PREFIX = "review://"
 
 -- A read-only buffer with a deleted file as it was at the merge base, all marked deleted, so the cursor can go
 -- through it.
@@ -510,27 +451,18 @@ local function fill_deleted(buf, path)
     -- Still in HEAD when only deleted locally.
     local uncommitted = git.show("HEAD", path) ~= nil
     for i = 1, #lines do
-        vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, {
-            line_hl_group = uncommitted and "ReviewLocalDelete" or "ReviewDelete",
-            number_hl_group = uncommitted and "ReviewLocalDeleteNr" or "ReviewDeleteNr",
-            sign_text = uncommitted and LOCAL_SIGN or SIGN,
-            sign_hl_group = uncommitted and "ReviewSignLocalDelete" or "ReviewSignDelete",
-            priority = config.options.sign_priority,
-        })
+        sign(buf, i - 1, uncommitted, "Delete")
     end
 end
 
 function M.deleted_buffer(path)
     local buf = vim.fn.bufadd(DELETED_PREFIX .. path)
-    if vim.api.nvim_buf_is_loaded(buf) then
-        return buf
+    if not vim.api.nvim_buf_is_loaded(buf) then
+        vim.bo[buf].buftype, vim.bo[buf].bufhidden, vim.bo[buf].swapfile = "nofile", "hide", false
+        vim.fn.bufload(buf)
+        fill_deleted(buf, path)
+        vim.bo[buf].filetype = vim.filetype.match({ filename = path, buf = buf }) or ""
     end
-    vim.bo[buf].buftype = "nofile"
-    vim.bo[buf].bufhidden = "hide"
-    vim.bo[buf].swapfile = false
-    vim.fn.bufload(buf)
-    fill_deleted(buf, path)
-    vim.bo[buf].filetype = vim.filetype.match({ filename = path, buf = buf }) or ""
     return buf
 end
 
@@ -563,15 +495,10 @@ end
 
 -- Shows the deleted lines above the first line when the buffer is opened at the top, like for a deleted file.
 function M.reveal(buf)
-    if not buffers[buf] then
-        return
-    end
-    for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-        local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
-        if view.topline == 1 and view.topfill == 0 then
-            vim.api.nvim_win_call(win, function()
-                vim.fn.winrestview({ topline = 1, topfill = fill(win, 1) })
-            end)
+    for _, win in ipairs(buffers[buf] and vim.fn.win_findbuf(buf) or {}) do
+        local top = view(win)
+        if top.topline == 1 and top.topfill == 0 then
+            restore(win, { topline = 1, topfill = fill(win, 1) })
         end
     end
 end

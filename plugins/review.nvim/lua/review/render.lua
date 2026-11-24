@@ -330,6 +330,7 @@ local function render(buf)
         end
     end
     render_deleted(buf)
+    require("review.diagnostics").apply(buf)
 end
 
 local function jump(buf, forward)

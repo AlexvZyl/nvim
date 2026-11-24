@@ -213,6 +213,49 @@ function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
     assert(gutter == width, ("gutter %d, window %d"):format(gutter, width))
 end
 
+function T.diagnostic_signs_on_changed_lines_get_the_review_background()
+    local base = h.lines(12)
+    local committed = vim.deepcopy(base)
+    committed[10] = "mod 10"
+    h.repo(base, committed)
+    vim.cmd("silent! only | enew | silent! %bwipeout!")
+    local main = vim.api.nvim_get_current_win()
+    h.start()
+    vim.api.nvim_set_current_win(main)
+    vim.cmd.edit("file.txt")
+    local buf = vim.api.nvim_get_current_buf()
+    vim.api.nvim_set_hl(0, "ReviewSignAdd", { fg = "#00ff00", bg = "#002200" })
+    vim.api.nvim_set_hl(0, "ReviewSignLocalAdd", { fg = "#00ff00", bg = "#003300" })
+    vim.api.nvim_set_hl(0, "DiagnosticSignError", { fg = "#ff0000" })
+    local ns = vim.api.nvim_create_namespace("test_diagnostics")
+    vim.diagnostic.config({ signs = true }, ns)
+    local error = vim.diagnostic.severity.ERROR
+    vim.diagnostic.set(ns, buf, {
+        { lnum = 9, col = 0, message = "changed", severity = error },
+        { lnum = 1, col = 0, message = "unchanged", severity = error },
+    })
+    local function groups()
+        local found = {}
+        local sign_ns = vim.diagnostic.get_namespace(ns).user_data.sign_ns
+        for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, sign_ns, 0, -1, { details = true })) do
+            found[mark[2] + 1] = mark[4].sign_hl_group
+        end
+        return found
+    end
+    local signs = groups()
+    local hl = vim.api.nvim_get_hl(0, { name = signs[10] })
+    local ok = signs[2] == "DiagnosticSignError" and hl.fg == 0xff0000 and hl.bg == 0x002200
+    h.keys("2GAx")
+    local edited = groups()
+    local local_bg = vim.api.nvim_get_hl(0, { name = edited[2] }).bg
+    require("review").stop()
+    local stopped = groups()
+    vim.diagnostic.reset(ns)
+    assert(ok, vim.inspect({ signs, hl }))
+    assert(local_bg == 0x003300, vim.inspect(edited))
+    assert(stopped[2] == "DiagnosticSignError" and stopped[10] == "DiagnosticSignError", vim.inspect(stopped))
+end
+
 function T.untracked_and_binary_files_are_not_rendered()
     h.repo(h.lines(3), h.lines(4))
     local function binary(text)

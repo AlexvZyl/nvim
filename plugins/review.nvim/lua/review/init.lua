@@ -74,7 +74,12 @@ end
 local function create_autocmds()
     local panel = require("review.panel")
     local render = require("review.render")
-    autocmd("ColorScheme", { callback = highlights.set })
+    autocmd("ColorScheme", {
+        callback = function()
+            highlights.set()
+            require("review.diagnostics").colors()
+        end,
+    })
     autocmd("BufEnter", {
         callback = function(args)
             panel.follow(args.buf)
@@ -122,6 +127,7 @@ local function teardown()
             vim.api.nvim_buf_delete(buf, { force = true })
         end
     end
+    require("review.diagnostics").stop()
 end
 
 -- Starts reviewing against the ref, or switches to it, and opens the panel.
@@ -137,6 +143,7 @@ function M.start(ref)
         teardown()
         highlights.set()
         create_autocmds()
+        require("review.diagnostics").start()
         watch.start(safely)
         for _, buf in ipairs(vim.api.nvim_list_bufs()) do
             if vim.api.nvim_buf_is_loaded(buf) then

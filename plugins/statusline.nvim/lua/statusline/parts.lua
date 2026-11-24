@@ -45,12 +45,21 @@ function M.lsp_clients()
     return "  %#StatuslineOff# [" .. result .. "]%*"
 end
 
+-- By buffer, as counting goes through every diagnostic, which is slow to do on every redraw.
+local counts = {}
+
+-- Counted again once they changed.
+function M.diagnostics_changed(buf)
+    counts[buf] = nil
+end
+
 function M.diagnostics()
     local signs = vim.tbl_get(vim.diagnostic.config() or {}, "signs", "text") or {}
-    local counts = vim.diagnostic.count(0)
+    local buf = vim.api.nvim_get_current_buf()
+    counts[buf] = counts[buf] or vim.diagnostic.count(buf)
     local parts = {}
     for _, level in ipairs(diagnostic_levels) do
-        local n = counts[level[1]] or 0
+        local n = counts[buf][level[1]] or 0
         if n > 0 then
             table.insert(parts, ("%%#%s#%s %d%%*"):format(level[2], signs[level[1]] or level[3], n))
         end

@@ -65,7 +65,7 @@ end
 function T.lsp_clients_show_by_name()
     local efm = { name = "efm", config = { settings = { languages = { lua = { { lintSource = "luacheck" }, {} } } } } }
     local shown = {}
-    with(vim.lsp, "get_clients", function()
+    with(vim.lsp, "get_clients", function(_)
         return { { name = "lua_ls" }, efm }
     end, function()
         vim.bo.filetype = "lua"
@@ -73,7 +73,7 @@ function T.lsp_clients_show_by_name()
         vim.bo.filetype = "python"
         shown.python = parts.lsp_clients()
     end)
-    with(vim.lsp, "get_clients", function()
+    with(vim.lsp, "get_clients", function(_)
         return {}
     end, function()
         vim.bo.filetype = "TelescopePrompt"

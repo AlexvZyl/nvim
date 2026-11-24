@@ -26,9 +26,13 @@ end
 function M.setup(opts)
     config.set(opts)
     highlights.set()
-    vim.api.nvim_create_autocmd("ColorScheme", {
-        group = vim.api.nvim_create_augroup("statusline", { clear = true }),
-        callback = highlights.set,
+    local group = vim.api.nvim_create_augroup("statusline", { clear = true })
+    vim.api.nvim_create_autocmd("ColorScheme", { group = group, callback = highlights.set })
+    vim.api.nvim_create_autocmd("DiagnosticChanged", {
+        group = group,
+        callback = function(args)
+            parts.diagnostics_changed(args.buf)
+        end,
     })
     vim.o.laststatus = 3
     vim.o.statusline = "%{%v:lua.require'statusline'.render()%}"

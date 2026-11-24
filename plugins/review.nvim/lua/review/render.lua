@@ -139,25 +139,21 @@ local function render_deleted(buf)
     -- The deleted lines by where they go, each with where it was in HEAD to order them by.
     local anchors, rows = {}, {}
     -- Deleted by commits against the base, and everything deleted against HEAD as uncommitted.
-    local function add(hunk, uncommitted)
-        -- A pure deletion starts at the line before it, so goes above the line after it unless it is at the end.
-        local row = hunk.count > 0 and hunk.start - 1 or hunk.start
-        for i in ipairs(hunk.deleted) do
-            local key = uncommitted and hunk.old + i - 1 or attached.committed_deletions[hunk.old + i - 1]
-            if key then
-                if not anchors[row] then
-                    anchors[row] = {}
-                    table.insert(rows, row)
+    for uncommitted, hunks in pairs({ [false] = attached.hunks, [true] = attached.local_hunks }) do
+        for _, hunk in ipairs(hunks) do
+            -- A pure deletion starts at the line before it, so goes above the line after it unless it is at the end.
+            local row = hunk.count > 0 and hunk.start - 1 or hunk.start
+            for i in ipairs(hunk.deleted) do
+                local key = uncommitted and hunk.old + i - 1 or attached.committed_deletions[hunk.old + i - 1]
+                if key then
+                    if not anchors[row] then
+                        anchors[row] = {}
+                        table.insert(rows, row)
+                    end
+                    table.insert(anchors[row], { key = key, order = i, hunk = hunk, uncommitted = uncommitted })
                 end
-                table.insert(anchors[row], { key = key, order = #anchors[row], hunk = hunk, i = i, uncommitted = uncommitted })
             end
         end
-    end
-    for _, hunk in ipairs(attached.hunks) do
-        add(hunk, false)
-    end
-    for _, hunk in ipairs(attached.local_hunks) do
-        add(hunk, true)
     end
     -- The marks drawn before, by where they are now and what they show.
     local drawn, existing = {}, {}
@@ -173,7 +169,7 @@ local function render_deleted(buf)
         row = above and row or line_count - 1
         local shown = above and "^" or "v"
         for _, line in ipairs(lines) do
-            shown = shown .. (line.uncommitted and "\n+" or "\n-") .. line.hunk.deleted[line.i]
+            shown = shown .. (line.uncommitted and "\n+" or "\n-") .. line.hunk.deleted[line.order]
         end
         local id = existing[row .. shown]
         if not id or drawn[id] then
@@ -182,7 +178,7 @@ local function render_deleted(buf)
                     local hunk = line.hunk
                     local cached = (lang or "") .. "\n" .. table.concat(hunk.deleted, "\n")
                     attached.highlights[cached] = attached.highlights[cached] or highlight_deleted(lang, hunk.deleted)
-                    local chunks = deleted_chunks(hunk.deleted[line.i], attached.highlights[cached][line.i] or {}, line.uncommitted, leftcol, tabstop)
+                    local chunks = deleted_chunks(hunk.deleted[line.order], attached.highlights[cached][line.order] or {}, line.uncommitted, leftcol, tabstop)
                     return vim.list_extend(M.gutter(buf, line.uncommitted, "Delete"), chunks)
                 end, lines),
                 virt_lines_above = above,
@@ -243,9 +239,9 @@ end
 local settled_rows = {}
 
 local function settle(win, buf)
-    local line = vim.api.nvim_win_get_cursor(win)[1]
+    local line, count = vim.api.nvim_win_get_cursor(win)[1], vim.api.nvim_buf_line_count(buf)
     -- Over the whole line with its line break, so it is only invalidated when the line is deleted.
-    local last = line == vim.api.nvim_buf_line_count(buf)
+    local last = line == count
     vim.api.nvim_buf_set_extmark(buf, anchor_namespace, line - 1, 0, {
         id = win,
         end_row = last and line - 1 or line,
@@ -257,7 +253,7 @@ local function settle(win, buf)
     settled_rows[win] = {
         buf = buf,
         line = line,
-        count = vim.api.nvim_buf_line_count(buf),
+        count = count,
         row = line_row(win, line),
         topline = top.topline,
         topfill = top.topfill,
@@ -305,26 +301,21 @@ end
 
 local function render(buf)
     vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
-    local uncommitted = {}
-    for _, hunk in ipairs(buffers[buf].local_hunks) do
-        if hunk.count > 0 then
-            sign(buf, hunk.start, hunk.start + hunk.count - 1, true, "Add")
-        end
-        for line = hunk.start, hunk.start + hunk.count - 1 do
-            uncommitted[line] = true
-        end
-    end
-    -- Committed lines in runs between the uncommitted ones.
-    for _, hunk in ipairs(buffers[buf].hunks) do
-        local first
-        for line = hunk.start, hunk.start + hunk.count do
-            if line < hunk.start + hunk.count and not uncommitted[line] then
-                first = first or line
-            elseif first then
-                sign(buf, first, line - 1, false, "Add")
-                first = nil
+    -- Whether each added line is uncommitted, signed in runs of the same.
+    local uncommitted, first = {}, nil
+    for i, hunks in ipairs({ buffers[buf].hunks, buffers[buf].local_hunks }) do
+        for _, hunk in ipairs(hunks) do
+            for line = hunk.start, hunk.start + hunk.count - 1 do
+                uncommitted[line] = i == 2
             end
         end
+    end
+    for line = 1, vim.api.nvim_buf_line_count(buf) + 1 do
+        if first and uncommitted[line] ~= uncommitted[first] then
+            sign(buf, first, line - 1, uncommitted[first], "Add")
+            first = nil
+        end
+        first = first or uncommitted[line] ~= nil and line or nil
     end
     render_deleted(buf)
     require("review.diagnostics").apply(buf)

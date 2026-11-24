@@ -90,6 +90,32 @@ function T.reviewing_files_hides_them_until_undone()
     assert(#done == 1 and winbar:find("100%%"), vim.inspect({ done, winbar }))
 end
 
+-- What the saved state has of use is kept, the rest ignored, and an emptied state saves and loads again.
+function T.broken_saved_state_loads_what_it_can()
+    h.repo(h.lines(5), h.lines(6))
+    vim.fn.mkdir(".git/review", "p")
+    local saved = {
+        "not json",
+        "5",
+        '{"reviewed": 5, "seen": "x", "undo": [1, {"changes": {}}, {"changes": {"file.txt": {"reviewed": "x", "seen": true}}}]}',
+    }
+    for _, text in ipairs(saved) do
+        vim.fn.writefile({ text }, ".git/review/branch..dev.json")
+        local _, _, panel_buf = h.review()
+        local listed = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
+        vim.v.errmsg = ""
+        -- Errors in mappings only show as messages.
+        vim.cmd("silent! normal uuuddu")
+        assert(vim.v.errmsg == "", text .. ": " .. vim.v.errmsg)
+        local undone = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
+        teardown()
+        _, _, panel_buf = h.review()
+        local reloaded = vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false)
+        teardown()
+        assert(#listed == 1 and vim.deep_equal(listed, undone) and vim.deep_equal(listed, reloaded), vim.inspect({ text, listed, undone, reloaded }))
+    end
+end
+
 function T.deleted_files_show_struck_through_and_open_as_deleted_lines()
     setup()
     require("review").stop()

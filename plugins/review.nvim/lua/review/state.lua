@@ -14,31 +14,24 @@ local function path()
     return session.git_dir .. "/review/" .. name .. ".json"
 end
 
-local function valid_history(stack)
-    return vim.tbl_filter(function(entry)
-        return type(entry) == "table" and type(entry.changes) == "table"
-    end, type(stack) == "table" and stack or {})
-end
-
-local function as_dict(tbl)
-    return next(tbl) and tbl or vim.empty_dict()
-end
-
+-- The saved state may be broken or from an older version.
 function M.load()
-    local ok, lines = pcall(vim.fn.readfile, path())
-    local decoded, saved = pcall(vim.json.decode, ok and table.concat(lines, "\n") or "")
-    saved = decoded and type(saved) == "table" and saved or {}
+    local ok, saved = pcall(function()
+        return vim.json.decode(table.concat(vim.fn.readfile(path()), "\n"))
+    end)
+    saved = ok and type(saved) == "table" and saved or {}
+    local function history(stack)
+        return vim.tbl_filter(function(entry)
+            return type(entry) == "table" and type(entry.changes) == "table"
+        end, type(stack) == "table" and stack or {})
+    end
     -- Without saved state nothing is new yet.
     local seen = type(saved.seen) == "table" and saved.seen
         or vim.tbl_map(function(file)
             return file.key
         end, session.files)
-    data = {
-        reviewed = type(saved.reviewed) == "table" and saved.reviewed or {},
-        seen = {},
-        undo = valid_history(saved.undo),
-        redo = valid_history(saved.redo),
-    }
+    local reviewed = type(saved.reviewed) == "table" and saved.reviewed or {}
+    data = { reviewed = reviewed, seen = {}, undo = history(saved.undo), redo = history(saved.redo) }
     for _, key in ipairs(seen) do
         data.seen[key] = true
     end
@@ -46,12 +39,8 @@ end
 
 function M.save()
     local file = path()
-    local encoded = vim.json.encode({
-        reviewed = as_dict(data.reviewed),
-        seen = vim.tbl_keys(data.seen),
-        undo = data.undo,
-        redo = data.redo,
-    })
+    -- An empty table encodes as a list, which loads the same.
+    local encoded = vim.json.encode({ reviewed = data.reviewed, seen = vim.tbl_keys(data.seen), undo = data.undo, redo = data.redo })
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
     vim.fn.writefile({ encoded }, file .. ".tmp")
     vim.uv.fs_rename(file .. ".tmp", file)

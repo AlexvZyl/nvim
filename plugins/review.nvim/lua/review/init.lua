@@ -74,12 +74,7 @@ end
 local function create_autocmds()
     local panel = require("review.panel")
     local render = require("review.render")
-    autocmd("ColorScheme", {
-        callback = function()
-            highlights.set()
-            require("review.diagnostics").colors()
-        end,
-    })
+    autocmd("ColorScheme", { callback = highlights.set })
     autocmd("BufEnter", {
         callback = function(args)
             panel.follow(args.buf)

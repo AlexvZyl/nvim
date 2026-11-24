@@ -2,7 +2,6 @@
 -- virtual text take it from the line highlight.
 local M = {}
 
-local namespace = vim.api.nvim_create_namespace("review")
 local handlers = {}
 -- Groups already combined, made again once the colorscheme changes.
 local combined = {}
@@ -72,14 +71,7 @@ local function restyle(buf, id, mark, line)
 end
 
 function M.apply(buf)
-    local changed = {}
-    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, namespace, 0, -1, { details = true })) do
-        if (mark[4].line_hl_group or ""):match("^Review%a*Add$") then
-            for row = mark[2], mark[4].end_row or mark[2] do
-                changed[row] = mark[4].line_hl_group
-            end
-        end
-    end
+    local changed = require("review.render").changed(buf)
     restyled[buf] = restyled[buf] or {}
     for _, ns in pairs(vim.diagnostic.get_namespaces()) do
         for _, kind in ipairs({ "sign_ns", "virt_text_ns", "virt_lines_ns" }) do
@@ -89,7 +81,7 @@ function M.apply(buf)
                 restyled[buf][id] = after
                 for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, id, 0, -1, {})) do
                     -- Only the marks on changed lines, or restyled before, need to be looked at.
-                    local line = changed[mark[2]]
+                    local line = changed[mark[2] + 1]
                     after[mark[1]] = line and true or nil
                     if line or before[mark[1]] then
                         restyle(buf, id, mark, line)

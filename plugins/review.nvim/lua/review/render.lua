@@ -291,22 +291,23 @@ end
 
 local function render(buf)
     vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
-    -- Whether each added line is uncommitted, signed in runs of the same.
-    local uncommitted, first = {}, nil
+    -- The highlight of each added line, signed in runs of the same.
+    local changed, first = {}, nil
     for i, hunks in ipairs({ buffers[buf].hunks, buffers[buf].local_hunks }) do
         for _, hunk in ipairs(hunks) do
             for line = hunk.start, hunk.start + hunk.count - 1 do
-                uncommitted[line] = i == 2
+                changed[line] = i == 1 and "ReviewAdd" or "ReviewLocalAdd"
             end
         end
     end
     for line = 1, vim.api.nvim_buf_line_count(buf) + 1 do
-        if first and uncommitted[line] ~= uncommitted[first] then
-            sign(buf, first, line - 1, uncommitted[first], "Add")
+        if first and changed[line] ~= changed[first] then
+            sign(buf, first, line - 1, changed[first] == "ReviewLocalAdd", "Add")
             first = nil
         end
-        first = first or uncommitted[line] ~= nil and line or nil
+        first = first or changed[line] and line
     end
+    buffers[buf].changed = changed
     render_deleted(buf)
     require("review.diagnostics").apply(buf)
 end
@@ -527,6 +528,11 @@ function M.reveal(buf)
             restore(win, { topline = 1, topfill = fill(win, 1) })
         end
     end
+end
+
+-- The highlight of each changed line, as last rendered.
+function M.changed(buf)
+    return buffers[buf] and buffers[buf].changed or {}
 end
 
 function M.first_hunk(buf)

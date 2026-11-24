@@ -148,4 +148,70 @@ function T.deleted_lines_render_before_the_redraw()
     assert(#deleted == 1 and deleted[1].text == "line 5", vim.inspect(deleted))
 end
 
+function T.lines_deleted_at_the_top_show_when_opened()
+    local base = h.lines(12)
+    h.repo(base, vim.list_slice(base, 3))
+    vim.cmd("silent! only | enew | silent! %bwipeout!")
+    local main = vim.api.nvim_get_current_win()
+    h.start()
+    vim.api.nvim_set_current_win(main)
+    vim.cmd.edit("file.txt")
+    local topfill = vim.fn.winsaveview().topfill
+    require("review").stop()
+    assert(topfill == 2, topfill)
+end
+
+function T.untracked_and_binary_files_are_not_rendered()
+    h.repo(h.lines(3), h.lines(4))
+    local function binary(text)
+        local file = assert(io.open("binary.bin", "wb"))
+        file:write(text)
+        file:close()
+    end
+    binary("a\0b")
+    vim.system({ "git", "add", "binary.bin" }):wait()
+    vim.system({ "git", "commit", "-qm", "binary" }):wait()
+    binary("c\0d")
+    vim.fn.writefile({ "new" }, "untracked.txt")
+    h.open()
+    for _, name in ipairs({ "binary.bin", "untracked.txt" }) do
+        vim.cmd.edit(name)
+        local buf = vim.api.nvim_get_current_buf()
+        require("review.render").attach(buf)
+        assert(not require("review.render").first_hunk(buf), name .. " attached")
+        assert(#h.marks(buf, "review", 1, 2) == 0, name .. " has marks")
+    end
+end
+
+function T.hunk_jumps_stop_at_the_first_and_last_hunk()
+    local base = h.lines(30)
+    local committed = vim.deepcopy(base)
+    for _, line in ipairs({ 5, 15, 25 }) do
+        committed[line] = "mod " .. line
+    end
+    h.repo(base, committed)
+    h.open()
+    local function jump(keys)
+        vim.cmd("normal " .. keys)
+        return vim.fn.line(".")
+    end
+    vim.cmd("normal! 1G")
+    local lines = { jump("]h"), jump("]h"), jump("]h"), jump("]h"), jump("[h"), jump("[h"), jump("[h") }
+    assert(vim.deep_equal(lines, { 5, 15, 25, 25, 15, 5, 5 }), vim.inspect(lines))
+end
+
+function T.an_invalid_ref_keeps_the_review()
+    h.repo(h.lines(3), h.lines(4))
+    vim.cmd("silent! only | enew | silent! %bwipeout!")
+    h.start()
+    local notify = vim.notify
+    vim.notify = function() end
+    require("review").start("nope")
+    vim.notify = notify
+    local session = require("review.session")
+    local ref, open = session.ref, require("review.panel").is_open()
+    require("review").stop()
+    assert(ref == "dev" and open, vim.inspect({ ref, open }))
+end
+
 return T

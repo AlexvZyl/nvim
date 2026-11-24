@@ -1,5 +1,14 @@
 local M = {}
 
+-- Not installed in CI.
+package.preload["nvim-web-devicons"] = function()
+    return {
+        get_icon = function()
+            return "", "Normal"
+        end,
+    }
+end
+
 local function git(dir, ...)
     local result = vim.system({ "git", "-C", dir, ... }, { text = true }):wait()
     assert(result.code == 0, table.concat({ ... }, " ") .. ": " .. (result.stderr or ""))
@@ -48,6 +57,12 @@ function M.open()
     require("review.render").attach(buf)
     M.flush()
     return buf
+end
+
+-- Starts the review from scratch, as a session left by open() would keep it from setting up.
+function M.start()
+    require("review").stop()
+    require("review").start("dev")
 end
 
 -- Runs the scheduled render and redraws, like the main loop between keys.

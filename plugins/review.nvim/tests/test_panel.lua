@@ -2,14 +2,6 @@ local h = require("tests.helpers")
 
 local T = {}
 
-package.preload["nvim-web-devicons"] = function()
-    return {
-        get_icon = function()
-            return "", "Normal"
-        end,
-    }
-end
-
 -- The panel open and focused over the file, with 80 changed files so it scrolls.
 local function setup()
     local files = {}
@@ -28,7 +20,7 @@ local function setup()
     vim.cmd("silent! %bwipeout!")
     vim.cmd.edit("file.txt")
     local main = vim.api.nvim_get_current_win()
-    require("review").start("dev")
+    h.start()
     return main, vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
 end
 
@@ -82,7 +74,7 @@ function T.deleted_files_show_struck_through_and_open_as_deleted_lines()
     vim.system({ "git", "rm", "-q", "file.txt" }):wait()
     vim.system({ "git", "commit", "-qm", "delete" }):wait()
     local main = vim.api.nvim_get_current_win()
-    require("review").start("dev")
+    h.start()
     local panel_buf = vim.api.nvim_get_current_buf()
     local row = vim.fn.search("file.txt$")
     assert(row > 0, "deleted file not listed")

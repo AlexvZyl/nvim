@@ -20,7 +20,8 @@ local MAPPINGS = {
 local SINGLE_SELECT_ICON = "   "
 local SINGLE_SELECT_ENTRY_PREFIX = "   "
 local LARGE_WIDTH = 141
-local SMALL_WIDTH = 120
+local SMALL_WIDTH = 140
+local SMALL_HEIGHT = 35
 local FULL_HEIGHT = 1000 -- HACK: 1.0 does not seem to work
 
 ----------------------------------------------------------------------------------------------------
@@ -70,7 +71,7 @@ large_no_preview = U.merge(baseline, large_no_preview)
 local small_no_preview = {
     layout_strategy = "center",
     layout_config = {
-        height = 30,
+        height = SMALL_HEIGHT,
         width = SMALL_WIDTH,
     },
 }

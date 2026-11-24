@@ -19,7 +19,14 @@ I do not use a distro becuase:
 
 ## Plugins
 
-I keep my own plugins in [plugins](plugins).  To load them with lazy:
+I keep my own plugins in [plugins](plugins).
+
+| Plugin | Description |
+|---|---|
+| [default.nvim](https://github.com/AlexvZyl/nvim/tree/main/plugins/default.nvim) | The default Neovim theme, slightly improved. |
+| [review.nvim](https://github.com/AlexvZyl/nvim/tree/main/plugins/review.nvim) | Review a branch against a base ref, in place. |
+
+To load them with lazy:
 
 ```lua
 {

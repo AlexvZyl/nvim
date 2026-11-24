@@ -291,17 +291,19 @@ function T.diagnostic_virtual_lines_on_changed_lines_get_the_review_background()
     local function chunks()
         local virt_ns = vim.diagnostic.get_namespace(ns).user_data.virt_lines_ns
         local mark = vim.api.nvim_buf_get_extmarks(buf, virt_ns, 0, -1, { details = true })[1]
-        return mark[4].virt_lines
+        return mark[4].virt_lines, mark[4].virt_lines_leftcol
     end
-    local changed = chunks()
+    local changed, leftcol = chunks()
     require("review.diagnostics").apply(buf)
     local shown_again = #chunks()[1]
     require("review").stop()
-    local stopped = chunks()
+    local stopped, stopped_leftcol = chunks()
     vim.diagnostic.reset(ns)
+    assert(leftcol and not stopped_leftcol, "gutter not drawn in")
     for _, line in ipairs(changed) do
-        for _, chunk in ipairs(line) do
-            local hl = vim.api.nvim_get_hl(0, { name = chunk[2], link = false })
+        assert(line[2][1]:match("^│") and line[2][2] == "ReviewSignAdd", vim.inspect(line))
+        for i = 3, #line do
+            local hl = vim.api.nvim_get_hl(0, { name = line[i][2], link = false })
             assert(hl.bg == 0x004400, vim.inspect(changed))
         end
         assert(line[#line][1]:match("^ +$"), "not padded")

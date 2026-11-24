@@ -121,6 +121,13 @@ local function textoff(buf)
     return vim.fn.getwininfo(window(buf))[1].textoff
 end
 
+-- The number and sign columns of a changed line, for virtual lines, which have none.
+function M.gutter(buf, uncommitted, kind)
+    local width = buffers[buf] and buffers[buf].textoff or textoff(buf)
+    local sign = SIGNS[uncommitted] .. string.rep(" ", width - 2)
+    return { { " ", "LineNr" }, { sign, "ReviewSign" .. (uncommitted and "Local" or "") .. kind } }
+end
+
 -- Drawn separately from the added lines, since they depend on the window's scroll and gutter.
 local function render_deleted(buf)
     vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
@@ -130,12 +137,6 @@ local function render_deleted(buf)
     local leftcol = view(window(buf)).leftcol
     local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
     local line_count = vim.api.nvim_buf_line_count(buf)
-    -- Virtual lines have no number or sign column, so draw them in.
-    local padding = string.rep(" ", attached.textoff - 2)
-    local signs = {
-        [false] = { SIGNS[false] .. padding, "ReviewSignDelete" },
-        [true] = { SIGNS[true] .. padding, "ReviewSignLocalDelete" },
-    }
     -- The deleted lines by where they go, each with where it was in HEAD to order them by.
     local anchors, rows = {}, {}
     -- Deleted by commits against the base, and everything deleted against HEAD as uncommitted.
@@ -152,7 +153,7 @@ local function render_deleted(buf)
                     table.insert(rows, row)
                 end
                 local lines = anchors[row]
-                local line = vim.list_extend({ { " ", "LineNr" }, signs[uncommitted] }, chunks)
+                local line = vim.list_extend(M.gutter(buf, uncommitted, "Delete"), chunks)
                 table.insert(lines, { key = key, order = #lines, chunks = line })
             end
         end
@@ -349,6 +350,7 @@ function M.update(buf)
             if attached.textoff ~= width then
                 attached.textoff = width
                 render_deleted(buf)
+                require("review.diagnostics").apply(buf)
             end
         end
     end)

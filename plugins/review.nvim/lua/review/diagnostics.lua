@@ -35,11 +35,18 @@ function M.apply(buf)
                     local group = combine(details.sign_hl_group, line, line and "ReviewSign" .. line:sub(7))
                     update, details.sign_hl_group = group ~= details.sign_hl_group, group
                 end
+                local gutter = details.virt_lines_leftcol
                 for _, chunks in ipairs(details.virt_lines or { details.virt_text }) do
-                    -- Virtual lines are padded to the edge like the line highlight, and the padding goes with it.
+                    -- Virtual lines get the gutter and are padded to the edge like the line highlight, which both
+                    -- go again with it.
                     local last = chunks[#chunks]
                     if details.virt_lines and last and last[1]:match("^ +$") and (last[2] or ""):match("^Review%a*Add$") then
                         table.remove(chunks)
+                        update = true
+                    end
+                    if gutter and (chunks[2] and chunks[2][2] or ""):match("^ReviewSign") then
+                        table.remove(chunks, 1)
+                        table.remove(chunks, 1)
                         update = true
                     end
                     for _, chunk in ipairs(chunks) do
@@ -50,7 +57,14 @@ function M.apply(buf)
                     end
                     if details.virt_lines and line then
                         table.insert(chunks, { string.rep(" ", vim.o.columns), line })
+                        local columns = require("review.render").gutter(buf, line == "ReviewLocalAdd", "Add")
+                        table.insert(chunks, 1, columns[2])
+                        table.insert(chunks, 1, columns[1])
                     end
+                end
+                if details.virt_lines then
+                    details.virt_lines_leftcol = line ~= nil
+                    update = update or details.virt_lines_leftcol ~= (gutter or false)
                 end
                 if update then
                     details.id, details.ns_id = mark[1], nil

@@ -497,22 +497,15 @@ local DELETED_PREFIX = "review://"
 
 -- A read-only buffer with a deleted file as it was at the merge base, all marked deleted, so the cursor can go
 -- through it.
-function M.deleted_buffer(path)
-    local buf = vim.fn.bufadd(DELETED_PREFIX .. path)
-    if vim.api.nvim_buf_is_loaded(buf) then
-        return buf
-    end
-    vim.bo[buf].buftype = "nofile"
-    vim.bo[buf].bufhidden = "hide"
-    vim.bo[buf].swapfile = false
-    vim.fn.bufload(buf)
+local function fill_deleted(buf, path)
     local lines = vim.split(git.show(session.merge_base, path) or "", "\n", { plain = true })
     if lines[#lines] == "" and #lines > 1 then
         table.remove(lines)
     end
+    vim.bo[buf].modifiable = true
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modifiable = false
-    vim.bo[buf].filetype = vim.filetype.match({ filename = path, buf = buf }) or ""
+    vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
     -- Still in HEAD when only deleted locally.
     local uncommitted = git.show("HEAD", path) ~= nil
     for i = 1, #lines do
@@ -524,7 +517,41 @@ function M.deleted_buffer(path)
             priority = config.options.sign_priority,
         })
     end
+end
+
+function M.deleted_buffer(path)
+    local buf = vim.fn.bufadd(DELETED_PREFIX .. path)
+    if vim.api.nvim_buf_is_loaded(buf) then
+        return buf
+    end
+    vim.bo[buf].buftype = "nofile"
+    vim.bo[buf].bufhidden = "hide"
+    vim.bo[buf].swapfile = false
+    vim.fn.bufload(buf)
+    fill_deleted(buf, path)
+    vim.bo[buf].filetype = vim.filetype.match({ filename = path, buf = buf }) or ""
     return buf
+end
+
+-- After git changed what is reviewed: buffers of files no longer deleted make way for the file, the others are
+-- rebuilt when what they show moved.
+function M.refresh_deleted(moved)
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.startswith(vim.api.nvim_buf_get_name(buf), DELETED_PREFIX) then
+            local path = M.path(buf)
+            local file = session.by_key[session.prefix .. path]
+            if not (file and file.deleted) then
+                for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+                    vim.api.nvim_win_call(win, function()
+                        vim.cmd.edit(vim.fn.fnameescape(path))
+                    end)
+                end
+                vim.api.nvim_buf_delete(buf, { force = true })
+            elseif moved then
+                fill_deleted(buf, path)
+            end
+        end
+    end
 end
 
 -- The path of a file from its buffer, also for a deleted file's.

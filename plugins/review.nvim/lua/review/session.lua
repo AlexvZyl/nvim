@@ -9,6 +9,8 @@ local function clear()
     -- Branch being reviewed.
     M.source = nil
     M.merge_base = nil
+    -- Commit HEAD was on when the files were last loaded.
+    M.head = nil
     M.git_dir = nil
     M.prefix = ""
     -- Changed files with their path from the cwd, key from the repo root and number of changed lines.
@@ -50,6 +52,7 @@ function M.load()
     end
     M.source = git.branch()
     M.merge_base = git.merge_base(M.ref)
+    M.head = git.head()
     M.prefix = git.prefix()
     M.files, M.by_key, M.total_changes = files, {}, 0
     for _, file in ipairs(files) do

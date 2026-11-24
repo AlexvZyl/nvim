@@ -16,6 +16,10 @@ function M.merge_base(ref)
     return trimmed("merge-base", "HEAD", ref)
 end
 
+function M.head()
+    return trimmed("rev-parse", "HEAD")
+end
+
 function M.branch()
     return trimmed("rev-parse", "--abbrev-ref", "HEAD") or "HEAD"
 end

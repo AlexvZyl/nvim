@@ -7,7 +7,7 @@ local timer, watcher, wrap
 
 -- Reloads from git after HEAD or the working tree changed.
 local function refresh()
-    local source, merge_base = session.source, session.merge_base
+    local source, merge_base, head = session.source, session.merge_base, session.head
     if not session.load() then
         return
     end
@@ -15,13 +15,16 @@ local function refresh()
         state.load()
         vim.notify("Reviewing " .. session.source .. " against " .. session.ref)
     end
-    if session.merge_base ~= merge_base then
+    local render = require("review.render")
+    -- What is committed moves with HEAD, which decides which changes are local.
+    if session.merge_base ~= merge_base or session.head ~= head then
         for _, buf in ipairs(vim.api.nvim_list_bufs()) do
             if vim.api.nvim_buf_is_loaded(buf) then
-                require("review.render").attach(buf)
+                render.attach(buf)
             end
         end
     end
+    render.refresh_deleted(session.merge_base ~= merge_base or session.head ~= head)
     require("review.panel").refresh()
 end
 

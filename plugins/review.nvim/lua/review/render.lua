@@ -334,7 +334,8 @@ function M.update(buf)
         return
     end
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-    local text = (#lines == 1 and lines[1] == "") and "" or table.concat(lines, "\n") .. "\n"
+    -- Like the file is written, with the line break at the end unless it had none when read.
+    local text = (#lines == 1 and lines[1] == "") and "" or table.concat(lines, "\n") .. (vim.bo[buf].eol and "\n" or "")
     local hunks = diff(attached.base, text)
     -- Without commits to the file everything is uncommitted.
     attached.hunks = hunks

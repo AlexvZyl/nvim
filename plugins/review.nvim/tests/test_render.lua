@@ -115,6 +115,19 @@ function T.deleted_lines_expand_tabs_and_scroll()
     assert(vim.deep_equal(shown, { "    café x", "  café x", "afé x" }), vim.inspect(shown))
 end
 
+-- Without a line break at the end the last line is not changed.
+function T.a_file_without_a_line_break_at_the_end_is_unchanged()
+    h.repo({ "a", "b" }, { "a", "b" })
+    local file = assert(io.open("file.txt", "wb"))
+    file:write("a\nb\nc")
+    file:close()
+    h.git("commit", "-qam", "no line break")
+    local buf = h.open()
+    local mark = h.marks(buf, "review", 3, 3)[1]
+    assert(mark and mark[4].sign_text == "│ ", vim.inspect(mark))
+    assert(#h.marks(buf, "review_deleted", 1, 3) == 0, vim.inspect(h.marks(buf, "review_deleted", 1, 3)))
+end
+
 function T.edits_rerender()
     h.repo(h.lines(12), h.lines(12))
     local buf = h.open()

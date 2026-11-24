@@ -1,6 +1,6 @@
 # "${HOME}/.config/nvim"
 
-[![review.nvim](https://github.com/AlexvZyl/nvim/actions/workflows/review.yml/badge.svg)](https://github.com/AlexvZyl/nvim/actions/workflows/review.yml)
+[![plugins](https://github.com/AlexvZyl/nvim/actions/workflows/plugins.yml/badge.svg)](https://github.com/AlexvZyl/nvim/actions/workflows/plugins.yml)
 
 <img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/9df1727d-fbc1-4987-93db-0f0e8f55c228" />
 

@@ -1,0 +1,37 @@
+name: plugins
+
+on:
+  push:
+    paths:
+      - "plugins/**"
+      - ".github/workflows/plugins.yml"
+  pull_request:
+    paths:
+      - "plugins/**"
+      - ".github/workflows/plugins.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [stable, nightly]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Neovim
+        run: |
+          curl -sSfL https://github.com/neovim/neovim/releases/download/${{ matrix.version }}/nvim-linux-x86_64.tar.gz | tar -xz -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+      # Every plugin with tests, all of them run even once one fails.
+      - name: Test
+        run: |
+          status=0
+          for run in plugins/*/tests/run.lua; do
+            plugin=$(dirname "$(dirname "$run")")
+            echo "::group::$(basename "$plugin")"
+            (cd "$plugin" && nvim --clean --headless -c "luafile tests/run.lua") || status=1
+            echo "::endgroup::"
+          done
+          exit $status

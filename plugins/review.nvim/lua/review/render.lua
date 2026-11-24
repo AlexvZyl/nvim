@@ -423,7 +423,8 @@ end
 
 function M.attach(buf)
     local file = vim.api.nvim_buf_get_name(buf)
-    if vim.bo[buf].buftype ~= "" or vim.fn.filereadable(file) == 0 then
+    -- Also when the file does not exist, to show a deleted file as all deleted lines.
+    if vim.bo[buf].buftype ~= "" or file == "" or vim.fn.isdirectory(file) == 1 then
         return
     end
     local base = session.merge_base and git.show(session.merge_base, file)
@@ -488,6 +489,21 @@ function M.scrolled()
             if buffers[buf] then
                 render_deleted(buf)
             end
+        end
+    end
+end
+
+-- Shows the deleted lines above the first line when the buffer is opened at the top, like for a deleted file.
+function M.reveal(buf)
+    if not buffers[buf] then
+        return
+    end
+    for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+        local view = vim.api.nvim_win_call(win, vim.fn.winsaveview)
+        if view.topline == 1 and view.topfill == 0 then
+            vim.api.nvim_win_call(win, function()
+                vim.fn.winrestview({ topline = 1, topfill = fill(win, 1) })
+            end)
         end
     end
 end

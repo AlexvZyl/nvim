@@ -17,11 +17,13 @@ local groups = {
     ReviewPanelNr = "CursorLineNr",
     ReviewChanged = "Changed",
     ReviewNew = "Added",
+    ReviewPanelDeleted = { strikethrough = true },
 }
 
 function M.set()
     for group, link in pairs(groups) do
-        vim.api.nvim_set_hl(0, group, { link = link, default = true })
+        local hl = type(link) == "table" and link or { link = link }
+        vim.api.nvim_set_hl(0, group, vim.tbl_extend("force", hl, { default = true }))
     end
 end
 

@@ -72,11 +72,17 @@ local function create_autocmds()
     })
     -- BufEnter as well: for a file not loaded yet, focus is put back after BufWinEnter.
     autocmd({ "BufEnter", "BufWinEnter" }, { callback = panel.guard })
+    autocmd("BufWinEnter", {
+        callback = function(args)
+            render.reveal(args.buf)
+        end,
+    })
     autocmd("WinScrolled", { callback = render.scrolled })
     autocmd("SafeState", { callback = render.settled })
     vim.on_key(safely(render.key), key_namespace)
     autocmd("WinResized", { callback = panel.resized })
-    autocmd({ "BufReadPost", "BufWritePost" }, {
+    -- BufNewFile for deleted files.
+    autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, {
         callback = function(args)
             render.attach(args.buf)
         end,

@@ -138,6 +138,12 @@ local function draw(cursor)
     vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
     for i, mark in ipairs(marks) do
         vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, mark)
+        if rows[i].deleted then
+            vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, mark.end_col + 1, {
+                end_col = #lines[i],
+                hl_group = "ReviewPanelDeleted",
+            })
+        end
     end
     vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor, #rows), 1), 0 })
     show_top_header()
@@ -204,6 +210,7 @@ local function select()
     if first then
         vim.api.nvim_win_set_cursor(0, { math.max(first.start, 1), 0 })
         vim.cmd("normal! zz")
+        render.reveal(vim.api.nvim_get_current_buf())
     end
     vim.api.nvim_set_current_win(win)
 end

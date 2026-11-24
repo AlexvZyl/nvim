@@ -42,7 +42,7 @@ end
 
 -- Files changed since the merge base with the ref, relative to the cwd. Nil when the diff fails.
 function M.changed_files(ref)
-    local numstat = M.run("diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--diff-filter=d", "--no-renames")
+    local numstat = M.run("diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames")
     if not numstat then
         return nil
     end
@@ -50,7 +50,12 @@ function M.changed_files(ref)
     for _, line in ipairs(vim.split(numstat, "\0", { trimempty = true })) do
         local added, deleted, path = line:match("^(%S+)\t(%S+)\t(.+)$")
         -- Binary files count as "-".
-        table.insert(files, { path = path, changes = (tonumber(added) or 0) + (tonumber(deleted) or 0) })
+        table.insert(files, {
+            path = path,
+            changes = (tonumber(added) or 0) + (tonumber(deleted) or 0),
+            -- The diff is against the working tree, so a deleted file is one not on disk.
+            deleted = vim.uv.fs_stat(path) == nil,
+        })
     end
     return files
 end

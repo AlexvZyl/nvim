@@ -75,4 +75,28 @@ function T.opening_from_the_panel_keeps_its_scroll()
     teardown()
 end
 
+function T.deleted_files_show_struck_through_and_open_as_deleted_lines()
+    setup()
+    require("review").stop()
+    vim.cmd("silent! only | enew | silent! %bwipeout!")
+    vim.system({ "git", "rm", "-q", "file.txt" }):wait()
+    vim.system({ "git", "commit", "-qm", "delete" }):wait()
+    local main = vim.api.nvim_get_current_win()
+    require("review").start("dev")
+    local panel_buf = vim.api.nvim_get_current_buf()
+    local row = vim.fn.search("file.txt$")
+    assert(row > 0, "deleted file not listed")
+    local struck = vim.iter(h.marks(panel_buf, "review_panel", row, row + 1)):any(function(mark)
+        return mark[4].hl_group == "ReviewPanelDeleted"
+    end)
+    assert(struck, "not struck through")
+    vim.api.nvim_set_current_win(main)
+    vim.cmd.edit("file.txt")
+    h.flush()
+    local marks = h.marks(vim.api.nvim_get_current_buf(), "review_deleted", 1, 1)
+    assert(#marks == 1 and #h.virt_lines(marks[1]) == 5, vim.inspect(marks))
+    assert(vim.fn.winsaveview().topfill == 5, "deleted lines above the top not shown")
+    teardown()
+end
+
 return T

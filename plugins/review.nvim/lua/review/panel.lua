@@ -7,7 +7,6 @@ local M = {}
 
 local namespace = vim.api.nvim_create_namespace("review_panel")
 local done_namespace = vim.api.nvim_create_namespace("review_panel_done")
-local MARK = "●"
 -- Fills up as the review progresses.
 local PROGRESS = { "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤" }
 local EMPTY, DONE = "󰝦", "󰄴"
@@ -17,58 +16,17 @@ local buf, win, selected
 -- Of the panel when another buffer was last opened in it.
 local view
 local rows = {}
-local top_header = false
 -- Rows that end their directory group.
 local group_ends = {}
 
-local function mark_text(key)
-    if state.changed(key) then
-        return { { " " .. MARK, "ReviewChanged" } }
-    end
-    if state.new(key) then
-        return { { " " .. MARK, "ReviewNew" } }
-    end
-end
-
 local function show_top_header()
     -- Without a header above the first row the filler would be drawn as a diff filler line.
-    if not top_header then
-        return
-    end
     vim.api.nvim_win_call(win, function()
-        local view = vim.fn.winsaveview()
-        if view.topline == 1 and view.topfill == 0 then
+        local top = vim.fn.winsaveview()
+        if rows[1] and top.topline == 1 and top.topfill == 0 then
             vim.fn.winrestview({ topline = 1, topfill = 1 })
         end
     end)
-end
-
--- The first directories of a path up to the configured depth, empty for files in the root.
-local function group_dir(path)
-    local dir = vim.fs.dirname(path)
-    if dir == "." then
-        return ""
-    end
-    local parts = vim.split(dir, "/", { plain = true })
-    return table.concat(parts, "/", 1, math.min(config.options.depth, #parts))
-end
-
-local function build_groups()
-    local groups, dirs = {}, {}
-    for _, file in ipairs(session.files) do
-        if state.pending(file.key) then
-            local dir = group_dir(file.path)
-            if not groups[dir] then
-                groups[dir] = {}
-                table.insert(dirs, dir)
-            end
-            table.insert(groups[dir], file)
-        end
-    end
-    table.sort(dirs)
-    return vim.tbl_map(function(dir)
-        return { dir = dir, files = groups[dir] }
-    end, dirs)
 end
 
 -- Centered in the panel once no files are left.
@@ -77,27 +35,24 @@ local function show_done()
     if #rows > 0 then
         return
     end
+    local count, undo = #session.files, config.options.keymaps.undo
     local message = { { DONE, "ReviewSignAdd" } }
-    if #session.files == 0 then
+    if count == 0 then
         table.insert(message, { "Nothing to review", "Comment" })
     else
-        local count = #session.files
         table.insert(message, { "Review complete", "Normal" })
-        table.insert(message, { string.format("%d file%s reviewed", count, count == 1 and "" or "s"), "Comment" })
-        local undo = config.options.keymaps.undo
+        table.insert(message, { ("%d file%s reviewed"):format(count, count == 1 and "" or "s"), "Comment" })
         if undo then
-            table.insert(message, { "", "Comment" })
-            table.insert(message, { undo .. " to undo", "Comment" })
+            vim.list_extend(message, { { "", "Comment" }, { undo .. " to undo", "Comment" } })
         end
     end
-    local width, height = vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win)
     -- The empty buffer line takes the first row.
     local virt_lines = {}
-    for _ = 1, math.floor((height - #message) / 2) - 1 do
+    for _ = 1, math.floor((vim.api.nvim_win_get_height(win) - #message) / 2) - 1 do
         table.insert(virt_lines, { { "", "Normal" } })
     end
     for _, chunk in ipairs(message) do
-        local pad = math.max(math.floor((width - vim.fn.strdisplaywidth(chunk[1])) / 2), 0)
+        local pad = math.max(math.floor((vim.api.nvim_win_get_width(win) - vim.fn.strdisplaywidth(chunk[1])) / 2), 0)
         -- Padding in its own chunk, so it does not get the text's background.
         table.insert(virt_lines, { { string.rep(" ", pad), "Normal" }, chunk })
     end
@@ -105,32 +60,40 @@ local function show_done()
 end
 
 local function draw(cursor)
-    local devicons = require("nvim-web-devicons")
-    local groups = build_groups()
-    rows = {}
-    group_ends = {}
-    local lines, marks, headers = {}, {}, {}
-    for _, group in ipairs(groups) do
-        headers[#rows + 1] = group.dir
-        for _, file in ipairs(group.files) do
+    -- Pending files grouped by their first directories up to the configured depth.
+    local groups, dirs = {}, {}
+    for _, file in ipairs(session.files) do
+        if state.pending(file.key) then
+            local parts = vim.split(vim.fs.dirname(file.path), "/", { plain = true })
+            local dir = parts[1] == "." and "" or table.concat(parts, "/", 1, math.min(config.options.depth, #parts))
+            if not groups[dir] then
+                groups[dir] = {}
+                table.insert(dirs, dir)
+            end
+            table.insert(groups[dir], file)
+        end
+    end
+    table.sort(dirs)
+    rows, group_ends = {}, {}
+    local lines, marks = {}, {}
+    for _, dir in ipairs(dirs) do
+        for i, file in ipairs(groups[dir]) do
             table.insert(rows, file)
             local name = vim.fn.fnamemodify(file.path, ":t")
-            local icon, hl = devicons.get_icon(name, nil, { default = true })
+            local icon, hl = require("nvim-web-devicons").get_icon(name, nil, { default = true })
             table.insert(lines, icon .. " " .. name)
+            local dot = state.changed(file.key) and "ReviewChanged" or state.new(file.key) and "ReviewNew"
             table.insert(marks, {
                 end_col = #icon,
                 hl_group = hl,
                 line_hl_group = file.key == selected and "ReviewPanelLine" or nil,
-                virt_text = mark_text(file.key),
+                virt_text = dot and { { " ●", dot } } or nil,
+                virt_lines = i == 1 and { { { " " .. FOLDER .. (dir ~= "" and " " .. dir or ""), "ReviewPanelDir" } } } or nil,
+                virt_lines_above = true,
+                virt_lines_leftcol = true,
             })
         end
         group_ends[#rows] = true
-    end
-    top_header = headers[1] ~= nil
-    for line, dir in pairs(headers) do
-        marks[line].virt_lines = { { { " " .. FOLDER .. (dir ~= "" and " " .. dir or ""), "ReviewPanelDir" } } }
-        marks[line].virt_lines_above = true
-        marks[line].virt_lines_leftcol = true
     end
     vim.bo[buf].modifiable = true
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -139,10 +102,7 @@ local function draw(cursor)
     for i, mark in ipairs(marks) do
         vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, mark)
         if rows[i].deleted then
-            vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, mark.end_col + 1, {
-                end_col = #lines[i],
-                hl_group = "ReviewPanelDeleted",
-            })
+            vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, mark.end_col + 1, { end_col = #lines[i], hl_group = "ReviewPanelDeleted" })
         end
     end
     vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor, #rows), 1), 0 })
@@ -152,16 +112,21 @@ local function draw(cursor)
     vim.cmd.redrawstatus({ bang = true })
 end
 
+-- Redraws with the session as it is now, keeping the cursor.
+function M.refresh()
+    if M.is_open() then
+        draw(vim.api.nvim_win_get_cursor(win)[1])
+    end
+end
+
 local function remove(first, last)
-    local keys = {}
-    for i = first, math.min(last, #rows) do
-        table.insert(keys, rows[i].key)
+    local keys = vim.tbl_map(function(file)
+        return file.key
+    end, vim.list_slice(rows, first, last))
+    if #keys > 0 then
+        state.review(keys, first)
+        draw(first)
     end
-    if #keys == 0 then
-        return
-    end
-    state.review(keys, first)
-    draw(first)
 end
 
 local function restore(step)
@@ -171,13 +136,10 @@ local function restore(step)
     end
 end
 
+-- The window focused before the panel, another one or a new one.
 local function target_window()
-    local previous = vim.fn.win_getid(vim.fn.winnr("#"))
-    if previous ~= 0 and previous ~= win and vim.api.nvim_win_get_config(previous).relative == "" then
-        return previous
-    end
-    for _, candidate in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        if candidate ~= win and vim.api.nvim_win_get_config(candidate).relative == "" then
+    for _, candidate in ipairs({ vim.fn.win_getid(vim.fn.winnr("#")), unpack(vim.api.nvim_tabpage_list_wins(0)) }) do
+        if candidate ~= 0 and candidate ~= win and vim.api.nvim_win_get_config(candidate).relative == "" then
             return candidate
         end
     end
@@ -197,25 +159,21 @@ local function select()
     end
     local target = target_window()
     if render.path(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":.") then
-        if marked then
-            draw(line)
-        end
-        return
+        return marked and draw(line)
     end
     selected = file.key
     draw(line)
     vim.api.nvim_set_current_win(target)
     if file.deleted then
         vim.api.nvim_win_set_buf(target, render.deleted_buffer(file.path))
-        vim.api.nvim_set_current_win(win)
-        return
-    end
-    vim.cmd.edit(vim.fn.fnameescape(file.path))
-    local first = render.first_hunk(vim.api.nvim_get_current_buf())
-    if first then
-        vim.api.nvim_win_set_cursor(0, { math.max(first.start, 1), 0 })
-        vim.cmd("normal! zz")
-        render.reveal(vim.api.nvim_get_current_buf())
+    else
+        vim.cmd.edit(vim.fn.fnameescape(file.path))
+        local first = render.first_hunk(vim.api.nvim_get_current_buf())
+        if first then
+            vim.api.nvim_win_set_cursor(0, { math.max(first.start, 1), 0 })
+            vim.cmd("normal! zz")
+            render.reveal(vim.api.nvim_get_current_buf())
+        end
     end
     vim.api.nvim_set_current_win(win)
 end
@@ -234,9 +192,7 @@ local function create_buffer()
     vim.api.nvim_create_autocmd("BufWinLeave", {
         buffer = buf,
         callback = function()
-            if vim.api.nvim_get_current_win() == win then
-                view = vim.fn.winsaveview()
-            end
+            view = vim.api.nvim_get_current_win() == win and vim.fn.winsaveview() or view
         end,
     })
     map("n", keys.open, select)
@@ -274,31 +230,19 @@ function M.guard()
     local cursor = vim.api.nvim_win_get_cursor(win)
     local target = target_window()
     vim.api.nvim_win_set_buf(win, buf)
-    if view then
-        vim.api.nvim_win_call(win, function()
-            vim.fn.winrestview(view)
-        end)
-    end
+    vim.api.nvim_win_call(win, function()
+        vim.fn.winrestview(view or {})
+    end)
     vim.api.nvim_win_set_buf(target, opened)
     vim.api.nvim_win_set_cursor(target, cursor)
     vim.api.nvim_set_current_win(target)
 end
 
-function M.follow(buf)
-    local key = session.prefix .. render.path(buf)
-    if key == selected or not session.by_key[key] then
-        return
-    end
-    selected = key
-    if M.is_open() then
-        draw(vim.api.nvim_win_get_cursor(win)[1])
-    end
-end
-
--- Redraws with the session as it is now, keeping the cursor.
-function M.refresh()
-    if M.is_open() then
-        draw(vim.api.nvim_win_get_cursor(win)[1])
+function M.follow(opened)
+    local key = session.prefix .. render.path(opened)
+    if key ~= selected and session.by_key[key] then
+        selected = key
+        M.refresh()
     end
 end
 
@@ -336,17 +280,20 @@ function M.toggle()
     vim.cmd("topleft vertical " .. config.options.width .. "split")
     win = vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_buf(win, buf)
-    local wo = vim.wo[win][0]
-    wo.number = true
-    wo.relativenumber = false
-    wo.cursorline = false
-    wo.wrap = false
-    wo.list = false
-    wo.spell = false
-    wo.winfixwidth = true
-    wo.signcolumn = "no"
-    wo.statuscolumn = " %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator# "
-    wo.winbar = " " .. ICON .. " %{%v:lua.require'review.panel'.winbar()%}"
+    for option, value in pairs({
+        number = true,
+        relativenumber = false,
+        cursorline = false,
+        wrap = false,
+        list = false,
+        spell = false,
+        winfixwidth = true,
+        signcolumn = "no",
+        statuscolumn = " %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator# ",
+        winbar = " " .. ICON .. " %{%v:lua.require'review.panel'.winbar()%}",
+    }) do
+        vim.wo[win][0][option] = value
+    end
     draw(1)
 end
 
@@ -359,11 +306,9 @@ function M.winbar()
     -- Only done once no files are left, however small, so binary files and an empty diff count too.
     local done = #rows == 0
     local percent = done and 100 or total > 0 and math.min(math.floor((total - remaining) / total * 100), 99) or 0
-    local icon = done and DONE
-        or percent == 0 and EMPTY
-        or PROGRESS[math.max(math.ceil(percent * #PROGRESS / 100), 1)]
-    local metrics = string.format("%d%%%% %s", percent, icon)
-    local branches = string.format("%s  %s", session.source, session.ref)
+    local icon = done and DONE or percent == 0 and EMPTY or PROGRESS[math.max(math.ceil(percent * #PROGRESS / 100), 1)]
+    local metrics = ("%d%%%% %s"):format(percent, icon)
+    local branches = ("%s  %s"):format(session.source, session.ref)
     if vim.fn.strdisplaywidth(branches .. metrics) + 7 > vim.api.nvim_win_get_width(0) then
         branches = " " .. session.ref
     end

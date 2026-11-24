@@ -15,5 +15,5 @@ require("default").load({
 ## Commands
 
 | Command | Function | Does |
-|---|---|---|
+|:---:|---|---|
 | `:colorscheme default` | `require("default").load(opts)` | Loads the theme. |

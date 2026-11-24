@@ -25,11 +25,11 @@ require("review").setup({
 ## Commands
 
 | Command | Function | Does |
-|---|---|---|
-| | `require("review").setup(opts)` | Sets up the commands and keymaps. |
+|:---:|---|---|
+| - | `require("review").setup(opts)` | Sets up the commands and keymaps. |
 | `:Review [ref]` | `require("review").start(ref)` | Starts or switches the review and opens the panel. |
 | `:ReviewStop` | `require("review").stop()` | Stops reviewing. |
 | `:ReviewReset` | `require("review").reset()` | Forgets which files were reviewed. |
-| | `require("review").panel()` | Toggles the panel. |
+| - | `require("review").panel()` | Toggles the panel. |
 | `:Telescope review` | `require("review").files(opts)` | Picks a changed file. |
-| | `require("review").active()` | Whether a review is running. |
+| - | `require("review").active()` | Whether a review is running. |

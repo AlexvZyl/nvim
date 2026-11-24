@@ -20,7 +20,7 @@ require("statusline").setup({
 ## Commands
 
 | Command | Function | Does |
-|---|---|---|
-| | `require("statusline").setup(opts)` | Sets the statusline. |
-| | `require("statusline").render()` | The statusline string. |
-| | `require("statusline").refresh()` | Redraws the statusline. |
+|:---:|---|---|
+| - | `require("statusline").setup(opts)` | Sets the statusline. |
+| - | `require("statusline").render()` | The statusline string. |
+| - | `require("statusline").refresh()` | Redraws the statusline. |

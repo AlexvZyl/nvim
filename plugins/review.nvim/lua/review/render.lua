@@ -115,7 +115,7 @@ local function render_deleted(buf)
     end
     local line_count = vim.api.nvim_buf_line_count(buf)
     -- The deleted lines by where they go, each with where it was in HEAD to order them by.
-    local anchors, rows = {}, {}
+    local anchors = {}
     -- Deleted by commits against the base, and everything deleted against HEAD as uncommitted.
     for uncommitted, hunks in pairs({ [false] = attached.hunks, [true] = attached.local_hunks }) do
         for _, hunk in ipairs(hunks) do
@@ -124,10 +124,7 @@ local function render_deleted(buf)
             for i in ipairs(hunk.deleted) do
                 local key = uncommitted and hunk.old + i - 1 or attached.committed_deletions[hunk.old + i - 1]
                 if key then
-                    if not anchors[row] then
-                        anchors[row] = {}
-                        table.insert(rows, row)
-                    end
+                    anchors[row] = anchors[row] or {}
                     table.insert(anchors[row], { key = key, order = i, hunk = hunk, uncommitted = uncommitted })
                 end
             end
@@ -138,8 +135,7 @@ local function render_deleted(buf)
     for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, deleted_namespace, 0, -1, {})) do
         existing[mark[2] .. attached.drawn[mark[1]]] = mark[1]
     end
-    for _, row in ipairs(rows) do
-        local lines = anchors[row]
+    for row, lines in pairs(anchors) do
         table.sort(lines, function(a, b)
             return a.key == b.key and a.order < b.order or a.key < b.key
         end)
@@ -288,8 +284,8 @@ function M.attach(buf)
     -- No base when the file was added since the merge base, no head when it was added since HEAD.
     local base = session.merge_base and git.show(session.merge_base, file)
     local head = git.show("HEAD", file)
-    if (not base and not head) or (base or ""):find("\0", 1, true) or (head or ""):find("\0", 1, true) then
-        -- Untracked, outside the repo or binary.
+    -- Untracked, outside the repo or binary.
+    if not (base or head) or ((base or "") .. (head or "")):find("\0", 1, true) then
         return M.detach(buf)
     end
     if not buffers[buf] then

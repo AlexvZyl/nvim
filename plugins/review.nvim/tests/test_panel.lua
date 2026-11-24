@@ -182,6 +182,20 @@ function T.an_empty_review_is_done()
     assert(message[#message][2][1] == "Nothing to review" and winbar:find("100%%"), vim.inspect({ message, winbar }))
 end
 
+-- Alone, the panel opens files in a new window next to it.
+function T.opening_from_a_lone_panel_opens_a_window()
+    h.repo(h.lines(5), h.lines(6))
+    local _, panel, panel_buf = h.review()
+    vim.cmd("only")
+    vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
+    local wins = vim.api.nvim_tabpage_list_wins(0)
+    local other = wins[1] == panel and wins[2] or wins[1]
+    local opened = other and vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(other))
+    local kept = vim.api.nvim_win_get_buf(panel) == panel_buf
+    teardown()
+    assert(#wins == 2 and kept and opened:match("file.txt$"), vim.inspect({ wins, kept, opened }))
+end
+
 -- What the saved state has of use is kept, the rest ignored, and an emptied state saves and loads again.
 function T.broken_saved_state_loads_what_it_can()
     h.repo(h.lines(5), h.lines(6))

@@ -130,4 +130,31 @@ function T.a_reviewed_file_comes_back_changed_once_committed_again()
     assert(mark and mark[4].virt_text and mark[4].virt_text[1][2] == "ReviewChanged", vim.inspect(mark))
 end
 
+-- A file that comes in once the review was saved is marked new until opened.
+function T.a_file_added_later_is_new_until_opened()
+    h.repo(h.lines(5), h.lines(6))
+    local main, panel, panel_buf = h.review()
+    local function dot()
+        local row = vim.fn.search("added.txt$") - 1
+        local mark = h.marks(panel_buf, "review_panel", row + 1, row + 1)[1]
+        return mark and mark[4].virt_text and mark[4].virt_text[1][2]
+    end
+    -- Saves the state with the file seen.
+    vim.api.nvim_feedkeys("ddu", "x", false)
+    vim.fn.writefile({ "a" }, "added.txt")
+    h.git("add", ".")
+    h.git("commit", "-qm", "added")
+    wait(function()
+        return panel_lines():match("added.txt") ~= nil
+    end, "added file not listed")
+    local marked = dot()
+    vim.api.nvim_set_current_win(panel)
+    vim.fn.cursor(vim.fn.search("added.txt$"), 1)
+    vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
+    local opened = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(main))
+    local cleared = dot()
+    require("review").stop()
+    assert(marked == "ReviewNew" and not cleared and opened:match("added.txt$"), vim.inspect({ marked, cleared, opened }))
+end
+
 return T

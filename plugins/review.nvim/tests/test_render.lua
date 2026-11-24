@@ -163,6 +163,11 @@ function T.lines_deleted_at_the_top_show_when_opened_from_the_panel()
     assert(topfill == 2, topfill)
 end
 
+-- Width of the number and sign columns of the window.
+local function textoff()
+    return vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+end
+
 -- Width of the number and sign columns drawn in the first of the deleted lines.
 local function gutter(buf)
     local chunks = h.marks(buf, "review_deleted", 1, 20)[1][4].virt_lines[1]
@@ -178,7 +183,7 @@ function T.deleted_lines_keep_the_gutter_width_while_editing()
     vim.cmd("redraw")
     h.keys("5Gdd")
     h.keys("u")
-    local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    local width = textoff()
     vim.cmd("normal! 5Gdd")
     require("review.render").update(buf)
     local drawn = gutter(buf)
@@ -192,7 +197,7 @@ function T.deleted_lines_follow_the_gutter_when_numbers_are_shown()
     h.keys("5Gdd")
     vim.wo.number = true
     h.flush()
-    local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    local width = textoff()
     local drawn = gutter(buf)
     vim.wo.number = false
     assert(drawn == width, ("gutter %d, window %d"):format(drawn, width))
@@ -229,10 +234,10 @@ function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
     h.repo(h.lines(20), h.lines(20))
     vim.wo.number, vim.wo.signcolumn = true, "auto"
     local buf = h.open()
-    local before = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    local before = textoff()
     h.keys("5Gccx\27")
     h.flush()
-    local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    local width = textoff()
     local drawn = gutter(buf)
     vim.wo.number, vim.wo.signcolumn = false, "yes"
     assert(width > before, ("gutter did not widen: %d"):format(width))

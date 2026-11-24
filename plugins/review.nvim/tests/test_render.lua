@@ -161,6 +161,40 @@ function T.lines_deleted_at_the_top_show_when_opened()
     assert(topfill == 2, topfill)
 end
 
+-- The panel puts the first hunk in the middle of the window, which hides what is above the first line again.
+function T.lines_deleted_at_the_top_show_when_opened_from_the_panel()
+    local base = h.lines(12)
+    h.repo(base, vim.list_slice(base, 3))
+    vim.cmd("silent! only | enew | silent! %bwipeout!")
+    local main = vim.api.nvim_get_current_win()
+    h.start()
+    vim.fn.cursor(vim.fn.search("file.txt$"), 1)
+    vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
+    local topfill = vim.api.nvim_win_call(main, vim.fn.winsaveview).topfill
+    require("review").stop()
+    assert(topfill == 2, topfill)
+end
+
+-- A statuscolumn with relative numbers measures narrower right after an edit, until the redraw.
+function T.deleted_lines_keep_the_gutter_width_while_editing()
+    local base = h.lines(20)
+    h.repo(base, base)
+    local buf = h.open()
+    vim.wo.number, vim.wo.relativenumber = true, true
+    vim.wo.statuscolumn = "%#LineNr# %*%s%=%{v:relnum?v:relnum:v:lnum}%*  "
+    vim.cmd("redraw")
+    h.keys("5Gdd")
+    h.keys("u")
+    local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
+    vim.cmd("normal! 5Gdd")
+    require("review.render").update(buf)
+    local mark = h.marks(buf, "review_deleted", 1, 20)[1]
+    vim.wo.number, vim.wo.relativenumber, vim.wo.statuscolumn = false, false, ""
+    local chunks = mark[4].virt_lines[1]
+    local gutter = vim.fn.strdisplaywidth(chunks[1][1] .. chunks[2][1])
+    assert(gutter == width, ("gutter %d, window %d"):format(gutter, width))
+end
+
 function T.untracked_and_binary_files_are_not_rendered()
     h.repo(h.lines(3), h.lines(4))
     local function binary(text)

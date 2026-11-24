@@ -143,6 +143,21 @@ local function deletes_up(keys, count)
     end)
 end
 
+-- Typed faster than the screen settles, only the key handler sees where the selection started.
+function T.a_selection_up_typed_fast_puts_the_cursor_above()
+    local buf = setup()
+    local main = vim.api.nvim_get_current_win()
+    h.start()
+    vim.api.nvim_set_current_win(main)
+    h.place(60, 10)
+    vim.api.nvim_feedkeys("jjVkkkkd", "xt", false)
+    require("review.render").update(buf)
+    h.flush()
+    local line = vim.fn.line(".")
+    require("review").stop()
+    assert(line == 57, line)
+end
+
 function T.deleting_up_with_a_motion_puts_the_cursor_above()
     deletes_up("dk", 2)
 end

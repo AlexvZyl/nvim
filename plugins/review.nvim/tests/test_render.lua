@@ -370,6 +370,26 @@ function T.hunk_jumps_stop_at_the_first_and_last_hunk()
     assert(vim.deep_equal(lines, { 5, 15, 25, 25, 15, 5, 5 }), vim.inspect(lines))
 end
 
+-- An error in a callback stops the review once, instead of on every event after.
+function T.an_error_stops_the_review_with_a_message()
+    h.repo(h.lines(5), h.lines(6))
+    h.review("file.txt")
+    local diagnostics = require("review.diagnostics")
+    local apply, notify, messages = diagnostics.apply, vim.notify, {}
+    diagnostics.apply = function()
+        error("broken")
+    end
+    vim.notify = function(message)
+        table.insert(messages, message)
+    end
+    vim.cmd("doautocmd TextChanged")
+    h.flush()
+    diagnostics.apply, vim.notify = apply, notify
+    local active = require("review").active()
+    require("review").stop()
+    assert(not active and #messages == 1 and messages[1]:find("broken"), vim.inspect({ active, messages }))
+end
+
 function T.an_invalid_ref_keeps_the_review()
     h.repo(h.lines(3), h.lines(4))
     h.review()

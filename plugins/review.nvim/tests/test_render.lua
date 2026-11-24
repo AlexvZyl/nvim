@@ -4,43 +4,31 @@ local T = {}
 
 -- Committed: line 10 modified. Uncommitted: line 5 modified, line 7 deleted and the committed line 10 deleted.
 local function setup()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    committed[10] = "mod 10"
-    local working = vim.deepcopy(committed)
-    working[5] = "local 5"
-    table.remove(working, 10)
-    table.remove(working, 7)
-    h.repo(base, committed, working)
+    local committed = h.edit(h.lines(12), { [10] = "mod 10" })
+    h.repo(h.lines(12), committed, h.edit(committed, { [5] = "local 5", [7] = false, [10] = false }))
     return h.open()
 end
 
-local function find(marks, line)
-    for _, mark in ipairs(marks) do
-        if mark[2] + 1 == line then
-            return mark
-        end
-    end
+-- The mark of the namespace starting on the line.
+local function find(buf, namespace, line)
+    return h.marks(buf, namespace, line, line)[1]
 end
 
 function T.committed_lines_have_a_solid_sign_and_background()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    committed[10] = "mod 10"
-    h.repo(base, committed)
+    h.repo(h.lines(12), h.edit(h.lines(12), { [10] = "mod 10" }))
     local buf = h.open()
-    local mark = find(h.marks(buf, "review", 1, 12), 10)
+    local mark = find(buf, "review", 10)
     assert(mark, "no mark on the committed line")
     assert(mark[4].sign_text == "│ ", vim.inspect(mark[4].sign_text))
     assert(mark[4].line_hl_group == "ReviewAdd")
-    local deleted = h.virt_lines(find(h.marks(buf, "review_deleted", 1, 12), 10))
+    local deleted = h.virt_lines(find(buf, "review_deleted", 10))
     assert(#deleted == 1 and deleted[1].text == "line 10" and deleted[1].sign == "│", vim.inspect(deleted))
     assert(deleted[1].group == "ReviewSignDelete")
 end
 
 function T.uncommitted_lines_have_a_dashed_sign()
     local buf = setup()
-    local mark = find(h.marks(buf, "review", 1, 12), 5)
+    local mark = find(buf, "review", 5)
     assert(mark, "no mark on the uncommitted line")
     assert(mark[4].sign_text == "╎ ", vim.inspect(mark[4].sign_text))
     assert(mark[4].sign_hl_group == "ReviewSignLocalAdd")
@@ -75,72 +63,53 @@ local function deleted_texts(buf)
     return texts
 end
 
+-- Deleted lines show in the order they were in, wherever they were deleted.
+local function shows_in_order(committed, working, texts)
+    committed = h.edit(h.lines(12), committed)
+    h.repo(h.lines(12), committed, h.edit(committed, working))
+    local shown = deleted_texts(h.open())
+    assert(vim.deep_equal(shown, texts), vim.inspect(shown))
+end
+
 function T.deleted_lines_show_in_order_when_deleted_before_committed_deletions()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    table.remove(committed, 7)
-    table.remove(committed, 6)
-    local working = vim.deepcopy(committed)
-    table.remove(working, 5)
-    h.repo(base, committed, working)
-    local texts = deleted_texts(h.open())
-    assert(vim.deep_equal(texts, { "line 5", "line 6", "line 7" }), vim.inspect(texts))
+    shows_in_order({ [6] = false, [7] = false }, { [5] = false }, { "line 5", "line 6", "line 7" })
 end
 
 function T.deleted_lines_show_in_order_when_deleted_after_committed_deletions()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    table.remove(committed, 6)
-    local working = vim.deepcopy(committed)
-    table.remove(working, 6)
-    h.repo(base, committed, working)
-    local texts = deleted_texts(h.open())
-    assert(vim.deep_equal(texts, { "line 6", "line 7" }), vim.inspect(texts))
+    shows_in_order({ [6] = false }, { [6] = false }, { "line 6", "line 7" })
 end
 
 function T.deleted_lines_show_in_order_when_a_committed_change_is_deleted()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    committed[6] = "mod 6"
-    local working = vim.deepcopy(committed)
-    table.remove(working, 6)
-    h.repo(base, committed, working)
-    local texts = deleted_texts(h.open())
-    assert(vim.deep_equal(texts, { "line 6", "mod 6" }), vim.inspect(texts))
+    shows_in_order({ [6] = "mod 6" }, { [6] = false }, { "line 6", "mod 6" })
 end
 
 function T.deleting_everything_renders()
-    local base = h.lines(3)
-    h.repo(base, base, {})
+    h.repo(h.lines(3), h.lines(3), {})
     local buf = h.open()
     local marks = h.marks(buf, "review_deleted", 1, 1)
     assert(#marks == 1 and #h.virt_lines(marks[1]) == 3, vim.inspect(marks))
 end
 
 function T.deletion_at_the_end_goes_below_the_last_line()
-    local base = h.lines(5)
-    local committed = vim.list_slice(base, 1, 4)
-    h.repo(base, committed)
+    h.repo(h.lines(5), h.lines(4))
     local buf = h.open()
     local mark = h.marks(buf, "review_deleted", 1, 5)[1]
     assert(mark and mark[2] == 3 and not mark[4].virt_lines_above, vim.inspect(mark))
 end
 
 function T.edits_rerender()
-    local base = h.lines(12)
-    h.repo(base, base)
+    h.repo(h.lines(12), h.lines(12))
     local buf = h.open()
     assert(#h.marks(buf, "review", 1, 12) == 0)
     vim.cmd("normal! 3G")
     h.keys("Ax")
-    local mark = find(h.marks(buf, "review", 1, 12), 3)
+    local mark = find(buf, "review", 3)
     assert(mark and mark[4].sign_hl_group == "ReviewSignLocalAdd", vim.inspect(mark))
 end
 
 -- TextChanged comes before the redraw, rendered later the edit flashes without the deleted lines.
 function T.deleted_lines_render_before_the_redraw()
-    local base = h.lines(12)
-    h.repo(base, base)
+    h.repo(h.lines(12), h.lines(12))
     local buf = h.open()
     vim.cmd("normal! 5Gdd")
     require("review.render").update(buf)
@@ -149,13 +118,8 @@ function T.deleted_lines_render_before_the_redraw()
 end
 
 function T.lines_deleted_at_the_top_show_when_opened()
-    local base = h.lines(12)
-    h.repo(base, vim.list_slice(base, 3))
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    local main = vim.api.nvim_get_current_win()
-    h.start()
-    vim.api.nvim_set_current_win(main)
-    vim.cmd.edit("file.txt")
+    h.repo(h.lines(12), vim.list_slice(h.lines(12), 3))
+    h.review("file.txt")
     local topfill = vim.fn.winsaveview().topfill
     require("review").stop()
     assert(topfill == 2, topfill)
@@ -163,11 +127,8 @@ end
 
 -- The panel puts the first hunk in the middle of the window, which hides what is above the first line again.
 function T.lines_deleted_at_the_top_show_when_opened_from_the_panel()
-    local base = h.lines(12)
-    h.repo(base, vim.list_slice(base, 3))
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    local main = vim.api.nvim_get_current_win()
-    h.start()
+    h.repo(h.lines(12), vim.list_slice(h.lines(12), 3))
+    local main = h.review()
     vim.fn.cursor(vim.fn.search("file.txt$"), 1)
     vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
     local topfill = vim.api.nvim_win_call(main, vim.fn.winsaveview).topfill
@@ -175,10 +136,15 @@ function T.lines_deleted_at_the_top_show_when_opened_from_the_panel()
     assert(topfill == 2, topfill)
 end
 
+-- Width of the number and sign columns drawn in the first of the deleted lines.
+local function gutter(buf)
+    local chunks = h.marks(buf, "review_deleted", 1, 20)[1][4].virt_lines[1]
+    return vim.fn.strdisplaywidth(chunks[1][1] .. chunks[2][1])
+end
+
 -- A statuscolumn with relative numbers measures narrower right after an edit, until the redraw.
 function T.deleted_lines_keep_the_gutter_width_while_editing()
-    local base = h.lines(20)
-    h.repo(base, base)
+    h.repo(h.lines(20), h.lines(20))
     local buf = h.open()
     vim.wo.number, vim.wo.relativenumber = true, true
     vim.wo.statuscolumn = "%#LineNr# %*%s%=%{v:relnum?v:relnum:v:lnum}%*  "
@@ -188,41 +154,29 @@ function T.deleted_lines_keep_the_gutter_width_while_editing()
     local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
     vim.cmd("normal! 5Gdd")
     require("review.render").update(buf)
-    local mark = h.marks(buf, "review_deleted", 1, 20)[1]
+    local drawn = gutter(buf)
     vim.wo.number, vim.wo.relativenumber, vim.wo.statuscolumn = false, false, ""
-    local chunks = mark[4].virt_lines[1]
-    local gutter = vim.fn.strdisplaywidth(chunks[1][1] .. chunks[2][1])
-    assert(gutter == width, ("gutter %d, window %d"):format(gutter, width))
+    assert(drawn == width, ("gutter %d, window %d"):format(drawn, width))
 end
 
 -- With signcolumn=auto the first sign widens the gutter only once it is drawn, after the render.
 function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
-    local base = h.lines(20)
-    h.repo(base, base)
+    h.repo(h.lines(20), h.lines(20))
     vim.wo.number, vim.wo.signcolumn = true, "auto"
     local buf = h.open()
     local before = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
     h.keys("5Gccx\27")
     h.flush()
     local width = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].textoff
-    local mark = h.marks(buf, "review_deleted", 1, 20)[1]
+    local drawn = gutter(buf)
     vim.wo.number, vim.wo.signcolumn = false, "yes"
     assert(width > before, ("gutter did not widen: %d"):format(width))
-    local chunks = mark[4].virt_lines[1]
-    local gutter = vim.fn.strdisplaywidth(chunks[1][1] .. chunks[2][1])
-    assert(gutter == width, ("gutter %d, window %d"):format(gutter, width))
+    assert(drawn == width, ("gutter %d, window %d"):format(drawn, width))
 end
 
 function T.diagnostic_signs_on_changed_lines_get_the_review_background()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    committed[10] = "mod 10"
-    h.repo(base, committed)
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    local main = vim.api.nvim_get_current_win()
-    h.start()
-    vim.api.nvim_set_current_win(main)
-    vim.cmd.edit("file.txt")
+    h.repo(h.lines(12), h.edit(h.lines(12), { [10] = "mod 10" }))
+    h.review("file.txt")
     local buf = vim.api.nvim_get_current_buf()
     vim.api.nvim_set_hl(0, "ReviewSignAdd", { fg = "#00ff00", bg = "#002200" })
     vim.api.nvim_set_hl(0, "ReviewSignLocalAdd", { fg = "#00ff00", bg = "#003300" })
@@ -273,15 +227,8 @@ function T.diagnostic_signs_on_changed_lines_get_the_review_background()
 end
 
 function T.diagnostic_virtual_lines_on_changed_lines_get_the_review_background()
-    local base = h.lines(12)
-    local committed = vim.deepcopy(base)
-    committed[10] = "mod 10"
-    h.repo(base, committed)
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    local main = vim.api.nvim_get_current_win()
-    h.start()
-    vim.api.nvim_set_current_win(main)
-    vim.cmd.edit("file.txt")
+    h.repo(h.lines(12), h.edit(h.lines(12), { [10] = "mod 10" }))
+    h.review("file.txt")
     local buf = vim.api.nvim_get_current_buf()
     vim.api.nvim_set_hl(0, "ReviewAdd", { bg = "#004400" })
     vim.api.nvim_set_hl(0, "DiagnosticVirtualLinesError", { fg = "#ff0000" })
@@ -324,8 +271,8 @@ function T.untracked_and_binary_files_are_not_rendered()
         file:close()
     end
     binary("a\0b")
-    vim.system({ "git", "add", "binary.bin" }):wait()
-    vim.system({ "git", "commit", "-qm", "binary" }):wait()
+    h.git("add", "binary.bin")
+    h.git("commit", "-qm", "binary")
     binary("c\0d")
     vim.fn.writefile({ "new" }, "untracked.txt")
     h.open()
@@ -339,12 +286,7 @@ function T.untracked_and_binary_files_are_not_rendered()
 end
 
 function T.hunk_jumps_stop_at_the_first_and_last_hunk()
-    local base = h.lines(30)
-    local committed = vim.deepcopy(base)
-    for _, line in ipairs({ 5, 15, 25 }) do
-        committed[line] = "mod " .. line
-    end
-    h.repo(base, committed)
+    h.repo(h.lines(30), h.edit(h.lines(30), { [5] = "mod 5", [15] = "mod 15", [25] = "mod 25" }))
     h.open()
     local function jump(keys)
         vim.cmd("normal " .. keys)
@@ -357,8 +299,7 @@ end
 
 function T.an_invalid_ref_keeps_the_review()
     h.repo(h.lines(3), h.lines(4))
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    h.start()
+    h.review()
     local notify = vim.notify
     vim.notify = function() end
     require("review").start("nope")

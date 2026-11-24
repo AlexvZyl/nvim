@@ -28,6 +28,25 @@ function M.lines(n)
     return lines
 end
 
+-- Runs git in the cwd.
+function M.git(...)
+    return git(vim.fn.getcwd(), ...)
+end
+
+-- A copy of the lines with the changes by line number: replaced by a line or lines, or deleted by false.
+function M.edit(lines, changes)
+    local edited = {}
+    for i, line in ipairs(lines) do
+        local change = changes[i]
+        if type(change) == "table" then
+            vim.list_extend(edited, change)
+        elseif change ~= false then
+            table.insert(edited, change or line)
+        end
+    end
+    return edited
+end
+
 -- A repo with `file` at `base` on dev, `committed` on a branch from it and `working` uncommitted, in the cwd.
 function M.repo(base, committed, working)
     local dir = vim.fn.tempname()
@@ -63,6 +82,22 @@ end
 function M.start()
     require("review").stop()
     require("review").start("dev")
+end
+
+-- Starts the review in a fixed size window, focusing the panel, or the window next to it with the file opened.
+-- Returns the window, the panel and its buffer.
+function M.review(file)
+    vim.o.lines = 40
+    vim.o.columns = 200
+    vim.cmd("silent! only | enew | silent! %bwipeout!")
+    local main = vim.api.nvim_get_current_win()
+    M.start()
+    local panel, panel_buf = vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
+    if file then
+        vim.api.nvim_set_current_win(main)
+        vim.cmd.edit(file)
+    end
+    return main, panel, panel_buf
 end
 
 -- Runs the scheduled render and redraws, like the main loop between keys.

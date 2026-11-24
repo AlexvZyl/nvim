@@ -2,29 +2,19 @@ local h = require("tests.helpers")
 
 local T = {}
 
-local function git(...)
-    local result = vim.system({ "git", ... }):wait()
-    assert(result.code == 0, table.concat({ ... }, " "))
-end
-
 -- file.txt deleted, committed or only locally, and other.txt added, with the review running.
 local function setup(committed)
     h.repo(h.lines(5), h.lines(5))
     vim.fn.writefile({ "a" }, "other.txt")
-    git("add", ".")
-    git("commit", "-qm", "other")
+    h.git("add", ".")
+    h.git("commit", "-qm", "other")
     if committed then
-        git("rm", "-q", "file.txt")
-        git("commit", "-qm", "delete")
+        h.git("rm", "-q", "file.txt")
+        h.git("commit", "-qm", "delete")
     else
         os.remove("file.txt")
     end
-    vim.o.lines = 40
-    vim.o.columns = 200
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    local main = vim.api.nvim_get_current_win()
-    h.start()
-    return main, vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
+    return h.review()
 end
 
 -- Selects the deleted file in the panel.
@@ -63,7 +53,7 @@ end
 
 function T.deleted_file_buffers_go_when_switching_ref()
     local _, panel = setup(true)
-    git("tag", "other", "dev")
+    h.git("tag", "other", "dev")
     open(panel)
     require("review").start("other")
     assert(vim.fn.bufnr("review://file.txt") == -1, "buffer left")

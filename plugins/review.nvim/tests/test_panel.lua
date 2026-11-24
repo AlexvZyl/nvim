@@ -12,8 +12,8 @@ local function setup()
     for name in pairs(files) do
         vim.fn.writefile({ "a" }, name)
     end
-    vim.system({ "git", "add", "." }):wait()
-    vim.system({ "git", "commit", "-qm", "files" }):wait()
+    h.git("add", ".")
+    h.git("commit", "-qm", "files")
     vim.fn.writefile({ "a", "b", "c", "d", "e" }, "other.txt")
     vim.o.lines = 40
     vim.o.columns = 200
@@ -93,12 +93,9 @@ end
 function T.deleted_files_show_struck_through_and_open_as_deleted_lines()
     setup()
     require("review").stop()
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    vim.system({ "git", "rm", "-q", "file.txt" }):wait()
-    vim.system({ "git", "commit", "-qm", "delete" }):wait()
-    local main = vim.api.nvim_get_current_win()
-    h.start()
-    local panel_buf = vim.api.nvim_get_current_buf()
+    h.git("rm", "-q", "file.txt")
+    h.git("commit", "-qm", "delete")
+    local main, _, panel_buf = h.review()
     local row = vim.fn.search("file.txt$")
     assert(row > 0, "deleted file not listed")
     local struck = vim.iter(h.marks(panel_buf, "review_panel", row, row + 1)):any(function(mark)

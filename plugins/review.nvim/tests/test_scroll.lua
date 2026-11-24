@@ -4,23 +4,14 @@ local T = {}
 
 -- Committed hunks of every kind: lines deleted, modified, added, and modified with more lines added.
 local function setup()
-    local base = h.lines(100)
-    local committed = {}
-    for i, line in ipairs(base) do
-        if i == 20 or i == 21 then
-            -- Deleted.
-        elseif i == 31 or i == 32 then
-            table.insert(committed, "mod " .. i)
-        elseif i == 50 then
-            vim.list_extend(committed, { "mod 50", "add 50" })
-        else
-            table.insert(committed, line)
-            if i == 40 then
-                vim.list_extend(committed, { "add 40a", "add 40b" })
-            end
-        end
-    end
-    h.repo(base, committed)
+    h.repo(h.lines(100), h.edit(h.lines(100), {
+        [20] = false,
+        [21] = false,
+        [31] = "mod 31",
+        [32] = "mod 32",
+        [40] = { "line 40", "add 40a", "add 40b" },
+        [50] = { "mod 50", "add 50" },
+    }))
     return h.open()
 end
 
@@ -50,17 +41,6 @@ local function describe(a, b)
     return ("top %d/%d row %d -> top %d/%d row %d"):format(a.top, a.fill, a.row, b.top, b.fill, b.row)
 end
 
--- Rows of lines deleted by commits shown right above the line.
-local function committed_above(line)
-    local rows = 0
-    for _, mark in ipairs(h.marks(0, "review_deleted", line, line)) do
-        for _, virt in ipairs(h.virt_lines(mark)) do
-            rows = rows + (virt.group == "ReviewSignDelete" and 1 or 0)
-        end
-    end
-    return rows
-end
-
 -- An edit then its undo, checking the view after both. The selection is made first, as it can scroll.
 local function edit(keys, check, settle, select, undo_check)
     setup()
@@ -72,7 +52,6 @@ local function edit(keys, check, settle, select, undo_check)
             require("review.render").key()
         end
         local before = h.view()
-        before.committed = committed_above(before.line)
         h.keys(keys, settle)
         local after = h.view()
         local err = check(before, after)
@@ -220,28 +199,24 @@ function T.opening_a_line_above_keeps_the_screen_above_in_place()
     edit("O", keeps_top)
 end
 
-function T.pasting_below_moves_the_cursor_down()
+local function paste(keys, check)
     setup()
     vim.cmd("normal! 1Gyy")
     each_position(function()
         local before = h.view()
-        h.keys("p")
-        local err = moves_down(before, h.view())
+        h.keys(keys)
+        local err = check(before, h.view())
         h.keys("u")
         return err
     end)
 end
 
+function T.pasting_below_moves_the_cursor_down()
+    paste("p", moves_down)
+end
+
 function T.pasting_above_keeps_the_screen_above_in_place()
-    setup()
-    vim.cmd("normal! 1Gyy")
-    each_position(function()
-        local before = h.view()
-        h.keys("P")
-        local err = keeps_top(before, h.view())
-        h.keys("u")
-        return err
-    end)
+    paste("P", keeps_top)
 end
 
 -- Spamming dd and u must not scroll the buffer away, settled between keys or not.

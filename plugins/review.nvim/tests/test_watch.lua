@@ -2,11 +2,6 @@ local h = require("tests.helpers")
 
 local T = {}
 
-local function git(...)
-    local result = vim.system({ "git", ... }, { text = true }):wait()
-    assert(result.code == 0, table.concat({ ... }, " ") .. ": " .. (result.stderr or ""))
-end
-
 -- Until the watcher has reloaded after git moved HEAD.
 local function wait(condition, message)
     assert(vim.wait(3000, condition, 20), message)
@@ -22,37 +17,26 @@ local function panel_lines()
     return ""
 end
 
--- The review running with file.txt open in the window next to the panel.
-local function start()
-    vim.o.lines = 40
-    vim.o.columns = 200
-    vim.cmd("silent! only | enew | silent! %bwipeout!")
-    local main = vim.api.nvim_get_current_win()
-    h.start()
-    vim.api.nvim_set_current_win(main)
-    return main
-end
-
 local function sign(buf, line)
-    local mark = h.marks(buf, "review", line, line + 1)[1]
+    local mark = h.marks(buf, "review", line, line)[1]
     return mark and mark[4].sign_text
 end
 
 function T.switching_branch_reloads_the_files()
     h.repo(h.lines(5), h.lines(6))
-    git("checkout", "-qb", "other", "dev")
+    h.git("checkout", "-qb", "other", "dev")
     vim.fn.writefile({ "a" }, "other.txt")
-    git("add", ".")
-    git("commit", "-qm", "other")
-    git("checkout", "-q", "branch")
-    start()
+    h.git("add", ".")
+    h.git("commit", "-qm", "other")
+    h.git("checkout", "-q", "branch")
+    h.review()
     assert(panel_lines():match("file.txt") and not panel_lines():match("other.txt"), panel_lines())
     local notified
     local notify = vim.notify
     vim.notify = function(message)
         notified = message
     end
-    git("checkout", "-q", "other")
+    h.git("checkout", "-q", "other")
     wait(function()
         return panel_lines():match("other.txt") ~= nil
     end, "panel not reloaded")
@@ -64,22 +48,17 @@ end
 
 -- dev moved on after the branch, and the other branch starts from there.
 function T.switching_to_a_new_merge_base_rerenders()
-    local base = h.lines(10)
-    local committed = vim.deepcopy(base)
-    committed[3] = "branch 3"
-    h.repo(base, committed)
-    git("checkout", "-q", "dev")
-    local moved = vim.deepcopy(base)
-    moved[3] = "branch 3"
-    vim.fn.writefile(moved, "file.txt")
-    git("commit", "-qam", "dev")
-    git("checkout", "-qb", "other")
-    git("checkout", "-q", "branch")
-    start()
-    vim.cmd.edit("file.txt")
+    local committed = h.edit(h.lines(10), { [3] = "branch 3" })
+    h.repo(h.lines(10), committed)
+    h.git("checkout", "-q", "dev")
+    vim.fn.writefile(committed, "file.txt")
+    h.git("commit", "-qam", "dev")
+    h.git("checkout", "-qb", "other")
+    h.git("checkout", "-q", "branch")
+    h.review("file.txt")
     local buf = vim.api.nvim_get_current_buf()
     assert(sign(buf, 3), "line 3 not changed")
-    git("checkout", "-q", "other")
+    h.git("checkout", "-q", "other")
     vim.cmd("checktime")
     wait(function()
         return sign(buf, 3) == nil
@@ -89,15 +68,11 @@ end
 
 -- Same merge base, but what is committed moved.
 function T.committing_restyles_local_changes()
-    local base = h.lines(10)
-    local working = vim.deepcopy(base)
-    working[3] = "local 3"
-    h.repo(base, base, working)
-    start()
-    vim.cmd.edit("file.txt")
+    h.repo(h.lines(10), h.lines(10), h.edit(h.lines(10), { [3] = "local 3" }))
+    h.review("file.txt")
     local buf = vim.api.nvim_get_current_buf()
     assert(sign(buf, 3) == "╎ ", vim.inspect(sign(buf, 3)))
-    git("commit", "-qam", "commit")
+    h.git("commit", "-qam", "commit")
     wait(function()
         return sign(buf, 3) == "│ "
     end, "still local: " .. vim.inspect(sign(buf, 3)))
@@ -106,16 +81,16 @@ end
 
 function T.a_deleted_file_restored_by_switching_branch_goes()
     h.repo(h.lines(5), h.lines(5))
-    git("checkout", "-qb", "other", "dev")
+    h.git("checkout", "-qb", "other", "dev")
     vim.fn.writefile({ "a" }, "other.txt")
-    git("add", ".")
-    git("commit", "-qm", "other")
-    git("checkout", "-q", "branch")
-    git("rm", "-q", "file.txt")
-    git("commit", "-qm", "delete")
-    local main = start()
+    h.git("add", ".")
+    h.git("commit", "-qm", "other")
+    h.git("checkout", "-q", "branch")
+    h.git("rm", "-q", "file.txt")
+    h.git("commit", "-qm", "delete")
+    local main = h.review()
     vim.api.nvim_win_set_buf(main, require("review.render").deleted_buffer("file.txt"))
-    git("checkout", "-q", "other")
+    h.git("checkout", "-q", "other")
     wait(function()
         return vim.fn.bufnr("review://file.txt") == -1
     end, "deleted file buffer left")
@@ -127,11 +102,11 @@ end
 function T.committing_a_deletion_restyles_its_buffer()
     h.repo(h.lines(5), h.lines(5))
     os.remove("file.txt")
-    local main = start()
+    local main = h.review()
     local buf = require("review.render").deleted_buffer("file.txt")
     vim.api.nvim_win_set_buf(main, buf)
     assert(sign(buf, 1) == "╎ ", vim.inspect(sign(buf, 1)))
-    git("commit", "-qam", "delete")
+    h.git("commit", "-qam", "delete")
     wait(function()
         return sign(buf, 1) == "│ "
     end, "still local: " .. vim.inspect(sign(buf, 1)))

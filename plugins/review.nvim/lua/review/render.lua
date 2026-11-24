@@ -111,19 +111,24 @@ function M.gutter(buf, uncommitted, kind)
     return { { " ", "LineNr" }, { sign, "ReviewSign" .. (uncommitted and "Local" or "") .. kind } }
 end
 
+-- How the deleted lines are drawn: scrolled, highlighted, in the gutter and padded to the edge.
+local function style(buf)
+    local leftcol, tabstop = view(window(buf)).leftcol, vim.bo[buf].tabstop
+    local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
+    return table.concat({ leftcol, tabstop, lang or "", buffers[buf].textoff, vim.o.columns }, " "), leftcol, tabstop, lang
+end
+
 -- Drawn separately from the added lines, since they depend on the window's scroll and gutter. Marks already showing
 -- the right lines in the right place are kept, so an edit only redraws the deleted lines it changed.
 local function render_deleted(buf)
     local attached = buffers[buf]
     -- As last seen after a redraw. Right after an edit, before the redraw, a statuscolumn is not measured yet.
     attached.textoff = attached.textoff or textoff(buf)
-    local leftcol, tabstop = view(window(buf)).leftcol, vim.bo[buf].tabstop
-    local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
+    local drawn_as, leftcol, tabstop, lang = style(buf)
     -- Every line is drawn again when how they are drawn changed.
-    local style = table.concat({ leftcol, tabstop, attached.textoff, vim.o.columns, lang or "" }, " ")
-    if attached.style ~= style then
+    if attached.style ~= drawn_as then
         vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-        attached.style, attached.drawn = style, {}
+        attached.style, attached.drawn = drawn_as, {}
     end
     local line_count = vim.api.nvim_buf_line_count(buf)
     -- The deleted lines by where they go, each with where it was in HEAD to order them by.
@@ -312,11 +317,11 @@ local function render(buf)
     require("review.diagnostics").apply(buf)
 end
 
--- Draws the deleted lines again once the gutter they draw in or the width they are padded to changed.
-local function follow_width(buf)
-    local width = textoff(buf)
-    if buffers[buf].textoff ~= width or buffers[buf].columns ~= vim.o.columns then
-        buffers[buf].textoff, buffers[buf].columns = width, vim.o.columns
+-- Draws the deleted lines again once how they are drawn changed without an edit, like the window scrolled sideways,
+-- the gutter or the window changed width, or the filetype changed.
+local function restyle(buf)
+    buffers[buf].textoff = textoff(buf)
+    if style(buf) ~= buffers[buf].style then
         render_deleted(buf)
         require("review.diagnostics").apply(buf)
     end
@@ -359,7 +364,7 @@ function M.update(buf)
     -- The width of the gutter the deleted lines draw in is only right after the redraw.
     vim.schedule(function()
         if buffers[buf] == attached and attached.hunks == hunks and vim.api.nvim_buf_is_valid(buf) then
-            follow_width(buf)
+            restyle(buf)
         end
     end)
 end
@@ -374,14 +379,14 @@ function M.key()
 end
 
 -- Once the screen shows the rendered hunks, so cursor moves and scrolls are kept by the next render. The gutter
--- and the width can also have changed without an edit, like with :set number or a resize.
+-- and how the deleted lines are drawn can also have changed without an edit.
 function M.settled()
     local rows = settled_rows
     settled_rows = {}
     for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
         if buffers[buf] and buffers[buf].rendered == buffers[buf].hunks then
-            follow_width(buf)
+            restyle(buf)
             settle(win, buf)
         else
             settled_rows[win] = rows[win]
@@ -461,11 +466,12 @@ function M.detach_all()
     end
 end
 
+-- Right away, as by the time the screen settled it would have shown the deleted lines unscrolled.
 function M.scrolled()
-    for win, delta in pairs(vim.v.event) do
+    for win in pairs(vim.v.event) do
         local id = tonumber(win)
-        if id and delta.leftcol ~= 0 and vim.api.nvim_win_is_valid(id) and buffers[vim.api.nvim_win_get_buf(id)] then
-            render_deleted(vim.api.nvim_win_get_buf(id))
+        if id and vim.api.nvim_win_is_valid(id) and buffers[vim.api.nvim_win_get_buf(id)] then
+            restyle(vim.api.nvim_win_get_buf(id))
         end
     end
 end

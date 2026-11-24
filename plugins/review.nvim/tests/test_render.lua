@@ -217,6 +217,18 @@ function T.deleted_lines_are_padded_to_the_edge_after_a_resize()
     assert(width >= 260, width)
 end
 
+function T.deleted_lines_are_highlighted_again_when_the_filetype_changes()
+    h.repo({ "local x = 1", "keep" }, { "keep" })
+    local buf = h.open()
+    vim.bo[buf].filetype = "lua"
+    require("review.render").settled()
+    local chunks = h.marks(buf, "review_deleted", 1, 1)[1][4].virt_lines[1]
+    vim.bo[buf].filetype = ""
+    assert(vim.iter(chunks):any(function(chunk)
+        return type(chunk[2]) == "table" and chunk[2][2]:match("^@keyword")
+    end), vim.inspect(chunks))
+end
+
 -- With signcolumn=auto the first sign widens the gutter only once it is drawn, after the render.
 function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
     h.repo(h.lines(20), h.lines(20))

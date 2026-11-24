@@ -9,6 +9,26 @@ function M.setup(opts)
     defaults = opts or {}
 end
 
+-- File entries, with the paths of deleted files struck through after their icon.
+local function struck_through(opts)
+    local make = require("telescope.make_entry").gen_from_file(opts)
+    return function(path)
+        local entry = make(path)
+        local file = session.by_key[session.prefix .. path]
+        if file and file.deleted then
+            local display = entry.display
+            entry.display = function(e)
+                local text, style = display(e)
+                style = style or {}
+                local start = opts.disable_devicons and 0 or (style[1] and style[1][1][2] or 0)
+                table.insert(style, { { start, #text }, "ReviewPanelDeleted" })
+                return text, style
+            end
+        end
+        return entry
+    end
+end
+
 -- Telescope picker of the changed files.
 function M.open(opts)
     opts = vim.tbl_deep_extend("force", defaults, opts or {})
@@ -20,7 +40,7 @@ function M.open(opts)
                 results = vim.tbl_map(function(file)
                     return file.path
                 end, session.files),
-                entry_maker = require("telescope.make_entry").gen_from_file(opts),
+                entry_maker = struck_through(opts),
             }),
             sorter = conf.file_sorter(opts),
             attach_mappings = function(prompt)

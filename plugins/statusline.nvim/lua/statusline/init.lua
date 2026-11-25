@@ -27,7 +27,6 @@ function M.setup(opts)
     config.set(opts)
     highlights.set()
     local group = vim.api.nvim_create_augroup("statusline", { clear = true })
-    vim.api.nvim_create_autocmd("ColorScheme", { group = group, callback = highlights.set })
     vim.api.nvim_create_autocmd("DiagnosticChanged", {
         group = group,
         callback = function(args)

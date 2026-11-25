@@ -23,6 +23,17 @@ function T.a_file_shows_its_icon_and_directory()
     assert(vim.wo.winbar == "  <lua> dir/file.lua", vim.wo.winbar)
 end
 
+-- Opened with the options of the window it opened from, which for the winbar is cleared to see it is left alone.
+function T.floating_windows_are_left_alone()
+    edit()
+    local float = vim.api.nvim_open_win(vim.api.nvim_create_buf(false, true), true, { relative = "editor", row = 1, col = 1, width = 20, height = 3 })
+    vim.wo[float].winbar = ""
+    require("winbar").set_winbar()
+    local winbar = vim.wo[float].winbar
+    vim.api.nvim_win_close(float, true)
+    assert(winbar == "", winbar)
+end
+
 function T.an_edit_marks_the_file_modified_until_undone()
     edit()
     press("dd")

@@ -38,6 +38,16 @@ function T.the_mode_shows_with_its_highlight()
     assert(insert:find("%#StatuslineModeInsert# ", 1, true) and insert:find("INSERT", 1, true), insert)
 end
 
+-- Like operator pending, by the mode they are in.
+function T.submodes_show_as_their_mode()
+    with(vim.api, "nvim_get_mode", function()
+        return { mode = "niI" }
+    end, function()
+        local drawn = statusline.render()
+        assert(drawn:find("NORMAL", 1, true), drawn)
+    end)
+end
+
 function T.toggles_are_highlighted_by_whether_they_are_enabled()
     local toggles = parts.toggles()
     assert(toggles == "%#StatuslineOn#on%*%#StatuslineOff#off%*", toggles)
@@ -104,7 +114,7 @@ function T.an_unknown_mode_shows_once_as_an_error()
     assert(#messages == 1 and messages[1]:find("?", 1, true), vim.inspect(messages))
 end
 
--- Colorschemes clear the highlights, which link back to their defaults.
+-- Colorschemes clear the highlights, which Neovim links back to their defaults as they are set as defaults.
 function T.highlights_come_back_after_a_colorscheme()
     vim.cmd("highlight clear")
     vim.cmd.doautocmd("ColorScheme")

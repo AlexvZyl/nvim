@@ -351,6 +351,17 @@ function T.untracked_and_binary_files_are_not_rendered()
     end
 end
 
+-- Read with dos line endings, so the buffer has none of the carriage returns git has.
+function T.crlf_files_only_show_the_changed_line()
+    h.repo("a\r\nb\r\nc\r\n", "a\r\nchanged\r\nc\r\n")
+    local buf = h.open()
+    assert(vim.bo[buf].fileformat == "dos", vim.bo[buf].fileformat)
+    local signed = vim.tbl_map(function(mark)
+        return { mark[2], mark[4].end_row }
+    end, h.marks(buf, "review", 1, 3))
+    assert(vim.deep_equal(signed, { { 1, 1 } }), vim.inspect(signed))
+end
+
 function T.hunk_jumps_stop_at_the_first_and_last_hunk()
     h.repo(h.lines(30), h.edit(h.lines(30), { [5] = "mod 5", [15] = "mod 15", [25] = "mod 25" }))
     h.open()

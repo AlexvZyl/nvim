@@ -24,14 +24,15 @@ clear()
 
 -- False when HEAD has no merge base with the ref.
 function M.start(ref)
-    local merge_base = git.merge_base(ref)
+    local merge_base, repo = git.merge_base(ref), git.repo()
+    merge_base = merge_base()
     if not merge_base then
         vim.notify("No merge base with " .. ref, vim.log.levels.ERROR)
         return false
     end
     clear()
     M.ref, M.merge_base = ref, merge_base
-    M.head, M.source, M.prefix, M.git_dir = git.repo()
+    M.head, M.source, M.prefix, M.git_dir = repo()
     return true
 end
 
@@ -43,13 +44,15 @@ end
 
 -- Reloads the changed files from git, false when the diff failed.
 function M.load()
-    local files = git.changed_files(M.ref)
+    -- All at once, as the diff takes the longest.
+    local files, merge_base, repo = git.changed_files(M.ref), git.merge_base(M.ref), git.repo()
+    files = files()
     if not files then
         vim.notify("git diff " .. M.ref .. " failed", vim.log.levels.ERROR)
         return false
     end
-    M.merge_base = git.merge_base(M.ref)
-    M.head, M.source, M.prefix = git.repo()
+    M.merge_base = merge_base()
+    M.head, M.source, M.prefix = repo()
     M.files, M.by_key, M.total_changes = files, {}, 0
     for _, file in ipairs(files) do
         file.key = M.prefix .. file.path

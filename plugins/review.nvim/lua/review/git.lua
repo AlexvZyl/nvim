@@ -1,23 +1,33 @@
 local M = {}
 
+-- Starts git in the cwd. The function it returns waits for it, then gives what it parsed from the output, nil when
+-- git failed. So functions returning it run git at the same time as the others started before waiting.
+local function start(args, parse)
+    local process = vim.system({ "git", "-C", vim.fn.getcwd(), unpack(args) }, { text = true })
+    return function()
+        local result = process:wait()
+        if result.code == 0 then
+            return parse(result.stdout)
+        end
+    end
+end
+
 function M.run(...)
-    local cmd = { "git", "-C", vim.fn.getcwd(), ... }
-    local result = vim.system(cmd, { text = true }):wait()
-    return result.code == 0 and result.stdout or nil
+    return start({ ... }, function(output)
+        return output
+    end)()
 end
 
 -- Nil when HEAD and the ref share no history.
 function M.merge_base(ref)
-    local output = M.run("merge-base", "HEAD", ref)
-    return output and vim.trim(output)
+    return start({ "merge-base", "HEAD", ref }, vim.trim)
 end
 
 -- HEAD, its branch, the path of the cwd inside the repo and the git dir. Nil outside a repo.
 function M.repo()
-    local output = M.run("rev-parse", "HEAD", "--abbrev-ref", "HEAD", "--show-prefix", "--absolute-git-dir")
-    if output then
+    return start({ "rev-parse", "HEAD", "--abbrev-ref", "HEAD", "--show-prefix", "--absolute-git-dir" }, function(output)
         return unpack(vim.split(output, "\n"))
-    end
+    end)
 end
 
 -- Branches, remote branches and tags.
@@ -26,32 +36,50 @@ function M.refs()
     return vim.split(refs, "\n", { trimempty = true })
 end
 
--- Contents of a file at a revision, nil when it does not exist there.
-function M.show(rev, file)
-    return M.run("show", rev .. ":./" .. vim.fn.fnamemodify(file, ":."))
+-- Contents of a file at each revision, nil where it does not exist, read by one git process.
+function M.show(file, ...)
+    local revs, path = { ... }, vim.fn.fnamemodify(file, ":.")
+    local objects = vim.tbl_map(function(rev)
+        return rev .. ":./" .. path .. "\n"
+    end, revs)
+    local output = vim.system({ "git", "-C", vim.fn.getcwd(), "cat-file", "--batch" }, { stdin = table.concat(objects) }):wait().stdout or ""
+    -- Each object is a header with its type and size, then its contents. Ones not found are only the header.
+    local contents, position = {}, 1
+    for i = 1, #revs do
+        local header_end = output:find("\n", position, true)
+        if not header_end then
+            break
+        end
+        local kind, size = output:sub(position, header_end - 1):match(" (%a+) (%d+)$")
+        position = header_end + 1
+        if size then
+            -- Without the carriage returns of CRLF files, which the buffer does not have either.
+            contents[i] = kind == "blob" and (output:sub(position, position + size - 1):gsub("\r\n", "\n")) or nil
+            position = position + size + 1
+        end
+    end
+    return unpack(contents, 1, #revs)
 end
 
 -- Files changed since the merge base with the ref, relative to the cwd. Nil when the diff fails.
 function M.changed_files(ref)
-    local numstat = M.run("diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames")
-    if not numstat then
-        return nil
-    end
-    local files = {}
-    for _, line in ipairs(vim.split(numstat, "\0", { trimempty = true })) do
-        local added, removed, path = line:match("^(%S+)\t(%S+)\t(.+)$")
-        -- Binary files count as "-", which leaves them without counts.
-        added, removed = tonumber(added), tonumber(removed)
-        table.insert(files, {
-            path = path,
-            added = added,
-            removed = removed,
-            changes = (added or 0) + (removed or 0),
-            -- The diff is against the working tree, so a deleted file is one not on disk.
-            deleted = vim.uv.fs_stat(path) == nil,
-        })
-    end
-    return files
+    return start({ "diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames" }, function(numstat)
+        local files = {}
+        for _, line in ipairs(vim.split(numstat, "\0", { trimempty = true })) do
+            local added, removed, path = line:match("^(%S+)\t(%S+)\t(.+)$")
+            -- Binary files count as "-", which leaves them without counts.
+            added, removed = tonumber(added), tonumber(removed)
+            table.insert(files, {
+                path = path,
+                added = added,
+                removed = removed,
+                changes = (added or 0) + (removed or 0),
+                -- The diff is against the working tree, so a deleted file is one not on disk.
+                deleted = vim.uv.fs_stat(path) == nil,
+            })
+        end
+        return files
+    end)
 end
 
 -- Blob of the files in HEAD, by path from the repo root, from their paths relative to the cwd.

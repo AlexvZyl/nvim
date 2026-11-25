@@ -62,26 +62,51 @@ local function highlight_deleted(lang, deleted)
     return highlights
 end
 
+-- Highlight ids by group name, which marks take faster than names, as they have every deleted line drawn again.
+local hl_ids = setmetatable({}, {
+    __index = function(ids, name)
+        ids[name] = vim.api.nvim_get_hl_id_by_name(name)
+        return ids[name]
+    end,
+})
+
 -- Virtual text of a deleted line, scrolled by leftcol and padded to the edge like a line highlight.
 local function deleted_chunks(text, highlights, uncommitted, leftcol, tabstop)
-    local base = uncommitted and "ReviewLocalDelete" or "ReviewDelete"
-    local chunks, width, byte, last = {}, 0, 1, nil
-    -- A UTF-8 lead byte followed by its continuation bytes.
-    for char in text:gmatch("[^\128-\191][\128-\191]*") do
-        local name = highlights[byte]
-        local cells = char == "\t" and tabstop or 1
-        byte, width = byte + #char, width + cells
-        local shown = math.min(cells, width - leftcol)
-        if shown > 0 then
-            char = char == "\t" and string.rep(" ", shown) or char
-            -- Neighbouring characters with the same highlight go in one chunk.
-            if chunks[1] and name == last then
-                chunks[#chunks][1] = chunks[#chunks][1] .. char
-            else
-                table.insert(chunks, { char, name and { base, name } or base })
-            end
-            last = name
+    local base = hl_ids[uncommitted and "ReviewLocalDelete" or "ReviewDelete"]
+    local chunks, width, last = {}, 0, nil
+    -- Neighbouring text with the same highlight goes in one chunk.
+    local function add(shown, name)
+        if chunks[1] and name == last then
+            chunks[#chunks][1] = chunks[#chunks][1] .. shown
+        else
+            table.insert(chunks, { shown, name and { base, hl_ids[name] } or base })
         end
+        last = name
+    end
+    -- Where the run of shown characters with the same highlight started, added once it ends. By byte rather than
+    -- with gmatch, which the JIT does not compile.
+    local from, byte = nil, 1
+    while byte <= #text do
+        local name, tab = highlights[byte], text:byte(byte) == 9
+        if from and (tab or name ~= highlights[from]) then
+            add(text:sub(from, byte - 1), highlights[from])
+            from = nil
+        end
+        local cells = tab and tabstop or 1
+        width = width + cells
+        local shown = math.min(cells, width - leftcol)
+        if shown > 0 and tab then
+            add(string.rep(" ", shown), name)
+        elseif shown > 0 then
+            from = from or byte
+        end
+        -- Past the UTF-8 continuation bytes of the character.
+        repeat
+            byte = byte + 1
+        until (text:byte(byte) or 0) < 128 or text:byte(byte) >= 192
+    end
+    if from then
+        add(text:sub(from), highlights[from])
     end
     table.insert(chunks, { string.rep(" ", math.max(vim.o.columns - width + leftcol, 0)), base })
     return chunks
@@ -95,7 +120,7 @@ end
 function M.gutter(buf, uncommitted, kind)
     local text = sign_text(uncommitted)
     local sign = text .. string.rep(" ", buffers[buf].textoff - 1 - vim.fn.strdisplaywidth(text))
-    return { { " ", "LineNr" }, { sign, "ReviewSign" .. (uncommitted and "Local" or "") .. kind } }
+    return { { " ", hl_ids.LineNr }, { sign, hl_ids["ReviewSign" .. (uncommitted and "Local" or "") .. kind] } }
 end
 
 -- How the deleted lines are drawn: scrolled, highlighted, in the gutter and padded to the edge.
@@ -176,7 +201,11 @@ local function render_deleted(buf)
 end
 
 local function render(buf)
-    vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
+    -- Marks already over the right lines are kept, so an edit only signs again the lines it changed.
+    local existing = {}
+    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, namespace, 0, -1, { details = true })) do
+        existing[mark[2] .. " " .. mark[4].end_row .. " " .. mark[4].line_hl_group] = mark[1]
+    end
     -- The highlight of each added line, signed in runs of the same.
     local changed, first = {}, nil
     for i, hunks in ipairs({ buffers[buf].hunks, buffers[buf].local_hunks }) do
@@ -188,10 +217,18 @@ local function render(buf)
     end
     for line = 1, vim.api.nvim_buf_line_count(buf) + 1 do
         if first and changed[line] ~= changed[first] then
-            M.sign(buf, first, line - 1, changed[first] == "ReviewLocalAdd", "Add")
+            local key = (first - 1) .. " " .. (line - 2) .. " " .. changed[first]
+            if existing[key] then
+                existing[key] = nil
+            else
+                M.sign(buf, first, line - 1, changed[first] == "ReviewLocalAdd", "Add")
+            end
             first = nil
         end
         first = first or changed[line] and line
+    end
+    for _, id in pairs(existing) do
+        vim.api.nvim_buf_del_extmark(buf, namespace, id)
     end
     buffers[buf].changed = changed
     render_deleted(buf)
@@ -232,10 +269,16 @@ function M.update(buf)
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
     -- Like the file is written, with the line break at the end unless it had none when read.
     local text = (#lines == 1 and lines[1] == "") and "" or table.concat(lines, "\n") .. (vim.bo[buf].eol and "\n" or "")
-    local hunks = diff(attached.base, text)
-    -- Without commits to the file everything is uncommitted.
-    attached.hunks = hunks
-    attached.local_hunks = attached.head.text == attached.base.text and hunks or diff(attached.head, text)
+    local hunks = attached.committed
+    if text == attached.head.text then
+        -- As committed, which attach already diffed, like when the file was just opened.
+        attached.hunks, attached.local_hunks = hunks, {}
+    else
+        hunks = diff(attached.base, text)
+        -- Without commits to the file everything is uncommitted.
+        attached.hunks = hunks
+        attached.local_hunks = attached.head.text == attached.base.text and hunks or diff(attached.head, text)
+    end
     -- Right away, as TextChanged comes before the redraw: scheduled, the edit would show without the deleted
     -- lines for a moment.
     render(buf)
@@ -286,8 +329,7 @@ function M.attach(buf)
         return
     end
     -- No base when the file was added since the merge base, no head when it was added since HEAD.
-    local base = session.merge_base and git.show(session.merge_base, file)
-    local head = git.show("HEAD", file)
+    local head, base = git.show(file, "HEAD", session.merge_base)
     -- Untracked, outside the repo or binary.
     if not (base or head) or ((base or "") .. (head or "")):find("\0", 1, true) then
         return M.detach(buf)
@@ -310,7 +352,8 @@ function M.attach(buf)
     -- Lines of the base deleted by commits, other deleted lines are only deleted locally. With where they were
     -- between the lines of HEAD: after the line before them, or before the lines that replaced them.
     attached.committed_deletions = {}
-    for _, hunk in ipairs(diff(attached.base, attached.head.text)) do
+    attached.committed = diff(attached.base, attached.head.text)
+    for _, hunk in ipairs(attached.committed) do
         for i = 1, #hunk.deleted do
             attached.committed_deletions[hunk.old + i - 1] = hunk.count == 0 and hunk.start + 0.5 or hunk.start - 0.5
         end

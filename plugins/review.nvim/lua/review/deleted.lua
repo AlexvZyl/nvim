@@ -27,7 +27,8 @@ local function buffers()
 end
 
 local function fill(buf, path)
-    local lines = vim.split(git.show(session.merge_base, path) or "", "\n", { plain = true })
+    local head, base = git.show(path, "HEAD", session.merge_base)
+    local lines = vim.split(base or "", "\n", { plain = true })
     if lines[#lines] == "" and #lines > 1 then
         table.remove(lines)
     end
@@ -36,7 +37,7 @@ local function fill(buf, path)
     vim.bo[buf].modifiable = false
     vim.api.nvim_buf_clear_namespace(buf, vim.api.nvim_create_namespace("review"), 0, -1)
     -- Still in HEAD when only deleted locally.
-    render.sign(buf, 1, #lines, git.show("HEAD", path) ~= nil, "Delete")
+    render.sign(buf, 1, #lines, head ~= nil, "Delete")
 end
 
 function M.open(path)

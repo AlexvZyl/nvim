@@ -34,6 +34,12 @@ function M.set()
     for _, group in ipairs({ "ReviewDelete", "ReviewLocalDelete" }) do
         vim.api.nvim_set_hl(0, group .. "Background", { bg = vim.api.nvim_get_hl(0, { name = group, link = false }).bg })
     end
+    -- The number of the cursor line on a changed line, which takes the changed line's number highlight otherwise.
+    local cursor = vim.api.nvim_get_hl(0, { name = "CursorLineNr", link = false })
+    for _, group in ipairs({ "ReviewAddNr", "ReviewLocalAddNr", "ReviewDeleteNr", "ReviewLocalDeleteNr" }) do
+        local bg = vim.api.nvim_get_hl(0, { name = group, link = false }).bg
+        vim.api.nvim_set_hl(0, group:gsub("Nr$", "CursorNr"), vim.tbl_extend("force", cursor, { bg = bg }))
+    end
 end
 
 return M

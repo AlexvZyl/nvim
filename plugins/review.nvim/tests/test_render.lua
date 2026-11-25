@@ -326,6 +326,27 @@ function T.deleted_lines_follow_the_gutter_when_signs_widen_it()
     assert(drawn == width, ("gutter %d, window %d"):format(drawn, width))
 end
 
+function T.the_cursor_line_number_keeps_its_highlight_on_changed_lines()
+    h.repo(h.lines(5), h.edit(h.lines(5), { [3] = "mod 3" }))
+    vim.wo.cursorline, vim.wo.cursorlineopt = true, "number"
+    local buf = h.open()
+    local function number_at(line)
+        vim.api.nvim_win_set_cursor(0, { line, 0 })
+        require("review.render").settled()
+        local mark = h.marks(buf, "review_cursor", 1, 5)[1]
+        return mark and mark[2] + 1, mark and mark[4].number_hl_group
+    end
+    local changed_row, changed = number_at(3)
+    local unchanged_row = number_at(1)
+    vim.wo.cursorline, vim.wo.cursorlineopt = false, "both"
+    local hl = vim.api.nvim_get_hl(0, { name = "ReviewAddCursorNr" })
+    local cursor = vim.api.nvim_get_hl(0, { name = "CursorLineNr", link = false })
+    local add = vim.api.nvim_get_hl(0, { name = "ReviewAddNr", link = false })
+    assert(changed_row == 3 and changed == "ReviewAddCursorNr", tostring(changed))
+    assert(unchanged_row == nil, "marked an unchanged line")
+    assert(hl.fg == cursor.fg and hl.bg == add.bg, vim.inspect({ hl, cursor, add }))
+end
+
 function T.diagnostic_signs_on_changed_lines_get_the_review_background()
     h.repo(h.lines(12), h.edit(h.lines(12), { [10] = "mod 10" }))
     h.review("file.txt")

@@ -44,6 +44,23 @@ function T.switching_branch_reloads_the_files()
     require("review").stop()
 end
 
+-- What was reviewed is kept by branch, so a new branch at the same commit starts unreviewed.
+function T.switching_branch_loads_its_own_review()
+    h.repo(h.lines(5), h.lines(6))
+    h.review()
+    vim.fn.cursor(vim.fn.search("file.txt$"), 1)
+    h.press("dd")
+    assert(not panel_lines():match("file.txt"), panel_lines())
+    local notify = vim.notify
+    vim.notify = function() end
+    h.git("checkout", "-qb", "other")
+    wait(function()
+        return panel_lines():match("file.txt") ~= nil
+    end, "reviewed on the other branch")
+    vim.notify = notify
+    require("review").stop()
+end
+
 -- dev moved on after the branch, and the other branch starts from there.
 function T.switching_to_a_new_merge_base_rerenders()
     local committed = h.edit(h.lines(10), { [3] = "branch 3" })

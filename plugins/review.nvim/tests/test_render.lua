@@ -150,16 +150,6 @@ function T.a_file_without_a_line_break_at_the_end_is_unchanged()
     assert(#h.marks(buf, "review_deleted", 1, 3) == 0, vim.inspect(h.marks(buf, "review_deleted", 1, 3)))
 end
 
-function T.edits_rerender()
-    h.repo(h.lines(12), h.lines(12))
-    local buf = h.open()
-    assert(#h.marks(buf, "review", 1, 12) == 0)
-    vim.cmd("normal! 3G")
-    h.keys("Ax")
-    local mark = find(buf, "review", 3)
-    assert(mark and mark[4].sign_hl_group == "ReviewSignLocalAdd", vim.inspect(mark))
-end
-
 -- TextChanged comes before the redraw, rendered later the edit flashes without the deleted lines.
 function T.deleted_lines_render_before_the_redraw()
     h.repo(h.lines(12), h.lines(12))

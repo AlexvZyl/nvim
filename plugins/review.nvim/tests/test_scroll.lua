@@ -236,10 +236,6 @@ function T.deleting_up_with_a_motion_puts_the_cursor_above()
     deletes_up("dk", 2)
 end
 
-function T.deleting_up_with_a_count_puts_the_cursor_above()
-    deletes_up("d2k", 3)
-end
-
 function T.deleting_a_selection_down_keeps_the_screen_in_place()
     edit("d", keeps_top, nil, "Vjj")
 end

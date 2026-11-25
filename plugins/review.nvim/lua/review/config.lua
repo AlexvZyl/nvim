@@ -17,7 +17,7 @@ local defaults = {
         files = "fg",
         -- In the panel.
         open = "<CR>",
-        review = "d",
+        mark_reviewed = "d",
         undo = "u",
         redo = "<C-r>",
         -- In reviewed files.

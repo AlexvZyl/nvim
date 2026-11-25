@@ -14,7 +14,7 @@ require("review").setup({
     keymaps = {
         files = "fg",
         open = "<CR>",
-        review = "d",
+        mark_reviewed = "d",
         undo = "u",
         redo = "<C-r>",
         next_hunk = "]h",

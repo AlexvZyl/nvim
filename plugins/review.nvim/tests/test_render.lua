@@ -178,6 +178,21 @@ function T.an_unloaded_file_is_not_drawn()
     assert(#marks == 1, vim.inspect(marks))
 end
 
+-- With the cursor on a line added past the end of the file, which reloading it takes away.
+function T.reloading_drops_the_line_the_cursor_was_on()
+    h.repo(h.lines(10), h.lines(10))
+    h.review("file.txt")
+    h.keys("Goadded\27")
+    vim.cmd("edit!")
+    vim.v.errmsg = ""
+    local ok, err = pcall(require("review.render").settled)
+    h.flush()
+    local active = require("review").active()
+    h.start()
+    assert(ok, err)
+    assert(active and vim.v.errmsg == "", vim.v.errmsg)
+end
+
 function T.stopping_clears_the_buffers()
     setup()
     local buf = vim.api.nvim_get_current_buf()

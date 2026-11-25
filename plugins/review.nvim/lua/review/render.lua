@@ -501,7 +501,7 @@ function M.settled()
         local buf = vim.api.nvim_win_get_buf(win)
         if buffers[buf] and buffers[buf].rendered == buffers[buf].hunks then
             restyle(buf)
-            scroll.settle(win, buf)
+            scroll.settle(win, buffers[buf].lines)
         end
     end
 end

@@ -53,15 +53,16 @@ local function scroll_to(win, line, rows)
     end
 end
 
--- By window, the screen row of the cursor line as last seen with the hunks rendered. Measured once an edit is made,
--- the stale virtual lines have already moved.
+-- By window, the screen row of the cursor line as last seen with the hunks rendered, and the lines they were rendered
+-- for. Measured once an edit is made, the stale virtual lines have already moved.
 local settled = {}
 
--- Once the screen shows the window's buffer rendered, so cursor moves and scrolls are kept by the next render.
-function M.settle(win, buf)
+-- Once the screen shows the window's buffer rendered for the lines, so cursor moves and scrolls are kept by the next
+-- render.
+function M.settle(win, lines)
     local line, top = vim.api.nvim_win_get_cursor(win)[1], view(win)
     settled[win] = {
-        buf = buf,
+        lines = lines,
         line = line,
         row = line_row(win, line),
         topline = top.topline,
@@ -89,7 +90,8 @@ function M.keep(buf, old, new)
     local before_lines, after_lines = unchanged(old, new)
     for _, win in ipairs(vim.fn.win_findbuf(buf)) do
         local before = settled[win]
-        if before and before.buf == buf then
+        -- Not when last seen with other lines, like those of the file before it was read again.
+        if before and before.lines == old then
             local line, cursor, added = before.line, vim.api.nvim_win_get_cursor(win)[1], #new - #old
             -- As many lines, as before above and below it.
             local within = added == 0 and before_lines >= line - 1 and after_lines >= #old - line
@@ -123,7 +125,7 @@ function M.keep(buf, old, new)
                 end
             end
         end
-        M.settle(win, buf)
+        M.settle(win, new)
     end
 end
 

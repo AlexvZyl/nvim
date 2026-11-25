@@ -237,6 +237,9 @@ local function lang_at(row, lang, injected)
     return lang, above, below
 end
 
+-- What each mark of deleted lines shows, put together in the same table for all of them, as most are a line or two.
+local shown_parts = {}
+
 -- Drawn separately from the added lines, since they depend on the window's scroll and gutter. Marks already showing
 -- the right lines in the right place are kept, so an edit only redraws the deleted lines it changed.
 local function render_deleted(buf)
@@ -285,11 +288,13 @@ local function render_deleted(buf)
             row_lang, lines_above, lines_below = lang_at(row, lang, injected)
         end
         -- Joined once, as adding to the string line by line copies it for every line of a large hunk.
-        local parts = { (above and "^" or "v") .. (row_lang or "") }
+        local count = 1
+        shown_parts[1] = (above and "^" or "v") .. (row_lang or "")
         for _, line in ipairs(lines) do
-            table.insert(parts, (line.uncommitted and "+" or "-") .. line.hunk.deleted[line.order])
+            shown_parts[count + 1], shown_parts[count + 2] = line.uncommitted and "\n+" or "\n-", line.hunk.deleted[line.order]
+            count = count + 2
         end
-        local shown = table.concat(parts, "\n")
+        local shown = table.concat(shown_parts, "", 1, count)
         local id = existing[row .. shown]
         if not id or drawn[id] then
             id = vim.api.nvim_buf_set_extmark(buf, deleted_namespace, row, 0, {

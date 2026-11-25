@@ -1,6 +1,9 @@
 local P = require("default.palette")
 local U = require("default.utils")
 
+local review_green_dim = 0.25
+local review_red_dim = 0.65
+
 return {
     -- Git
     Added = { fg = P.green },
@@ -137,17 +140,17 @@ return {
     LeapLabel = { bg = P.yellow, fg = P.bg_dark, bold = true },
 
     -- Review.
-    ReviewAdd = { bg = U.blend(P.diff.add, 0.2, P.bg) },
-    ReviewAddNr = { fg = P.gray2, bg = U.blend(P.diff.add, 0.2, P.bg) },
-    ReviewDelete = { bg = U.blend(P.diff.delete, 0.65, P.bg) },
-    ReviewDeleteNr = { fg = P.gray2, bg = U.blend(P.diff.delete, 0.65, P.bg) },
+    ReviewAdd = { bg = U.blend(P.diff.add, review_green_dim, P.bg) },
+    ReviewAddNr = { fg = P.gray2, bg = U.blend(P.diff.add, review_green_dim, P.bg) },
+    ReviewDelete = { bg = U.blend(P.diff.delete, review_red_dim, P.bg) },
+    ReviewDeleteNr = { fg = P.gray2, bg = U.blend(P.diff.delete, review_red_dim, P.bg) },
     ReviewPanelLine = { bold = true },
     ReviewPanelDir = { fg = P.gray2 },
     ReviewPanelNr = { fg = P.white0, bold = true },
     ReviewChanged = { fg = P.yellow },
     ReviewNew = { fg = P.green },
-    ReviewSignAdd = { fg = P.green, bg = U.blend(P.diff.add, 0.2, P.bg), bold = true },
-    ReviewSignDelete = { fg = P.red, bg = U.blend(P.diff.delete, 0.65, P.bg), bold = true },
+    ReviewSignAdd = { fg = P.green, bg = U.blend(P.diff.add, review_green_dim, P.bg), bold = true },
+    ReviewSignDelete = { fg = P.red, bg = U.blend(P.diff.delete, review_red_dim, P.bg), bold = true },
 
     -- Statusline.
     StatuslineModeNormal = { fg = P.bg_dark, bg = P.blue, bold = true },

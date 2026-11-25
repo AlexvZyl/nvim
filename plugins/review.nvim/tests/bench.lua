@@ -67,6 +67,13 @@ bench("repeat", 20, function()
     vim.cmd("normal! .")
     render.update(buf)
 end)
+-- A held repeat key deleting at the top, where the deleted lines pile up above the first line.
+vim.cmd("normal! ggdd")
+bench("repeat at top", 100, function()
+    vim.cmd("normal! .")
+    render.update(buf)
+end)
+vim.cmd("normal! " .. math.floor(n / 2) .. "G")
 -- Every deleted line is drawn again for the new leftcol.
 bench("scroll", 10, function()
     vim.cmd("normal! zl")

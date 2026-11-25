@@ -38,28 +38,41 @@ function M.sign(buf, first, last, uncommitted, kind)
     })
 end
 
--- Treesitter highlight of every byte of the deleted lines, by line.
-local function highlight_deleted(lang, deleted)
-    local highlights = {}
-    local query = lang and vim.treesitter.query.get(lang, "highlights")
-    local source = table.concat(deleted, "\n")
+-- Treesitter highlight of every byte of a line of the file, highlighted with the lines from first to last that are
+-- not yet, kept on the file. Parsed with the lines around it from first, so a hunk growing with every edit, like a
+-- held repeat key deleting lines, only highlights its new lines. Not the whole file, whose tree takes a lot of memory.
+local function highlight_line(file, lang, line, first, last)
+    file.highlights[lang] = file.highlights[lang] or {}
+    local cache = file.highlights[lang]
+    local from = first
+    while from <= last and cache[from] do
+        from = from + 1
+    end
+    if cache[line] or from > last then
+        return cache[line] or {}
+    end
+    for row = from, last do
+        cache[row] = {}
+    end
+    local query = vim.treesitter.query.get(lang, "highlights")
+    local source = table.concat(file.lines, "\n", first, last)
     local ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
     if not query or not ok then
-        return highlights
+        return cache[line]
     end
-    for id, node in query:iter_captures(parser:parse()[1]:root(), source) do
+    for id, node in query:iter_captures(parser:parse()[1]:root(), source, from - first, last - first + 1) do
         local name = query.captures[id]
         if not name:find("^_") and name ~= "spell" and name ~= "nospell" then
             local start_row, start_col, end_row, end_col = node:range()
-            for row = start_row, math.min(end_row, #deleted - 1) do
-                highlights[row + 1] = highlights[row + 1] or {}
-                for col = (row == start_row and start_col or 0) + 1, row == end_row and end_col or #deleted[row + 1] do
-                    highlights[row + 1][col] = "@" .. name .. "." .. lang
+            for row = math.max(start_row, from - first), math.min(end_row, last - first) do
+                local highlights = cache[first + row]
+                for col = (row == start_row and start_col or 0) + 1, row == end_row and end_col or #file.lines[first + row] do
+                    highlights[col] = "@" .. name .. "." .. lang
                 end
             end
         end
     end
-    return highlights
+    return cache[line]
 end
 
 -- Highlight ids by group name, which marks take faster than names, as they have every deleted line drawn again.
@@ -179,9 +192,11 @@ local function render_deleted(buf)
             id = vim.api.nvim_buf_set_extmark(buf, deleted_namespace, row, 0, {
                 virt_lines = vim.tbl_map(function(line)
                     local hunk = line.hunk
-                    local cached = (lang or "") .. "\n" .. table.concat(hunk.deleted, "\n")
-                    attached.highlights[cached] = attached.highlights[cached] or highlight_deleted(lang, hunk.deleted)
-                    local chunks = deleted_chunks(hunk.deleted[line.order], attached.highlights[cached][line.order] or {}, line.uncommitted, leftcol, tabstop)
+                    -- Committed deletions are lines of the base, the others of HEAD.
+                    local file = line.uncommitted and attached.head or attached.base
+                    local first, last = hunk.old, hunk.old + #hunk.deleted - 1
+                    local highlights = lang and highlight_line(file, lang, first + line.order - 1, first, last) or {}
+                    local chunks = deleted_chunks(hunk.deleted[line.order], highlights, line.uncommitted, leftcol, tabstop)
                     return vim.list_extend(M.gutter(buf, line.uncommitted, "Delete"), chunks)
                 end, lines),
                 virt_lines_above = above,
@@ -348,10 +363,9 @@ function M.attach(buf)
         end
     end
     local attached = buffers[buf]
-    attached.base = { text = base or "", lines = vim.split(base or "", "\n") }
-    attached.head = { text = head or "", lines = vim.split(head or "", "\n") }
-    -- Treesitter highlights of deleted lines, by their language and text.
-    attached.highlights = {}
+    -- With the treesitter highlights of their lines by language, for the deleted lines.
+    attached.base = { text = base or "", lines = vim.split(base or "", "\n"), highlights = {} }
+    attached.head = { text = head or "", lines = vim.split(head or "", "\n"), highlights = {} }
     -- Lines of the base deleted by commits, other deleted lines are only deleted locally. With where they were
     -- between the lines of HEAD: after the line before them, or before the lines that replaced them.
     attached.committed_deletions = {}

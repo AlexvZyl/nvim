@@ -137,11 +137,51 @@ function M.gutter(buf, uncommitted, kind)
     return { { " ", hl_ids.LineNr }, { sign, hl_ids["ReviewSign" .. (uncommitted and "Local" or "") .. kind] } }
 end
 
+-- The first and last row and language of the languages injected over more than one line, like code blocks in
+-- markdown, inner ones last. As parsed for the highlights of what was shown, as parsing all of them takes long.
+local function blocks(buf, lang)
+    local found = {}
+    local function add(tree)
+        for child_lang, child in pairs(tree:children()) do
+            for _, region in ipairs(child:included_regions()) do
+                local first, last = region[1], region[#region]
+                -- Up to the start of the line after.
+                local last_row = last and (last[5] == 0 and last[4] - 1 or last[4])
+                if first and first[1] < last_row then
+                    table.insert(found, { first[1], last_row, child_lang })
+                end
+            end
+            add(child)
+        end
+    end
+    local parser = lang and vim.treesitter.get_parser(buf, lang, { error = false })
+    if parser then
+        add(parser)
+    end
+    return found
+end
+
 -- How the deleted lines are drawn: scrolled, highlighted, in the gutter and padded to the edge.
 local function style(buf)
     local leftcol, tabstop = vim.fn.getwininfo(window(buf))[1].leftcol, vim.bo[buf].tabstop
     local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
-    return table.concat({ leftcol, tabstop, lang or "", buffers[buf].textoff, vim.o.columns }, " "), leftcol, tabstop, lang
+    local injected = blocks(buf, lang)
+    local key = { leftcol, tabstop, lang or "", buffers[buf].textoff, vim.o.columns }
+    for _, block in ipairs(injected) do
+        table.insert(key, table.concat(block, ","))
+    end
+    return table.concat(key, " "), leftcol, tabstop, lang, injected
+end
+
+-- The language of the lines deleted above the row, like Lua in a code block of markdown, as they are parsed by
+-- themselves.
+local function lang_at(row, lang, injected)
+    for _, block in ipairs(injected) do
+        if row - 1 >= block[1] and row - 1 <= block[2] or row >= block[1] and row <= block[2] then
+            lang = block[3]
+        end
+    end
+    return lang
 end
 
 -- Drawn separately from the added lines, since they depend on the window's scroll and gutter. Marks already showing
@@ -150,7 +190,7 @@ local function render_deleted(buf)
     local attached = buffers[buf]
     -- As last seen after a redraw. Right after an edit, before the redraw, a statuscolumn is not measured yet.
     attached.textoff = attached.textoff or vim.fn.getwininfo(window(buf))[1].textoff
-    local drawn_as, leftcol, tabstop, lang = style(buf)
+    local drawn_as, leftcol, tabstop, lang, injected = style(buf)
     -- Every line is drawn again when how they are drawn changed.
     if attached.style ~= drawn_as then
         vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
@@ -184,7 +224,8 @@ local function render_deleted(buf)
         end)
         local above = row < line_count
         row = above and row or line_count - 1
-        local shown = above and "^" or "v"
+        local row_lang = lang and lang_at(row, lang, injected)
+        local shown = (above and "^" or "v") .. (row_lang or "")
         for _, line in ipairs(lines) do
             shown = shown .. (line.uncommitted and "\n+" or "\n-") .. line.hunk.deleted[line.order]
         end
@@ -196,7 +237,7 @@ local function render_deleted(buf)
                     -- Committed deletions are lines of the base, the others of HEAD.
                     local file = line.uncommitted and attached.head or attached.base
                     local first, last = hunk.old, hunk.old + #hunk.deleted - 1
-                    local highlights = lang and highlight_line(file, lang, first + line.order - 1, first, last) or {}
+                    local highlights = row_lang and highlight_line(file, row_lang, first + line.order - 1, first, last) or {}
                     local chunks = deleted_chunks(hunk.deleted[line.order], highlights, line.uncommitted, leftcol, tabstop)
                     return vim.list_extend(M.gutter(buf, line.uncommitted, "Delete"), chunks)
                 end, lines),

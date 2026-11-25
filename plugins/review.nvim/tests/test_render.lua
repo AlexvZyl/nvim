@@ -251,6 +251,21 @@ function T.deleted_lines_keep_their_background_over_syntax_with_its_own()
     assert(groups[#groups] ~= "@keyword.lua" and background == delete, vim.inspect({ groups, background, delete }))
 end
 
+function T.deleted_lines_are_highlighted_in_the_language_they_are_in()
+    local block = { "# t", "", "```lua", "local x = {", "    y = 1,", "}", "```" }
+    h.repo(block, h.edit(block, { [5] = false }))
+    local buf = h.open()
+    vim.bo[buf].filetype = "markdown"
+    -- Which parses what is shown.
+    vim.cmd.redraw()
+    require("review.render").settled()
+    local chunks = h.marks(buf, "review_deleted", 1, #block)[1][4].virt_lines[1]
+    vim.bo[buf].filetype = ""
+    assert(vim.iter(chunks):any(function(chunk)
+        return type(chunk[2]) == "table" and chunk[2][2]:match("%.lua$")
+    end), vim.inspect(chunks))
+end
+
 function T.deleted_lines_are_highlighted_again_when_the_filetype_changes()
     h.repo({ "local x = 1", "keep" }, { "keep" })
     local buf = h.open()

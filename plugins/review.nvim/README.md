@@ -12,7 +12,6 @@ require("review").setup({
     sign_priority = 6,
     signs = { committed = "│", uncommitted = "╎" },
     keymaps = {
-        files = "fg",
         open = "<CR>",
         mark_reviewed = "d",
         undo = "u",
@@ -27,7 +26,7 @@ require("review").setup({
 
 | Command | Function | Does |
 |:---:|---|---|
-| - | `require("review").setup(opts)` | Sets up the commands and keymaps. |
+| - | `require("review").setup(opts)` | Sets up the commands. |
 | `:Review [ref]` | `require("review").start(ref)` | Starts or switches the review and opens the panel. |
 | `:ReviewStop` | `require("review").stop()` | Stops reviewing. |
 | `:ReviewReset` | `require("review").reset()` | Forgets which files were reviewed. |

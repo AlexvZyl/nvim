@@ -151,9 +151,6 @@ function M.setup(opts)
     })
     vim.api.nvim_create_user_command("ReviewStop", M.stop, {})
     vim.api.nvim_create_user_command("ReviewReset", M.reset, {})
-    if config.options.keymaps.files then
-        vim.keymap.set("n", config.options.keymaps.files, M.files, { desc = "Review files" })
-    end
 end
 
 return M

@@ -149,7 +149,15 @@ local plugins = {
         dir = vim.fn.stdpath("config") .. "/plugins/review.nvim",
         name = "review.nvim",
         cmd = { "Review", "ReviewStop", "ReviewReset" },
-        keys = { "fg" },
+        keys = {
+            {
+                "fg",
+                function()
+                    require("review").files()
+                end,
+                desc = "Review files",
+            },
+        },
         dependencies = { "nvim-telescope/telescope.nvim", "nvim-tree/nvim-web-devicons" },
         config = function()
             require("alex.plugins.review")

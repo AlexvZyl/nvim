@@ -132,6 +132,15 @@ function T.deleting_in_a_changed_run_shortens_it()
     assert(#covering == 0, vim.inspect(covering))
 end
 
+-- Deleting the lines from one changed line to the line before the next moves both their marks onto that line.
+function T.changed_lines_moved_onto_one_line_keep_one_sign()
+    h.repo(h.lines(20), h.edit(h.lines(20), { [3] = "mod 3", [5] = "mod 5" }))
+    local buf = h.open()
+    h.keys("3G2dd")
+    local marks = h.marks(buf, "review", 3, 3)
+    assert(#marks == 1, vim.inspect(marks))
+end
+
 function T.stopping_clears_the_buffers()
     setup()
     local buf = vim.api.nvim_get_current_buf()

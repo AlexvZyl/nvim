@@ -323,7 +323,13 @@ local function render(buf)
     -- Marks already over the right lines are kept, so an edit only signs again the lines it changed.
     local existing = {}
     for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, namespace, 0, -1, { details = true })) do
-        existing[mark[2] .. " " .. mark[4].end_row .. " " .. mark[4].line_hl_group] = mark[1]
+        local key = mark[2] .. " " .. mark[4].end_row .. " " .. mark[4].line_hl_group
+        -- Edits can move marks onto the same lines, where one is enough.
+        if existing[key] then
+            vim.api.nvim_buf_del_extmark(buf, namespace, mark[1])
+        else
+            existing[key] = mark[1]
+        end
     end
     -- The highlight of each added line, signed in runs of the same.
     local changed, first = {}, nil

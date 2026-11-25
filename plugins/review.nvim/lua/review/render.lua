@@ -511,14 +511,24 @@ function M.settled()
     end
 end
 
-function M.attach(buf)
+-- Buffers of files, also ones that do not exist, to show a deleted file as all deleted lines.
+local function attachable(buf)
     local file = vim.api.nvim_buf_get_name(buf)
-    -- Also when the file does not exist, to show a deleted file as all deleted lines.
-    if vim.bo[buf].buftype ~= "" or file == "" or vim.fn.isdirectory(file) == 1 then
+    return vim.bo[buf].buftype == "" and file ~= "" and vim.fn.isdirectory(file) == 0
+end
+
+-- With the file in HEAD and at the merge base when already read.
+function M.attach(buf, shown)
+    if not attachable(buf) then
         return
     end
     -- No base when the file was added since the merge base, no head when it was added since HEAD.
-    local head, base = git.show(file, "HEAD", session.merge_base)
+    local head, base
+    if shown then
+        head, base = shown[1], shown[2]
+    else
+        head, base = git.show(vim.api.nvim_buf_get_name(buf), "HEAD", session.merge_base)
+    end
     -- Untracked, outside the repo or binary.
     if not (base or head) or ((base or "") .. (head or "")):find("\0", 1, true) then
         return M.detach(buf)
@@ -549,11 +559,14 @@ function M.attach(buf)
     M.update(buf)
 end
 
+-- Read by one git process, as a process for each adds up with many buffers open.
 function M.attach_all()
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.api.nvim_buf_is_loaded(buf) then
-            M.attach(buf)
-        end
+    local bufs = vim.tbl_filter(function(buf)
+        return vim.api.nvim_buf_is_loaded(buf) and attachable(buf)
+    end, vim.api.nvim_list_bufs())
+    local shown = git.show_each(vim.tbl_map(vim.api.nvim_buf_get_name, bufs), { "HEAD", session.merge_base })
+    for i, buf in ipairs(bufs) do
+        M.attach(buf, shown[i])
     end
 end
 

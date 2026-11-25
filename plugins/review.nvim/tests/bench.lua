@@ -217,6 +217,11 @@ vim.cmd.edit("rewritten.lua")
 bench("attach rewritten", 5, function()
     render.attach(vim.api.nvim_get_current_buf())
 end)
+-- Every buffer open again once HEAD moved, with 50 of the files open.
+for i = 1, 50 do
+    vim.fn.bufload(vim.fn.bufadd(require("review.session").files[i].path))
+end
+bench("attach all", 10, render.attach_all)
 vim.api.nvim_set_current_win(panel)
 bench("panel redraw", 50, function()
     vim.api.nvim_buf_call(panel_buf, function()

@@ -39,16 +39,20 @@ function M.refs()
     return vim.split(refs, "\n", { trimempty = true })
 end
 
--- Contents of a file at each revision, nil where it does not exist, read by one git process.
-function M.show(file, ...)
-    local revs, path = { ... }, vim.fn.fnamemodify(file, ":.")
-    local objects = vim.tbl_map(function(rev)
-        return rev .. ":./" .. path .. "\n"
-    end, revs)
+-- Contents of each file at each revision, by file a list by revision, nil where it does not exist, read by one git
+-- process.
+function M.show_each(files, revs)
+    local objects = {}
+    for _, file in ipairs(files) do
+        local path = vim.fn.fnamemodify(file, ":.")
+        for _, rev in ipairs(revs) do
+            table.insert(objects, rev .. ":./" .. path .. "\n")
+        end
+    end
     local output = vim.system({ "git", "-C", vim.fn.getcwd(), "cat-file", "--batch" }, { stdin = table.concat(objects) }):wait().stdout or ""
     -- Each object is a header with its type and size, then its contents. Ones not found are only the header.
     local contents, position = {}, 1
-    for i = 1, #revs do
+    for i = 1, #objects do
         local header_end = output:find("\n", position, true)
         if not header_end then
             break
@@ -61,7 +65,16 @@ function M.show(file, ...)
             position = position + size + 1
         end
     end
-    return unpack(contents, 1, #revs)
+    local by_file = {}
+    for i = 1, #files do
+        by_file[i] = { unpack(contents, (i - 1) * #revs + 1, i * #revs) }
+    end
+    return by_file
+end
+
+-- Contents of a file at each revision, nil where it does not exist.
+function M.show(file, ...)
+    return unpack(M.show_each({ file }, { ... })[1], 1, select("#", ...))
 end
 
 -- The files of a diff --numstat -z with the lines they added and removed.

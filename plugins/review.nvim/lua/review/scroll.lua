@@ -87,8 +87,9 @@ function M.keep(buf, old, new)
         if before and before.buf == buf then
             local line, cursor, added = before.line, vim.api.nvim_win_get_cursor(win)[1], #new - #old
             -- Lines as before above and below it, which a run of the same lines leaves more than one place for. With
-            -- a line more or less, like deleting it or breaking it in two, but not more, like undoing deleting lines.
-            local single = math.abs(added) <= 1 and before_lines >= line - 1 and after_lines >= #old - line
+            -- a line less or more in its place, like deleting it or undoing that, but not after it, like breaking it in
+            -- two, which undone would not come back to where it was.
+            local single = before_lines >= line - 1 and after_lines >= #old - line + math.max(added, 0)
             if single then
                 -- Off screen when it was, which is left to Vim, and nothing to keep once the last line is deleted.
                 local shown = before.row >= 0 and before.row < vim.api.nvim_win_get_height(win) and line <= #new

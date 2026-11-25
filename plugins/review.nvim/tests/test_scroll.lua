@@ -141,6 +141,65 @@ function T.deleting_one_of_the_same_lines_keeps_the_cursor_on_its_row()
     end
 end
 
+-- Two lines from one, as undone the line comes back where it was.
+function T.breaking_a_line_keeps_the_screen_in_place()
+    edit("0li\r\27", keeps_top)
+end
+
+function T.deleting_the_last_line_keeps_the_screen_in_place()
+    setup()
+    vim.cmd("normal! Gzb")
+    local before = h.view()
+    h.keys("dd")
+    local after = h.view()
+    assert(same_top(before, after), describe(before, after))
+end
+
+-- Lines deleted at the top of the window show above it, and go once that is undone.
+function T.deleting_lines_at_the_top_shows_them()
+    setup()
+    for _, line in ipairs({ 5, 30, 70 }) do
+        h.place(line, 0)
+        h.keys("dj")
+        local view = h.view()
+        assert(view.top == line and view.fill == 2 and view.row == 3, line .. ": " .. vim.inspect(view))
+        h.keys("u")
+        view = h.view()
+        assert(view.top == line and view.fill == 0 and view.row == 1, line .. " undo: " .. vim.inspect(view))
+    end
+end
+
+-- An edit of another line, like by a formatter, is not the cursor's to keep in place, so the screen stays.
+function T.an_edit_above_keeps_the_screen_still()
+    local buf = setup()
+    each_position(function(line)
+        local before = h.view()
+        vim.api.nvim_buf_set_lines(buf, line - 3, line - 2, true, { "changed" })
+        require("review.render").update(buf)
+        h.flush()
+        local after = h.view()
+        h.keys("u")
+        return line > 3 and keeps_top(before, after) or nil
+    end)
+end
+
+-- Typed in the main loop, through the autocmds that render, settle and restyle.
+function T.typed_keys_keep_the_line_in_place_and_scroll_the_deleted_lines()
+    h.repo(h.lines(100), h.edit(h.lines(100), { [50] = false }))
+    local main = h.review("file.txt")
+    vim.api.nvim_set_current_win(main)
+    vim.wo.wrap = false
+    h.input("60Gzt5j")
+    local before = h.view()
+    h.input("dd")
+    local after = h.view()
+    h.input("u45Gztzl")
+    local chunks = h.marks(vim.api.nvim_get_current_buf(), "review_deleted", 50, 50)[1][4].virt_lines[1]
+    require("review").stop()
+    assert(before.row == after.row, describe(before, after))
+    assert(chunks[3][1]:sub(1, 6) == "ine 50", vim.inspect(chunks))
+end
+
 function T.deleting_down_with_a_motion_drops_the_cursor_below()
     edit("dj", function(before, after)
         return (keeps_top(before, after) or after.line ~= before.line) and describe(before, after) or nil

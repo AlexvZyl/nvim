@@ -121,6 +121,16 @@ function M.press(keys)
     vim.api.nvim_feedkeys(vim.keycode(keys), "x", false)
 end
 
+-- Types the keys in the main loop and waits until they ran, so the autocmds run like for a person typing.
+function M.input(keys)
+    local co = coroutine.running()
+    vim.api.nvim_input(keys)
+    vim.defer_fn(function()
+        coroutine.resume(co)
+    end, 50)
+    coroutine.yield()
+end
+
 -- Opens the file from the panel, focused, by the end of its name.
 function M.pick(name)
     vim.fn.cursor(vim.fn.search(name .. "$"), 1)

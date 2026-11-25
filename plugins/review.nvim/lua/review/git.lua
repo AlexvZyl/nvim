@@ -64,25 +64,38 @@ function M.show(file, ...)
     return unpack(contents, 1, #revs)
 end
 
--- Files changed since the merge base with the ref, relative to the cwd. Nil when the diff fails.
+-- The files of a diff --numstat -z with the lines they added and removed.
+local function numstat(output)
+    local files = {}
+    for _, line in ipairs(vim.split(output, "\0", { trimempty = true })) do
+        local added, removed, path = line:match("^(%S+)\t(%S+)\t(.+)$")
+        -- Binary files count as "-", which leaves them without counts.
+        table.insert(files, { path = path, added = tonumber(added), removed = tonumber(removed) })
+    end
+    return files
+end
+
+-- Files changed since the merge base with the ref, relative to the cwd, with the lines changed by the commits
+-- alone as their changes. Nil when the diff fails.
 function M.changed_files(ref)
-    return start({ "diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames" }, function(numstat)
-        local files = {}
-        for _, line in ipairs(vim.split(numstat, "\0", { trimempty = true })) do
-            local added, removed, path = line:match("^(%S+)\t(%S+)\t(.+)$")
-            -- Binary files count as "-", which leaves them without counts.
-            added, removed = tonumber(added), tonumber(removed)
-            table.insert(files, {
-                path = path,
-                added = added,
-                removed = removed,
-                changes = (added or 0) + (removed or 0),
-                -- The diff is against the working tree, so a deleted file is one not on disk.
-                deleted = vim.uv.fs_stat(path) == nil,
-            })
+    local args = { "diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames" }
+    local all, committed = start(args, numstat), start(vim.list_extend({ unpack(args, 1, 3) }, { "HEAD", unpack(args, 4) }), numstat)
+    return function()
+        local files, reason = all()
+        if not files then
+            return nil, reason
+        end
+        local changes = {}
+        for _, file in ipairs(committed() or {}) do
+            changes[file.path] = (file.added or 0) + (file.removed or 0)
+        end
+        for _, file in ipairs(files) do
+            file.changes = changes[file.path] or 0
+            -- The diff is against the working tree, so a deleted file is one not on disk.
+            file.deleted = vim.uv.fs_stat(file.path) == nil
         end
         return files
-    end)
+    end
 end
 
 -- Blob of the files in HEAD, by path from the repo root, from their paths relative to the cwd. Waited for once

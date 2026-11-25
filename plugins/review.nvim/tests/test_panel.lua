@@ -192,9 +192,11 @@ function T.files_show_the_lines_they_added_and_removed()
 end
 
 -- Progress counts changed lines, so a small file left is a little of the review.
-function T.progress_counts_the_changed_lines_reviewed()
+-- Of the committed lines only, as the uncommitted ones are still being written.
+function T.progress_counts_the_committed_lines_reviewed()
     h.repo(h.lines(5), h.lines(6))
     h.commit({ ["other.txt"] = { "a", "b", "c" } })
+    h.write("file.txt", h.lines(8))
     h.review()
     local panel = require("review.panel")
     local function percent()

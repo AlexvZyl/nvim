@@ -141,6 +141,22 @@ function T.changed_lines_moved_onto_one_line_keep_one_sign()
     assert(#marks == 1, vim.inspect(marks))
 end
 
+-- Like a language server editing a file shown in another window, which gets no TextChanged.
+function T.edits_without_text_changed_render_once_settled()
+    h.repo(h.lines(5), h.lines(5))
+    local buf = h.open()
+    local render = require("review.render")
+    h.keys("ggdG")
+    vim.api.nvim_buf_set_lines(buf, 1, 1, false, { "added" })
+    vim.api.nvim_win_set_cursor(0, { 2, 0 })
+    render.settled()
+    local changed = render.changed(buf)[2]
+    vim.api.nvim_buf_set_lines(buf, 1, 2, false, {})
+    local ok, err = pcall(render.update, buf)
+    assert(changed == "ReviewLocalAdd", vim.inspect(render.changed(buf)))
+    assert(ok, err)
+end
+
 function T.stopping_clears_the_buffers()
     setup()
     local buf = vim.api.nvim_get_current_buf()

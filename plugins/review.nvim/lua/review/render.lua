@@ -363,7 +363,11 @@ end
 -- Draws the deleted lines again once how they are drawn changed without an edit, like the window scrolled sideways,
 -- the window changed width or the filetype changed.
 local function restyle(buf)
-    if style(buf) ~= buffers[buf].style then
+    -- Edits without TextChanged, which only comes for the current buffer, like a language server's to a file in another
+    -- window, are rendered first.
+    if buffers[buf].tick ~= vim.b[buf].changedtick then
+        M.update(buf)
+    elseif style(buf) ~= buffers[buf].style then
         render_deleted(buf)
         require("review.diagnostics").apply(buf)
     end
@@ -413,7 +417,7 @@ function M.update(buf)
     if attached.lines then
         scroll.keep(buf, attached.lines, lines)
     end
-    attached.lines, attached.rendered = lines, hunks
+    attached.lines, attached.rendered, attached.tick = lines, hunks, vim.b[buf].changedtick
 end
 
 -- The gutter the deleted lines draw in is measured once a redraw drew it, as between an edit and the redraw a

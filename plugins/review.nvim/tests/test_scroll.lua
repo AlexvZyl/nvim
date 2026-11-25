@@ -301,6 +301,33 @@ function T.repeating_a_delete_keeps_the_deleted_lines_in_the_gutter()
     assert(ok and typed.redraws > 50 and typed.misdrawn == 0, (result.stdout or "") .. (result.stderr or ""))
 end
 
+-- Held dd or ., with the deleted lines growing above the cursor line once it is the top line. Each must keep it in the
+-- window, as one pushed below for a moment draws the cursor above the deleted lines.
+function T.repeating_a_delete_at_the_bottom_keeps_the_cursor_line_in_the_window()
+    local buf = setup()
+    local win = vim.api.nvim_get_current_win()
+    -- Which the window's height counts, but not the rows of text.
+    vim.wo.winbar = "bar"
+    local function text_height(first, last, vcol)
+        return vim.api.nvim_win_text_height(win, { start_row = first - 1, end_row = last - 1, start_vcol = vcol }).all
+    end
+    h.place(10, vim.fn.winheight(win) - 1)
+    local failures = {}
+    for i = 1, 70 do
+        vim.cmd("silent normal! dd")
+        require("review.render").update(buf)
+        local view, line = vim.fn.winsaveview(), vim.fn.line(".")
+        local hidden = text_height(view.topline, view.topline) - text_height(view.topline, view.topline, 0) - view.topfill
+        local bottom = text_height(view.topline, line) - hidden
+        if line < view.topline or bottom > vim.fn.winheight(win) then
+            table.insert(failures, ("%d: top %d fill %d, line %d ends on row %d"):format(i, view.topline, view.topfill, line, bottom))
+        end
+        h.flush()
+    end
+    vim.wo.winbar = ""
+    assert(#failures == 0, table.concat(failures, "\n"))
+end
+
 -- Spamming dd and u must not scroll the buffer away, settled between keys or not.
 local function no_drift(settle)
     setup()

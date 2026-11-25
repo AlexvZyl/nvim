@@ -16,6 +16,11 @@ local function height(win, first, last, vcol)
     return vim.api.nvim_win_text_height(win, { start_row = first - 1, end_row = last - 1, start_vcol = vcol }).all
 end
 
+-- Rows of text in the window, without the winbar the window's height counts.
+local function text_rows(win)
+    return vim.fn.winheight(win)
+end
+
 -- Virtual lines above the line.
 local function fill(win, line)
     return height(win, line, line) - height(win, line, line, 0)
@@ -90,7 +95,7 @@ function M.keep(buf, old, new)
             local within = added == 0 and before_lines >= line - 1 and after_lines >= #old - line
             if within then
                 -- Off screen when it was, which is left to Vim.
-                local shown = before.row >= 0 and before.row < vim.api.nvim_win_get_height(win)
+                local shown = before.row >= 0 and before.row < text_rows(win)
                 if shown and line_row(win, line) ~= before.row then
                     scroll_to(win, line, before.row)
                 end
@@ -108,6 +113,13 @@ function M.keep(buf, old, new)
                 if removed > 1 and (before.visual or line) == cursor + removed - 1 and cursor > 1 then
                     local text = vim.api.nvim_buf_get_lines(buf, cursor - 2, cursor - 1, true)[1]
                     vim.api.nvim_win_set_cursor(win, { cursor - 1, #text:match("^%s*") })
+                end
+                -- Kept on the bottom row once the deleted lines above push it below, like holding dd or . there. Left
+                -- below the window, the screen scrolls only with the redraw, which draws the cursor above them.
+                cursor = vim.api.nvim_win_get_cursor(win)[1]
+                local rows, shown_rows = height(win, cursor, cursor, 0), text_rows(win)
+                if before.row >= 0 and before.row < shown_rows and line_row(win, cursor) + rows > shown_rows then
+                    scroll_to(win, cursor, shown_rows - rows)
                 end
             end
         end

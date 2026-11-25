@@ -157,6 +157,27 @@ function T.edits_without_text_changed_render_once_settled()
     assert(ok, err)
 end
 
+-- Unloaded, like with :bdelete, it has no lines to draw on until it is read again.
+function T.an_unloaded_file_is_not_drawn()
+    h.repo(h.lines(12), h.edit(h.lines(12), { [3] = false }))
+    h.review("file.txt")
+    local buf = vim.api.nvim_get_current_buf()
+    -- The gutter widening redraws the deleted lines once the screen is drawn.
+    vim.wo.number = not vim.wo.number
+    vim.cmd("redraw")
+    vim.cmd("enew")
+    vim.cmd.bunload(buf)
+    vim.v.errmsg = ""
+    h.flush()
+    local message = vim.v.errmsg
+    vim.cmd.edit("file.txt")
+    local marks = h.marks(buf, "review_deleted", 1, 12)
+    vim.wo.number = not vim.wo.number
+    h.start()
+    assert(message == "", message)
+    assert(#marks == 1, vim.inspect(marks))
+end
+
 function T.stopping_clears_the_buffers()
     setup()
     local buf = vim.api.nvim_get_current_buf()

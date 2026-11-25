@@ -89,7 +89,8 @@ local function create_autocmds()
     autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, on_buf(render.attach))
     -- Saves and outside tools change what is in the diff without moving HEAD.
     autocmd({ "BufWritePost", "FocusGained" }, watch.schedule)
-    autocmd("BufWipeout", on_buf(render.detach))
+    -- Unloaded, like with :bdelete, it has no lines to draw on until it is read again.
+    autocmd("BufUnload", on_buf(render.detach))
     autocmd({ "TextChanged", "TextChangedI" }, on_buf(render.update))
     vim.on_key(safely(require("review.scroll").key), key_namespace)
 end

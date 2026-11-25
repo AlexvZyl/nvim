@@ -7,7 +7,7 @@ Review the current branch against a base ref, in place.
 ```lua
 require("review").setup({
     base = "dev",
-    width = 60,
+    width = 60, -- Or below 1 as a ratio of the editor's width, like 0.25.
     depth = 2,
     sign_priority = 6,
     signs = { committed = "│", uncommitted = "╎" },

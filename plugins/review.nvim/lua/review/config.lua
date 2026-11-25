@@ -3,7 +3,7 @@ local M = {}
 local defaults = {
     -- Ref to review against when `nvim diff` is given none.
     base = "dev",
-    -- Width of the panel.
+    -- Width of the panel, in columns, or below 1 as a ratio of the editor's, kept as it resizes.
     width = 60,
     -- Directory levels the panel groups files by.
     depth = 2,

@@ -262,6 +262,19 @@ function M.follow(opened)
     end
 end
 
+-- In columns, of the editor's for a ratio.
+local function width()
+    local width = config.options.width
+    return width < 1 and math.max(math.floor(vim.o.columns * width), 1) or width
+end
+
+-- Keeps a ratio of the editor's width once it resized.
+function M.fit()
+    if M.is_open() and config.options.width < 1 then
+        vim.api.nvim_win_set_width(win, width())
+    end
+end
+
 function M.resized()
     if M.is_open() and vim.tbl_contains(vim.v.event.windows, win) then
         show_done()
@@ -294,7 +307,7 @@ function M.toggle(loaded)
     if not (buf and vim.api.nvim_buf_is_valid(buf)) then
         create_buffer()
     end
-    vim.cmd("topleft vertical " .. config.options.width .. "split")
+    vim.cmd("topleft vertical " .. width() .. "split")
     win = vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_buf(win, buf)
     for option, value in pairs({

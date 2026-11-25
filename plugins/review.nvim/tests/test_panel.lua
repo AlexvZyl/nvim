@@ -64,6 +64,22 @@ function T.opening_from_the_panel_keeps_its_scroll()
 end
 
 -- With no saved state nothing is new, and the first group's directory shows above it.
+function T.the_width_is_in_columns_or_a_ratio_kept_as_the_editor_resizes()
+    local options = require("review.config").options
+    local _, panel = setup()
+    local columns = vim.api.nvim_win_get_width(panel)
+    teardown()
+    options.width = 0.25
+    local _, ratio = setup()
+    local quarter = vim.api.nvim_win_get_width(ratio)
+    vim.o.columns = 100
+    vim.api.nvim_exec_autocmds("VimResized", {})
+    local resized = vim.api.nvim_win_get_width(ratio)
+    options.width = 60
+    teardown()
+    assert(columns == 60 and quarter == 50 and resized == 25, vim.inspect({ columns, quarter, resized }))
+end
+
 function T.a_first_review_lists_the_files_as_a_tree()
     local _, panel, panel_buf = setup()
     local dots = vim.tbl_filter(function(mark)

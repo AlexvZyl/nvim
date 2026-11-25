@@ -9,6 +9,8 @@ local defaults = {
     depth = 2,
     -- Of the signs, under the diagnostic signs at 10.
     sign_priority = 6,
+    -- Of committed and uncommitted changes, one or two cells.
+    signs = { committed = "│", uncommitted = "╎" },
     -- False leaves a key unmapped.
     keymaps = {
         -- Everywhere, picks a changed file with Telescope.

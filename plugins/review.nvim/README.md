@@ -10,6 +10,7 @@ require("review").setup({
     width = 60,
     depth = 2,
     sign_priority = 6,
+    signs = { committed = "│", uncommitted = "╎" },
     keymaps = {
         files = "fg",
         open = "<CR>",

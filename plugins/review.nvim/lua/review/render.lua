@@ -8,7 +8,10 @@ local M = {}
 local namespace = vim.api.nvim_create_namespace("review")
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
 -- Committed and uncommitted.
-local SIGNS = { [false] = "│", [true] = "╎" }
+local function sign_text(uncommitted)
+    return config.options.signs[uncommitted and "uncommitted" or "committed"]
+end
+
 -- Attached buffers, with the file at the merge base and the current hunks against it.
 local buffers = {}
 
@@ -29,7 +32,7 @@ function M.sign(buf, first, last, uncommitted, kind)
         end_row = last - 1,
         line_hl_group = group,
         number_hl_group = group .. "Nr",
-        sign_text = SIGNS[uncommitted],
+        sign_text = sign_text(uncommitted),
         sign_hl_group = "ReviewSign" .. group:sub(7),
         priority = config.options.sign_priority,
     })
@@ -90,7 +93,8 @@ end
 
 -- The number and sign columns of a changed line, for virtual lines, which have none.
 function M.gutter(buf, uncommitted, kind)
-    local sign = SIGNS[uncommitted] .. string.rep(" ", buffers[buf].textoff - 2)
+    local text = sign_text(uncommitted)
+    local sign = text .. string.rep(" ", buffers[buf].textoff - 1 - vim.fn.strdisplaywidth(text))
     return { { " ", "LineNr" }, { sign, "ReviewSign" .. (uncommitted and "Local" or "") .. kind } }
 end
 

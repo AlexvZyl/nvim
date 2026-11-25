@@ -80,11 +80,30 @@ function T.the_width_is_in_columns_or_a_ratio_kept_as_the_editor_resizes()
     assert(columns == 60 and quarter == 50 and resized == 25, vim.inspect({ columns, quarter, resized }))
 end
 
+function T.the_panel_opens_on_the_file_it_is_opened_from()
+    local main = setup()
+    local started = vim.api.nvim_get_current_line()
+    vim.api.nvim_set_current_win(main)
+    vim.cmd.edit("f50.txt")
+    require("review").panel()
+    require("review").panel()
+    local reopened = vim.api.nvim_get_current_line()
+    vim.cmd.enew()
+    require("review").panel()
+    require("review").panel()
+    local unchanged = vim.api.nvim_get_current_line()
+    teardown()
+    assert(started:match(" file.txt$") and reopened:match(" f50.txt$") and unchanged == reopened, vim.inspect({ started, reopened, unchanged }))
+end
+
 function T.a_first_review_lists_the_files_as_a_tree()
     local _, panel, panel_buf = setup()
     local dots = vim.tbl_filter(function(mark)
         return mark[4].virt_text and mark[4].virt_text[1][2] == "ReviewNew"
     end, h.marks(panel_buf, "review_panel", 1, vim.api.nvim_buf_line_count(panel_buf)))
+    -- Opened on file.txt, further down.
+    vim.api.nvim_win_set_cursor(panel, { 1, 0 })
+    require("review.panel").refresh()
     local topfill = vim.api.nvim_win_call(panel, vim.fn.winsaveview).topfill
     local function branch(row)
         vim.api.nvim_win_set_cursor(panel, { row, 0 })

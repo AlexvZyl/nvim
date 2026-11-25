@@ -71,6 +71,7 @@ local function counts(file)
     return chunks
 end
 
+-- With the cursor on the line, or on the selected file when not given, else the first.
 local function draw(cursor)
     -- Pending files grouped by their first directories up to the configured depth.
     local groups, dirs = {}, {}
@@ -121,7 +122,14 @@ local function draw(cursor)
             vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, { virt_text = count, virt_text_pos = "right_align" })
         end
     end
-    vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor, #rows), 1), 0 })
+    if not cursor then
+        for i, file in ipairs(rows) do
+            if file.key == selected then
+                cursor = i
+            end
+        end
+    end
+    vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor or 1, #rows), 1), 0 })
     show_top_header()
     show_done()
     -- The winbar only redraws by itself on window events.
@@ -304,6 +312,11 @@ function M.toggle(loaded)
         return
     end
     state.load()
+    -- The file it is opened from, like once entered.
+    local key = session.prefix .. deleted.path(vim.api.nvim_get_current_buf())
+    if session.by_key[key] then
+        selected = key
+    end
     if not (buf and vim.api.nvim_buf_is_valid(buf)) then
         create_buffer()
     end
@@ -324,7 +337,7 @@ function M.toggle(loaded)
     }) do
         vim.wo[win][0][option] = value
     end
-    draw(1)
+    draw()
 end
 
 function M.winbar()

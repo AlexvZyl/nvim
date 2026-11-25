@@ -38,40 +38,87 @@ function M.sign(buf, first, last, uncommitted, kind)
     })
 end
 
--- Treesitter highlight of every byte of a line of the file, highlighted with the lines from first to last that are
--- not yet, kept on the file. Parsed with the lines around it from first, so a hunk growing with every edit, like a
--- held repeat key deleting lines, only highlights its new lines. Not the whole file, whose tree takes a lot of memory.
-local function highlight_line(file, lang, line, first, last)
+-- Lines of the file parsed around deleted lines at most, for highlights that depend on the code around them, like a
+-- field holding a function.
+local context = 30
+
+-- Treesitter highlight of every byte of a line of the file, kept on the file. Parsed with up to context lines of the
+-- file around it, or above and below when fewer, and the languages injected in them, but not the whole file, whose
+-- tree takes a lot of memory. With the deleted lines near it not highlighted yet in the same parse, so a file with
+-- many is parsed about once, and a hunk growing with every edit, like a held repeat key deleting lines, only
+-- highlights its new lines.
+local function highlight_line(file, lang, line, above, below)
     file.highlights[lang] = file.highlights[lang] or {}
     local cache = file.highlights[lang]
-    local from = first
-    while from <= last and cache[from] do
-        from = from + 1
-    end
-    if cache[line] or from > last then
-        return cache[line] or {}
-    end
-    for row = from, last do
-        cache[row] = {}
-    end
-    local query = vim.treesitter.query.get(lang, "highlights")
-    local source = table.concat(file.lines, "\n", first, last)
-    local ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
-    if not query or not ok then
+    if cache[line] then
         return cache[line]
     end
-    for id, node in query:iter_captures(parser:parse()[1]:root(), source, from - first, last - first + 1) do
-        local name = query.captures[id]
-        if not name:find("^_") and name ~= "spell" and name ~= "nospell" then
-            local start_row, start_col, end_row, end_col = node:range()
-            for row = math.max(start_row, from - first), math.min(end_row, last - first) do
-                local highlights = cache[first + row]
-                for col = (row == start_row and start_col or 0) + 1, row == end_row and end_col or #file.lines[first + row] do
-                    highlights[col] = "@" .. name .. "." .. lang
-                end
+    local low, high = line, line
+    -- Not past the lines of an injected language, like a code block.
+    if above == math.huge and below == math.huge then
+        local row = line - 1
+        while row >= math.max(low - context, 1) do
+            low = file.deleted[row] and not cache[row] and row or low
+            row = row - 1
+        end
+        row = line + 1
+        while row <= math.min(high + context, #file.lines) do
+            high = file.deleted[row] and not cache[row] and row or high
+            row = row + 1
+        end
+    end
+    local top = math.max(low - math.min(above, context), 1)
+    local bottom = math.min(high + math.min(below, context), #file.lines)
+    -- The runs of deleted lines in between still to highlight, by their first and last row.
+    local runs = {}
+    for row = low, high do
+        if row == line or file.deleted[row] and not cache[row] then
+            cache[row] = {}
+            local run = runs[#runs]
+            if run and run[2] == row - 1 then
+                run[2] = row
+            else
+                table.insert(runs, { row, row })
             end
         end
     end
+    local source = table.concat(file.lines, "\n", top, bottom)
+    local ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
+    if not ok then
+        return cache[line]
+    end
+    parser:parse()
+    -- With the languages injected only in the deleted lines, as finding them in all the lines takes as long again.
+    for _, run in ipairs(runs) do
+        parser:parse({ run[1] - top, 0, run[2] - top + 1, 0 })
+    end
+    -- Injected languages after the ones they are in, so theirs win.
+    local function add(tree)
+        local tree_lang = tree:lang()
+        local query = vim.treesitter.query.get(tree_lang, "highlights")
+        for _, parsed in ipairs(query and tree:trees() or {}) do
+            for _, run in ipairs(runs) do
+                local from, to = run[1] - top, run[2] - top
+                for id, node in query:iter_captures(parsed:root(), source, from, to + 1) do
+                    local name = query.captures[id]
+                    if not name:find("^_") and name ~= "spell" and name ~= "nospell" then
+                        local start_row, start_col, end_row, end_col = node:range()
+                        for row = math.max(start_row, from), math.min(end_row, to) do
+                            local highlights = cache[top + row]
+                            local columns = #file.lines[top + row]
+                            for col = (row == start_row and start_col or 0) + 1, row == end_row and end_col or columns do
+                                highlights[col] = "@" .. name .. "." .. tree_lang
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        for _, child in pairs(tree:children()) do
+            add(child)
+        end
+    end
+    add(parser)
     return cache[line]
 end
 
@@ -174,14 +221,15 @@ local function style(buf)
 end
 
 -- The language of the lines deleted above the row, like Lua in a code block of markdown, as they are parsed by
--- themselves.
+-- themselves, and how many lines of it are above and below them.
 local function lang_at(row, lang, injected)
+    local above, below = math.huge, math.huge
     for _, block in ipairs(injected) do
         if row - 1 >= block[1] and row - 1 <= block[2] or row >= block[1] and row <= block[2] then
-            lang = block[3]
+            lang, above, below = block[3], math.max(row - block[1], 0), math.max(block[2] - row + 1, 0)
         end
     end
-    return lang
+    return lang, above, below
 end
 
 -- Drawn separately from the added lines, since they depend on the window's scroll and gutter. Marks already showing
@@ -199,6 +247,8 @@ local function render_deleted(buf)
     local line_count = vim.api.nvim_buf_line_count(buf)
     -- The deleted lines by where they go, each with where it was in HEAD to order them by.
     local anchors = {}
+    -- The lines of each file shown deleted, to highlight those near each other at once.
+    attached.base.deleted, attached.head.deleted = {}, {}
     -- Deleted by commits against the base, and everything deleted against HEAD as uncommitted.
     for uncommitted, hunks in pairs({ [false] = attached.hunks, [true] = attached.local_hunks }) do
         for _, hunk in ipairs(hunks) do
@@ -207,6 +257,7 @@ local function render_deleted(buf)
             for i in ipairs(hunk.deleted) do
                 local key = uncommitted and hunk.old + i - 1 or attached.committed_deletions[hunk.old + i - 1]
                 if key then
+                    (uncommitted and attached.head or attached.base).deleted[hunk.old + i - 1] = true
                     anchors[row] = anchors[row] or {}
                     table.insert(anchors[row], { key = key, order = i, hunk = hunk, uncommitted = uncommitted })
                 end
@@ -224,7 +275,10 @@ local function render_deleted(buf)
         end)
         local above = row < line_count
         row = above and row or line_count - 1
-        local row_lang = lang and lang_at(row, lang, injected)
+        local row_lang, lines_above, lines_below
+        if lang then
+            row_lang, lines_above, lines_below = lang_at(row, lang, injected)
+        end
         local shown = (above and "^" or "v") .. (row_lang or "")
         for _, line in ipairs(lines) do
             shown = shown .. (line.uncommitted and "\n+" or "\n-") .. line.hunk.deleted[line.order]
@@ -236,8 +290,9 @@ local function render_deleted(buf)
                     local hunk = line.hunk
                     -- Committed deletions are lines of the base, the others of HEAD.
                     local file = line.uncommitted and attached.head or attached.base
-                    local first, last = hunk.old, hunk.old + #hunk.deleted - 1
-                    local highlights = row_lang and highlight_line(file, row_lang, first + line.order - 1, first, last) or {}
+                    local highlights = row_lang
+                            and highlight_line(file, row_lang, hunk.old + line.order - 1, lines_above, lines_below)
+                        or {}
                     local chunks = deleted_chunks(hunk.deleted[line.order], highlights, line.uncommitted, leftcol, tabstop)
                     return vim.list_extend(M.gutter(buf, line.uncommitted, "Delete"), chunks)
                 end, lines),

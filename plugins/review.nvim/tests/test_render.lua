@@ -266,6 +266,39 @@ function T.deleted_lines_are_highlighted_in_the_language_they_are_in()
     end), vim.inspect(chunks))
 end
 
+-- The highlight of the chunk of a deleted line showing text.
+local function deleted_highlight(buf, text, line_count)
+    local chunks = h.marks(buf, "review_deleted", 1, line_count)[1][4].virt_lines[1]
+    for _, chunk in ipairs(chunks) do
+        if chunk[1]:find(text, 1, true) and type(chunk[2]) == "table" then
+            return chunk[2][2], chunks
+        end
+    end
+    return nil, chunks
+end
+
+function T.deleted_lines_are_highlighted_with_the_code_around_them()
+    local lines = { "local t = {", "    f = function()", "        return 1", "    end,", "}" }
+    h.repo(lines, h.edit(lines, { [2] = false }))
+    local buf = h.open()
+    vim.bo[buf].filetype = "lua"
+    require("review.render").settled()
+    local name, chunks = deleted_highlight(buf, "f", #lines)
+    vim.bo[buf].filetype = ""
+    assert(name == "@function.lua", vim.inspect(chunks))
+end
+
+function T.deleted_lines_are_highlighted_in_the_languages_injected_in_them()
+    local lines = { 'vim.cmd("resize 10")', "keep" }
+    h.repo(lines, { "keep" })
+    local buf = h.open()
+    vim.bo[buf].filetype = "lua"
+    require("review.render").settled()
+    local name, chunks = deleted_highlight(buf, "resize", #lines)
+    vim.bo[buf].filetype = ""
+    assert(name and name:match("%.vim$"), vim.inspect(chunks))
+end
+
 function T.deleted_lines_are_highlighted_again_when_the_filetype_changes()
     h.repo({ "local x = 1", "keep" }, { "keep" })
     local buf = h.open()

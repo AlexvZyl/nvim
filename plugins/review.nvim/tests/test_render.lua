@@ -150,6 +150,13 @@ function T.a_file_without_a_line_break_at_the_end_is_unchanged()
     assert(#h.marks(buf, "review_deleted", 1, 3) == 0, vim.inspect(h.marks(buf, "review_deleted", 1, 3)))
 end
 
+-- Its buffer has the same one empty line as an empty file's.
+function T.a_file_of_one_empty_line_is_unchanged()
+    h.repo({ "" }, { "" })
+    local buf = h.open()
+    assert(#h.marks(buf, "review_deleted", 1, 1) == 0, vim.inspect(h.marks(buf, "review_deleted", 1, 1)))
+end
+
 -- TextChanged comes before the redraw, rendered later the edit flashes without the deleted lines.
 function T.deleted_lines_render_before_the_redraw()
     h.repo(h.lines(12), h.lines(12))

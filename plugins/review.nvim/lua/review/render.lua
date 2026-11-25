@@ -379,8 +379,10 @@ function M.update(buf)
         return
     end
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-    -- Like the file is written, with the line break at the end unless it had none when read.
-    local text = (#lines == 1 and lines[1] == "") and "" or table.concat(lines, "\n") .. (vim.bo[buf].eol and "\n" or "")
+    -- Like the file is written, with the line break at the end unless it had none when read. Nothing for an empty
+    -- buffer, which shows one empty line like a file of one does.
+    local empty = #lines == 1 and lines[1] == "" and vim.api.nvim_buf_call(buf, vim.fn.wordcount).bytes == 0
+    local text = empty and "" or table.concat(lines, "\n") .. (vim.bo[buf].eol and "\n" or "")
     local hunks = attached.committed
     if text == attached.head.text then
         -- As committed, which attach already diffed, like when the file was just opened.

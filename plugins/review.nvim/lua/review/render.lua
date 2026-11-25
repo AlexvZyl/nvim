@@ -284,10 +284,12 @@ local function render_deleted(buf)
         if lang then
             row_lang, lines_above, lines_below = lang_at(row, lang, injected)
         end
-        local shown = (above and "^" or "v") .. (row_lang or "")
+        -- Joined once, as adding to the string line by line copies it for every line of a large hunk.
+        local parts = { (above and "^" or "v") .. (row_lang or "") }
         for _, line in ipairs(lines) do
-            shown = shown .. (line.uncommitted and "\n+" or "\n-") .. line.hunk.deleted[line.order]
+            table.insert(parts, (line.uncommitted and "+" or "-") .. line.hunk.deleted[line.order])
         end
+        local shown = table.concat(parts, "\n")
         local id = existing[row .. shown]
         if not id or drawn[id] then
             id = vim.api.nvim_buf_set_extmark(buf, deleted_namespace, row, 0, {

@@ -20,7 +20,7 @@ function T.committed_lines_have_a_solid_sign_and_background()
     local mark = find(buf, "review", 10)
     assert(mark, "no mark on the committed line")
     assert(mark[4].sign_text == "│ ", vim.inspect(mark[4].sign_text))
-    assert(mark[4].line_hl_group == "ReviewAdd")
+    assert(mark[4].line_hl_group == "ReviewAdd" and mark[4].priority == 6, vim.inspect(mark[4]))
     local deleted = h.virt_lines(find(buf, "review_deleted", 10))
     assert(#deleted == 1 and deleted[1].text == "line 10" and deleted[1].sign == "│", vim.inspect(deleted))
     assert(deleted[1].group == "ReviewSignDelete")
@@ -102,17 +102,42 @@ function T.deleted_lines_expand_tabs_and_scroll()
     h.repo({ "\tcafé x", "keep" }, { "keep" })
     local buf = h.open()
     vim.bo[buf].tabstop, vim.wo.wrap = 4, false
+    local width
     local function text(leftcol)
         vim.fn.winrestview({ leftcol = leftcol })
         require("review.render").update(buf)
         local chunks = h.marks(buf, "review_deleted", 1, 1)[1][4].virt_lines[1]
-        return table.concat(vim.tbl_map(function(chunk)
+        local texts = vim.tbl_map(function(chunk)
             return chunk[1]
-        end, vim.list_slice(chunks, 3, #chunks - 1)))
+        end, chunks)
+        -- Padded to the edge of the window however far it is scrolled.
+        width = math.min(width or math.huge, vim.fn.strdisplaywidth(table.concat(texts)))
+        return table.concat(texts, "", 3, #texts - 1)
     end
-    local shown = { text(0), text(2), text(5) }
+    -- Past the é, which is two bytes and one cell.
+    local shown = { text(0), text(2), text(5), text(8) }
     vim.wo.wrap = true
-    assert(vim.deep_equal(shown, { "    café x", "  café x", "afé x" }), vim.inspect(shown))
+    assert(vim.deep_equal(shown, { "    café x", "  café x", "afé x", " x" }), vim.inspect(shown))
+    assert(width >= vim.o.columns, width)
+end
+
+-- Deleting a line in the middle of a run of changed lines leaves the line after it, which is not changed, unsigned.
+function T.deleting_in_a_changed_run_shortens_it()
+    h.repo(h.lines(20), h.edit(h.lines(20), { [10] = "mod 10", [11] = "mod 11" }))
+    local buf = h.open()
+    h.keys("11Gdd")
+    local covering = vim.tbl_filter(function(mark)
+        return mark[2] <= 10 and mark[4].end_row >= 10
+    end, vim.api.nvim_buf_get_extmarks(buf, vim.api.nvim_create_namespace("review"), 0, -1, { details = true }))
+    assert(#covering == 0, vim.inspect(covering))
+end
+
+function T.stopping_clears_the_buffers()
+    setup()
+    local buf = vim.api.nvim_get_current_buf()
+    require("review").stop()
+    local left = vim.api.nvim_buf_get_extmarks(buf, -1, 0, -1, {})
+    assert(#left == 0, vim.inspect(left))
 end
 
 -- Without a line break at the end the last line is not changed.

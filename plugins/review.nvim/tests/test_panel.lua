@@ -63,6 +63,24 @@ function T.opening_from_the_panel_keeps_its_scroll()
     teardown()
 end
 
+-- With no saved state nothing is new, and the first group's directory shows above it.
+function T.a_first_review_lists_the_files_as_a_tree()
+    local _, panel, panel_buf = setup()
+    local dots = vim.tbl_filter(function(mark)
+        return mark[4].virt_text and mark[4].virt_text[1][2] == "ReviewNew"
+    end, h.marks(panel_buf, "review_panel", 1, vim.api.nvim_buf_line_count(panel_buf)))
+    local topfill = vim.api.nvim_win_call(panel, vim.fn.winsaveview).topfill
+    local function branch(row)
+        vim.api.nvim_win_set_cursor(panel, { row, 0 })
+        return vim.api.nvim_eval_statusline(vim.wo[panel].statuscolumn, { winid = panel, use_statuscol_lnum = row }).str
+    end
+    local first, last = branch(1), branch(vim.api.nvim_buf_line_count(panel_buf))
+    teardown()
+    assert(#dots == 0, vim.inspect(dots))
+    assert(topfill == 1, topfill)
+    assert(first:find("├─", 1, true) and last:find("└─", 1, true), vim.inspect({ first, last }))
+end
+
 function T.reviewing_files_hides_them_until_undone()
     local _, _, panel_buf = setup()
     local function names()
@@ -77,12 +95,16 @@ function T.reviewing_files_hides_them_until_undone()
     local after_undo = #names()
     h.press("<C-r>")
     local after_redo = #names()
+    -- Reviewing more after an undo leaves nothing to redo.
+    h.press("uggdd<C-r>")
+    local redo_cleared = #names()
     h.press("ggdG")
     local done = h.marks(panel_buf, "review_panel_done", 1, 1)
     local winbar = require("review.panel").winbar()
     teardown()
     assert(after_dd == all - 1 and after_visual == all - 3, vim.inspect({ all, after_dd, after_visual }))
     assert(after_undo == all - 1 and after_redo == all - 3, vim.inspect({ after_undo, after_redo }))
+    assert(redo_cleared == all - 2, vim.inspect({ all, redo_cleared }))
     assert(#done == 1 and winbar:find("100%%"), vim.inspect({ done, winbar }))
 end
 
@@ -156,7 +178,14 @@ function T.files_show_the_lines_they_added_and_removed()
         end
     end
     local file, added, binary = counts("file.txt"), counts("added.txt"), counts("binary.bin")
+    -- A binary file left has no lines, but is not reviewed yet.
+    for _, name in ipairs({ "file.txt", "added.txt" }) do
+        vim.fn.cursor(vim.fn.search(name .. "$"), 1)
+        h.press("dd")
+    end
+    local percent = require("review.panel").winbar():match("(%d+)%%%%")
     teardown()
+    assert(percent == "99", percent)
     assert(vim.deep_equal(file, { { "+1 ", "ReviewPanelAdded" }, { "-2 ", "ReviewPanelRemoved" } }), vim.inspect(file))
     assert(vim.deep_equal(added, { { "+3 ", "ReviewPanelAdded" } }), vim.inspect(added))
     assert(binary == nil, vim.inspect(binary))

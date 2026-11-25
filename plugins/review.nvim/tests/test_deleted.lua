@@ -35,6 +35,7 @@ function T.a_file_deleted_locally_has_the_local_style()
     local buf = vim.api.nvim_win_get_buf(main)
     assert(vim.deep_equal(vim.api.nvim_buf_get_lines(buf, 0, -1, false), h.lines(5)), "not the old contents")
     local mark = h.marks(buf, "review", 1, 2)[1]
+    assert(vim.bo[buf].filetype == "text", vim.bo[buf].filetype)
     assert(mark and mark[4].sign_text == "╎ ", vim.inspect(mark))
     assert(mark[4].line_hl_group == "ReviewLocalDelete" and mark[4].number_hl_group == "ReviewLocalDeleteNr")
     require("review").stop()

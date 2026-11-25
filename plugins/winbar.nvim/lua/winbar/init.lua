@@ -27,7 +27,11 @@ function M.set_winbar()
     if vim.tbl_contains(config.options.exclude, vim.bo.filetype) or vim.api.nvim_win_get_config(0).relative ~= "" then
         return
     end
-    vim.opt_local.winbar = M.get_winbar()
+    local winbar = M.get_winbar()
+    -- Setting it redraws it, which is most of the time when it is the same.
+    if vim.api.nvim_get_option_value("winbar", { scope = "local" }) ~= winbar then
+        vim.api.nvim_set_option_value("winbar", winbar, { scope = "local" })
+    end
 end
 
 function M.setup(opts)

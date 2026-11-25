@@ -6,7 +6,7 @@ local M = {}
 local timer, watcher, wrap
 
 -- Reloads from git after HEAD or the working tree changed.
-local function refresh()
+function M.refresh()
     local source, merge_base, head = session.source, session.merge_base, session.head
     if not session.load() then
         return
@@ -29,7 +29,7 @@ end
 function M.schedule()
     if timer then
         timer:stop()
-        timer:start(200, 0, vim.schedule_wrap(wrap(refresh)))
+        timer:start(200, 0, vim.schedule_wrap(wrap(M.refresh)))
     end
 end
 

@@ -1,6 +1,9 @@
--- nvim --clean --headless -c "luafile tests/bench.lua", rendering with N diagnostics in the buffer.
+-- nvim --clean --headless -c "luafile tests/bench.lua", rendering with N diagnostics in the buffer, with FILTER=text
+-- to run the benchmarks with it in their name. PLUGIN_ROOT runs them against the plugin there instead, like another
+-- revision of it.
 local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
-vim.opt.rtp:prepend(root)
+vim.opt.rtp:prepend(os.getenv("PLUGIN_ROOT") or root)
+vim.opt.rtp:prepend(root .. "/../shared.nvim")
 package.path = root .. "/?.lua;" .. package.path
 local toggles = {}
 for i = 1, 4 do
@@ -14,6 +17,13 @@ end
 require("statusline").setup({ toggles = toggles })
 local statusline = require("statusline")
 
+local function bench(name, count, fn)
+    require("shared.bench").run(name, count, fn, "us")
+end
+
+-- Nothing to show but the mode and the position.
+bench("render empty", 5000, statusline.render)
+
 local n = tonumber(os.getenv("N")) or 2000
 local lines, diagnostics = {}, {}
 for i = 1, n do
@@ -22,6 +32,8 @@ for i = 1, n do
 end
 vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 vim.diagnostic.set(vim.api.nvim_create_namespace("bench"), 0, diagnostics)
+bench("render no lsp", 5000, statusline.render)
+
 -- Two clients, one of them efm with linters for the filetype.
 vim.bo.filetype = "lua"
 local clients = {
@@ -31,18 +43,21 @@ local clients = {
 vim.lsp.get_clients = function(_)
     return clients
 end
-
-local function bench(name, count, fn)
-    collectgarbage()
-    local start = vim.uv.hrtime()
-    for _ = 1, count do
-        fn()
-    end
-    io.stdout:write(("%-10s %8.2f us\n"):format(name, (vim.uv.hrtime() - start) / 1e3 / count))
-end
-
 bench("render", 5000, statusline.render)
 bench("draw", 5000, function()
     vim.api.nvim_eval_statusline(vim.o.statusline, {})
 end)
-vim.cmd("qa!")
+-- The first render after the diagnostics changed counts them again.
+bench("recount", 500, function()
+    require("statusline.parts").diagnostics_changed(vim.api.nvim_get_current_buf())
+    statusline.render()
+end)
+vim.diagnostic.config({ signs = { text = { "E", "W", "I", "H" } } })
+bench("render signs", 5000, statusline.render)
+-- Prompts show the clients of the buffer before them.
+vim.bo.filetype = "TelescopePrompt"
+bench("render prompt", 5000, statusline.render)
+vim.bo.filetype = "lua"
+require("statusline.config").options.toggles = vim.list_extend(vim.deepcopy(toggles), vim.deepcopy(toggles))
+bench("render toggles", 5000, statusline.render)
+require("shared.bench").finish()

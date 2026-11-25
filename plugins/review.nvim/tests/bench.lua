@@ -1,10 +1,19 @@
--- nvim --clean --headless -c "luafile tests/bench.lua", with N=lines for the size of the file.
+-- nvim --clean --headless -c "luafile tests/bench.lua", with N=lines for the size of the files, FILES=count for the
+-- size of the review and FILTER=text to run the benchmarks with it in their name. PLUGIN_ROOT runs them against the
+-- plugin there instead, like another revision of it.
 local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
-vim.opt.rtp:prepend(root)
+vim.opt.rtp:prepend(os.getenv("PLUGIN_ROOT") or root)
+vim.opt.rtp:prepend(root .. "/../shared.nvim")
 package.path = root .. "/?.lua;" .. package.path
+vim.o.report = 10000
+vim.notify = function(...) end
 require("review").setup({})
 local h = require("tests.helpers")
 local render = require("review.render")
+
+local function bench(name, count, fn)
+    require("shared.bench").run(name, count, fn, "ms")
+end
 
 -- Lua lines, with every 7th changed and every 11th deleted by commits, then every 13th changed and every 17th
 -- deleted locally.
@@ -31,15 +40,6 @@ vim.bo[buf].filetype = "lua"
 vim.wo.wrap = false
 vim.cmd("normal! " .. math.floor(n / 2) .. "G")
 
-local function bench(name, count, fn)
-    collectgarbage()
-    local start = vim.uv.hrtime()
-    for _ = 1, count do
-        fn()
-    end
-    io.stdout:write(("%-10s %8.2f ms\n"):format(name, (vim.uv.hrtime() - start) / 1e6 / count))
-end
-
 bench("attach", 5, function()
     render.attach(buf)
 end)
@@ -56,16 +56,37 @@ bench("delete", 10, function()
     vim.cmd("silent normal! u")
     render.update(buf)
 end)
+bench("delete visual", 10, function()
+    vim.cmd("normal! Vjd")
+    render.update(buf)
+    vim.cmd("silent normal! u")
+    render.update(buf)
+end)
 vim.cmd("normal! dd")
 bench("repeat", 20, function()
     vim.cmd("normal! .")
     render.update(buf)
 end)
+-- Every deleted line is drawn again for the new leftcol.
 bench("scroll", 10, function()
     vim.cmd("normal! zl")
-    render.update(buf)
+    render.settled()
 end)
 bench("settled", 200, render.settled)
+bench("jump", 200, function()
+    vim.cmd("normal ]h")
+end)
+-- The screen with the deleted lines on it.
+bench("redraw", 50, function()
+    vim.cmd("redraw!")
+end)
+-- Keeping the line in place measures the height of the wrapped lines.
+vim.cmd("normal! 0")
+vim.wo.wrap = true
+bench("type wrapped", 20, function()
+    vim.cmd("normal! Ax")
+    render.update(buf)
+end)
 local diagnostics = {}
 for row = 0, n - 1000, 3 do
     table.insert(diagnostics, { lnum = row, col = 0, message = "diagnostic", severity = 1 })
@@ -76,4 +97,83 @@ bench("diagnosed", 10, function()
     vim.cmd("normal! Ax")
     render.update(buf)
 end)
-vim.cmd("qa!")
+require("review.diagnostics").stop()
+
+-- A review of FILES files spread over directories, a few lines each: a quarter added, modified, deleted and left
+-- as they are. With a file rewritten from scratch and a large one deleted.
+local before, after, modified = { ["rewritten.lua"] = base, ["deleted.lua"] = base }, { ["rewritten.lua"] = working }, {}
+for i = 1, tonumber(os.getenv("FILES")) or 500 do
+    local name = ("file%d.lua"):format(i)
+    local path = ("dir%d/sub%d/%s"):format(i % 20, i % 3, name)
+    local lines = h.lines(i % 30 + 10)
+    before[path] = i % 4 ~= 0 and lines or nil
+    after[path] = i % 4 == 1 and h.edit(lines, { [3] = "changed", [5] = false }) or i % 4 ~= 2 and lines or nil
+    if i % 4 == 1 then
+        table.insert(modified, name)
+    end
+end
+vim.cmd("silent! %bwipeout!")
+h.git("checkout", "-q", "-f", "dev")
+h.commit(before)
+h.git("checkout", "-q", "branch")
+h.git("merge", "-q", "--no-edit", "dev")
+for path in pairs(before) do
+    if not after[path] then
+        os.remove(path)
+    end
+end
+h.commit(after)
+local main, panel, panel_buf = h.review()
+local review = require("review")
+
+bench("start", 5, function()
+    review.stop()
+    review.start("dev")
+end)
+bench("load", 10, require("review.session").load)
+-- What the watcher does once git moved HEAD.
+bench("refresh", 10, require("review.watch").refresh)
+bench("panel", 20, require("review.panel").refresh)
+bench("toggle", 10, function()
+    review.panel()
+    review.panel()
+end)
+-- Marking files reviewed saves the state and draws the panel again.
+bench("mark", 10, function()
+    h.press("ddu")
+end)
+bench("mark lines", 10, function()
+    h.press("V4jdu")
+end)
+h.press("ddu")
+bench("redo", 10, function()
+    h.press("<C-r>u")
+end)
+-- Opening a file not opened before reads and renders it. Started again, as toggling made new windows.
+main, panel, panel_buf = h.review()
+local opened = 0
+bench("open", 20, function()
+    opened = opened + 1
+    h.pick(" " .. modified[opened])
+end)
+-- Wiped first, in another buffer so its window stays.
+local scratch = vim.api.nvim_create_buf(false, true)
+bench("open deleted", 10, function()
+    local deleted = require("review.deleted")
+    vim.api.nvim_win_set_buf(main, scratch)
+    deleted.wipe()
+    vim.api.nvim_win_set_buf(main, deleted.open("deleted.lua"))
+end)
+vim.api.nvim_set_current_win(main)
+vim.cmd.edit("rewritten.lua")
+bench("attach rewritten", 5, function()
+    render.attach(vim.api.nvim_get_current_buf())
+end)
+vim.api.nvim_set_current_win(panel)
+bench("panel redraw", 50, function()
+    vim.api.nvim_buf_call(panel_buf, function()
+        vim.cmd("redraw!")
+    end)
+end)
+review.stop()
+require("shared.bench").finish()

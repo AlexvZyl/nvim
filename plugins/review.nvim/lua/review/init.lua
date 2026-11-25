@@ -107,7 +107,8 @@ end
 function M.start(ref)
     local panel = require("review.panel")
     ref = ref or session.ref or config.options.base
-    if ref ~= session.ref then
+    local started = ref ~= session.ref
+    if started then
         local switching = session.active()
         -- Keeps the current review when the ref is invalid.
         if not session.start(ref) then
@@ -124,7 +125,7 @@ function M.start(ref)
         end
     end
     if not panel.is_open() then
-        panel.toggle()
+        panel.toggle(started)
     end
 end
 

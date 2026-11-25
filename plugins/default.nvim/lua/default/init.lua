@@ -3,11 +3,11 @@ local M = {}
 M.opts = { overrides = {} }
 
 function M.load(opts)
-    if vim.g.colors_name ~= "default" then
+    -- Only another colorscheme has anything to clear, which is not the case at startup.
+    if vim.g.colors_name and vim.g.colors_name ~= "default" then
         vim.api.nvim_command('hi clear')
-    else
-        vim.g.colors_name = "default"
     end
+    vim.g.colors_name = "default"
 
     if opts then
         M.opts = vim.tbl_deep_extend("force", M.opts, opts or {})

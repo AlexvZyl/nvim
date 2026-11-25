@@ -7,8 +7,25 @@ vim.opt.rtp:prepend(root .. "/../shared.nvim")
 package.path = root .. "/?.lua;" .. package.path
 vim.o.report = 10000
 vim.notify = function(...) end
-require("review").setup({})
 local h = require("tests.helpers")
+
+-- At startup, in a new process each.
+local cold = require("shared.bench").cold
+cold("startup", 20, function()
+    require("review").setup({})
+end)
+-- The first review started after startup, which loads the rest, with the file open and drawn.
+cold("first start", 10, function()
+    require("review").start("dev")
+    vim.cmd.redraw()
+end, function()
+    require("review").setup({})
+    local lines = h.lines(300)
+    h.repo(lines, h.edit(lines, { [10] = "changed", [20] = false }), h.edit(lines, { [100] = { "added", "lines" } }))
+    vim.cmd.edit("file.txt")
+end)
+
+require("review").setup({})
 local render = require("review.render")
 
 local function bench(name, count, fn)
@@ -137,7 +154,12 @@ bench("start", 5, function()
     review.stop()
     review.start("dev")
 end)
-bench("load", 10, require("review.session").load)
+-- With the blobs of the files, which the review reads once needed.
+bench("load", 10, function()
+    local session = require("review.session")
+    session.load()
+    require("review.state").pending(session.files[1].key)
+end)
 -- What the watcher does once git moved HEAD.
 bench("refresh", 10, require("review.watch").refresh)
 bench("panel", 20, require("review.panel").refresh)

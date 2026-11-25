@@ -282,11 +282,12 @@ function M.close()
     end
 end
 
-function M.toggle()
+-- Loaded when given, like just after the review started.
+function M.toggle(loaded)
     if M.is_open() then
         return M.close()
     end
-    if not session.load() then
+    if not loaded and not session.load() then
         return
     end
     state.load()

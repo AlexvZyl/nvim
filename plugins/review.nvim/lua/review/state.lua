@@ -49,7 +49,7 @@ function M.reset()
 end
 
 local function blob(key)
-    return session.blobs[key] or ""
+    return session.blobs()[key] or ""
 end
 
 function M.pending(key)

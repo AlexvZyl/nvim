@@ -14,6 +14,20 @@ for i = 1, 4 do
         icon = "t" .. i,
     }
 end
+-- At startup, in a new process each.
+local cold = require("shared.bench").cold
+cold("startup", 20, function()
+    require("statusline").setup({ toggles = toggles })
+end)
+-- After a draw without it, so what Neovim does the first time is done.
+cold("first draw", 20, vim.cmd.redraw, function()
+    vim.cmd.redraw()
+    require("statusline").setup({ toggles = toggles })
+end)
+
+-- Like in a config with diagnostics, which the renders run with. Loaded later, recount takes twice as long, as the
+-- JIT compiles the count differently.
+require("vim.diagnostic")
 require("statusline").setup({ toggles = toggles })
 local statusline = require("statusline")
 

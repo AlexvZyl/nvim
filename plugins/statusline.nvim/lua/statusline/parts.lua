@@ -2,13 +2,18 @@ local config = require("statusline.config")
 
 local M = {}
 
-local severity = vim.diagnostic.severity
--- With the letter shown when the diagnostic signs have no text.
+-- vim.lsp and vim.diagnostic take a while to load, and until something else does there are no clients or
+-- diagnostics to show, so they are left for it to load.
+local function loaded(module)
+    return package.loaded[module] ~= nil
+end
+
+-- By vim.diagnostic.severity, with the letter shown when the diagnostic signs have no text.
 local diagnostic_levels = {
-    { severity = severity.ERROR, group = "StatuslineDiagError", letter = "E" },
-    { severity = severity.WARN, group = "StatuslineDiagWarn", letter = "W" },
-    { severity = severity.INFO, group = "StatuslineDiagInfo", letter = "I" },
-    { severity = severity.HINT, group = "StatuslineDiagHint", letter = "H" },
+    { severity = 1, group = "StatuslineDiagError", letter = "E" },
+    { severity = 2, group = "StatuslineDiagWarn", letter = "W" },
+    { severity = 3, group = "StatuslineDiagInfo", letter = "I" },
+    { severity = 4, group = "StatuslineDiagHint", letter = "H" },
 }
 
 -- Buffers that show the clients of the buffer before them, like prompts.
@@ -40,7 +45,7 @@ end
 local previous_lsp = ""
 function M.lsp_clients()
     local names = {}
-    for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    for _, client in ipairs(loaded("vim.lsp") and vim.lsp.get_clients({ bufnr = 0 }) or {}) do
         vim.list_extend(names, client_names(client))
     end
     local result = table.concat(names, "•")
@@ -61,6 +66,9 @@ function M.diagnostics_changed(buf)
 end
 
 function M.diagnostics()
+    if not loaded("vim.diagnostic") then
+        return ""
+    end
     local signs = vim.tbl_get(vim.diagnostic.config() or {}, "signs", "text") or {}
     local buf = vim.api.nvim_get_current_buf()
     counts[buf] = counts[buf] or vim.diagnostic.count(buf)

@@ -11,18 +11,33 @@ package.preload["nvim-web-devicons"] = function()
         end,
     }
 end
-require("winbar").setup({ exclude = { "excluded" } })
-local winbar = require("winbar")
-
-local function bench(name, count, fn)
-    require("shared.bench").run(name, count, fn, "us")
-end
-
 local function edit(name)
     local path = vim.fn.tempname() .. "/dir/" .. name
     vim.fn.mkdir(vim.fs.dirname(path), "p")
     vim.fn.writefile({ "a" }, path)
     vim.cmd.edit(path)
+end
+
+-- At startup, in a new process each.
+local cold = require("shared.bench").cold
+cold("startup", 20, function()
+    require("winbar").setup({ exclude = { "excluded" } })
+end)
+-- The first file opened after startup, after another without it so what Neovim does the first time is done.
+cold("first file", 20, function()
+    edit("file.lua")
+    vim.cmd.redraw()
+end, function()
+    edit("other.lua")
+    vim.cmd.redraw()
+    require("winbar").setup({ exclude = { "excluded" } })
+end)
+
+require("winbar").setup({ exclude = { "excluded" } })
+local winbar = require("winbar")
+
+local function bench(name, count, fn)
+    require("shared.bench").run(name, count, fn, "us")
 end
 
 edit("file.lua")

@@ -282,8 +282,11 @@ function M.update(buf)
     -- Right away, as TextChanged comes before the redraw: scheduled, the edit would show without the deleted
     -- lines for a moment.
     render(buf)
-    scroll.keep(buf)
-    attached.rendered = hunks
+    -- Not when attached, which is no edit.
+    if attached.lines then
+        scroll.keep(buf, attached.lines, lines)
+    end
+    attached.lines, attached.rendered = lines, hunks
 end
 
 -- The gutter the deleted lines draw in is measured once a redraw drew it, as between an edit and the redraw a
@@ -378,7 +381,6 @@ function M.detach(buf)
         for _, ns in ipairs({ namespace, deleted_namespace }) do
             vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
         end
-        scroll.detach(buf)
         for _, key in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
             pcall(vim.keymap.del, "n", key, { buffer = buf })
         end

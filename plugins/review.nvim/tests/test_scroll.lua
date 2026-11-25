@@ -89,39 +89,55 @@ function T.typing_keeps_the_line_in_place()
 end
 
 -- Commenting replaces the lines through the API, rather than editing them in place like typing.
-function T.commenting_lines_keeps_the_line_in_place()
+function T.commenting_a_line_keeps_the_cursor_on_its_row()
     local buf = setup()
     vim.bo[buf].commentstring = "# %s"
     each_position(function()
-        for _, keys in ipairs({ "gcc", "gcj" }) do
-            local before = h.view()
-            h.keys(keys, true, true)
-            local after = h.view()
-            h.keys("u")
-            local undone = h.view()
-            if before.row ~= after.row then
-                return keys .. ": " .. describe(before, after)
-            elseif not same_top(before, undone) then
-                return keys .. " undo: " .. describe(before, undone)
-            end
+        local before = h.view()
+        h.keys("gcc", true, true)
+        local after = h.view()
+        h.keys("u")
+        local undone = h.view()
+        if before.row ~= after.row then
+            return describe(before, after)
+        elseif not same_top(before, undone) then
+            return "undo: " .. describe(before, undone)
         end
     end)
 end
 
-function T.deleting_a_line_keeps_the_screen_in_place()
-    edit("dd", keeps_top)
+-- Like any edit of more lines, scrolling as much is jarring.
+function T.commenting_lines_keeps_the_screen_in_place()
+    local buf = setup()
+    vim.bo[buf].commentstring = "# %s"
+    each_position(function()
+        local before = h.view()
+        h.keys("gcj", true, true)
+        local after = h.view()
+        h.keys("u")
+        return keeps_top(before, after) or not same_top(before, h.view()) and "undo: " .. describe(before, h.view()) or nil
+    end)
 end
 
-function T.deleting_at_the_top_shows_the_deleted_lines()
-    setup()
-    for _, line in ipairs({ 5, 30, 70 }) do
-        h.place(line, 0)
+function T.deleting_a_line_keeps_the_cursor_on_its_row()
+    edit("dd", keeps_row)
+end
+
+function T.deleting_a_selection_of_one_line_keeps_the_cursor_on_its_row()
+    edit("d", keeps_row, nil, "V")
+end
+
+-- Deleting one of two lines that are the same could be deleting either.
+function T.deleting_one_of_the_same_lines_keeps_the_cursor_on_its_row()
+    h.repo(h.lines(30), h.edit(h.lines(30), { [10] = { "", "" }, [20] = false }))
+    h.open()
+    for _, line in ipairs({ 10, 11 }) do
+        h.place(line, 5)
+        local before = h.view()
         h.keys("dd")
-        local view = h.view()
-        assert(view.top == line and view.fill == 1 and view.row == 2, line .. ": " .. vim.inspect(view))
+        local after = h.view()
         h.keys("u")
-        view = h.view()
-        assert(view.top == line and view.fill == 0 and view.row == 1, line .. " undo: " .. vim.inspect(view))
+        assert(before.row == after.row, line .. ": " .. describe(before, after))
     end
 end
 

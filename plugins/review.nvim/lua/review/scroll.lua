@@ -77,22 +77,20 @@ local function unchanged(old, new)
     return before, after
 end
 
--- Through an edit of the line the cursor was on alone, like typing, deleting it, commenting it or undoing that, the
--- line in its place stays on its row, like without the deleted lines that come or go above it. Through an edit of
--- more lines, like deleting a selection, scrolling as much is jarring, so the screen stays and the lines move instead.
+-- Through an edit within the line the cursor was on, like typing or commenting it, the line stays on its row, like
+-- without the deleted line that comes or goes above it. Through an edit that adds or deletes lines, like deleting
+-- it, scrolling is jarring, so the screen stays and the lines move instead.
 function M.keep(buf, old, new)
     local before_lines, after_lines = unchanged(old, new)
     for _, win in ipairs(vim.fn.win_findbuf(buf)) do
         local before = settled[win]
         if before and before.buf == buf then
             local line, cursor, added = before.line, vim.api.nvim_win_get_cursor(win)[1], #new - #old
-            -- Lines as before above and below it, which a run of the same lines leaves more than one place for. With
-            -- a line less or more in its place, like deleting it or undoing that, but not after it, like breaking it in
-            -- two, which undone would not come back to where it was.
-            local single = before_lines >= line - 1 and after_lines >= #old - line + math.max(added, 0)
-            if single then
-                -- Off screen when it was, which is left to Vim, and nothing to keep once the last line is deleted.
-                local shown = before.row >= 0 and before.row < vim.api.nvim_win_get_height(win) and line <= #new
+            -- As many lines, as before above and below it.
+            local within = added == 0 and before_lines >= line - 1 and after_lines >= #old - line
+            if within then
+                -- Off screen when it was, which is left to Vim.
+                local shown = before.row >= 0 and before.row < vim.api.nvim_win_get_height(win)
                 if shown and line_row(win, line) ~= before.row then
                     scroll_to(win, line, before.row)
                 end

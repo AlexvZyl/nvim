@@ -119,26 +119,8 @@ function T.commenting_lines_keeps_the_screen_in_place()
     end)
 end
 
-function T.deleting_a_line_keeps_the_cursor_on_its_row()
-    edit("dd", keeps_row)
-end
-
-function T.deleting_a_selection_of_one_line_keeps_the_cursor_on_its_row()
-    edit("d", keeps_row, nil, "V")
-end
-
--- Deleting one of two lines that are the same could be deleting either.
-function T.deleting_one_of_the_same_lines_keeps_the_cursor_on_its_row()
-    h.repo(h.lines(30), h.edit(h.lines(30), { [10] = { "", "" }, [20] = false }))
-    h.open()
-    for _, line in ipairs({ 10, 11 }) do
-        h.place(line, 5)
-        local before = h.view()
-        h.keys("dd")
-        local after = h.view()
-        h.keys("u")
-        assert(before.row == after.row, line .. ": " .. describe(before, after))
-    end
+function T.deleting_a_line_keeps_the_screen_in_place()
+    edit("dd", keeps_top)
 end
 
 -- Two lines from one, as undone the line comes back where it was.
@@ -191,7 +173,7 @@ function T.typed_keys_keep_the_line_in_place_and_scroll_the_deleted_lines()
     vim.wo.wrap = false
     h.input("60Gzt5j")
     local before = h.view()
-    h.input("dd")
+    h.input("Ax<Esc>")
     local after = h.view()
     h.input("u45Gztzl")
     local chunks = h.marks(vim.api.nvim_get_current_buf(), "review_deleted", 50, 50)[1][4].virt_lines[1]

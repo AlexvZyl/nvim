@@ -97,9 +97,9 @@ function T.deletion_at_the_end_goes_below_the_last_line()
     assert(mark and mark[2] == 3 and not mark[4].virt_lines_above, vim.inspect(mark))
 end
 
--- Tabs take the tabstop and the text scrolls with the window, a cell at a time.
+-- Tabs go to the next tabstop and the text scrolls with the window, a cell at a time.
 function T.deleted_lines_expand_tabs_and_scroll()
-    h.repo({ "\tcafé x", "keep" }, { "keep" })
+    h.repo({ "\tcafé x\t日y", "keep" }, { "keep" })
     local buf = h.open()
     vim.bo[buf].tabstop, vim.wo.wrap = 4, false
     local width
@@ -114,10 +114,10 @@ function T.deleted_lines_expand_tabs_and_scroll()
         width = math.min(width or math.huge, vim.fn.strdisplaywidth(table.concat(texts)))
         return table.concat(texts, "", 3, #texts - 1)
     end
-    -- Past the é, which is two bytes and one cell.
-    local shown = { text(0), text(2), text(5), text(8) }
+    -- Past the é, which is two bytes and one cell, and through the 日, which is two cells and cut shows as <.
+    local shown = { text(0), text(2), text(5), text(8), text(13) }
     vim.wo.wrap = true
-    assert(vim.deep_equal(shown, { "    café x", "  café x", "afé x", " x" }), vim.inspect(shown))
+    assert(vim.deep_equal(shown, { "    café x  日y", "  café x  日y", "afé x  日y", " x  日y", "<y" }), vim.inspect(shown))
     assert(width >= vim.o.columns, width)
 end
 

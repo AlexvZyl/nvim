@@ -148,23 +148,28 @@ local function deleted_chunks(text, highlights, uncommitted, leftcol, tabstop)
     -- with gmatch, which the JIT does not compile.
     local from, byte = nil, 1
     while byte <= #text do
-        local name, tab = highlights[byte], text:byte(byte) == 9
-        if from and (tab or name ~= highlights[from]) then
+        local name, code = highlights[byte], text:byte(byte)
+        -- Past the UTF-8 continuation bytes of the character.
+        local after = byte + 1
+        while (text:byte(after) or 0) >= 128 and text:byte(after) < 192 do
+            after = after + 1
+        end
+        -- Tabs to the next tabstop, and wide characters, like 日, two cells.
+        local cells = code == 9 and tabstop - width % tabstop or code < 128 and 1 or vim.api.nvim_strwidth(text:sub(byte, after - 1))
+        width = width + cells
+        local shown = math.min(cells, width - leftcol)
+        -- Shown as blanks, or < for a wide character cut by the edge of the window like Neovim does.
+        local blank = shown > 0 and (code == 9 or shown < cells)
+        if from and (blank or name ~= highlights[from]) then
             add(text:sub(from, byte - 1), highlights[from])
             from = nil
         end
-        local cells = tab and tabstop or 1
-        width = width + cells
-        local shown = math.min(cells, width - leftcol)
-        if shown > 0 and tab then
-            add(string.rep(" ", shown), name)
+        if blank then
+            add(code == 9 and string.rep(" ", shown) or "<" .. string.rep(" ", shown - 1), name)
         elseif shown > 0 then
             from = from or byte
         end
-        -- Past the UTF-8 continuation bytes of the character.
-        repeat
-            byte = byte + 1
-        until (text:byte(byte) or 0) < 128 or text:byte(byte) >= 192
+        byte = after
     end
     if from then
         add(text:sub(from), highlights[from])

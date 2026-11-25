@@ -87,11 +87,11 @@ local function highlight_line(file, lang, line, above, below)
     if not ok then
         return cache[line]
     end
-    parser:parse()
     -- With the languages injected only in the deleted lines, as finding them in all the lines takes as long again.
-    for _, run in ipairs(runs) do
-        parser:parse({ run[1] - top, 0, run[2] - top + 1, 0 })
-    end
+    -- All at once, as parsing a range drops what was injected outside it.
+    parser:parse(vim.tbl_map(function(run)
+        return { run[1] - top, 0, run[2] - top + 1, 0 }
+    end, runs))
     -- Injected languages after the ones they are in, so theirs win.
     local function add(tree)
         local tree_lang = tree:lang()

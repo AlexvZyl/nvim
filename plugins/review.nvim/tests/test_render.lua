@@ -372,15 +372,24 @@ function T.deleted_lines_are_highlighted_with_the_code_around_them()
     assert(name == "@function.lua", vim.inspect(chunks))
 end
 
+-- Also apart from each other.
 function T.deleted_lines_are_highlighted_in_the_languages_injected_in_them()
-    local lines = { 'vim.cmd("resize 10")', "keep" }
-    h.repo(lines, { "keep" })
+    local lines = { 'vim.cmd("resize 10")', "local a = 1", 'vim.cmd("resize 20")', "local b = 2" }
+    h.repo(lines, { lines[2], lines[4] })
     local buf = h.open()
     vim.bo[buf].filetype = "lua"
     require("review.render").settled()
-    local name, chunks = deleted_highlight(buf, "resize", #lines)
+    local marks = h.marks(buf, "review_deleted", 1, #lines)
+    local names = vim.tbl_map(function(mark)
+        for _, chunk in ipairs(mark[4].virt_lines[1]) do
+            if chunk[1] == "resize" and type(chunk[2]) == "table" then
+                return chunk[2][2]
+            end
+        end
+        return "none"
+    end, marks)
     vim.bo[buf].filetype = ""
-    assert(name and name:match("%.vim$"), vim.inspect(chunks))
+    assert(#names == 2 and names[1]:match("%.vim$") and names[2]:match("%.vim$"), vim.inspect(marks))
 end
 
 function T.deleted_lines_are_highlighted_again_when_the_filetype_changes()

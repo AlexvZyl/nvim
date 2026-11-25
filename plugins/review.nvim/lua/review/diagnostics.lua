@@ -65,7 +65,8 @@ local function restyle(buf, id, mark, line)
         update = update or details.virt_lines_leftcol ~= (gutter or false)
     end
     if update then
-        details.id, details.ns_id = mark[1], nil
+        -- Edits can leave the marks of diagnostics past the last line, which Neovim puts back as they were.
+        details.id, details.ns_id, details.strict = mark[1], nil, false
         vim.api.nvim_buf_set_extmark(buf, id, mark[2], mark[3], details)
     end
 end

@@ -86,9 +86,11 @@ function M.keep(buf)
         local mark = before and before.buf == buf and vim.api.nvim_buf_get_extmark_by_id(buf, namespace, win, { details = true })
         -- Not found once invalidated.
         local deleted = mark and (not mark[1] or mark[3].invalid)
+        -- Lines replaced through the API, like by commenting, invalidate it as well, but leave as many lines.
+        local replaced = deleted and vim.api.nvim_buf_line_count(buf) == before.count
         -- Only when the edit was on or after the line. Otherwise nothing moves, like the deleted lines taking the
         -- place of the line with the cursor below them, or an undo putting lines back in place of deleted ones.
-        if mark and not deleted and mark[1] + 1 == before.line then
+        if mark and (replaced or not deleted and mark[1] + 1 == before.line) then
             -- Off screen when the mark was, which is left to Vim.
             if line_row(win, before.line) ~= before.row and before.row >= 0 and before.row < vim.api.nvim_win_get_height(win) then
                 scroll_to(win, before.line, before.row)

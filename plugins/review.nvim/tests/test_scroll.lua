@@ -88,6 +88,26 @@ function T.typing_keeps_the_line_in_place()
     edit("Ax", keeps_row)
 end
 
+-- Commenting replaces the lines through the API, rather than editing them in place like typing.
+function T.commenting_lines_keeps_the_line_in_place()
+    local buf = setup()
+    vim.bo[buf].commentstring = "# %s"
+    each_position(function()
+        for _, keys in ipairs({ "gcc", "gcj" }) do
+            local before = h.view()
+            h.keys(keys, true, true)
+            local after = h.view()
+            h.keys("u")
+            local undone = h.view()
+            if before.row ~= after.row then
+                return keys .. ": " .. describe(before, after)
+            elseif not same_top(before, undone) then
+                return keys .. " undo: " .. describe(before, undone)
+            end
+        end
+    end)
+end
+
 function T.deleting_a_line_keeps_the_screen_in_place()
     edit("dd", keeps_top)
 end

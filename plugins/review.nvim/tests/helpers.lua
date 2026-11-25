@@ -138,10 +138,10 @@ function M.flush()
 end
 
 -- Runs normal mode keys like typed, with the render after TextChanged and SafeState once it settles. Without
--- settle, like keys typed faster than the screen settles.
-function M.keys(keys, settle)
+-- settle, like keys typed faster than the screen settles. With remap, mappings like gcc run too.
+function M.keys(keys, settle, remap)
     local render = require("review.render")
-    vim.cmd("silent normal! " .. keys)
+    vim.cmd("silent normal" .. (remap and " " or "! ") .. keys)
     vim.cmd("redraw")
     render.update(vim.api.nvim_get_current_buf())
     M.flush()

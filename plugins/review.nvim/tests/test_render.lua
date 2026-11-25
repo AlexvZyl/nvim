@@ -193,6 +193,22 @@ function T.reloading_drops_the_line_the_cursor_was_on()
     assert(active and vim.v.errmsg == "", vim.v.errmsg)
 end
 
+-- Typing while it is open only gives TextChangedP.
+function T.typing_with_the_completion_menu_open_renders()
+    h.repo({ "line", "lin" }, { "line", "lin" })
+    h.review("file.txt")
+    local buf = vim.api.nvim_get_current_buf()
+    local completeopt = vim.o.completeopt
+    vim.o.completeopt = "menu,menuone,noinsert"
+    h.input("2GA<C-n>")
+    h.input("e")
+    local open, changed = vim.fn.pumvisible(), require("review.render").changed(buf)[2]
+    h.input("<C-e><Esc>")
+    vim.o.completeopt = completeopt
+    assert(open == 1, "the menu closed")
+    assert(changed == "ReviewLocalAdd", vim.inspect(require("review.render").changed(buf)))
+end
+
 function T.stopping_clears_the_buffers()
     setup()
     local buf = vim.api.nvim_get_current_buf()

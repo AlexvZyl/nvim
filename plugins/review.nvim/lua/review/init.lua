@@ -91,7 +91,8 @@ local function create_autocmds()
     autocmd({ "BufWritePost", "FocusGained" }, watch.schedule)
     -- Unloaded, like with :bdelete, it has no lines to draw on until it is read again.
     autocmd("BufUnload", on_buf(render.detach))
-    autocmd({ "TextChanged", "TextChangedI" }, on_buf(render.update))
+    -- TextChangedP while the completion menu is open.
+    autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, on_buf(render.update))
     vim.on_key(safely(require("review.scroll").key), key_namespace)
 end
 

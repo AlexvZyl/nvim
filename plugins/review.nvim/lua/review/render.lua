@@ -7,7 +7,6 @@ local M = {}
 
 local namespace = vim.api.nvim_create_namespace("review")
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
-local cursor_namespace = vim.api.nvim_create_namespace("review_cursor")
 -- Committed and uncommitted.
 local function sign_text(uncommitted)
     return config.options.signs[uncommitted and "uncommitted" or "committed"]
@@ -427,8 +426,11 @@ vim.api.nvim_set_decoration_provider(deleted_namespace, {
 })
 
 -- By window, the mark giving the number of its cursor line CursorLineNr on a changed line, whose number highlight
--- takes its place otherwise, and where it was put.
+-- takes its place otherwise, and where it was put. In a namespace drawn only in that window, as the buffer can show
+-- in others with their cursor elsewhere.
 local cursor_marks = {}
+-- Namespaces of closed windows, to use for new ones.
+local spare_namespaces = {}
 
 local function mark_cursor(win)
     local buf = vim.api.nvim_win_get_buf(win)
@@ -442,20 +444,25 @@ local function mark_cursor(win)
     if mark and mark.buf == buf and mark.row == row and mark.group == group and mark.tick == tick then
         return
     end
-    if mark and vim.api.nvim_buf_is_valid(mark.buf) then
-        vim.api.nvim_buf_del_extmark(mark.buf, cursor_namespace, mark.id)
+    if mark and mark.id and vim.api.nvim_buf_is_valid(mark.buf) then
+        vim.api.nvim_buf_del_extmark(mark.buf, mark.ns, mark.id)
     end
-    cursor_marks[win] = group
-        and {
-            buf = buf,
-            row = row,
-            group = group,
-            tick = tick,
-            id = vim.api.nvim_buf_set_extmark(buf, cursor_namespace, row, 0, {
-                number_hl_group = group:gsub("Nr$", "CursorNr"),
-                priority = config.options.sign_priority + 1,
-            }),
-        }
+    local ns = mark and mark.ns
+    if not ns then
+        ns = table.remove(spare_namespaces) or vim.api.nvim_create_namespace("")
+        vim.api.nvim__ns_set(ns, { wins = { win } })
+    end
+    cursor_marks[win] = {
+        ns = ns,
+        buf = buf,
+        row = row,
+        group = group,
+        tick = tick,
+        id = group and vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
+            number_hl_group = group:gsub("Nr$", "CursorNr"),
+            priority = config.options.sign_priority + 1,
+        }),
+    }
 end
 
 -- Once the screen shows the rendered hunks, so cursor moves and scrolls are kept by the next render. The gutter
@@ -463,7 +470,10 @@ end
 function M.settled()
     for win, mark in pairs(cursor_marks) do
         if not vim.api.nvim_win_is_valid(win) then
-            pcall(vim.api.nvim_buf_del_extmark, mark.buf, cursor_namespace, mark.id)
+            if vim.api.nvim_buf_is_valid(mark.buf) then
+                vim.api.nvim_buf_clear_namespace(mark.buf, mark.ns, 0, -1)
+            end
+            table.insert(spare_namespaces, mark.ns)
             cursor_marks[win] = nil
         end
     end
@@ -529,8 +539,11 @@ function M.detach(buf)
     end
     buffers[buf] = nil
     if vim.api.nvim_buf_is_valid(buf) then
-        for _, ns in ipairs({ namespace, deleted_namespace, cursor_namespace }) do
+        for _, ns in ipairs({ namespace, deleted_namespace }) do
             vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+        end
+        for _, mark in pairs(cursor_marks) do
+            vim.api.nvim_buf_clear_namespace(buf, mark.ns, 0, -1)
         end
         for _, key in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
             pcall(vim.keymap.del, "n", key, { buffer = buf })

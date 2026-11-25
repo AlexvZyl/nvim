@@ -333,8 +333,11 @@ function T.the_cursor_line_number_keeps_its_highlight_on_changed_lines()
     local function number_at(line)
         vim.api.nvim_win_set_cursor(0, { line, 0 })
         require("review.render").settled()
-        local mark = h.marks(buf, "review_cursor", 1, 5)[1]
-        return mark and mark[2] + 1, mark and mark[4].number_hl_group
+        for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, -1, 0, -1, { details = true })) do
+            if (mark[4].number_hl_group or ""):match("CursorNr$") then
+                return mark[2] + 1, mark[4].number_hl_group
+            end
+        end
     end
     local changed_row, changed = number_at(3)
     local unchanged_row = number_at(1)
@@ -345,6 +348,36 @@ function T.the_cursor_line_number_keeps_its_highlight_on_changed_lines()
     assert(changed_row == 3 and changed == "ReviewAddCursorNr", tostring(changed))
     assert(unchanged_row == nil, "marked an unchanged line")
     assert(hl.fg == cursor.fg and hl.bg == add.bg, vim.inspect({ hl, cursor, add }))
+end
+
+function T.the_cursor_line_number_shows_only_in_its_window()
+    h.repo(h.lines(12), h.edit(h.lines(12), { [3] = "mod 3", [5] = "mod 5", [10] = "mod 10" }))
+    vim.wo.cursorline, vim.wo.cursorlineopt, vim.wo.number = true, "number", true
+    -- Without colors, the number of a changed line looks like any other.
+    vim.o.termguicolors = true
+    vim.api.nvim_set_hl(0, "ReviewAddNr", { fg = "#0000ff", bg = "#00ff00" })
+    vim.api.nvim_set_hl(0, "ReviewAddCursorNr", { fg = "#ff0000", bg = "#00ff00" })
+    h.open()
+    vim.cmd("normal! 3G")
+    vim.cmd("split")
+    vim.cmd("normal! 10G")
+    require("review.render").settled()
+    vim.cmd("redraw!")
+    -- The highlight of the number of the line in the window.
+    local function number(win, line)
+        local pos = vim.fn.screenpos(win, line, 1)
+        return vim.fn.screenattr(pos.row, pos.col - 2)
+    end
+    local top, bottom = unpack(vim.api.nvim_tabpage_list_wins(0))
+    local plain = number(top, 5)
+    local seen = { number(top, 3), number(top, 10), number(bottom, 3), number(bottom, 10) }
+    vim.cmd("only")
+    vim.wo.cursorline, vim.wo.cursorlineopt, vim.wo.number = false, "both", false
+    vim.o.termguicolors = false
+    vim.cmd.highlight("clear")
+    require("review.highlights").set()
+    assert(seen[1] == plain and seen[4] == plain, "the other window's cursor line number shows: " .. vim.inspect(seen))
+    assert(seen[2] ~= plain and seen[3] ~= plain, "the cursor line number does not show: " .. vim.inspect(seen))
 end
 
 function T.diagnostic_signs_on_changed_lines_get_the_review_background()

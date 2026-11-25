@@ -130,10 +130,15 @@ for row = 0, n - 1000, 3 do
     table.insert(diagnostics, { lnum = row, col = 0, message = "diagnostic", severity = 1 })
 end
 require("review.diagnostics").start()
-vim.diagnostic.set(vim.api.nvim_create_namespace("bench"), buf, diagnostics, { virtual_text = true })
+local diagnostic_namespace = vim.api.nvim_create_namespace("bench")
+vim.diagnostic.set(diagnostic_namespace, buf, diagnostics, { virtual_text = true })
 bench("diagnosed", 10, function()
     vim.cmd("normal! Ax")
     render.update(buf)
+end)
+-- A language server publishing them again after an edit, which restyles those on changed lines.
+bench("publish", 10, function()
+    vim.diagnostic.set(diagnostic_namespace, buf, diagnostics, { virtual_text = true })
 end)
 require("review.diagnostics").stop()
 

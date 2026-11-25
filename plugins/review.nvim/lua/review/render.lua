@@ -85,14 +85,15 @@ local hl_ids = setmetatable({}, {
 
 -- Virtual text of a deleted line, scrolled by leftcol and padded to the edge like a line highlight.
 local function deleted_chunks(text, highlights, uncommitted, leftcol, tabstop)
-    local base = hl_ids[uncommitted and "ReviewLocalDelete" or "ReviewDelete"]
+    local group = uncommitted and "ReviewLocalDelete" or "ReviewDelete"
+    local base, background = hl_ids[group], hl_ids[group .. "Background"]
     local chunks, width, last = {}, 0, nil
     -- Neighbouring text with the same highlight goes in one chunk.
     local function add(shown, name)
         if chunks[1] and name == last then
             chunks[#chunks][1] = chunks[#chunks][1] .. shown
         else
-            table.insert(chunks, { shown, name and { base, hl_ids[name] } or base })
+            table.insert(chunks, { shown, name and { base, hl_ids[name], background } or base })
         end
         last = name
     end

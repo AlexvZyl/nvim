@@ -29,6 +29,11 @@ function M.set()
         local hl = type(link) == "table" and link or { link = link }
         vim.api.nvim_set_hl(0, group, vim.tbl_extend("force", hl, { default = true }))
     end
+    -- Only the background of deleted lines, put over the syntax of their text, which can have its own, like markdown
+    -- code blocks.
+    for _, group in ipairs({ "ReviewDelete", "ReviewLocalDelete" }) do
+        vim.api.nvim_set_hl(0, group .. "Background", { bg = vim.api.nvim_get_hl(0, { name = group, link = false }).bg })
+    end
 end
 
 return M

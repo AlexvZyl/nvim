@@ -232,6 +232,25 @@ function T.deleted_lines_are_padded_to_the_edge_after_a_resize()
     assert(width >= 260, width)
 end
 
+-- Like markdown code blocks in some colorschemes.
+function T.deleted_lines_keep_their_background_over_syntax_with_its_own()
+    local keyword = vim.api.nvim_get_hl(0, { name = "@keyword.lua" })
+    vim.api.nvim_set_hl(0, "@keyword.lua", { fg = "#ff0000", bg = "#00ff00" })
+    h.repo({ "local x = 1", "keep" }, { "keep" })
+    local buf = h.open()
+    vim.bo[buf].filetype = "lua"
+    require("review.render").settled()
+    local chunks = h.marks(buf, "review_deleted", 1, 1)[1][4].virt_lines[1]
+    vim.api.nvim_set_hl(0, "@keyword.lua", keyword)
+    vim.bo[buf].filetype = ""
+    local groups = vim.iter(chunks):find(function(chunk)
+        return type(chunk[2]) == "table" and chunk[2][2]:match("^@keyword")
+    end)[2]
+    local background = vim.api.nvim_get_hl(0, { name = groups[3] or "", link = false }).bg
+    local delete = vim.api.nvim_get_hl(0, { name = "ReviewDelete", link = false }).bg
+    assert(groups[#groups] ~= "@keyword.lua" and background == delete, vim.inspect({ groups, background, delete }))
+end
+
 function T.deleted_lines_are_highlighted_again_when_the_filetype_changes()
     h.repo({ "local x = 1", "keep" }, { "keep" })
     local buf = h.open()

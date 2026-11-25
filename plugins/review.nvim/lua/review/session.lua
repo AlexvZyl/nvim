@@ -38,16 +38,25 @@ local function set_files(files)
     end, files))
 end
 
+-- A warning and not an error, which Neovim raises as one when the command runs from vim.cmd, like lazy.nvim does
+-- for the first one.
+local function warn(message, reason)
+    vim.notify(message .. (reason and ": " .. reason or ""), vim.log.levels.WARN)
+end
+
 -- Starts with the changed files loaded, false when HEAD has no merge base with the ref or the diff failed.
 function M.start(ref)
     -- All at once, as the diff takes the longest.
     local files, merge_base, repo = git.changed_files(ref), git.merge_base(ref), git.repo()
-    merge_base, files = merge_base(), files()
+    local reason, diff_reason
+    merge_base, reason = merge_base()
+    files, diff_reason = files()
     if not merge_base then
-        vim.notify("No merge base with " .. ref, vim.log.levels.ERROR)
+        -- Git only says why when it is not the histories, like for a ref that does not exist.
+        warn(reason and "Cannot review against " .. ref or "HEAD shares no history with " .. ref, reason)
         return false
     elseif not files then
-        vim.notify("git diff " .. ref .. " failed", vim.log.levels.ERROR)
+        warn("git diff " .. ref .. " failed", diff_reason)
         return false
     end
     clear()
@@ -67,9 +76,10 @@ end
 function M.load()
     -- All at once, as the diff takes the longest.
     local files, merge_base, repo = git.changed_files(M.ref), git.merge_base(M.ref), git.repo()
-    files = files()
+    local reason
+    files, reason = files()
     if not files then
-        vim.notify("git diff " .. M.ref .. " failed", vim.log.levels.ERROR)
+        warn("git diff " .. M.ref .. " failed", reason)
         return false
     end
     M.merge_base = merge_base()

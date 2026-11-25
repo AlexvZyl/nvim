@@ -409,17 +409,37 @@ function T.an_error_stops_the_review_with_a_message()
     assert(not active and #messages == 1 and messages[1]:find("broken"), vim.inspect({ active, messages }))
 end
 
+-- Starting the review notifies why it cannot, as a warning, which unlike an error does not fail the command.
+local function warning(ref)
+    local notify, notified = vim.notify, {}
+    vim.notify = function(message, level)
+        notified = { message, level }
+    end
+    require("review").start(ref)
+    vim.notify = notify
+    assert(notified[2] == vim.log.levels.WARN, vim.inspect(notified))
+    return notified[1]
+end
+
 function T.an_invalid_ref_keeps_the_review()
     h.repo(h.lines(3), h.lines(4))
     h.review()
-    local notify = vim.notify
-    vim.notify = function() end
-    require("review").start("nope")
-    vim.notify = notify
+    local message = warning("nope")
     local session = require("review.session")
     local ref, open = session.ref, require("review.panel").is_open()
     require("review").stop()
     assert(ref == "dev" and open, vim.inspect({ ref, open }))
+    assert(message == "Cannot review against nope: Not a valid object name nope", message)
+end
+
+function T.a_ref_without_shared_history_says_so()
+    h.repo(h.lines(3), h.lines(4))
+    h.git("checkout", "-q", "--orphan", "unrelated")
+    h.git("commit", "-qm", "unrelated")
+    require("review").stop()
+    local message = warning("dev")
+    assert(not require("review").active(), "started")
+    assert(message == "HEAD shares no history with dev", message)
 end
 
 return T

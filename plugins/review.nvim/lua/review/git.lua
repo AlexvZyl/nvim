@@ -1,7 +1,8 @@
 local M = {}
 
--- Starts git in the cwd. The function it returns waits for it, then gives what it parsed from the output, nil when
--- git failed. So functions returning it run git at the same time as the others started before waiting.
+-- Starts git in the cwd. The function it returns waits for it, then gives what it parsed from the output, or nil
+-- and why when git failed, like "Not a valid object name main", nil when it does not say. So functions returning it
+-- run git at the same time as the others started before waiting.
 local function start(args, parse)
     local process = vim.system({ "git", "-C", vim.fn.getcwd(), unpack(args) }, { text = true })
     return function()
@@ -9,6 +10,8 @@ local function start(args, parse)
         if result.code == 0 then
             return parse(result.stdout)
         end
+        local reason = (result.stderr or ""):match("^fatal: ([^\n]+)") or (result.stderr or ""):match("^[^\n]+")
+        return nil, reason and (reason:gsub("^%l", string.upper))
     end
 end
 

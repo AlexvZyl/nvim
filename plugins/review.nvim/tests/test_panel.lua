@@ -124,7 +124,7 @@ function T.setting_line_numbers_keeps_the_branches()
     local shown = vim.api.nvim_eval_statusline(vim.wo[panel].statuscolumn, { winid = panel, use_statuscol_lnum = 1 }).str
     local relative = vim.wo[panel].relativenumber
     vim.o.relativenumber, vim.o.statuscolumn = false, ""
-    finish()
+    teardown()
     assert(shown:find("├─", 1, true) and not relative, vim.inspect({ shown, relative }))
 end
 

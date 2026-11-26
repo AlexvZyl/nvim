@@ -97,22 +97,18 @@ local function numstat(output)
     return files
 end
 
--- Files changed since the merge base with the ref, relative to the cwd, with the lines changed by the commits
--- alone as their changes. Nil when the diff fails.
+-- Files changed since the merge base with the ref, relative to the cwd, with the lines they changed, committed or
+-- not, as their changes. Nil when the diff fails.
 function M.changed_files(ref)
-    local args = { "diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames" }
-    local all, committed = start(args, numstat), start(vim.list_extend({ unpack(args, 1, 3) }, { "HEAD", unpack(args, 4) }), numstat)
+    local all = start({ "diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames" }, numstat)
     return function()
         local files, reason = all()
         if not files then
             return nil, reason
         end
-        local changes = {}
-        for _, file in ipairs(committed() or {}) do
-            changes[file.path] = (file.added or 0) + (file.removed or 0)
-        end
         for _, file in ipairs(files) do
-            file.changes = changes[file.path] or 0
+            -- Binary files have no lines, but are some of the review too.
+            file.changes = math.max((file.added or 0) + (file.removed or 0), 1)
             -- The diff is against the working tree, so a deleted file is one not on disk.
             file.deleted = vim.uv.fs_stat(file.path) == nil
         end

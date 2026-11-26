@@ -225,22 +225,21 @@ function T.files_show_the_lines_they_added_and_removed()
         end
     end
     local file, added, binary = counts("file.txt"), counts("added.txt"), counts("binary.bin")
-    -- A binary file left has no lines, but is not reviewed yet.
+    -- A binary file left has no lines, but counts as one, not reviewed yet.
     for _, name in ipairs({ "file.txt", "added.txt" }) do
         vim.fn.cursor(vim.fn.search(name .. "$"), 1)
         h.press("dd")
     end
     local percent = require("review.panel").winbar():match("(%d+)%%%%")
     teardown()
-    assert(percent == "99", percent)
+    assert(percent == "85", percent)
     assert(vim.deep_equal(file, { { "+1 ", "ReviewPanelAdded" }, { "-2 ", "ReviewPanelRemoved" } }), vim.inspect(file))
     assert(vim.deep_equal(added, { { "+3 ", "ReviewPanelAdded" } }), vim.inspect(added))
     assert(binary == nil, vim.inspect(binary))
 end
 
--- Progress counts changed lines, so a small file left is a little of the review.
--- Of the committed lines only, as the uncommitted ones are still being written.
-function T.progress_counts_the_committed_lines_reviewed()
+-- Progress counts changed lines, committed or not, so a small file left is a little of the review.
+function T.progress_counts_the_lines_reviewed()
     h.repo(h.lines(5), h.lines(6))
     h.commit({ ["other.txt"] = { "a", "b", "c" } })
     h.write("file.txt", h.lines(8))
@@ -254,7 +253,29 @@ function T.progress_counts_the_committed_lines_reviewed()
     h.press("dd")
     local after = percent()
     teardown()
-    assert(before == "0" and after == "75", vim.inspect({ before, after }))
+    assert(before == "0" and after == "50", vim.inspect({ before, after }))
+end
+
+-- Else the bar jumps from 0 to 100 at the last one.
+function T.progress_counts_files_only_changed_locally()
+    h.repo(h.lines(5), h.lines(5))
+    h.git("checkout", "-q", "dev")
+    h.commit({ ["other.txt"] = { "a" }, ["more.txt"] = { "a" } })
+    h.git("checkout", "-q", "branch")
+    h.git("merge", "-q", "--no-edit", "dev")
+    for _, name in ipairs({ "file.txt", "other.txt", "more.txt" }) do
+        h.write(name, name == "file.txt" and h.edit(h.lines(5), { [2] = "changed" }) or { "changed" })
+    end
+    h.review()
+    local panel = require("review.panel")
+    local function percent()
+        return panel.winbar():match("(%d+)%%%%")
+    end
+    local before = percent()
+    h.press("ggdd")
+    local after = percent()
+    teardown()
+    assert(before == "0" and after == "33", vim.inspect({ before, after }))
 end
 
 function T.an_empty_review_is_done()

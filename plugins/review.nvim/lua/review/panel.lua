@@ -303,6 +303,19 @@ function M.close()
     end
 end
 
+local options = {
+    number = true,
+    relativenumber = false,
+    cursorline = false,
+    wrap = false,
+    list = false,
+    spell = false,
+    winfixwidth = true,
+    signcolumn = "no",
+    statuscolumn = " %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator# ",
+    winbar = " " .. ICON .. " %{%v:lua.require'review.panel'.winbar()%}",
+}
+
 -- Loaded when given, like just after the review started.
 function M.toggle(loaded)
     if M.is_open() then
@@ -323,21 +336,18 @@ function M.toggle(loaded)
     vim.cmd("topleft vertical " .. width() .. "split")
     win = vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_buf(win, buf)
-    for option, value in pairs({
-        number = true,
-        relativenumber = false,
-        cursorline = false,
-        wrap = false,
-        list = false,
-        spell = false,
-        winfixwidth = true,
-        signcolumn = "no",
-        statuscolumn = " %=%{%v:lua.require'review.panel'.number()%}%#WinSeparator# ",
-        winbar = " " .. ICON .. " %{%v:lua.require'review.panel'.winbar()%}",
-    }) do
+    for option, value in pairs(options) do
         vim.wo[win][0][option] = value
     end
     draw()
+end
+
+-- Put back once set for every window with :set while in the panel, like a toggle of relative numbers in a config.
+function M.option_set()
+    local option = vim.fn.expand("<amatch>")
+    if options[option] ~= nil and M.is_open() and vim.api.nvim_get_current_win() == win then
+        vim.wo[win][0][option] = options[option]
+    end
 end
 
 function M.winbar()

@@ -116,6 +116,18 @@ function T.a_first_review_lists_the_files_as_a_tree()
     assert(first:find("├─", 1, true) and last:find("└─", 1, true), vim.inspect({ first, last }))
 end
 
+-- Like a toggle of relative numbers in the config, which sets them for every window with :set.
+function T.setting_line_numbers_keeps_the_branches()
+    local _, panel = setup()
+    vim.o.relativenumber = true
+    vim.o.statuscolumn = "%{v:relnum?v:relnum:v:lnum}"
+    local shown = vim.api.nvim_eval_statusline(vim.wo[panel].statuscolumn, { winid = panel, use_statuscol_lnum = 1 }).str
+    local relative = vim.wo[panel].relativenumber
+    vim.o.relativenumber, vim.o.statuscolumn = false, ""
+    finish()
+    assert(shown:find("├─", 1, true) and not relative, vim.inspect({ shown, relative }))
+end
+
 function T.reviewing_files_hides_them_until_undone()
     local _, _, panel_buf = setup()
     local function names()

@@ -85,6 +85,7 @@ local function create_autocmds()
     autocmd("SafeState", render.settled)
     autocmd("WinResized", panel.resized)
     autocmd("VimResized", panel.fit)
+    autocmd("OptionSet", panel.option_set)
     -- BufNewFile for deleted files.
     autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, on_buf(render.attach))
     -- Saves and outside tools change what is in the diff without moving HEAD.

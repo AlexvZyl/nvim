@@ -213,7 +213,12 @@ local function select()
         return marked and draw(line)
     end
     selected = file.key
-    draw(line)
+    -- Drawn again only for the dot it no longer has.
+    if marked then
+        draw(line)
+    else
+        mark_selected()
+    end
     vim.api.nvim_set_current_win(target)
     if file.deleted then
         vim.api.nvim_win_set_buf(target, deleted.open(file.path))

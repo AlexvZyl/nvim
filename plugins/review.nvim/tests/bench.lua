@@ -25,7 +25,8 @@ end, function()
     vim.cmd.edit("file.txt")
 end)
 
-require("review").setup({})
+-- Against the merge base, as reviewing files only changes what the since_review view shows.
+require("review").setup({ view = "all" })
 local render = require("review.render")
 
 local function bench(name, count, fn)

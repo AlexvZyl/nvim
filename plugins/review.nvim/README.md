@@ -10,7 +10,7 @@ require("review").setup({
     width = 60, -- Or below 1 as a ratio of the editor's width, like 0.25.
     depth = 2,
     sign_priority = 6,
-    view = "all", -- Or "since_review" for the changes since files were reviewed.
+    view = "since_review", -- Or "all" for every change against the base.
     signs = { committed = "│", uncommitted = "╎" },
     keymaps = {
         open = "<CR>",

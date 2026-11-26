@@ -19,7 +19,7 @@ local function setup(reviewed)
 end
 
 local function finish()
-    require("review").view("all")
+    require("review").view("since_review")
     require("review").stop()
 end
 

@@ -46,6 +46,7 @@ function M.view(view)
     config.options.view = view
     if session.active() then
         require("review.render").attach_all()
+        require("review.panel").refresh()
     end
 end
 

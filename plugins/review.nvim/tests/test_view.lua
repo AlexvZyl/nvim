@@ -18,6 +18,18 @@ local function setup(reviewed)
     return vim.api.nvim_get_current_buf(), panel
 end
 
+-- The lines added and removed the panel shows for the file, like "+1 -1".
+local function counted(panel)
+    local panel_buf = vim.api.nvim_win_get_buf(panel)
+    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(panel_buf, -1, 0, -1, { details = true })) do
+        if mark[4].virt_text_pos == "right_align" then
+            return vim.trim(table.concat(vim.tbl_map(function(chunk)
+                return chunk[1]
+            end, mark[4].virt_text)))
+        end
+    end
+end
+
 local function finish()
     require("review").view("since_review")
     require("review").stop()
@@ -73,6 +85,25 @@ function T.since_review_shows_everything_when_the_reviewed_blob_is_gone()
     local since = signed(buf)
     finish()
     assert(vim.deep_equal(since, { 3, 9 }), vim.inspect(since))
+end
+
+function T.the_panel_counts_the_lines_changed_since_the_review()
+    local _, panel = setup(true)
+    require("review").view("since_review")
+    local since = counted(panel)
+    require("review").toggle_view()
+    local all = counted(panel)
+    finish()
+    assert(since == "+1 -1", since)
+    assert(all == "+2 -2", all)
+end
+
+function T.the_panel_counts_files_not_reviewed_in_full()
+    local _, panel = setup(false)
+    require("review").view("since_review")
+    local since = counted(panel)
+    finish()
+    assert(since == "+2 -2", since)
 end
 
 return T

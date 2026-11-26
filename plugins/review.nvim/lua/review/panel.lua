@@ -1,5 +1,6 @@
 local config = require("review.config")
 local deleted = require("review.deleted")
+local git = require("review.git")
 local render = require("review.render")
 local session = require("review.session")
 local state = require("review.state")
@@ -62,10 +63,57 @@ local function show_done()
     vim.api.nvim_buf_set_extmark(buf, done_namespace, 0, 0, { virt_lines = virt_lines, virt_lines_leftcol = true })
 end
 
--- Lines the file added and removed, right aligned. None for binary files.
+-- In the since_review view, the lines files reviewed then changed added and removed since the blob they were
+-- reviewed at, kept on the file with that blob. Read for all of them by one git process, left as against the merge
+-- base when git no longer has the blob.
+local function count_since_review(files)
+    local changed = {}
+    for _, file in ipairs(files) do
+        local reviewed = state.changed(file.key) and state.reviewed(file.key)
+        if reviewed and file.added and not (file.since and file.since.blob == reviewed) then
+            table.insert(changed, file)
+        end
+    end
+    if #changed == 0 then
+        return
+    end
+    local shown = git.show_each(
+        vim.tbl_map(function(file)
+            return file.path
+        end, changed),
+        {
+            function(path)
+                return state.reviewed(session.prefix .. path)
+            end,
+        }
+    )
+    for i, file in ipairs(changed) do
+        local since = { blob = state.reviewed(file.key) }
+        local reviewed = shown[i][1]
+        if reviewed then
+            -- Against the working tree like the counts of the diff, without carriage returns like the blob.
+            local disk = io.open(file.path, "rb")
+            local text = disk and disk:read("*a"):gsub("\r\n", "\n") or ""
+            if disk then
+                disk:close()
+            end
+            since.added, since.removed = 0, 0
+            for _, hunk in ipairs(vim.text.diff(reviewed, text, { result_type = "indices" })) do
+                since.removed, since.added = since.removed + hunk[2], since.added + hunk[4]
+            end
+        end
+        file.since = since
+    end
+end
+
+-- Lines the file added and removed, right aligned, since it was reviewed in that view. None for binary files.
 local function counts(file)
+    local since = config.options.view == "since_review" and file.since
+    if not (since and since.added and since.blob == state.reviewed(file.key)) then
+        since = file
+    end
     local chunks = {}
-    for _, count in ipairs({ { file.added, "+", "ReviewPanelAdded" }, { file.removed, "-", "ReviewPanelRemoved" } }) do
+    for _, count in ipairs({ { since.added, "+", "ReviewPanelAdded" }, { since.removed, "-", "ReviewPanelRemoved" } }) do
         if (count[1] or 0) > 0 then
             table.insert(chunks, { count[2] .. count[1] .. " ", count[3] })
         end
@@ -142,6 +190,9 @@ local function draw(cursor)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modifiable = false
     vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
+    if config.options.view == "since_review" then
+        count_since_review(rows)
+    end
     for i, mark in ipairs(marks) do
         vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, mark)
         if rows[i].deleted then

@@ -258,6 +258,16 @@ vim.fn.cursor(vim.fn.search(" " .. modified[1] .. "$"), 1)
 bench("mark since review", 10, function()
     h.press("ddu")
 end)
+-- What the watcher does once HEAD moved, with 50 files reviewed then changed by the commit, counted since review.
+local session = require("review.session")
+local changed = {}
+for i = 1, 50 do
+    local file = session.by_key[session.prefix .. "dir" .. (i * 4 - 3) % 20 .. "/sub" .. (i * 4 - 3) % 3 .. "/" .. modified[i]]
+    require("review.state").review({ file.key }, 1)
+    changed[file.path] = h.edit(h.lines((i * 4 - 3) % 30 + 10), { [3] = "changed", [5] = false, [7] = "since" })
+end
+h.commit(changed)
+bench("refresh since review", 10, require("review.watch").refresh)
 review.view("all")
 bench("panel redraw", 50, function()
     vim.api.nvim_buf_call(panel_buf, function()

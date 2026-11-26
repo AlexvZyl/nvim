@@ -119,6 +119,23 @@ end)
 bench("redraw", 50, function()
     vim.cmd("redraw!")
 end)
+-- Moving around, with the number of the cursor line highlighted like cursorlineopt=number, which marks it on
+-- changed lines. Put back after, as the others run where they were.
+local before = vim.fn.winsaveview()
+vim.wo.cursorline, vim.wo.cursorlineopt = true, "number"
+bench("move", 200, function()
+    vim.cmd("normal! j")
+    render.settled()
+end)
+-- Half a page at a time, drawing the deleted lines that come into view.
+bench("scroll down", 50, function()
+    vim.cmd("normal! \4")
+    vim.cmd("redraw")
+    render.settled()
+end)
+vim.wo.cursorline = false
+vim.fn.winrestview(before)
+render.settled()
 -- Keeping the line in place measures the height of the wrapped lines.
 vim.cmd("normal! 0")
 vim.wo.wrap = true
@@ -204,6 +221,14 @@ local opened = 0
 bench("open", 20, function()
     opened = opened + 1
     h.pick(" " .. modified[opened])
+end)
+-- Going back and forth between files opened, which the panel follows.
+h.pick(" " .. modified[1])
+h.pick(" " .. modified[2])
+vim.api.nvim_set_current_win(main)
+bench("switch", 20, function()
+    vim.cmd("buffer #")
+    vim.cmd("redraw")
 end)
 -- Wiped first, in another buffer so its window stays.
 local scratch = vim.api.nvim_create_buf(false, true)

@@ -2,6 +2,7 @@ local config = require("review.config")
 local git = require("review.git")
 local scroll = require("review.scroll")
 local session = require("review.session")
+local state = require("review.state")
 
 local M = {}
 
@@ -517,18 +518,26 @@ local function attachable(buf)
     return vim.bo[buf].buftype == "" and file ~= "" and vim.fn.isdirectory(file) == 0
 end
 
--- With the file in HEAD and at the merge base when already read.
+-- What files are diffed against: the merge base, and with the "since_review" view the blob reviewed files were
+-- reviewed at, once that is still there to read.
+local function revs()
+    local reviewed = config.options.view == "since_review"
+        and function(path)
+            local blob = state.reviewed(session.prefix .. path)
+            -- Not in HEAD when reviewed.
+            return blob ~= "" and blob or nil
+        end
+    return { "HEAD", session.merge_base, reviewed }
+end
+
+-- With the file in HEAD, at the merge base and as reviewed when already read.
 function M.attach(buf, shown)
     if not attachable(buf) then
         return
     end
     -- No base when the file was added since the merge base, no head when it was added since HEAD.
-    local head, base
-    if shown then
-        head, base = shown[1], shown[2]
-    else
-        head, base = git.show(vim.api.nvim_buf_get_name(buf), "HEAD", session.merge_base)
-    end
+    shown = shown or git.show_each({ vim.api.nvim_buf_get_name(buf) }, revs())[1]
+    local head, base = shown[1], shown[3] or shown[2]
     -- Untracked, outside the repo or binary.
     if not (base or head) or ((base or "") .. (head or "")):find("\0", 1, true) then
         return M.detach(buf)
@@ -560,14 +569,42 @@ function M.attach(buf, shown)
 end
 
 -- Read by one git process, as a process for each adds up with many buffers open.
-function M.attach_all()
-    local bufs = vim.tbl_filter(function(buf)
-        return vim.api.nvim_buf_is_loaded(buf) and attachable(buf)
-    end, vim.api.nvim_list_bufs())
-    local shown = git.show_each(vim.tbl_map(vim.api.nvim_buf_get_name, bufs), { "HEAD", session.merge_base })
+local function attach_each(bufs)
+    if #bufs == 0 then
+        return
+    end
+    local shown = git.show_each(vim.tbl_map(vim.api.nvim_buf_get_name, bufs), revs())
     for i, buf in ipairs(bufs) do
         M.attach(buf, shown[i])
     end
+end
+
+function M.attach_all()
+    attach_each(vim.tbl_filter(function(buf)
+        return vim.api.nvim_buf_is_loaded(buf) and attachable(buf)
+    end, vim.api.nvim_list_bufs()))
+end
+
+-- Files marked reviewed or not, by key, are diffed against something else with the "since_review" view.
+function M.reviewed(keys)
+    if config.options.view ~= "since_review" then
+        return
+    end
+    local marked, read = {}, {}
+    for _, key in ipairs(keys) do
+        marked[key] = true
+    end
+    for buf, attached in pairs(buffers) do
+        local key = session.prefix .. vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":.")
+        local blob = state.reviewed(key)
+        if marked[key] and blob and blob == session.blobs()[key] then
+            -- Reviewed as in HEAD, which it already has.
+            M.attach(buf, { attached.head.text, nil, attached.head.text })
+        elseif marked[key] then
+            table.insert(read, buf)
+        end
+    end
+    attach_each(read)
 end
 
 function M.detach(buf)

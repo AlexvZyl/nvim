@@ -61,6 +61,11 @@ function M.changed(key)
     return reviewed ~= nil and reviewed ~= blob(key)
 end
 
+-- Blob the file was reviewed at, nil when not reviewed.
+function M.reviewed(key)
+    return data.reviewed[key]
+end
+
 function M.new(key)
     return not data.seen[key]
 end
@@ -107,7 +112,7 @@ local function restore(from, to, cursor)
         end
     until changed or #data[from] == 0
     M.save()
-    return entry.cursor
+    return entry.cursor, vim.tbl_keys(entry.changes)
 end
 
 function M.undo(cursor)

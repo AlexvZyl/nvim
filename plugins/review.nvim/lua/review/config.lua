@@ -11,6 +11,9 @@ local defaults = {
     sign_priority = 6,
     -- Of committed and uncommitted changes, one or two cells.
     signs = { committed = "│", uncommitted = "╎" },
+    -- What files show changed against: "all" for the merge base, "since_review" for as reviewed, for the files
+    -- changed since.
+    view = "all",
     -- False leaves a key unmapped.
     keymaps = {
         -- In the panel.

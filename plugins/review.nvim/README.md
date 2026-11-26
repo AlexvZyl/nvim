@@ -10,6 +10,7 @@ require("review").setup({
     width = 60, -- Or below 1 as a ratio of the editor's width, like 0.25.
     depth = 2,
     sign_priority = 6,
+    view = "all", -- Or "since_review" for the changes since files were reviewed.
     signs = { committed = "│", uncommitted = "╎" },
     keymaps = {
         open = "<CR>",
@@ -31,5 +32,7 @@ require("review").setup({
 | `:ReviewStop` | `require("review").stop()` | Stops reviewing. |
 | `:ReviewReset` | `require("review").reset()` | Forgets which files were reviewed. |
 | - | `require("review").panel()` | Toggles the panel. |
+| - | `require("review").view([view])` | Sets or gives the view. |
+| - | `require("review").toggle_view()` | Toggles the view. |
 | `:Telescope review` | `require("review").files(opts)` | Picks a changed file. |
 | - | `require("review").active()` | Whether a review is running. |

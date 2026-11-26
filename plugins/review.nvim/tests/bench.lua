@@ -223,6 +223,13 @@ for i = 1, 50 do
 end
 bench("attach all", 10, render.attach_all)
 vim.api.nvim_set_current_win(panel)
+-- Diffed against as reviewed, marking a file reviewed attaches its buffer again. One of those opened.
+review.view("since_review")
+vim.fn.cursor(vim.fn.search(" " .. modified[1] .. "$"), 1)
+bench("mark since review", 10, function()
+    h.press("ddu")
+end)
+review.view("all")
 bench("panel redraw", 50, function()
     vim.api.nvim_buf_call(panel_buf, function()
         vim.cmd("redraw!")

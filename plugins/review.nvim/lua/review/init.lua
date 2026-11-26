@@ -35,6 +35,24 @@ M.panel = guarded(function()
     require("review.panel").toggle()
 end)
 
+local views = { all = "since_review", since_review = "all" }
+
+-- Sets what files show changed against, see the view option, or gives it without one.
+function M.view(view)
+    if not view then
+        return config.options.view
+    end
+    assert(views[view], "unknown view " .. view)
+    config.options.view = view
+    if session.active() then
+        require("review.render").attach_all()
+    end
+end
+
+function M.toggle_view()
+    M.view(views[M.view()])
+end
+
 M.files = guarded(function(opts)
     require("review.picker").open(opts)
 end)
@@ -123,6 +141,8 @@ function M.start(ref)
         create_autocmds()
         require("review.diagnostics").start()
         watch.start(safely)
+        -- Which files were reviewed decides what the "since_review" view diffs them against.
+        require("review.state").load()
         require("review.render").attach_all()
         if not switching then
             vim.api.nvim_exec_autocmds("User", { pattern = "ReviewStart" })

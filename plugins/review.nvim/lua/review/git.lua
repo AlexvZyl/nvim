@@ -40,13 +40,19 @@ function M.refs()
 end
 
 -- Contents of each file at each revision, by file a list by revision, nil where it does not exist, read by one git
--- process.
+-- process. A revision can be a function of the file's path from the cwd instead, giving the object to read, like a
+-- blob, or nil for none.
 function M.show_each(files, revs)
-    local objects = {}
-    for _, file in ipairs(files) do
+    local objects, at = {}, {}
+    for i, file in ipairs(files) do
         local path = vim.fn.fnamemodify(file, ":.")
-        for _, rev in ipairs(revs) do
-            table.insert(objects, rev .. ":./" .. path .. "\n")
+        at[i] = {}
+        for j, rev in ipairs(revs) do
+            local object = type(rev) == "function" and rev(path) or type(rev) == "string" and rev .. ":./" .. path
+            if object then
+                table.insert(objects, object .. "\n")
+                at[i][j] = #objects
+            end
         end
     end
     local output = vim.system({ "git", "-C", vim.fn.getcwd(), "cat-file", "--batch" }, { stdin = table.concat(objects) }):wait().stdout or ""
@@ -67,7 +73,10 @@ function M.show_each(files, revs)
     end
     local by_file = {}
     for i = 1, #files do
-        by_file[i] = { unpack(contents, (i - 1) * #revs + 1, i * #revs) }
+        by_file[i] = {}
+        for j, position in pairs(at[i]) do
+            by_file[i][j] = contents[position]
+        end
     end
     return by_file
 end

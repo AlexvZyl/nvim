@@ -149,13 +149,15 @@ local function remove(first, last)
     end, vim.list_slice(rows, first, last))
     if #keys > 0 then
         state.review(keys, first)
+        render.reviewed(keys)
         draw(first)
     end
 end
 
 local function restore(step)
-    local cursor = step(vim.fn.line("."))
+    local cursor, keys = step(vim.fn.line("."))
     if cursor then
+        render.reviewed(keys)
         draw(cursor)
     end
 end

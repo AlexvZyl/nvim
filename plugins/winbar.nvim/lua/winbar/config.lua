@@ -1,5 +1,3 @@
-local M = {}
-
 local defaults = {
     -- Filetypes left alone, like ones that set their own.
     exclude = {},
@@ -7,10 +5,4 @@ local defaults = {
     bars = require("winbar.bars"),
 }
 
-M.options = vim.deepcopy(defaults)
-
-function M.set(opts)
-    M.options = vim.tbl_deep_extend("force", defaults, opts or {})
-end
-
-return M
+return require("shared.config").new(defaults)

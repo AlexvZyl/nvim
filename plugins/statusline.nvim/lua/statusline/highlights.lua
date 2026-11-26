@@ -19,9 +19,7 @@ local groups = {
 }
 
 function M.set()
-    for group, link in pairs(groups) do
-        vim.api.nvim_set_hl(0, group, { link = link, default = true })
-    end
+    require("shared.highlights").link(groups)
 end
 
 return M

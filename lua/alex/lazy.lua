@@ -129,9 +129,15 @@ local plugins = {
 
     -- Own plugins.
     {
+        dir = vim.fn.stdpath("config") .. "/plugins/shared.nvim",
+        name = "shared.nvim",
+        lazy = true,
+    },
+    {
         dir = vim.fn.stdpath("config") .. "/plugins/statusline.nvim",
         name = "statusline.nvim",
         lazy = false,
+        dependencies = { "shared.nvim" },
         config = function()
             require("alex.plugins.statusline")
         end,
@@ -140,7 +146,7 @@ local plugins = {
         dir = vim.fn.stdpath("config") .. "/plugins/winbar.nvim",
         name = "winbar.nvim",
         lazy = false,
-        dependencies = { "nvim-tree/nvim-web-devicons" },
+        dependencies = { "shared.nvim", "nvim-tree/nvim-web-devicons" },
         config = function()
             require("alex.plugins.winbar")
         end,
@@ -158,7 +164,7 @@ local plugins = {
                 desc = "Review files",
             },
         },
-        dependencies = { "nvim-telescope/telescope.nvim", "nvim-tree/nvim-web-devicons" },
+        dependencies = { "shared.nvim", "nvim-telescope/telescope.nvim", "nvim-tree/nvim-web-devicons" },
         config = function()
             require("alex.plugins.review")
         end,

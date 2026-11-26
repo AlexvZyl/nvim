@@ -3,6 +3,7 @@
 -- were and how many of them drew the deleted lines in a gutter other than the window's.
 local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
 vim.opt.rtp:prepend(root)
+vim.opt.rtp:prepend(root .. "/../shared.nvim")
 package.path = root .. "/?.lua;" .. package.path
 local h = require("tests.helpers")
 require("review").setup({})

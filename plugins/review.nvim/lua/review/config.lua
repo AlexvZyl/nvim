@@ -1,5 +1,3 @@
-local M = {}
-
 local defaults = {
     -- Ref to review against when `nvim diff` is given none.
     base = "dev",
@@ -27,10 +25,4 @@ local defaults = {
     },
 }
 
-M.options = vim.deepcopy(defaults)
-
-function M.set(opts)
-    M.options = vim.tbl_deep_extend("force", defaults, opts or {})
-end
-
-return M
+return require("shared.config").new(defaults)

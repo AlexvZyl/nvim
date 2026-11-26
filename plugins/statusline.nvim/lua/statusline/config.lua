@@ -3,4 +3,4 @@ local defaults = {
     toggles = {},
 }
 
-return require("shared.config").new(defaults)
+return require("shared.plugin").config(defaults)

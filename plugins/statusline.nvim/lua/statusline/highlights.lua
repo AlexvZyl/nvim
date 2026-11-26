@@ -19,7 +19,7 @@ local groups = {
 }
 
 function M.set()
-    require("shared.highlights").link(groups)
+    require("shared.plugin").link(groups)
 end
 
 return M

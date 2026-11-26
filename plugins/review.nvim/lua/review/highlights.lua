@@ -25,7 +25,7 @@ local groups = {
 }
 
 function M.set()
-    require("shared.highlights").link(groups)
+    require("shared.plugin").link(groups)
     -- Only the background of deleted lines, put over the syntax of their text, which can have its own, like markdown
     -- code blocks.
     for _, group in ipairs({ "ReviewDelete", "ReviewLocalDelete" }) do

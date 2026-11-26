@@ -5,4 +5,4 @@ local defaults = {
     bars = require("winbar.bars"),
 }
 
-return require("shared.config").new(defaults)
+return require("shared.plugin").config(defaults)

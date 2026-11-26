@@ -1,0 +1,147 @@
+{
+  "benchmarks": {
+    "calibrate": {
+      "medians": [
+        3.4198,
+        3.4198,
+        3.4221,
+        3.5068,
+        3.5595
+      ],
+      "min": 3.3082,
+      "order": 11,
+      "unit": "ms"
+    },
+    "draw": {
+      "medians": [
+        7.425,
+        7.459,
+        7.419,
+        7.471,
+        7.669
+      ],
+      "min": 6.64,
+      "order": 6,
+      "unit": "us"
+    },
+    "first draw": {
+      "medians": [
+        0.08649999999999999,
+        0.0866,
+        0.0862,
+        0.0872,
+        0.0887
+      ],
+      "min": 0.0823,
+      "order": 2,
+      "unit": "ms"
+    },
+    "recount": {
+      "medians": [
+        63.569,
+        63.017,
+        63.944,
+        75.512,
+        64.81
+      ],
+      "min": 59.947,
+      "order": 7,
+      "unit": "us"
+    },
+    "render": {
+      "medians": [
+        1.879,
+        1.864,
+        1.835,
+        1.857,
+        1.925
+      ],
+      "min": 1.637,
+      "order": 5,
+      "unit": "us"
+    },
+    "render empty": {
+      "medians": [
+        1.197,
+        1.133,
+        1.202,
+        1.205,
+        1.239
+      ],
+      "min": 0.976,
+      "order": 3,
+      "unit": "us"
+    },
+    "render no lsp": {
+      "medians": [
+        1.452,
+        1.42,
+        1.427,
+        1.448,
+        1.495
+      ],
+      "min": 1.322,
+      "order": 4,
+      "unit": "us"
+    },
+    "render prompt": {
+      "medians": [
+        2.215,
+        2.01,
+        2.001,
+        2.116,
+        2.125
+      ],
+      "min": 1.827,
+      "order": 9,
+      "unit": "us"
+    },
+    "render signs": {
+      "medians": [
+        2.196,
+        2.009,
+        2.034,
+        2.07,
+        2.117
+      ],
+      "min": 1.845,
+      "order": 8,
+      "unit": "us"
+    },
+    "render toggles": {
+      "medians": [
+        2.396,
+        2.136,
+        2.184,
+        2.258,
+        2.313
+      ],
+      "min": 1.959,
+      "order": 10,
+      "unit": "us"
+    },
+    "startup": {
+      "medians": [
+        0.2045,
+        0.2042,
+        0.2064,
+        0.1998,
+        0.2193
+      ],
+      "min": 0.1784,
+      "order": 1,
+      "unit": "ms"
+    }
+  },
+  "commit": "e72ae55",
+  "date": "2026-11-26T14:50:56",
+  "dirty": false,
+  "machine": {
+    "cores": 18,
+    "cpu": "Intel(R) Core(TM) Ultra 5 250KF Plus",
+    "nvim": "0.13.0-dev+g9fbcb28ea6",
+    "os": "Linux 7.2.15-200.fc44.x86_64",
+    "pinned": "0-5"
+  },
+  "runs": 5
+}

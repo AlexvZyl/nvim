@@ -89,8 +89,7 @@ end
 -- The files of a diff --numstat -z with the lines they added and removed.
 local function numstat(output)
     local files = {}
-    for _, line in ipairs(vim.split(output, "\0", { trimempty = true })) do
-        local added, removed, path = line:match("^(%S+)\t(%S+)\t(.+)$")
+    for added, removed, path in output:gmatch("(%S+)\t(%S+)\t([^%z]+)%z") do
         -- Binary files count as "-", which leaves them without counts.
         table.insert(files, { path = path, added = tonumber(added), removed = tonumber(removed) })
     end
@@ -109,8 +108,9 @@ function M.changed_files(ref)
         for _, file in ipairs(files) do
             -- Binary files have no lines, but are some of the review too.
             file.changes = math.max((file.added or 0) + (file.removed or 0), 1)
-            -- The diff is against the working tree, so a deleted file is one not on disk.
-            file.deleted = vim.uv.fs_stat(file.path) == nil
+            -- The diff is against the working tree, so a deleted file is one not on disk. Only those adding no lines
+            -- can be, binary ones adding none either.
+            file.deleted = (file.added or 0) == 0 and vim.uv.fs_stat(file.path) == nil
         end
         return files
     end
@@ -127,11 +127,8 @@ function M.head_blobs(paths)
     return function()
         if not blobs then
             blobs = {}
-            for _, line in ipairs(vim.split(wait and wait() or "", "\0", { trimempty = true })) do
-                local sha, path = line:match("^%S+ blob (%S+)\t(.+)$")
-                if sha then
-                    blobs[path] = sha
-                end
+            for sha, path in (wait and wait() or ""):gmatch("%S+ blob (%S+)\t([^%z]+)%z") do
+                blobs[path] = sha
             end
         end
         return blobs

@@ -83,14 +83,34 @@ local function mark_selected()
     end
 end
 
+-- The directory group, name, icon and its highlight of each file by path, for the depth they were grouped by.
+local layouts, layouts_depth = {}, nil
+
+local function layout(path)
+    if layouts_depth ~= config.options.depth then
+        layouts, layouts_depth = {}, config.options.depth
+    end
+    if not layouts[path] then
+        local parts = vim.split(vim.fs.dirname(path), "/", { plain = true })
+        local name = vim.fn.fnamemodify(path, ":t")
+        local icon, hl = require("nvim-web-devicons").get_icon(name, nil, { default = true })
+        layouts[path] = {
+            dir = parts[1] == "." and "" or table.concat(parts, "/", 1, math.min(layouts_depth, #parts)),
+            line = icon .. " " .. name,
+            icon_end = #icon,
+            hl = hl,
+        }
+    end
+    return layouts[path]
+end
+
 -- With the cursor on the line, or on the selected file when not given, else the first.
 local function draw(cursor)
     -- Pending files grouped by their first directories up to the configured depth.
     local groups, dirs = {}, {}
     for _, file in ipairs(session.files) do
         if state.pending(file.key) then
-            local parts = vim.split(vim.fs.dirname(file.path), "/", { plain = true })
-            local dir = parts[1] == "." and "" or table.concat(parts, "/", 1, math.min(config.options.depth, #parts))
+            local dir = layout(file.path).dir
             if not groups[dir] then
                 groups[dir] = {}
                 table.insert(dirs, dir)
@@ -104,13 +124,12 @@ local function draw(cursor)
     for _, dir in ipairs(dirs) do
         for i, file in ipairs(groups[dir]) do
             table.insert(rows, file)
-            local name = vim.fn.fnamemodify(file.path, ":t")
-            local icon, hl = require("nvim-web-devicons").get_icon(name, nil, { default = true })
-            table.insert(lines, icon .. " " .. name)
+            local shown = layout(file.path)
+            table.insert(lines, shown.line)
             local dot = state.changed(file.key) and "ReviewChanged" or state.new(file.key) and "ReviewNew"
             table.insert(marks, {
-                end_col = #icon,
-                hl_group = hl,
+                end_col = shown.icon_end,
+                hl_group = shown.hl,
                 virt_text = dot and { { " ●", dot } } or nil,
                 virt_lines = i == 1 and { { { " " .. FOLDER .. (dir ~= "" and " " .. dir or ""), "ReviewPanelDir" } } } or nil,
                 virt_lines_above = true,

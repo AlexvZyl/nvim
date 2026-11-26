@@ -554,8 +554,8 @@ function M.attach(buf, shown)
     end
     local attached = buffers[buf]
     -- With the treesitter highlights of their lines by language, for the deleted lines.
-    attached.base = { text = base or "", lines = vim.split(base or "", "\n"), highlights = {} }
-    attached.head = { text = head or "", lines = vim.split(head or "", "\n"), highlights = {} }
+    attached.base = { text = base or "", lines = vim.split(base or "", "\n", { plain = true }), highlights = {} }
+    attached.head = { text = head or "", lines = vim.split(head or "", "\n", { plain = true }), highlights = {} }
     -- Lines of the base deleted by commits, other deleted lines are only deleted locally. With where they were
     -- between the lines of HEAD: after the line before them, or before the lines that replaced them.
     attached.committed_deletions = {}

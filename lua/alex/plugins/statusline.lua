@@ -24,5 +24,11 @@ require("statusline").setup({
             end,
             icon = "󰉼 ",
         },
+        {
+            enabled = function()
+                return package.loaded.review ~= nil and require("review").view() == "since_review"
+            end,
+            icon = " ",
+        },
     },
 })

@@ -390,6 +390,20 @@ function T.deleted_lines_are_highlighted_with_the_code_around_them()
     assert(name == "@function.lua", vim.inspect(chunks))
 end
 
+-- Like a tag opened at the top of an XML file.
+function T.deleted_lines_are_highlighted_with_code_opened_far_above_them()
+    local lines = { "--[[" }
+    vim.list_extend(lines, vim.split(string.rep("a", 40), ""))
+    vim.list_extend(lines, { "]]", "keep" })
+    h.repo(lines, h.edit(lines, { [36] = false }))
+    local buf = h.open()
+    vim.bo[buf].filetype = "lua"
+    require("review.render").settled()
+    local name, chunks = deleted_highlight(buf, "a", #lines)
+    vim.bo[buf].filetype = ""
+    assert(name == "@comment.lua", vim.inspect(chunks))
+end
+
 -- Also apart from each other.
 function T.deleted_lines_are_highlighted_in_the_languages_injected_in_them()
     local lines = { 'vim.cmd("resize 10")', "local a = 1", 'vim.cmd("resize 20")', "local b = 2" }

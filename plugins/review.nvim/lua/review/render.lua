@@ -68,8 +68,6 @@ local function highlight_line(file, lang, line, above, below)
             row = row + 1
         end
     end
-    local top = math.max(low - math.min(above, context), 1)
-    local bottom = math.min(high + math.min(below, context), #file.lines)
     -- The runs of deleted lines in between still to highlight, by their first and last row.
     local runs = {}
     for row = low, high do
@@ -83,16 +81,31 @@ local function highlight_line(file, lang, line, above, below)
             end
         end
     end
-    local source = table.concat(file.lines, "\n", top, bottom)
-    local ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
-    if not ok then
+    local top, bottom, source, parser
+    local function parse(lines_above, lines_below)
+        top = math.max(low - lines_above, 1)
+        bottom = math.min(high + lines_below, #file.lines)
+        source = table.concat(file.lines, "\n", top, bottom)
+        local ok
+        ok, parser = pcall(vim.treesitter.get_string_parser, source, lang)
+        if not ok then
+            return false
+        end
+        -- With the languages injected only in the deleted lines, as finding them in all the lines takes as long again.
+        -- All at once, as parsing a range drops what was injected outside it.
+        parser:parse(vim.tbl_map(function(run)
+            return { run[1] - top, 0, run[2] - top + 1, 0 }
+        end, runs))
+        return true
+    end
+    if not parse(math.min(above, context), math.min(below, context)) then
         return cache[line]
     end
-    -- With the languages injected only in the deleted lines, as finding them in all the lines takes as long again.
-    -- All at once, as parsing a range drops what was injected outside it.
-    parser:parse(vim.tbl_map(function(run)
-        return { run[1] - top, 0, run[2] - top + 1, 0 }
-    end, runs))
+    -- Code opened outside the lines parsed, like the root tag of XML or a long comment, leaves them in errors.
+    local window = top > math.max(low - above, 1) or bottom < math.min(high + below, #file.lines)
+    if window and parser:trees()[1]:root():has_error() then
+        parse(above, below)
+    end
     -- Injected languages after the ones they are in, so theirs win.
     local function add(tree)
         local tree_lang = tree:lang()

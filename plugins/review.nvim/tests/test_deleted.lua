@@ -22,7 +22,7 @@ local function open(panel)
 end
 
 local function selected(panel_buf)
-    for _, mark in ipairs(h.marks(panel_buf, "review_panel", 1, vim.api.nvim_buf_line_count(panel_buf) + 1)) do
+    for _, mark in ipairs(h.marks(panel_buf, "review_panel_selected", 1, vim.api.nvim_buf_line_count(panel_buf) + 1)) do
         if mark[4].line_hl_group == "ReviewPanelLine" then
             return vim.api.nvim_buf_get_lines(panel_buf, mark[2], mark[2] + 1, true)[1]
         end

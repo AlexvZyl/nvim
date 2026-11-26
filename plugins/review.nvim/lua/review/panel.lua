@@ -8,6 +8,8 @@ local M = {}
 
 local namespace = vim.api.nvim_create_namespace("review_panel")
 local done_namespace = vim.api.nvim_create_namespace("review_panel_done")
+-- Of the selected file, by itself so another file selected only moves it.
+local selected_namespace = vim.api.nvim_create_namespace("review_panel_selected")
 -- Fills up as the review progresses.
 local PROGRESS = { "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤" }
 local EMPTY, DONE = "󰝦", "󰄴"
@@ -71,6 +73,16 @@ local function counts(file)
     return chunks
 end
 
+local function mark_selected()
+    vim.api.nvim_buf_clear_namespace(buf, selected_namespace, 0, -1)
+    for i, file in ipairs(rows) do
+        if file.key == selected then
+            vim.api.nvim_buf_set_extmark(buf, selected_namespace, i - 1, 0, { line_hl_group = "ReviewPanelLine" })
+            return i
+        end
+    end
+end
+
 -- With the cursor on the line, or on the selected file when not given, else the first.
 local function draw(cursor)
     -- Pending files grouped by their first directories up to the configured depth.
@@ -99,7 +111,6 @@ local function draw(cursor)
             table.insert(marks, {
                 end_col = #icon,
                 hl_group = hl,
-                line_hl_group = file.key == selected and "ReviewPanelLine" or nil,
                 virt_text = dot and { { " ●", dot } } or nil,
                 virt_lines = i == 1 and { { { " " .. FOLDER .. (dir ~= "" and " " .. dir or ""), "ReviewPanelDir" } } } or nil,
                 virt_lines_above = true,
@@ -122,13 +133,8 @@ local function draw(cursor)
             vim.api.nvim_buf_set_extmark(buf, namespace, i - 1, 0, { virt_text = count, virt_text_pos = "right_align" })
         end
     end
-    if not cursor then
-        for i, file in ipairs(rows) do
-            if file.key == selected then
-                cursor = i
-            end
-        end
-    end
+    local selected_row = mark_selected()
+    cursor = cursor or selected_row
     vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor or 1, #rows), 1), 0 })
     show_top_header()
     show_done()
@@ -268,7 +274,9 @@ function M.follow(opened)
     local key = session.prefix .. deleted.path(opened)
     if key ~= selected and session.by_key[key] then
         selected = key
-        M.refresh()
+        if M.is_open() then
+            mark_selected()
+        end
     end
 end
 

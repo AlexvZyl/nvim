@@ -345,13 +345,14 @@ local options = {
     winbar = " " .. ICON .. " %{%v:lua.require'review.panel'.winbar()%}",
 }
 
--- Loaded when given, like just after the review started.
+-- Loaded when given, like just after the review started. Otherwise shown as last loaded, and loaded again after,
+-- which redraws it only when something changed meanwhile, as the watcher reloads it on what changes it.
 function M.toggle(loaded)
     if M.is_open() then
         return M.close()
     end
-    if not loaded and not session.load() then
-        return
+    if not loaded then
+        require("review.watch").schedule()
     end
     state.load()
     -- The file it is opened from, like once entered.

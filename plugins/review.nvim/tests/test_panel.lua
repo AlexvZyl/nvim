@@ -96,6 +96,23 @@ function T.the_panel_opens_on_the_file_it_is_opened_from()
     assert(started:match(" file.txt$") and reopened:match(" f50.txt$") and unchanged == reopened, vim.inspect({ started, reopened, unchanged }))
 end
 
+-- Like a file removed by another program while the panel was closed, which leaves the review as the branch added it.
+function T.reopening_the_panel_shows_what_changed_while_closed()
+    local _, _, panel_buf = setup()
+    local function listed()
+        return vim.tbl_contains(vim.api.nvim_buf_get_lines(panel_buf, 0, -1, false), " f1.txt")
+    end
+    local before = listed()
+    require("review").panel()
+    os.remove("f1.txt")
+    require("review").panel()
+    local gone = vim.wait(1000, function()
+        return not listed()
+    end)
+    teardown()
+    assert(before and gone, vim.inspect({ before, gone }))
+end
+
 function T.a_first_review_lists_the_files_as_a_tree()
     local _, panel, panel_buf = setup()
     local dots = vim.tbl_filter(function(mark)

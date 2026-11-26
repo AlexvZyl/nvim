@@ -204,6 +204,10 @@ bench("toggle", 10, function()
     review.panel()
     review.panel()
 end)
+-- The reload opening it scheduled, done before the others.
+vim.wait(500, function()
+    return false
+end)
 -- Marking files reviewed saves the state and draws the panel again.
 bench("mark", 10, function()
     h.press("ddu")

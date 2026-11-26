@@ -61,10 +61,9 @@ vim.cmd("normal! " .. math.floor(n / 2) .. "G")
 bench("attach", 5, function()
     render.attach(buf)
 end)
--- With the deleted lines drawn and highlighted anew, which attach keeps when they show the same.
-local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
+-- Like the first time, with the deleted lines drawn and highlighted anew, which attach keeps when they show the same.
 bench("attach drawn", 5, function()
-    vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
+    render.detach(buf)
     render.attach(buf)
 end)
 bench("update", 20, function()

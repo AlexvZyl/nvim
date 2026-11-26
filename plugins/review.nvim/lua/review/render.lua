@@ -553,6 +553,10 @@ function M.attach(buf, shown)
         end
     end
     local attached = buffers[buf]
+    -- Read again as they were, like after a save, what was worked out from them is kept, their highlights too.
+    if attached.base and attached.base.text == (base or "") and attached.head.text == (head or "") then
+        return M.update(buf)
+    end
     -- With the treesitter highlights of their lines by language, for the deleted lines.
     attached.base = { text = base or "", lines = vim.split(base or "", "\n", { plain = true }), highlights = {} }
     attached.head = { text = head or "", lines = vim.split(head or "", "\n", { plain = true }), highlights = {} }

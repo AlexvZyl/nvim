@@ -63,6 +63,24 @@ local function deleted_texts(buf)
     return texts
 end
 
+-- Saving reads the file from git again, which keeps what it worked out before when that did not change.
+function T.saving_keeps_the_deleted_lines()
+    h.repo(h.lines(12), h.edit(h.lines(12), { [10] = false }))
+    h.review("file.txt")
+    local buf = vim.api.nvim_get_current_buf()
+    h.keys("5Gdd")
+    vim.cmd("silent write")
+    local texts, signs = deleted_texts(buf), {}
+    for _, mark in ipairs(h.marks(buf, "review_deleted", 1, vim.api.nvim_buf_line_count(buf))) do
+        for _, line in ipairs(h.virt_lines(mark)) do
+            table.insert(signs, line.sign)
+        end
+    end
+    require("review").stop()
+    assert(vim.deep_equal(texts, { "line 5", "line 10" }), vim.inspect(texts))
+    assert(vim.deep_equal(signs, { "╎", "│" }), vim.inspect(signs))
+end
+
 -- Deleted lines show in the order they were in, wherever they were deleted.
 local function shows_in_order(committed, working, texts)
     committed = h.edit(h.lines(12), committed)

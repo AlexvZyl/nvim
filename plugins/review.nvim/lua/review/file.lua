@@ -5,15 +5,11 @@ local M = {}
 
 -- Text
 
----@class LineRange
----@field start integer First byte of the line in the text's data
----@field finish integer Last byte, before its newline. Below start when the line is empty.
-
--- Text is a string with the byte range of each line, as LineRanges stored in two flat arrays.
+-- Text is a string with where each line starts. Only starts are stored, as a line ends 2 bytes before the next
+-- starts, skipping its newline. That halves the memory.
 ---@class Text
 ---@field data string
----@field line_starts integer[]? LineRange.start of each line, nil until indexed
----@field line_ends integer[]? LineRange.finish of each line
+---@field line_starts integer[]? First byte of each line, then one past the end for the last line to end at. Nil until indexed.
 ---@field read_lines table<integer, string>? Lines already read, as deleted lines are read on every render
 local Text = {}
 Text.__index = Text
@@ -23,49 +19,53 @@ function Text.new(data)
     return setmetatable({ data = data }, Text)
 end
 
--- Builds the line ranges, split at "\n" like vim.split: a trailing newline gives a last, empty line. Only Texts
+-- Finds where lines start, split at "\n" like vim.split: a trailing newline gives a last, empty line. Only Texts
 -- whose lines are read need it, so a buffer's Text, which is only diffed, is never indexed.
 function Text:index_lines()
     if self.line_starts then
         return self
     end
-    local data, line_starts, line_ends, start = self.data, {}, {}, 1
+    local data, line_starts, start = self.data, {}, 1
     while true do
+        line_starts[#line_starts + 1] = start
         local newline = data:find("\n", start, true)
         if not newline then
             break
         end
-        line_starts[#line_starts + 1], line_ends[#line_ends + 1] = start, newline - 1
         start = newline + 1
     end
-    line_starts[#line_starts + 1], line_ends[#line_ends + 1] = start, #data
-    self.line_starts, self.line_ends, self.read_lines = line_starts, line_ends, {}
+    -- As if the text ended in a newline, so the last line ends like the others.
+    line_starts[#line_starts + 1] = #data + 2
+    self.line_starts, self.read_lines = line_starts, {}
     return self
 end
 
+-- The last byte of the line, before its newline. Below its start when the line is empty.
+function Text:line_end(i)
+    return self:index_lines().line_starts[i + 1] - 2
+end
+
 function Text:line_count()
-    return #self:index_lines().line_starts
+    return #self:index_lines().line_starts - 1
 end
 
 function Text:line(i)
     self:index_lines()
     local line = self.read_lines[i]
     if not line then
-        line = self.data:sub(self.line_starts[i], self.line_ends[i])
+        line = self.data:sub(self.line_starts[i], self:line_end(i))
         self.read_lines[i] = line
     end
     return line
 end
 
 function Text:line_length(i)
-    self:index_lines()
-    return self.line_ends[i] - self.line_starts[i] + 1
+    return self:line_end(i) - self:index_lines().line_starts[i] + 1
 end
 
 -- Lines first to last as one string, joined by their newlines.
 function Text:range(first, last)
-    self:index_lines()
-    return self.data:sub(self.line_starts[first], self.line_ends[last])
+    return self.data:sub(self:index_lines().line_starts[first], self:line_end(last))
 end
 
 -- File

@@ -26,31 +26,30 @@ local defaults = {
 
 local M = require("shared.plugin").config(defaults)
 
--- Default links, so colorschemes can override them.
-local groups = {
-    ReviewAdd = "DiffAdd",
-    ReviewAddNr = "DiffAdd",
-    ReviewDelete = "DiffDelete",
-    ReviewDeleteNr = "DiffDelete",
-    ReviewSignAdd = "Added",
-    ReviewSignDelete = "Removed",
-    ReviewSignLocalAdd = "ReviewSignAdd",
-    ReviewSignLocalDelete = "ReviewSignDelete",
-    ReviewLocalAdd = "ReviewAdd",
-    ReviewLocalAddNr = "ReviewAddNr",
-    ReviewLocalDelete = "ReviewDelete",
-    ReviewLocalDeleteNr = "ReviewDeleteNr",
-    ReviewPanelLine = "CursorLine",
-    ReviewPanelDir = "Directory",
-    ReviewPanelNr = "CursorLineNr",
-    ReviewChanged = "Changed",
-    ReviewNew = "Added",
-    ReviewPanelAdded = "Added",
-    ReviewPanelRemoved = "Removed",
-    ReviewPanelDeleted = { strikethrough = true },
-}
-
 function M.set_highlights()
+    -- Default links, so colorschemes can override them.
+    local groups = {
+        ReviewAdd = "DiffAdd",
+        ReviewAddNr = "DiffAdd",
+        ReviewDelete = "DiffDelete",
+        ReviewDeleteNr = "DiffDelete",
+        ReviewSignAdd = "Added",
+        ReviewSignDelete = "Removed",
+        ReviewSignLocalAdd = "ReviewSignAdd",
+        ReviewSignLocalDelete = "ReviewSignDelete",
+        ReviewLocalAdd = "ReviewAdd",
+        ReviewLocalAddNr = "ReviewAddNr",
+        ReviewLocalDelete = "ReviewDelete",
+        ReviewLocalDeleteNr = "ReviewDeleteNr",
+        ReviewPanelLine = "CursorLine",
+        ReviewPanelDir = "Directory",
+        ReviewPanelNr = "CursorLineNr",
+        ReviewChanged = "Changed",
+        ReviewNew = "Added",
+        ReviewPanelAdded = "Added",
+        ReviewPanelRemoved = "Removed",
+        ReviewPanelDeleted = { strikethrough = true },
+    }
     require("shared.plugin").link(groups)
     -- Background only, to put over syntax highlights.
     for _, group in ipairs({ "ReviewDelete", "ReviewLocalDelete" }) do

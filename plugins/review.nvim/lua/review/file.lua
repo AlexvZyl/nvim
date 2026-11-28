@@ -14,6 +14,7 @@ local M = {}
 ---@field data string
 ---@field line_starts integer[]? LineRange.start of each line, nil until indexed
 ---@field line_ends integer[]? LineRange.finish of each line
+---@field read_lines table<integer, string>? Lines already read, as deleted lines are read on every render
 local Text = {}
 Text.__index = Text
 M.Text = Text
@@ -38,7 +39,7 @@ function Text:index_lines()
         start = newline + 1
     end
     line_starts[#line_starts + 1], line_ends[#line_ends + 1] = start, #data
-    self.line_starts, self.line_ends = line_starts, line_ends
+    self.line_starts, self.line_ends, self.read_lines = line_starts, line_ends, {}
     return self
 end
 
@@ -48,7 +49,12 @@ end
 
 function Text:line(i)
     self:index_lines()
-    return self.data:sub(self.line_starts[i], self.line_ends[i])
+    local line = self.read_lines[i]
+    if not line then
+        line = self.data:sub(self.line_starts[i], self.line_ends[i])
+        self.read_lines[i] = line
+    end
+    return line
 end
 
 function Text:line_length(i)
@@ -75,8 +81,7 @@ M.File = File
 
 -- Data nil means git has no file there.
 function File.new(path, revision, data)
-    -- Indexed on load, as deleted lines are read from it.
-    return setmetatable({ path = path, revision = revision, text = data and Text.new(data):index_lines() }, File)
+    return setmetatable({ path = path, revision = revision, text = data and Text.new(data) }, File)
 end
 
 function File:is_binary()
@@ -130,33 +135,40 @@ function Diff.unchanged(text)
     return setmetatable({ old_text = text, new_text = text, hunks = {} }, Diff)
 end
 
--- Lines of new_text added or changed.
-function Diff:added_lines()
-    local lines = {}
-    for _, hunk in ipairs(self.hunks) do
-        for line = hunk.new_start, hunk.new_start + hunk.new_count - 1 do
-            lines[#lines + 1] = line
+-- Iterates the lines of new_text added or changed. An iterator, so nothing is built on every edit.
+function Diff:each_added_line()
+    local hunks, hunk_index, line, last = self.hunks, 0, 0, 0
+    return function()
+        while line >= last do
+            hunk_index = hunk_index + 1
+            local hunk = hunks[hunk_index]
+            if not hunk then
+                return nil
+            end
+            line, last = hunk.new_start - 1, hunk.new_start + hunk.new_count - 1
         end
+        line = line + 1
+        return line
     end
-    return lines
 end
 
----@class DeletedLine
----@field old_line integer Its line in old_text
----@field index integer Its place in its hunk
----@field row integer The 0-based row of new_text it is drawn at
----@field hunk Hunk
-
--- Lines of old_text deleted, in order. A pure deletion is drawn above the line after it.
-function Diff:deleted_lines()
-    local deleted = {}
-    for _, hunk in ipairs(self.hunks) do
-        local row = hunk.new_count > 0 and hunk.new_start - 1 or hunk.new_start
-        for index = 1, hunk.old_count do
-            deleted[#deleted + 1] = { old_line = hunk.old_start + index - 1, index = index, row = row, hunk = hunk }
+-- Iterates the lines of old_text deleted, in order, as: its line in old_text, its place in its hunk, and the 0-based
+-- row of new_text it is drawn at. A pure deletion is drawn above the line after it.
+function Diff:each_deleted_line()
+    local hunks, hunk_index, index = self.hunks, 1, 0
+    return function()
+        local hunk = hunks[hunk_index]
+        while hunk and index >= hunk.old_count do
+            hunk_index, index = hunk_index + 1, 0
+            hunk = hunks[hunk_index]
         end
+        if not hunk then
+            return nil
+        end
+        index = index + 1
+        local row = hunk.new_count > 0 and hunk.new_start - 1 or hunk.new_start
+        return hunk.old_start + index - 1, index, row
     end
-    return deleted
 end
 
 -- Where each deleted line of old_text sits between new_text's lines: after the line before it, or before the lines replacing

@@ -124,6 +124,10 @@ function Buffer.new(bufnr)
         -- Base to HEAD, and where its deleted lines sit between HEAD's lines.
         committed = nil,
         committed_positions = nil,
+        -- HEAD to itself, for when the buffer is as in HEAD.
+        unchanged = nil,
+        -- Set when new Files arrive, so the next update renders.
+        files_changed = false,
         -- Base to the buffer, and HEAD to the buffer (uncommitted).
         from_base = nil,
         from_head = nil,
@@ -171,8 +175,13 @@ function Buffer:set_files(base, head)
     local unchanged = self.base and text_of(self.base).data == text_of(base).data and text_of(self.head).data == text_of(head).data
     if not unchanged then
         self.base, self.head = base, head
+        -- Indexed once loaded, as deleted lines are read from them.
+        text_of(base):index_lines()
+        text_of(head):index_lines()
         self.committed = Diff.new(text_of(base), text_of(head))
         self.committed_positions = self.committed:deleted_positions()
+        self.unchanged = Diff.unchanged(text_of(head))
+        self.files_changed = true
     end
     self:update()
 end
@@ -183,6 +192,11 @@ function Buffer:update()
     if not vim.api.nvim_buf_is_valid(bufnr) then
         return
     end
+    -- Already rendered as it is, like when attached again after HEAD moved without changing the file.
+    if not self.files_changed and self.rendered_tick == vim.b[bufnr].changedtick then
+        return self:restyle()
+    end
+    self.files_changed = false
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
     -- As written to disk. An empty buffer still has one empty line.
     local empty = #lines == 1 and lines[1] == "" and vim.api.nvim_buf_call(bufnr, vim.fn.wordcount).bytes == 0
@@ -190,7 +204,7 @@ function Buffer:update()
     local base_text, head_text = text_of(self.base), text_of(self.head)
     if data == head_text.data then
         self.current = head_text
-        self.from_base, self.from_head = self.committed, Diff.unchanged(head_text)
+        self.from_base, self.from_head = self.committed, self.unchanged
     else
         self.current = Text.new(data)
         self.from_base = Diff.new(base_text, self.current)
@@ -212,13 +226,20 @@ function Buffer:render()
     require("review.diagnostics").apply(self.bufnr)
 end
 
--- Redraws after a change without TextChanged: an edit in another window, a scroll, a resize or a new filetype.
+-- Draws the deleted lines again when how they are drawn changed, like after a scroll, a resize or a new filetype.
+function Buffer:restyle()
+    if self:deleted_style().key ~= self.style_key then
+        self:draw_deleted_lines()
+        require("review.diagnostics").apply(self.bufnr)
+    end
+end
+
+-- Redraws after a change without TextChanged, like an edit in another window.
 function Buffer:refresh()
     if self.rendered_tick ~= vim.b[self.bufnr].changedtick then
         self:update()
-    elseif self:deleted_style().key ~= self.style_key then
-        self:draw_deleted_lines()
-        require("review.diagnostics").apply(self.bufnr)
+    else
+        self:restyle()
     end
 end
 
@@ -235,10 +256,10 @@ function Buffer:sign_added_lines()
         end
     end
     local changed_lines, run_start = {}, nil
-    for _, line in ipairs(self.from_base:added_lines()) do
+    for line in self.from_base:each_added_line() do
         changed_lines[line] = "ReviewAdd"
     end
-    for _, line in ipairs(self.from_head:added_lines()) do
+    for line in self.from_head:each_added_line() do
         changed_lines[line] = "ReviewLocalAdd"
     end
     for line = 1, vim.api.nvim_buf_line_count(bufnr) + 1 do
@@ -324,6 +345,10 @@ function Buffer:syntax_state(text)
     return self.syntax_states[text]
 end
 
+local function in_head_order(a, b)
+    return a.position == b.position and a.index < b.index or a.position < b.position
+end
+
 -- Deleted lines by the row they are drawn at, in HEAD order: committed ones from the base, uncommitted ones from
 -- HEAD. Marks which lines of each Text are shown deleted, to highlight nearby ones in one parse.
 function Buffer:deleted_by_row()
@@ -333,21 +358,28 @@ function Buffer:deleted_by_row()
     end
     for uncommitted, diff in pairs({ [false] = self.from_base, [true] = self.from_head }) do
         local shown_deleted = self:syntax_state(diff.old_text).shown_deleted
-        for _, deleted in ipairs(diff:deleted_lines()) do
-            local position = uncommitted and deleted.old_line or self.committed_positions[deleted.old_line]
+        -- Without committed deletions, the base has none to show.
+        local none = not uncommitted and next(self.committed_positions) == nil
+        for old_line, index, row in diff:each_deleted_line() do
+            local position = not none and (uncommitted and old_line or self.committed_positions[old_line])
             if position then
-                shown_deleted[deleted.old_line] = true
-                deleted.position, deleted.uncommitted, deleted.text = position, uncommitted, diff.old_text
-                deleted.line = diff.old_text:line(deleted.old_line)
-                by_row[deleted.row] = by_row[deleted.row] or {}
-                table.insert(by_row[deleted.row], deleted)
+                shown_deleted[old_line] = true
+                by_row[row] = by_row[row] or {}
+                table.insert(by_row[row], {
+                    old_line = old_line,
+                    index = index,
+                    position = position,
+                    uncommitted = uncommitted,
+                    text = diff.old_text,
+                    line = diff.old_text:line(old_line),
+                })
             end
         end
     end
     for _, deleted in pairs(by_row) do
-        table.sort(deleted, function(a, b)
-            return a.position == b.position and a.index < b.index or a.position < b.position
-        end)
+        if #deleted > 1 then
+            table.sort(deleted, in_head_order)
+        end
     end
     return by_row
 end

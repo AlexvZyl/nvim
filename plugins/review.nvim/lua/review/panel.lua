@@ -15,7 +15,7 @@ local PROGRESS = { "󰪞", "󰪟", "󰪠", "󰪡", "󰪢", "󰪣", "󰪤" }
 local EMPTY = "󰝦"
 local ICON = ""
 
-local buf, win
+local bufnr, winid
 -- The file last opened.
 local selected_repo_path
 -- The panel's view before another buffer replaced it.
@@ -37,7 +37,7 @@ local window_options = {
 }
 
 function M.is_open()
-    return win ~= nil and vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf
+    return winid ~= nil and vim.api.nvim_win_is_valid(winid) and vim.api.nvim_win_get_buf(winid) == bufnr
 end
 
 -- Rows
@@ -174,7 +174,7 @@ end
 
 -- Shows the first header, which is otherwise scrolled off.
 local function show_top_header()
-    vim.api.nvim_win_call(win, function()
+    vim.api.nvim_win_call(winid, function()
         local view = vim.fn.winsaveview()
         if rows[1] and view.topline == 1 and view.topfill == 0 then
             vim.fn.winrestview({ topline = 1, topfill = 1 })
@@ -183,18 +183,18 @@ local function show_top_header()
 end
 
 local function show_done()
-    vim.api.nvim_buf_clear_namespace(buf, done_namespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufnr, done_namespace, 0, -1)
     if #rows == 0 then
-        local lines = done_lines(#session.files, vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win))
-        vim.api.nvim_buf_set_extmark(buf, done_namespace, 0, 0, { virt_lines = lines, virt_lines_leftcol = true })
+        local lines = done_lines(#session.files, vim.api.nvim_win_get_width(winid), vim.api.nvim_win_get_height(winid))
+        vim.api.nvim_buf_set_extmark(bufnr, done_namespace, 0, 0, { virt_lines = lines, virt_lines_leftcol = true })
     end
 end
 
 local function mark_selected()
-    vim.api.nvim_buf_clear_namespace(buf, selected_namespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufnr, selected_namespace, 0, -1)
     for i, row in ipairs(rows) do
         if row.file.repo_path == selected_repo_path then
-            vim.api.nvim_buf_set_extmark(buf, selected_namespace, i - 1, 0, { line_hl_group = "ReviewPanelLine" })
+            vim.api.nvim_buf_set_extmark(bufnr, selected_namespace, i - 1, 0, { line_hl_group = "ReviewPanelLine" })
             return i
         end
     end
@@ -203,20 +203,20 @@ end
 -- Cursor goes to the line, else the selected file, else the first row.
 local function draw(cursor_line)
     rows = build_rows(session.files)
-    vim.bo[buf].modifiable = true
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.tbl_map(function(row)
+    vim.bo[bufnr].modifiable = true
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.tbl_map(function(row)
         return row.text
     end, rows))
-    vim.bo[buf].modifiable = false
-    vim.api.nvim_buf_clear_namespace(buf, rows_namespace, 0, -1)
+    vim.bo[bufnr].modifiable = false
+    vim.api.nvim_buf_clear_namespace(bufnr, rows_namespace, 0, -1)
     for i, row in ipairs(rows) do
         for _, mark in ipairs(row.extmarks) do
-            vim.api.nvim_buf_set_extmark(buf, rows_namespace, i - 1, mark[1], mark[2])
+            vim.api.nvim_buf_set_extmark(bufnr, rows_namespace, i - 1, mark[1], mark[2])
         end
     end
     local selected_row = mark_selected()
     cursor_line = cursor_line or selected_row
-    vim.api.nvim_win_set_cursor(win, { math.max(math.min(cursor_line or 1, #rows), 1), 0 })
+    vim.api.nvim_win_set_cursor(winid, { math.max(math.min(cursor_line or 1, #rows), 1), 0 })
     show_top_header()
     show_done()
     -- The winbar only redraws itself on window events.
@@ -226,7 +226,7 @@ end
 -- Redraws, keeping the cursor.
 function M.refresh()
     if M.is_open() then
-        draw(vim.api.nvim_win_get_cursor(win)[1])
+        draw(vim.api.nvim_win_get_cursor(winid)[1])
     end
 end
 
@@ -254,7 +254,7 @@ end
 -- The previous window, any other one, or a new one.
 local function target_window()
     for _, candidate in ipairs({ vim.fn.win_getid(vim.fn.winnr("#")), unpack(vim.api.nvim_tabpage_list_wins(0)) }) do
-        if candidate ~= 0 and candidate ~= win and vim.api.nvim_win_get_config(candidate).relative == "" then
+        if candidate ~= 0 and candidate ~= winid and vim.api.nvim_win_get_config(candidate).relative == "" then
             return candidate
         end
     end
@@ -276,7 +276,7 @@ local function open_file(file, target_win)
             render.reveal(vim.api.nvim_get_current_buf())
         end
     end
-    vim.api.nvim_set_current_win(win)
+    vim.api.nvim_set_current_win(winid)
 end
 
 local function open_selected_row()
@@ -308,20 +308,20 @@ function M.operator()
 end
 
 local function create_buffer()
-    buf = vim.api.nvim_create_buf(false, true)
-    vim.bo[buf].filetype = "review"
+    bufnr = vim.api.nvim_create_buf(false, true)
+    vim.bo[bufnr].filetype = "review"
     local keymaps = config.options.keymaps
     local function map(mode, lhs, rhs, opts)
         if lhs then
-            vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", { buffer = buf }, opts or {}))
+            vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", { buffer = bufnr }, opts or {}))
         end
     end
-    vim.api.nvim_create_autocmd("CursorMoved", { buffer = buf, callback = show_top_header })
+    vim.api.nvim_create_autocmd("CursorMoved", { buffer = bufnr, callback = show_top_header })
     -- To restore after another buffer replaces it.
     vim.api.nvim_create_autocmd("BufWinLeave", {
-        buffer = buf,
+        buffer = bufnr,
         callback = function()
-            saved_view = vim.api.nvim_get_current_win() == win and vim.fn.winsaveview() or saved_view
+            saved_view = vim.api.nvim_get_current_win() == winid and vim.fn.winsaveview() or saved_view
         end,
     })
     map("n", keymaps.open, open_selected_row)
@@ -367,37 +367,37 @@ function M.toggle(just_loaded)
     if session.by_repo_path[repo_path] then
         selected_repo_path = repo_path
     end
-    if not (buf and vim.api.nvim_buf_is_valid(buf)) then
+    if not (bufnr and vim.api.nvim_buf_is_valid(bufnr)) then
         create_buffer()
     end
     vim.cmd("topleft vertical " .. panel_width() .. "split")
-    win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_buf(win, buf)
+    winid = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_buf(winid, bufnr)
     for option, value in pairs(window_options) do
-        vim.wo[win][0][option] = value
+        vim.wo[winid][0][option] = value
     end
     draw()
 end
 
 function M.close()
     if M.is_open() then
-        pcall(vim.api.nvim_win_close, win, false)
+        pcall(vim.api.nvim_win_close, winid, false)
     end
 end
 
 -- Moves a buffer opened in the panel, like with :edit, to the previous window and focuses it.
 function M.guard()
-    if not (win and vim.api.nvim_win_is_valid(win) and buf and vim.api.nvim_buf_is_valid(buf)) then
+    if not (winid and vim.api.nvim_win_is_valid(winid) and bufnr and vim.api.nvim_buf_is_valid(bufnr)) then
         return
     end
-    local opened_buf = vim.api.nvim_win_get_buf(win)
-    if opened_buf == buf then
+    local opened_buf = vim.api.nvim_win_get_buf(winid)
+    if opened_buf == bufnr then
         return
     end
-    local cursor_pos = vim.api.nvim_win_get_cursor(win)
+    local cursor_pos = vim.api.nvim_win_get_cursor(winid)
     local target = target_window()
-    vim.api.nvim_win_set_buf(win, buf)
-    vim.api.nvim_win_call(win, function()
+    vim.api.nvim_win_set_buf(winid, bufnr)
+    vim.api.nvim_win_call(winid, function()
         vim.fn.winrestview(saved_view or {})
     end)
     vim.api.nvim_win_set_buf(target, opened_buf)
@@ -418,12 +418,12 @@ end
 -- Keeps a ratio width after the editor resizes.
 function M.fit()
     if M.is_open() and config.options.width < 1 then
-        vim.api.nvim_win_set_width(win, panel_width())
+        vim.api.nvim_win_set_width(winid, panel_width())
     end
 end
 
 function M.resized()
-    if M.is_open() and vim.tbl_contains(vim.v.event.windows, win) then
+    if M.is_open() and vim.tbl_contains(vim.v.event.windows, winid) then
         show_done()
     end
 end
@@ -431,8 +431,8 @@ end
 -- Restores panel options changed by :set while in it.
 function M.option_set()
     local option = vim.fn.expand("<amatch>")
-    if window_options[option] ~= nil and M.is_open() and vim.api.nvim_get_current_win() == win then
-        vim.wo[win][0][option] = window_options[option]
+    if window_options[option] ~= nil and M.is_open() and vim.api.nvim_get_current_win() == winid then
+        vim.wo[winid][0][option] = window_options[option]
     end
 end
 

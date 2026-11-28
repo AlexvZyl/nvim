@@ -1,7 +1,10 @@
--- Buffer is an attached buffer of a reviewed file: its diffs against HEAD and the base, and the marks drawing them.
+-- Buffer is an open buffer of a reviewed file: its Files at the base and HEAD, its Diffs against them, and their drawing.
 local config = require("review.config")
 local scroll = require("review.scroll")
-local Text = require("review.text")
+local review_file = require("review.file")
+local syntax = require("review.syntax")
+
+local Text, Diff = review_file.Text, review_file.Diff
 
 local Buffer = {}
 Buffer.__index = Buffer
@@ -25,9 +28,9 @@ local function sign_text(uncommitted)
 end
 
 -- Kind is Add or Delete.
-function Buffer.sign(buf, first_line, last_line, uncommitted, kind)
+function Buffer.sign(bufnr, first_line, last_line, uncommitted, kind)
     local group = "Review" .. (uncommitted and "Local" or "") .. kind
-    vim.api.nvim_buf_set_extmark(buf, Buffer.namespace, first_line - 1, 0, {
+    vim.api.nvim_buf_set_extmark(bufnr, Buffer.namespace, first_line - 1, 0, {
         end_row = last_line - 1,
         line_hl_group = group,
         number_hl_group = group .. "Nr",
@@ -94,167 +97,170 @@ end
 
 -- Buffers
 
+-- For files git does not have at a revision.
+local EMPTY = Text.new("")
+
+local function text_of(file)
+    return file and file.text or EMPTY
+end
+
 -- By buffer number.
 local attached = {}
 
-function Buffer.get(buf)
-    return attached[buf]
+function Buffer.get(bufnr)
+    return attached[bufnr]
 end
 
 function Buffer.each()
     return pairs(attached)
 end
 
-function Buffer.new(buf)
+function Buffer.new(bufnr)
     local self = setmetatable({
-        buf = buf,
-        -- The file at the base (merge base or reviewed version) and at HEAD.
-        base_text = nil,
-        head_text = nil,
-        -- Base to HEAD.
-        committed_hunks = nil,
-        -- Where each base line deleted by a commit sits between HEAD's lines.
-        committed_deleted_at = nil,
-        -- Base to buffer, and HEAD to buffer (uncommitted).
-        hunks_from_base = {},
-        hunks_from_head = {},
+        bufnr = bufnr,
+        -- Files at the base (merge base or reviewed version) and at HEAD.
+        base = nil,
+        head = nil,
+        -- Base to HEAD, and where its deleted lines sit between HEAD's lines.
+        committed = nil,
+        committed_positions = nil,
+        -- Base to the buffer, and HEAD to the buffer (uncommitted).
+        from_base = nil,
+        from_head = nil,
+        -- The buffer's text, as last diffed.
+        current = nil,
         -- Highlight group by changed line.
         changed_lines = {},
+        -- Syntax state of each Text deleted lines come from.
+        syntax_states = setmetatable({}, { __mode = "k" }),
         -- Content of each deleted-lines mark by id, and the style they were drawn with.
         deleted_marks = {},
-        deleted_style_key = nil,
+        style_key = nil,
         -- Width of the number and sign columns.
         gutter_width = nil,
         -- What was last rendered.
         rendered_lines = nil,
-        rendered_hunks = nil,
+        rendered_diff = nil,
         rendered_tick = nil,
     }, Buffer)
-    attached[buf] = self
+    attached[bufnr] = self
     for keymap, forward in pairs({ next_hunk = true, prev_hunk = false }) do
         if config.options.keymaps[keymap] then
             vim.keymap.set("n", config.options.keymaps[keymap], function()
                 self:jump_to_hunk(forward)
-            end, { buffer = buf })
+            end, { buffer = bufnr })
         end
     end
     return self
 end
 
 function Buffer:detach()
-    attached[self.buf] = nil
-    if vim.api.nvim_buf_is_valid(self.buf) then
+    attached[self.bufnr] = nil
+    if vim.api.nvim_buf_is_valid(self.bufnr) then
         for _, ns in ipairs({ Buffer.namespace, deleted_namespace }) do
-            vim.api.nvim_buf_clear_namespace(self.buf, ns, 0, -1)
+            vim.api.nvim_buf_clear_namespace(self.bufnr, ns, 0, -1)
         end
         for _, lhs in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
-            pcall(vim.keymap.del, "n", lhs, { buffer = self.buf })
+            pcall(vim.keymap.del, "n", lhs, { buffer = self.bufnr })
         end
     end
 end
 
--- Nil content means the file does not exist there. Unchanged content keeps its diffs and highlights.
-function Buffer:set_texts(head_content, base_content)
-    local unchanged = self.base_text
-        and self.base_text.content == (base_content or "")
-        and self.head_text.content == (head_content or "")
+-- New Files from git. Unchanged texts keep their diffs and highlights.
+function Buffer:set_files(base, head)
+    local unchanged = self.base and text_of(self.base).data == text_of(base).data and text_of(self.head).data == text_of(head).data
     if not unchanged then
-        self.base_text, self.head_text = Text.new(base_content), Text.new(head_content)
-        self.committed_hunks = self.base_text:diff(self.head_text.content)
-        -- After the line before them, or before the lines replacing them.
-        self.committed_deleted_at = {}
-        for _, hunk in ipairs(self.committed_hunks) do
-            for i = 1, #hunk.deleted_lines do
-                local position = hunk.new_count == 0 and hunk.new_start + 0.5 or hunk.new_start - 0.5
-                self.committed_deleted_at[hunk.old_start + i - 1] = position
-            end
-        end
+        self.base, self.head = base, head
+        self.committed = Diff.new(text_of(base), text_of(head))
+        self.committed_positions = self.committed:deleted_positions()
     end
     self:update()
 end
 
 -- Diffs the buffer's lines and renders them.
 function Buffer:update()
-    local buf = self.buf
-    if not vim.api.nvim_buf_is_valid(buf) then
+    local bufnr = self.bufnr
+    if not vim.api.nvim_buf_is_valid(bufnr) then
         return
     end
-    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
     -- As written to disk. An empty buffer still has one empty line.
-    local empty = #lines == 1 and lines[1] == "" and vim.api.nvim_buf_call(buf, vim.fn.wordcount).bytes == 0
-    local content = empty and "" or table.concat(lines, "\n") .. (vim.bo[buf].eol and "\n" or "")
-    if content == self.head_text.content then
-        self.hunks_from_base, self.hunks_from_head = self.committed_hunks, {}
+    local empty = #lines == 1 and lines[1] == "" and vim.api.nvim_buf_call(bufnr, vim.fn.wordcount).bytes == 0
+    local data = empty and "" or table.concat(lines, "\n") .. (vim.bo[bufnr].eol and "\n" or "")
+    local base_text, head_text = text_of(self.base), text_of(self.head)
+    if data == head_text.data then
+        self.current = head_text
+        self.from_base, self.from_head = self.committed, Diff.unchanged(head_text)
     else
-        self.hunks_from_base = self.base_text:diff(content)
+        self.current = Text.new(data)
+        self.from_base = Diff.new(base_text, self.current)
         -- Without commits to the file everything is uncommitted.
-        local no_commits = self.head_text.content == self.base_text.content
-        self.hunks_from_head = no_commits and self.hunks_from_base or self.head_text:diff(content)
+        local no_commits = head_text.data == base_text.data
+        self.from_head = no_commits and self.from_base or Diff.new(head_text, self.current)
     end
     -- Now, as TextChanged comes before the redraw.
     self:render()
     if self.rendered_lines then
-        scroll.keep(buf, self.rendered_lines, lines)
+        scroll.keep(bufnr, self.rendered_lines, lines)
     end
-    self.rendered_lines, self.rendered_hunks, self.rendered_tick = lines, self.hunks_from_base, vim.b[buf].changedtick
+    self.rendered_lines, self.rendered_diff, self.rendered_tick = lines, self.from_base, vim.b[bufnr].changedtick
 end
 
 function Buffer:render()
     self:sign_added_lines()
     self:draw_deleted_lines()
-    require("review.diagnostics").apply(self.buf)
+    require("review.diagnostics").apply(self.bufnr)
 end
 
 -- Redraws after a change without TextChanged: an edit in another window, a scroll, a resize or a new filetype.
 function Buffer:refresh()
-    if self.rendered_tick ~= vim.b[self.buf].changedtick then
+    if self.rendered_tick ~= vim.b[self.bufnr].changedtick then
         self:update()
-    elseif self:deleted_style().key ~= self.deleted_style_key then
+    elseif self:deleted_style().key ~= self.style_key then
         self:draw_deleted_lines()
-        require("review.diagnostics").apply(self.buf)
+        require("review.diagnostics").apply(self.bufnr)
     end
 end
 
 -- Keeps marks already on the right lines.
 function Buffer:sign_added_lines()
-    local buf, existing = self.buf, {}
-    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, Buffer.namespace, 0, -1, { details = true })) do
+    local bufnr, existing = self.bufnr, {}
+    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, Buffer.namespace, 0, -1, { details = true })) do
         local mark_key = mark[2] .. " " .. mark[4].end_row .. " " .. mark[4].line_hl_group
         -- Edits can move marks onto the same lines.
         if existing[mark_key] then
-            vim.api.nvim_buf_del_extmark(buf, Buffer.namespace, mark[1])
+            vim.api.nvim_buf_del_extmark(bufnr, Buffer.namespace, mark[1])
         else
             existing[mark_key] = mark[1]
         end
     end
     local changed_lines, run_start = {}, nil
-    for i, hunks in ipairs({ self.hunks_from_base, self.hunks_from_head }) do
-        for _, hunk in ipairs(hunks) do
-            for line = hunk.new_start, hunk.new_start + hunk.new_count - 1 do
-                changed_lines[line] = i == 1 and "ReviewAdd" or "ReviewLocalAdd"
-            end
-        end
+    for _, line in ipairs(self.from_base:added_lines()) do
+        changed_lines[line] = "ReviewAdd"
     end
-    for line = 1, vim.api.nvim_buf_line_count(buf) + 1 do
+    for _, line in ipairs(self.from_head:added_lines()) do
+        changed_lines[line] = "ReviewLocalAdd"
+    end
+    for line = 1, vim.api.nvim_buf_line_count(bufnr) + 1 do
         if run_start and changed_lines[line] ~= changed_lines[run_start] then
             local mark_key = (run_start - 1) .. " " .. (line - 2) .. " " .. changed_lines[run_start]
             if existing[mark_key] then
                 existing[mark_key] = nil
             else
-                Buffer.sign(buf, run_start, line - 1, changed_lines[run_start] == "ReviewLocalAdd", "Add")
+                Buffer.sign(bufnr, run_start, line - 1, changed_lines[run_start] == "ReviewLocalAdd", "Add")
             end
             run_start = nil
         end
         run_start = run_start or changed_lines[line] and line
     end
     for _, id in pairs(existing) do
-        vim.api.nvim_buf_del_extmark(buf, Buffer.namespace, id)
+        vim.api.nvim_buf_del_extmark(bufnr, Buffer.namespace, id)
     end
     self.changed_lines = changed_lines
 end
 
 function Buffer:display_window()
-    return vim.fn.win_findbuf(self.buf)[1] or vim.api.nvim_get_current_win()
+    return vim.fn.win_findbuf(self.bufnr)[1] or vim.api.nvim_get_current_win()
 end
 
 function Buffer:gutter(uncommitted, kind)
@@ -262,7 +268,7 @@ function Buffer:gutter(uncommitted, kind)
 end
 
 -- Multi-line injected languages, like markdown code blocks: { first_row, last_row, lang }, inner ones last.
-local function injected_blocks(buf, lang)
+local function injected_blocks(bufnr, lang)
     local blocks = {}
     local function add(tree)
         for child_lang, child in pairs(tree:children()) do
@@ -277,7 +283,7 @@ local function injected_blocks(buf, lang)
             add(child)
         end
     end
-    local parser = lang and vim.treesitter.get_parser(buf, lang, { error = false })
+    local parser = lang and vim.treesitter.get_parser(bufnr, lang, { error = false })
     if parser then
         add(parser)
     end
@@ -286,13 +292,13 @@ end
 
 -- How deleted lines are drawn. The key changes whenever any of it does.
 function Buffer:deleted_style()
-    local buf = self.buf
+    local bufnr = self.bufnr
     local style = {
         leftcol = vim.fn.getwininfo(self:display_window())[1].leftcol,
-        tabstop = vim.bo[buf].tabstop,
-        lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype),
+        tabstop = vim.bo[bufnr].tabstop,
+        lang = vim.treesitter.language.get_lang(vim.bo[bufnr].filetype),
     }
-    style.blocks = injected_blocks(buf, style.lang)
+    style.blocks = injected_blocks(bufnr, style.lang)
     local parts = { style.leftcol, style.tabstop, style.lang or "", self.gutter_width, vim.o.columns }
     for _, block in ipairs(style.blocks) do
         table.insert(parts, table.concat(block, ","))
@@ -313,22 +319,28 @@ local function lang_at(row, style)
     return lang, lines_above, lines_below
 end
 
--- Deleted lines by the row they are drawn at, in HEAD order. Marks which lines of each text are shown deleted.
+function Buffer:syntax_state(text)
+    self.syntax_states[text] = self.syntax_states[text] or syntax.new_state()
+    return self.syntax_states[text]
+end
+
+-- Deleted lines by the row they are drawn at, in HEAD order: committed ones from the base, uncommitted ones from
+-- HEAD. Marks which lines of each Text are shown deleted, to highlight nearby ones in one parse.
 function Buffer:deleted_by_row()
     local by_row = {}
-    self.base_text.shown_deleted, self.head_text.shown_deleted = {}, {}
-    for uncommitted, hunks in pairs({ [false] = self.hunks_from_base, [true] = self.hunks_from_head }) do
-        for _, hunk in ipairs(hunks) do
-            -- A pure deletion goes above the line after it.
-            local row = hunk.new_count > 0 and hunk.new_start - 1 or hunk.new_start
-            for index in ipairs(hunk.deleted_lines) do
-                local old_line = hunk.old_start + index - 1
-                local position = uncommitted and old_line or self.committed_deleted_at[old_line]
-                if position then
-                    (uncommitted and self.head_text or self.base_text).shown_deleted[old_line] = true
-                    by_row[row] = by_row[row] or {}
-                    table.insert(by_row[row], { position = position, index = index, hunk = hunk, uncommitted = uncommitted })
-                end
+    for _, diff in ipairs({ self.from_base, self.from_head }) do
+        self:syntax_state(diff.old_text).shown_deleted = {}
+    end
+    for uncommitted, diff in pairs({ [false] = self.from_base, [true] = self.from_head }) do
+        local shown_deleted = self:syntax_state(diff.old_text).shown_deleted
+        for _, deleted in ipairs(diff:deleted_lines()) do
+            local position = uncommitted and deleted.old_line or self.committed_positions[deleted.old_line]
+            if position then
+                shown_deleted[deleted.old_line] = true
+                deleted.position, deleted.uncommitted, deleted.text = position, uncommitted, diff.old_text
+                deleted.line = diff.old_text:line(deleted.old_line)
+                by_row[deleted.row] = by_row[deleted.row] or {}
+                table.insert(by_row[deleted.row], deleted)
             end
         end
     end
@@ -349,37 +361,35 @@ local function mark_content(deleted, above, lang)
     content_parts[1] = (above and "^" or "v") .. (lang or "")
     for _, line in ipairs(deleted) do
         content_parts[count + 1] = line.uncommitted and "\n+" or "\n-"
-        content_parts[count + 2] = line.hunk.deleted_lines[line.index]
+        content_parts[count + 2] = line.line
         count = count + 2
     end
     return table.concat(content_parts, "", 1, count)
 end
 
-function Buffer:deleted_line_chunks(line, style, lang, lines_above, lines_below)
-    local hunk = line.hunk
-    -- Committed deletions are lines of the base, the others of HEAD.
-    local text = line.uncommitted and self.head_text or self.base_text
-    local highlights = lang and text:highlight(lang, hunk.old_start + line.index - 1, lines_above, lines_below) or {}
-    local chunks = deleted_text_chunks(hunk.deleted_lines[line.index], highlights, line.uncommitted, style.leftcol, style.tabstop)
-    return vim.list_extend(self:gutter(line.uncommitted, "Delete"), chunks)
+function Buffer:deleted_line_chunks(deleted, style, lang, lines_above, lines_below)
+    local state = self:syntax_state(deleted.text)
+    local highlights = lang and syntax.highlight(deleted.text, state, lang, deleted.old_line, lines_above, lines_below) or {}
+    local chunks = deleted_text_chunks(deleted.line, highlights, deleted.uncommitted, style.leftcol, style.tabstop)
+    return vim.list_extend(self:gutter(deleted.uncommitted, "Delete"), chunks)
 end
 
 -- Keeps marks already showing the right lines in the right place.
 function Buffer:draw_deleted_lines()
-    local buf = self.buf
+    local bufnr = self.bufnr
     -- Measured before the redraw, a statuscolumn is too narrow.
     self.gutter_width = self.gutter_width or vim.fn.getwininfo(self:display_window())[1].textoff
     local style = self:deleted_style()
-    if self.deleted_style_key ~= style.key then
-        vim.api.nvim_buf_clear_namespace(buf, deleted_namespace, 0, -1)
-        self.deleted_style_key, self.deleted_marks = style.key, {}
+    if self.style_key ~= style.key then
+        vim.api.nvim_buf_clear_namespace(bufnr, deleted_namespace, 0, -1)
+        self.style_key, self.deleted_marks = style.key, {}
     end
     -- By row and content.
     local existing, drawn = {}, {}
-    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, deleted_namespace, 0, -1, {})) do
+    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, deleted_namespace, 0, -1, {})) do
         existing[mark[2] .. self.deleted_marks[mark[1]]] = mark[1]
     end
-    local line_count = vim.api.nvim_buf_line_count(buf)
+    local line_count = vim.api.nvim_buf_line_count(bufnr)
     for row, deleted in pairs(self:deleted_by_row()) do
         local above = row < line_count
         row = above and row or line_count - 1
@@ -390,7 +400,7 @@ function Buffer:draw_deleted_lines()
         local content = mark_content(deleted, above, lang)
         local id = existing[row .. content]
         if not id or drawn[id] then
-            id = vim.api.nvim_buf_set_extmark(buf, deleted_namespace, row, 0, {
+            id = vim.api.nvim_buf_set_extmark(bufnr, deleted_namespace, row, 0, {
                 virt_lines = vim.tbl_map(function(line)
                     return self:deleted_line_chunks(line, style, lang, lines_above, lines_below)
                 end, deleted),
@@ -404,7 +414,7 @@ function Buffer:draw_deleted_lines()
     end
     for id in pairs(self.deleted_marks) do
         if not drawn[id] then
-            vim.api.nvim_buf_del_extmark(buf, deleted_namespace, id)
+            vim.api.nvim_buf_del_extmark(bufnr, deleted_namespace, id)
         end
     end
     self.deleted_marks = drawn
@@ -413,7 +423,7 @@ end
 function Buffer:jump_to_hunk(forward)
     local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
     local target
-    for _, hunk in ipairs(self.hunks_from_base) do
+    for _, hunk in ipairs(self.from_base.hunks) do
         local line = math.max(hunk.new_start, 1)
         if forward and line > cursor_line then
             target = target or line

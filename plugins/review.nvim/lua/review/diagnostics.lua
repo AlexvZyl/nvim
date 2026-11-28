@@ -26,9 +26,9 @@ local function combine(group, line_group, background_group)
 end
 
 -- Gives the mark its changed line's background, or its own back when line_group is nil.
-local function restyle(buf, ns, mark, line_group)
+local function restyle(bufnr, ns, mark, line_group)
     local id, row, col = mark[1], mark[2], mark[3]
-    local details, needs_update = vim.api.nvim_buf_get_extmark_by_id(buf, ns, id, { details = true })[3], false
+    local details, needs_update = vim.api.nvim_buf_get_extmark_by_id(bufnr, ns, id, { details = true })[3], false
     if details.sign_hl_group then
         local group = combine(details.sign_hl_group, line_group, line_group and "ReviewSign" .. line_group:sub(7))
         needs_update, details.sign_hl_group = group ~= details.sign_hl_group, group
@@ -55,7 +55,7 @@ local function restyle(buf, ns, mark, line_group)
         -- Virtual lines get the gutter and padding like changed lines.
         if details.virt_lines and line_group then
             table.insert(chunks, { string.rep(" ", vim.o.columns), line_group })
-            local gutter = require("review.buffer").get(buf):gutter(line_group == "ReviewLocalAdd", "Add")
+            local gutter = require("review.buffer").get(bufnr):gutter(line_group == "ReviewLocalAdd", "Add")
             table.insert(chunks, 1, gutter[2])
             table.insert(chunks, 1, gutter[1])
         end
@@ -67,25 +67,25 @@ local function restyle(buf, ns, mark, line_group)
     if needs_update then
         -- Not strict: edits can leave diagnostic marks past the last line.
         details.id, details.ns_id, details.strict = id, nil, false
-        vim.api.nvim_buf_set_extmark(buf, ns, row, col, details)
+        vim.api.nvim_buf_set_extmark(bufnr, ns, row, col, details)
     end
 end
 
-function M.apply(buf)
-    local changed_lines = require("review.render").changed_lines(buf)
-    restyled[buf] = restyled[buf] or {}
+function M.apply(bufnr)
+    local changed_lines = require("review.render").changed_lines(bufnr)
+    restyled[bufnr] = restyled[bufnr] or {}
     for _, diagnostic_ns in pairs(vim.diagnostic.get_namespaces()) do
         for _, ns_kind in ipairs({ "sign_ns", "virt_text_ns", "virt_lines_ns" }) do
             local ns = diagnostic_ns.user_data[ns_kind]
             if ns then
-                local before, now = restyled[buf][ns] or {}, {}
-                restyled[buf][ns] = now
-                for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, {})) do
+                local before, now = restyled[bufnr][ns] or {}, {}
+                restyled[bufnr][ns] = now
+                for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, {})) do
                     -- Only marks on changed lines, or restyled before.
                     local line_group = changed_lines[mark[2] + 1]
                     now[mark[1]] = line_group and true or nil
                     if line_group or before[mark[1]] then
-                        restyle(buf, ns, mark, line_group)
+                        restyle(bufnr, ns, mark, line_group)
                     end
                 end
             end
@@ -104,9 +104,9 @@ function M.start()
         local handler = original_handlers[name] or vim.diagnostic.handlers[name]
         original_handlers[name] = handler
         vim.diagnostic.handlers[name] = {
-            show = function(ns, buf, ...)
-                handler.show(ns, buf, ...)
-                M.apply(buf)
+            show = function(ns, bufnr, ...)
+                handler.show(ns, bufnr, ...)
+                M.apply(bufnr)
             end,
             hide = handler.hide,
         }

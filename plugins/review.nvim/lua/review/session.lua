@@ -129,14 +129,14 @@ function M.redo(cursor_line)
     return restore("redo", "undo", cursor_line)
 end
 
--- File
+-- ChangedFile
 
--- File is one changed file in the review, with its line counts and review status.
-local File = {}
-File.__index = File
+-- ChangedFile is one file the branch changed, with its line counts and review status.
+local ChangedFile = {}
+ChangedFile.__index = ChangedFile
 
 -- Counts are nil for binary files.
-function File.new(path, lines_added, lines_removed)
+function ChangedFile.new(path, lines_added, lines_removed)
     return setmetatable({
         -- From the cwd.
         path = path,
@@ -149,28 +149,28 @@ function File.new(path, lines_added, lines_removed)
         is_deleted = (lines_added or 0) == 0 and vim.uv.fs_stat(path) == nil,
         -- { hash, lines_added, lines_removed }, set by count_lines_since_review.
         since_review = nil,
-    }, File)
+    }, ChangedFile)
 end
 
-function File:needs_review()
+function ChangedFile:needs_review()
     return M.needs_review(self.repo_path)
 end
 
-function File:changed_after_review()
+function ChangedFile:changed_after_review()
     return M.changed_after_review(self.repo_path)
 end
 
-function File:is_unseen()
+function ChangedFile:is_unseen()
     return M.is_unseen(self.repo_path)
 end
 
 -- Nil when not reviewed.
-function File:reviewed_hash()
+function ChangedFile:reviewed_hash()
     return M.reviewed_hash(self.repo_path)
 end
 
 -- Since review in the since_review view when counted, else since the merge base.
-function File:counts_to_show()
+function ChangedFile:counts_to_show()
     local since_review = config.options.view == "since_review" and self.since_review
     if since_review and since_review.lines_added and since_review.hash == self:reviewed_hash() then
         return since_review.lines_added, since_review.lines_removed
@@ -246,7 +246,7 @@ clear()
 local function set_files(entries)
     M.files, M.by_repo_path, M.total_progress_weight = {}, {}, 0
     for i, entry in ipairs(entries) do
-        local file = File.new(entry.path, entry.lines_added, entry.lines_removed)
+        local file = ChangedFile.new(entry.path, entry.lines_added, entry.lines_removed)
         M.files[i], M.by_repo_path[file.repo_path] = file, file
         M.total_progress_weight = M.total_progress_weight + file.progress_weight
     end

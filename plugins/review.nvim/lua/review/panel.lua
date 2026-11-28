@@ -1,8 +1,7 @@
--- The side panel of files to review: its window, keymaps and drawing. Rows come from panel/rows.lua.
+-- The side panel of files to review: its rows, window, keymaps and drawing.
 local config = require("review.config")
 local deleted = require("review.deleted")
 local render = require("review.render")
-local panel_rows = require("review.panel.rows")
 local session = require("review.session")
 
 local M = {}
@@ -41,6 +40,136 @@ function M.is_open()
     return win ~= nil and vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf
 end
 
+-- Rows
+
+local FOLDER = ""
+local DONE = "󰄴"
+
+-- How each file is shown, by path. Reset when the grouping depth changes.
+local layouts, layouts_depth = {}, nil
+
+local function layout(path)
+    if layouts_depth ~= config.options.depth then
+        layouts, layouts_depth = {}, config.options.depth
+    end
+    if not layouts[path] then
+        local dirs = vim.split(vim.fs.dirname(path), "/", { plain = true })
+        local name = vim.fn.fnamemodify(path, ":t")
+        local icon, icon_hl = require("nvim-web-devicons").get_icon(name, nil, { default = true })
+        layouts[path] = {
+            dir = dirs[1] == "." and "" or table.concat(dirs, "/", 1, math.min(config.options.depth, #dirs)),
+            text = icon .. " " .. name,
+            icon_end = #icon,
+            icon_hl = icon_hl,
+        }
+    end
+    return layouts[path]
+end
+
+-- Pending files by directory, and the directories sorted.
+local function group_by_dir(files)
+    local by_dir, dirs = {}, {}
+    for _, file in ipairs(files) do
+        if file:needs_review() then
+            local dir = layout(file.path).dir
+            if not by_dir[dir] then
+                by_dir[dir] = {}
+                table.insert(dirs, dir)
+            end
+            table.insert(by_dir[dir], file)
+        end
+    end
+    table.sort(dirs)
+    return by_dir, dirs
+end
+
+-- "+added -removed" as chunks.
+local function count_chunks(file)
+    local chunks = {}
+    local lines_added, lines_removed = file:counts_to_show()
+    for _, count in ipairs({ { lines_added, "+", "ReviewPanelAdded" }, { lines_removed, "-", "ReviewPanelRemoved" } }) do
+        local number, sign, group = count[1], count[2], count[3]
+        if (number or 0) > 0 then
+            table.insert(chunks, { sign .. number .. " ", group })
+        end
+    end
+    return chunks
+end
+
+-- A row's extmarks as { col, opts }: icon highlight, dot, directory header, strikethrough and counts.
+local function extmarks(file, text, header)
+    local file_layout = layout(file.path)
+    local dot = file:changed_after_review() and "ReviewChanged" or file:is_unseen() and "ReviewNew"
+    local found = {
+        {
+            0,
+            {
+                end_col = file_layout.icon_end,
+                hl_group = file_layout.icon_hl,
+                virt_text = dot and { { " ●", dot } } or nil,
+                virt_lines = header and { { { " " .. FOLDER .. (header ~= "" and " " .. header or ""), "ReviewPanelDir" } } } or nil,
+                virt_lines_above = true,
+                virt_lines_leftcol = true,
+            },
+        },
+    }
+    if file.is_deleted then
+        table.insert(found, { file_layout.icon_end + 1, { end_col = #text, hl_group = "ReviewPanelDeleted" } })
+    end
+    local counts = count_chunks(file)
+    if #counts > 0 then
+        table.insert(found, { 0, { virt_text = counts, virt_text_pos = "right_align" } })
+    end
+    return found
+end
+
+-- Rows of files to review: { file, text, header, ends_group, extmarks }. Header is the directory, on a group's first.
+local function build_rows(files)
+    local by_dir, dirs = group_by_dir(files)
+    local rows = {}
+    for _, dir in ipairs(dirs) do
+        for i, file in ipairs(by_dir[dir]) do
+            table.insert(rows, { file = file, text = layout(file.path).text, header = i == 1 and dir or nil })
+        end
+        rows[#rows].ends_group = true
+    end
+    if config.options.view == "since_review" then
+        session.count_lines_since_review(vim.tbl_map(function(row)
+            return row.file
+        end, rows))
+    end
+    for _, row in ipairs(rows) do
+        row.extmarks = extmarks(row.file, row.text, row.header)
+    end
+    return rows
+end
+
+-- The done message as virtual lines, centered in the window.
+local function done_lines(reviewed_count, width, height)
+    local undo = config.options.keymaps.undo
+    local message = { { DONE, "ReviewSignAdd" } }
+    if reviewed_count == 0 then
+        table.insert(message, { "Nothing to review", "Comment" })
+    else
+        table.insert(message, { "Review complete", "Normal" })
+        table.insert(message, { ("%d file%s reviewed"):format(reviewed_count, reviewed_count == 1 and "" or "s"), "Comment" })
+        if undo then
+            vim.list_extend(message, { { "", "Comment" }, { undo .. " to undo", "Comment" } })
+        end
+    end
+    -- The empty buffer line takes the first row.
+    local lines = {}
+    for _ = 1, math.floor((height - #message) / 2) - 1 do
+        table.insert(lines, { { "", "Normal" } })
+    end
+    for _, chunk in ipairs(message) do
+        local padding = math.max(math.floor((width - vim.fn.strdisplaywidth(chunk[1])) / 2), 0)
+        -- Own chunk, so it does not get the text's background.
+        table.insert(lines, { { string.rep(" ", padding), "Normal" }, chunk })
+    end
+    return lines
+end
+
 -- Drawing
 
 -- Shows the first header, which is otherwise scrolled off.
@@ -56,7 +185,7 @@ end
 local function show_done()
     vim.api.nvim_buf_clear_namespace(buf, done_namespace, 0, -1)
     if #rows == 0 then
-        local lines = panel_rows.done(#session.files, vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win))
+        local lines = done_lines(#session.files, vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win))
         vim.api.nvim_buf_set_extmark(buf, done_namespace, 0, 0, { virt_lines = lines, virt_lines_leftcol = true })
     end
 end
@@ -73,7 +202,7 @@ end
 
 -- Cursor goes to the line, else the selected file, else the first row.
 local function draw(cursor_line)
-    rows = panel_rows.build(session.files)
+    rows = build_rows(session.files)
     vim.bo[buf].modifiable = true
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.tbl_map(function(row)
         return row.text
@@ -319,7 +448,7 @@ function M.winbar()
     -- 100% only once no files are left.
     local done = #rows == 0
     local percent = done and 100 or total_weight > 0 and math.min(math.floor((total_weight - remaining_weight) / total_weight * 100), 99) or 0
-    local icon = done and panel_rows.DONE or percent == 0 and EMPTY or PROGRESS[math.max(math.ceil(percent * #PROGRESS / 100), 1)]
+    local icon = done and DONE or percent == 0 and EMPTY or PROGRESS[math.max(math.ceil(percent * #PROGRESS / 100), 1)]
     local progress = ("%d%%%% %s"):format(percent, icon)
     local branches = ("%s  %s"):format(session.branch, session.base_ref)
     if vim.fn.strdisplaywidth(branches .. progress) + 7 > vim.api.nvim_win_get_width(0) then

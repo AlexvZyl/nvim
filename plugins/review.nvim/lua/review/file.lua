@@ -9,41 +9,57 @@ local M = {}
 ---@field start integer First byte of the line in the text's data
 ---@field finish integer Last byte, before its newline. Below start when the line is empty.
 
--- Text is a string with the byte range of each line, built once on creation.
+-- Text is a string with the byte range of each line, as LineRanges stored in two flat arrays.
 ---@class Text
 ---@field data string
----@field lines LineRange[]
+---@field line_starts integer[]? LineRange.start of each line, nil until indexed
+---@field line_ends integer[]? LineRange.finish of each line
 local Text = {}
 Text.__index = Text
 M.Text = Text
 
--- Lines split at "\n", like vim.split: a trailing newline gives a last, empty line.
 function Text.new(data)
-    local lines, start = {}, 1
+    return setmetatable({ data = data }, Text)
+end
+
+-- Builds the line ranges, split at "\n" like vim.split: a trailing newline gives a last, empty line. Only Texts
+-- whose lines are read need it, so a buffer's Text, which is only diffed, is never indexed.
+function Text:index_lines()
+    if self.line_starts then
+        return self
+    end
+    local data, line_starts, line_ends, start = self.data, {}, {}, 1
     while true do
         local newline = data:find("\n", start, true)
         if not newline then
             break
         end
-        lines[#lines + 1] = { start = start, finish = newline - 1 }
+        line_starts[#line_starts + 1], line_ends[#line_ends + 1] = start, newline - 1
         start = newline + 1
     end
-    lines[#lines + 1] = { start = start, finish = #data }
-    return setmetatable({ data = data, lines = lines }, Text)
+    line_starts[#line_starts + 1], line_ends[#line_ends + 1] = start, #data
+    self.line_starts, self.line_ends = line_starts, line_ends
+    return self
 end
 
 function Text:line_count()
-    return #self.lines
+    return #self:index_lines().line_starts
 end
 
 function Text:line(i)
-    local range = self.lines[i]
-    return self.data:sub(range.start, range.finish)
+    self:index_lines()
+    return self.data:sub(self.line_starts[i], self.line_ends[i])
+end
+
+function Text:line_length(i)
+    self:index_lines()
+    return self.line_ends[i] - self.line_starts[i] + 1
 end
 
 -- Lines first to last as one string, joined by their newlines.
 function Text:range(first, last)
-    return self.data:sub(self.lines[first].start, self.lines[last].finish)
+    self:index_lines()
+    return self.data:sub(self.line_starts[first], self.line_ends[last])
 end
 
 -- File
@@ -59,7 +75,8 @@ M.File = File
 
 -- Data nil means git has no file there.
 function File.new(path, revision, data)
-    return setmetatable({ path = path, revision = revision, text = data and Text.new(data) }, File)
+    -- Indexed on load, as deleted lines are read from it.
+    return setmetatable({ path = path, revision = revision, text = data and Text.new(data):index_lines() }, File)
 end
 
 function File:is_binary()

@@ -70,9 +70,8 @@ local function capture(text, highlights, parsed, tree, runs)
                     local start_row, start_col, end_row, end_col = node:range()
                     for row = math.max(start_row, from_row), math.min(end_row, to_row) do
                         local line = parsed.first_line + row
-                        local line_range = text.lines[line]
                         local line_highlights = highlights[line]
-                        local last_col = row == end_row and end_col or line_range.finish - line_range.start + 1
+                        local last_col = row == end_row and end_col or text:line_length(line)
                         for col = (row == start_row and start_col or 0) + 1, last_col do
                             line_highlights[col] = "@" .. name .. "." .. lang
                         end

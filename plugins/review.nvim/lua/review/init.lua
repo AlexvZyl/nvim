@@ -54,7 +54,8 @@ function M.toggle_view()
 end
 
 M.files = when_active(function(opts)
-    require("review.picker").open(opts)
+    -- Loading the extension runs its setup with telescope's config.
+    require("telescope").load_extension("review").pick(opts)
 end)
 
 M.reset = when_active(function()

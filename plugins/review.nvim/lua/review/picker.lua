@@ -2,39 +2,38 @@ local session = require("review.session")
 
 local M = {}
 
--- From the telescope extension config.
+-- Set by the telescope extension's config.
 local defaults = {}
 
 function M.setup(opts)
     defaults = opts or {}
 end
 
--- File entries, with the paths of deleted files struck through after their icon.
+-- Strikes through deleted files' paths.
 local function struck_through(opts)
-    local make = require("telescope.make_entry").gen_from_file(opts)
+    local make_entry = require("telescope.make_entry").gen_from_file(opts)
     return function(path)
-        local entry = make(path)
-        local file = session.by_key[session.prefix .. path]
-        if file and file.deleted then
-            local display = entry.display
-            entry.display = function(e)
-                local text, style = display(e)
-                style = style or {}
-                local start = opts.disable_devicons and 0 or (style[1] and style[1][1][2] or 0)
-                table.insert(style, { { start, #text }, "ReviewPanelDeleted" })
-                return text, style
+        local entry = make_entry(path)
+        local file = session.by_repo_path[session.cwd_prefix .. path]
+        if file and file.is_deleted then
+            local default_display = entry.display
+            entry.display = function(this_entry)
+                local text, highlights = default_display(this_entry)
+                highlights = highlights or {}
+                local path_start = opts.disable_devicons and 0 or (highlights[1] and highlights[1][1][2] or 0)
+                table.insert(highlights, { { path_start, #text }, "ReviewPanelDeleted" })
+                return text, highlights
             end
         end
         return entry
     end
 end
 
--- Telescope picker of the changed files.
 function M.open(opts)
-    -- Loading the extension runs its setup with `extensions.review`, which sets the defaults.
+    -- Loading the extension sets the defaults.
     pcall(require("telescope").load_extension, "review")
     opts = vim.tbl_deep_extend("force", defaults, opts or {})
-    local conf = require("telescope.config").values
+    local telescope_config = require("telescope.config").values
     require("telescope.pickers")
         .new(opts, {
             prompt_title = "Review files",
@@ -44,18 +43,18 @@ function M.open(opts)
                 end, session.files),
                 entry_maker = struck_through(opts),
             }),
-            sorter = conf.file_sorter(opts),
-            attach_mappings = function(prompt)
+            sorter = telescope_config.file_sorter(opts),
+            attach_mappings = function(prompt_buf)
                 local actions = require("telescope.actions")
-                local state = require("telescope.actions.state")
-                local function deleted()
-                    local entry = state.get_selected_entry()
-                    local file = entry and session.by_key[session.prefix .. entry.value]
-                    return file and file.deleted
+                local action_state = require("telescope.actions.state")
+                local function selected_is_deleted()
+                    local entry = action_state.get_selected_entry()
+                    local file = entry and session.by_repo_path[session.cwd_prefix .. entry.value]
+                    return file and file.is_deleted
                 end
-                actions.select_default:replace_if(deleted, function()
-                    local path = state.get_selected_entry().value
-                    actions.close(prompt)
+                actions.select_default:replace_if(selected_is_deleted, function()
+                    local path = action_state.get_selected_entry().value
+                    actions.close(prompt_buf)
                     vim.api.nvim_win_set_buf(0, require("review.deleted").open(path))
                 end)
                 return true

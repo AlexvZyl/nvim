@@ -194,7 +194,7 @@ end)
 bench("load", 10, function()
     local session = require("review.session")
     session.load()
-    require("review.state").pending(session.files[1].key)
+    require("review.state").needs_review(session.files[1].repo_path)
 end)
 -- What the watcher does once git moved HEAD.
 bench("refresh", 10, require("review.watch").refresh)
@@ -262,8 +262,8 @@ end)
 local session = require("review.session")
 local changed = {}
 for i = 1, 50 do
-    local file = session.by_key[session.prefix .. "dir" .. (i * 4 - 3) % 20 .. "/sub" .. (i * 4 - 3) % 3 .. "/" .. modified[i]]
-    require("review.state").review({ file.key }, 1)
+    local file = session.by_repo_path[session.cwd_prefix .. "dir" .. (i * 4 - 3) % 20 .. "/sub" .. (i * 4 - 3) % 3 .. "/" .. modified[i]]
+    require("review.state").review({ file.repo_path }, 1)
     changed[file.path] = h.edit(h.lines((i * 4 - 3) % 30 + 10), { [3] = "changed", [5] = false, [7] = "since" })
 end
 h.commit(changed)

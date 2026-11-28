@@ -1,6 +1,6 @@
 local config = require("review.config")
 
--- Required on first use, so setup loads nothing until a review starts.
+-- Requires on first use, so setup loads nothing.
 local function lazy(name)
     return setmetatable({}, {
         __index = function(_, key)
@@ -15,10 +15,10 @@ local watch = lazy("review.watch")
 
 local M = {}
 
-local group = vim.api.nvim_create_augroup("review", { clear = true })
+local augroup = vim.api.nvim_create_augroup("review", { clear = true })
 local key_namespace = vim.api.nvim_create_namespace("review_keys")
 
-local function guarded(fn)
+local function when_active(fn)
     return function(...)
         if not session.active() then
             return vim.notify("No review running, start one with :Review", vim.log.levels.WARN)
@@ -31,18 +31,18 @@ function M.active()
     return session.active()
 end
 
-M.panel = guarded(function()
+M.panel = when_active(function()
     require("review.panel").toggle()
 end)
 
-local views = { all = "since_review", since_review = "all" }
+local other_view = { all = "since_review", since_review = "all" }
 
--- Sets what files show changed against, see the view option, or gives it without one.
+-- Sets the view option, or returns it.
 function M.view(view)
     if not view then
         return config.options.view
     end
-    assert(views[view], "unknown view " .. view)
+    assert(other_view[view], "unknown view " .. view)
     config.options.view = view
     if session.active() then
         require("review.render").attach_all()
@@ -51,39 +51,38 @@ function M.view(view)
 end
 
 function M.toggle_view()
-    M.view(views[M.view()])
+    M.view(other_view[M.view()])
 end
 
-M.files = guarded(function(opts)
+M.files = when_active(function(opts)
     require("review.picker").open(opts)
 end)
 
-M.reset = guarded(function()
+M.reset = when_active(function()
     if session.load() then
         require("review.state").reset()
         require("review.panel").refresh()
     end
 end)
 
--- A failing callback would error on every event, stop the review on the first one instead.
+-- Stops the review on the first error, instead of erroring on every event.
 local function safely(fn)
     return function(...)
-        local ok, err = pcall(fn, ...)
+        local ok, message = pcall(fn, ...)
         if not ok then
             pcall(M.stop)
             vim.schedule(function()
-                vim.notify("review.nvim stopped after an error, run :Review to resume:\n" .. err, vim.log.levels.ERROR)
+                vim.notify("review.nvim stopped after an error, run :Review to resume:\n" .. message, vim.log.levels.ERROR)
             end)
         end
     end
 end
 
 local function autocmd(event, callback)
-    vim.api.nvim_create_autocmd(event, { group = group, callback = safely(callback) })
+    vim.api.nvim_create_autocmd(event, { group = augroup, callback = safely(callback) })
 end
 
--- Of the buffer the event is for.
-local function on_buf(fn)
+local function with_buf(fn)
     return function(args)
         fn(args.buf)
     end
@@ -96,45 +95,45 @@ local function create_autocmds()
         highlights.set()
         require("review.diagnostics").recolor()
     end)
-    autocmd("BufEnter", on_buf(panel.follow))
-    -- BufEnter as well: for a file not loaded yet, focus is put back after BufWinEnter.
+    autocmd("BufEnter", with_buf(panel.follow))
+    -- BufEnter too, as unloaded files get focus back after BufWinEnter.
     autocmd({ "BufEnter", "BufWinEnter" }, panel.guard)
-    autocmd("BufWinEnter", on_buf(render.reveal))
+    autocmd("BufWinEnter", with_buf(render.reveal))
     autocmd("WinScrolled", render.scrolled)
     autocmd("SafeState", render.settled)
     autocmd("WinResized", panel.resized)
     autocmd("VimResized", panel.fit)
     autocmd("OptionSet", panel.option_set)
     -- BufNewFile for deleted files.
-    autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, on_buf(render.attach))
-    -- Saves and outside tools change what is in the diff without moving HEAD.
+    autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, with_buf(render.attach))
+    -- Saves and outside tools change the diff without moving HEAD.
     autocmd({ "BufWritePost", "FocusGained" }, watch.schedule)
-    -- Unloaded, like with :bdelete, it has no lines to draw on until it is read again.
-    autocmd("BufUnload", on_buf(render.detach))
+    -- Unloaded buffers have no lines to draw on.
+    autocmd("BufUnload", with_buf(render.detach))
     -- TextChangedP while the completion menu is open.
-    autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, on_buf(render.update))
+    autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, with_buf(render.update))
     vim.on_key(safely(require("review.scroll").key), key_namespace)
 end
 
 local function teardown()
     watch.stop()
     require("review.panel").close()
-    vim.api.nvim_clear_autocmds({ group = group })
+    vim.api.nvim_clear_autocmds({ group = augroup })
     vim.on_key(nil, key_namespace)
     require("review.render").detach_all()
     require("review.deleted").wipe()
     require("review.diagnostics").stop()
 end
 
--- Starts reviewing against the ref, or switches to it, and opens the panel.
-function M.start(ref)
+-- Starts or switches the review, and opens the panel.
+function M.start(base_ref)
     local panel = require("review.panel")
-    ref = ref or session.ref or config.options.base
-    local started = ref ~= session.ref
+    base_ref = base_ref or session.base_ref or config.options.base
+    local started = base_ref ~= session.base_ref
     if started then
         local switching = session.active()
-        -- Keeps the current review when the ref is invalid.
-        if not session.start(ref) then
+        -- Keeps the current review on an invalid ref.
+        if not session.start(base_ref) then
             return
         end
         teardown()
@@ -142,7 +141,7 @@ function M.start(ref)
         create_autocmds()
         require("review.diagnostics").start()
         watch.start(safely)
-        -- Which files were reviewed decides what the "since_review" view diffs them against.
+        -- Before attaching, as the since_review view diffs against reviewed versions.
         require("review.state").load()
         require("review.render").attach_all()
         if not switching then

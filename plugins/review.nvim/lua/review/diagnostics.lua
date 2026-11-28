@@ -1,91 +1,91 @@
--- Diagnostic signs and virtual text on changed lines get the review background, as neither the sign column nor
--- virtual text take it from the line highlight.
+-- Gives diagnostic signs and virtual text on changed lines the review background, which they do not inherit.
 local M = {}
 
-local handlers = {}
--- Groups already combined, made again once the colorscheme changes.
-local combined = {}
--- By buffer and namespace, the marks given the review background, to put back once their line is not changed.
+-- Neovim's own handlers, while replaced.
+local original_handlers = {}
+-- Combined groups already defined. Reset on colorscheme change.
+local combined_groups = {}
+-- By buffer and namespace, the marks restyled, to restore once their line is unchanged.
 local restyled = {}
 
--- The group for a diagnostic group on the changed line, named <line group>_<group> so the diagnostic group is
--- known again once the line is not changed. Without a group, like padding, the line group itself.
-local function combine(group, line, background)
-    local base = group and group:match("^Review%a*Add_(.+)$") or group
-    base = not (base and base:match("^Review%a*Add$")) and base or nil
-    if not line or not base then
-        return line or base
+-- "<line group>_<diagnostic group>", so the diagnostic group can be recovered. Nil groups give the other.
+local function combine(group, line_group, background_group)
+    local diagnostic_group = group and group:match("^Review%a*Add_(.+)$") or group
+    diagnostic_group = not (diagnostic_group and diagnostic_group:match("^Review%a*Add$")) and diagnostic_group or nil
+    if not line_group or not diagnostic_group then
+        return line_group or diagnostic_group
     end
-    local name = line .. "_" .. base
-    if not combined[name] then
-        local hl = vim.api.nvim_get_hl(0, { name = base, link = false })
-        hl.bg = vim.api.nvim_get_hl(0, { name = background, link = false }).bg
+    local name = line_group .. "_" .. diagnostic_group
+    if not combined_groups[name] then
+        local hl = vim.api.nvim_get_hl(0, { name = diagnostic_group, link = false })
+        hl.bg = vim.api.nvim_get_hl(0, { name = background_group, link = false }).bg
         vim.api.nvim_set_hl(0, name, hl)
-        combined[name] = true
+        combined_groups[name] = true
     end
     return name
 end
 
--- Gives the diagnostic mark the background of the changed line it is on, or puts its own back without one.
-local function restyle(buf, id, mark, line)
-    local details, update = vim.api.nvim_buf_get_extmark_by_id(buf, id, mark[1], { details = true })[3], false
+-- Gives the mark its changed line's background, or its own back when line_group is nil.
+local function restyle(buf, ns, mark, line_group)
+    local id, row, col = mark[1], mark[2], mark[3]
+    local details, needs_update = vim.api.nvim_buf_get_extmark_by_id(buf, ns, id, { details = true })[3], false
     if details.sign_hl_group then
-        local group = combine(details.sign_hl_group, line, line and "ReviewSign" .. line:sub(7))
-        update, details.sign_hl_group = group ~= details.sign_hl_group, group
+        local group = combine(details.sign_hl_group, line_group, line_group and "ReviewSign" .. line_group:sub(7))
+        needs_update, details.sign_hl_group = group ~= details.sign_hl_group, group
     end
-    local gutter = details.virt_lines_leftcol
+    local had_gutter = details.virt_lines_leftcol
     for _, chunks in ipairs(details.virt_lines or { details.virt_text }) do
-        -- Virtual lines get the gutter and are padded to the edge like the line highlight, which both go again with
-        -- it.
+        -- Removes the padding and gutter added last time.
         local last = chunks[#chunks]
         if details.virt_lines and last and last[1]:match("^ +$") and (last[2] or ""):match("^Review%a*Add$") then
             table.remove(chunks)
-            update = true
+            needs_update = true
         end
-        if gutter and (chunks[2] and chunks[2][2] or ""):match("^ReviewSign") then
+        if had_gutter and (chunks[2] and chunks[2][2] or ""):match("^ReviewSign") then
             table.remove(chunks, 1)
             table.remove(chunks, 1)
-            update = true
+            needs_update = true
         end
         for _, chunk in ipairs(chunks) do
             if type(chunk[2]) ~= "table" then
-                local group = combine(chunk[2], line, line)
-                update, chunk[2] = update or group ~= chunk[2], group
+                local group = combine(chunk[2], line_group, line_group)
+                needs_update, chunk[2] = needs_update or group ~= chunk[2], group
             end
         end
-        if details.virt_lines and line then
-            table.insert(chunks, { string.rep(" ", vim.o.columns), line })
-            local columns = require("review.render").gutter(buf, line == "ReviewLocalAdd", "Add")
-            table.insert(chunks, 1, columns[2])
-            table.insert(chunks, 1, columns[1])
+        -- Virtual lines get the gutter and padding like changed lines.
+        if details.virt_lines and line_group then
+            table.insert(chunks, { string.rep(" ", vim.o.columns), line_group })
+            local gutter = require("review.buffer").get(buf):gutter(line_group == "ReviewLocalAdd", "Add")
+            table.insert(chunks, 1, gutter[2])
+            table.insert(chunks, 1, gutter[1])
         end
     end
     if details.virt_lines then
-        details.virt_lines_leftcol = line ~= nil
-        update = update or details.virt_lines_leftcol ~= (gutter or false)
+        details.virt_lines_leftcol = line_group ~= nil
+        needs_update = needs_update or details.virt_lines_leftcol ~= (had_gutter or false)
     end
-    if update then
-        -- Edits can leave the marks of diagnostics past the last line, which Neovim puts back as they were.
-        details.id, details.ns_id, details.strict = mark[1], nil, false
-        vim.api.nvim_buf_set_extmark(buf, id, mark[2], mark[3], details)
+    if needs_update then
+        -- Not strict: edits can leave diagnostic marks past the last line.
+        details.id, details.ns_id, details.strict = id, nil, false
+        vim.api.nvim_buf_set_extmark(buf, ns, row, col, details)
     end
 end
 
 function M.apply(buf)
-    local changed = require("review.render").changed(buf)
+    local changed_lines = require("review.render").changed_lines(buf)
     restyled[buf] = restyled[buf] or {}
-    for _, ns in pairs(vim.diagnostic.get_namespaces()) do
-        for _, kind in ipairs({ "sign_ns", "virt_text_ns", "virt_lines_ns" }) do
-            local id = ns.user_data[kind]
-            if id then
-                local before, after = restyled[buf][id] or {}, {}
-                restyled[buf][id] = after
-                for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, id, 0, -1, {})) do
-                    -- Only the marks on changed lines, or restyled before, need to be looked at.
-                    local line = changed[mark[2] + 1]
-                    after[mark[1]] = line and true or nil
-                    if line or before[mark[1]] then
-                        restyle(buf, id, mark, line)
+    for _, diagnostic_ns in pairs(vim.diagnostic.get_namespaces()) do
+        for _, ns_kind in ipairs({ "sign_ns", "virt_text_ns", "virt_lines_ns" }) do
+            local ns = diagnostic_ns.user_data[ns_kind]
+            if ns then
+                local before, now = restyled[buf][ns] or {}, {}
+                restyled[buf][ns] = now
+                for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, {})) do
+                    -- Only marks on changed lines, or restyled before.
+                    local line_group = changed_lines[mark[2] + 1]
+                    now[mark[1]] = line_group and true or nil
+                    if line_group or before[mark[1]] then
+                        restyle(buf, ns, mark, line_group)
                     end
                 end
             end
@@ -93,17 +93,16 @@ function M.apply(buf)
     end
 end
 
--- Combined again with the new colors.
 function M.recolor()
-    combined = {}
+    combined_groups = {}
 end
 
--- Diagnostics redraw by themselves, like after leaving insert mode.
+-- Wraps the handlers, as diagnostics redraw by themselves.
 function M.start()
-    combined, restyled = {}, {}
+    combined_groups, restyled = {}, {}
     for _, name in ipairs({ "signs", "virtual_text", "virtual_lines" }) do
-        local handler = handlers[name] or vim.diagnostic.handlers[name]
-        handlers[name] = handler
+        local handler = original_handlers[name] or vim.diagnostic.handlers[name]
+        original_handlers[name] = handler
         vim.diagnostic.handlers[name] = {
             show = function(ns, buf, ...)
                 handler.show(ns, buf, ...)
@@ -115,11 +114,11 @@ function M.start()
 end
 
 function M.stop()
-    if next(handlers) then
-        for name, handler in pairs(handlers) do
+    if next(original_handlers) then
+        for name, handler in pairs(original_handlers) do
             vim.diagnostic.handlers[name] = handler
         end
-        handlers = {}
+        original_handlers = {}
         vim.diagnostic.show()
     end
 end

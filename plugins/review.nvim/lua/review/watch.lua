@@ -3,21 +3,20 @@ local state = require("review.state")
 
 local M = {}
 
-local timer, watcher, wrap
+local timer, watcher, safely
 
--- Reloads from git after HEAD or the working tree changed.
 function M.refresh()
-    local source, merge_base, head = session.source, session.merge_base, session.head
+    local branch, merge_base, head_commit = session.branch, session.merge_base, session.head_commit
     if not session.load() then
         return
     end
-    if session.source ~= source then
+    if session.branch ~= branch then
         state.load()
-        vim.notify("Reviewing " .. session.source .. " against " .. session.ref)
+        vim.notify("Reviewing " .. session.branch .. " against " .. session.base_ref)
     end
     local render = require("review.render")
-    -- What is committed moves with HEAD, which decides which changes are local.
-    local moved = session.merge_base ~= merge_base or session.head ~= head
+    -- Moving HEAD changes which changes are uncommitted.
+    local moved = session.merge_base ~= merge_base or session.head_commit ~= head_commit
     if moved then
         render.attach_all()
     end
@@ -25,27 +24,26 @@ function M.refresh()
     require("review.panel").refresh()
 end
 
--- Once for a burst of changes, a rebase moves HEAD for every commit.
+-- Debounced, as a rebase moves HEAD for every commit.
 function M.schedule()
     if timer then
         timer:stop()
-        timer:start(200, 0, vim.schedule_wrap(wrap(M.refresh)))
+        timer:start(200, 0, vim.schedule_wrap(safely(M.refresh)))
     end
 end
 
--- Git appends to the HEAD reflog whenever HEAD moves, and the merge base only changes when HEAD does.
--- Refreshes run through `safe`, which handles their errors.
-function M.start(safe)
-    wrap = safe
+-- Watches the HEAD reflog, which git appends to whenever HEAD moves.
+function M.start(run_safely)
+    safely = run_safely
     timer = vim.uv.new_timer()
     watcher = vim.uv.new_fs_event()
-    local reflog = session.git_dir .. "/logs/HEAD"
+    local reflog_path = session.git_dir .. "/logs/HEAD"
     local function start()
-        watcher:start(reflog, {}, function(err)
-            if err then
+        watcher:start(reflog_path, {}, function(watch_error)
+            if watch_error then
                 return
             end
-            -- Restarted in case git replaced the file.
+            -- Git may have replaced the file.
             watcher:stop()
             start()
             M.schedule()

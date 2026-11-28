@@ -168,10 +168,10 @@ function T.edits_without_text_changed_render_once_settled()
     vim.api.nvim_buf_set_lines(buf, 1, 1, false, { "added" })
     vim.api.nvim_win_set_cursor(0, { 2, 0 })
     render.settled()
-    local changed = render.changed(buf)[2]
+    local changed = render.changed_lines(buf)[2]
     vim.api.nvim_buf_set_lines(buf, 1, 2, false, {})
     local ok, err = pcall(render.update, buf)
-    assert(changed == "ReviewLocalAdd", vim.inspect(render.changed(buf)))
+    assert(changed == "ReviewLocalAdd", vim.inspect(render.changed_lines(buf)))
     assert(ok, err)
 end
 
@@ -220,11 +220,11 @@ function T.typing_with_the_completion_menu_open_renders()
     vim.o.completeopt = "menu,menuone,noinsert"
     h.input("2GA<C-n>")
     h.input("e")
-    local open, changed = vim.fn.pumvisible(), require("review.render").changed(buf)[2]
+    local open, changed = vim.fn.pumvisible(), require("review.render").changed_lines(buf)[2]
     h.input("<C-e><Esc>")
     vim.o.completeopt = completeopt
     assert(open == 1, "the menu closed")
-    assert(changed == "ReviewLocalAdd", vim.inspect(require("review.render").changed(buf)))
+    assert(changed == "ReviewLocalAdd", vim.inspect(require("review.render").changed_lines(buf)))
 end
 
 function T.stopping_clears_the_buffers()
@@ -672,7 +672,7 @@ function T.an_invalid_ref_keeps_the_review()
     h.review()
     local message = warning("nope")
     local session = require("review.session")
-    local ref, open = session.ref, require("review.panel").is_open()
+    local ref, open = session.base_ref, require("review.panel").is_open()
     require("review").stop()
     assert(ref == "dev" and open, vim.inspect({ ref, open }))
     assert(message == "Cannot review against nope: Not a valid object name nope", message)

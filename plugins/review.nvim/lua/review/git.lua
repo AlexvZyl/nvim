@@ -1,9 +1,7 @@
 local M = {}
 
--- Starts git in the cwd. The function it returns waits for it, then gives what it parsed from the output, or nil
--- and why when git failed, like "Not a valid object name main", nil when it does not say. So functions returning it
--- run git at the same time as the others started before waiting.
-local function start(args, parse)
+-- Starts git and returns a function that waits for it, giving the parsed output, or nil and git's reason.
+local function spawn(args, parse)
     local process = vim.system({ "git", "-C", vim.fn.getcwd(), unpack(args) }, { text = true })
     return function()
         local result = process:wait()
@@ -16,19 +14,19 @@ local function start(args, parse)
 end
 
 function M.run(...)
-    return start({ ... }, function(output)
+    return spawn({ ... }, function(output)
         return output
     end)()
 end
 
 -- Nil when HEAD and the ref share no history.
 function M.merge_base(ref)
-    return start({ "merge-base", "HEAD", ref }, vim.trim)
+    return spawn({ "merge-base", "HEAD", ref }, vim.trim)
 end
 
--- HEAD, its branch, the path of the cwd inside the repo and the git dir. Nil outside a repo.
-function M.repo()
-    return start({ "rev-parse", "HEAD", "--abbrev-ref", "HEAD", "--show-prefix", "--absolute-git-dir" }, function(output)
+-- HEAD, its branch, the cwd's repo path and the git dir. Nil outside a repo.
+function M.repo_info()
+    return spawn({ "rev-parse", "HEAD", "--abbrev-ref", "HEAD", "--show-prefix", "--absolute-git-dir" }, function(output)
         return unpack(vim.split(output, "\n"))
     end)
 end
@@ -39,99 +37,82 @@ function M.refs()
     return vim.split(refs, "\n", { trimempty = true })
 end
 
--- Contents of each file at each revision, by file a list by revision, nil where it does not exist, read by one git
--- process. A revision can be a function of the file's path from the cwd instead, giving the object to read, like a
--- blob, or nil for none.
-function M.show_each(files, revs)
-    local objects, at = {}, {}
-    for i, file in ipairs(files) do
-        local path = vim.fn.fnamemodify(file, ":.")
-        at[i] = {}
-        for j, rev in ipairs(revs) do
-            local object = type(rev) == "function" and rev(path) or type(rev) == "string" and rev .. ":./" .. path
+-- Contents by path, then revision, nil where missing, from one git process. A revision can be a function of the
+-- cwd path returning an object, like a blob hash.
+function M.show_each(paths, revisions)
+    local objects, object_index = {}, {}
+    for i, path in ipairs(paths) do
+        local cwd_path = vim.fn.fnamemodify(path, ":.")
+        object_index[i] = {}
+        for j, revision in ipairs(revisions) do
+            local object = type(revision) == "function" and revision(cwd_path)
+                or type(revision) == "string" and revision .. ":./" .. cwd_path
             if object then
                 table.insert(objects, object .. "\n")
-                at[i][j] = #objects
+                object_index[i][j] = #objects
             end
         end
     end
     local output = vim.system({ "git", "-C", vim.fn.getcwd(), "cat-file", "--batch" }, { stdin = table.concat(objects) }):wait().stdout or ""
-    -- Each object is a header with its type and size, then its contents. Ones not found are only the header.
+    -- A header with type and size, then the contents. Missing objects have only the header.
     local contents, position = {}, 1
     for i = 1, #objects do
         local header_end = output:find("\n", position, true)
         if not header_end then
             break
         end
-        local kind, size = output:sub(position, header_end - 1):match(" (%a+) (%d+)$")
+        local object_type, size = output:sub(position, header_end - 1):match(" (%a+) (%d+)$")
         position = header_end + 1
         if size then
-            -- Without the carriage returns of CRLF files, which the buffer does not have either.
-            contents[i] = kind == "blob" and (output:sub(position, position + size - 1):gsub("\r\n", "\n")) or nil
+            -- Without carriage returns, like the buffer.
+            contents[i] = object_type == "blob" and (output:sub(position, position + size - 1):gsub("\r\n", "\n")) or nil
             position = position + size + 1
         end
     end
-    local by_file = {}
-    for i = 1, #files do
-        by_file[i] = {}
-        for j, position in pairs(at[i]) do
-            by_file[i][j] = contents[position]
+    local by_path = {}
+    for i = 1, #paths do
+        by_path[i] = {}
+        for j, index in pairs(object_index[i]) do
+            by_path[i][j] = contents[index]
         end
     end
-    return by_file
+    return by_path
 end
 
--- Contents of a file at each revision, nil where it does not exist.
-function M.show(file, ...)
-    return unpack(M.show_each({ file }, { ... })[1], 1, select("#", ...))
+function M.show(path, ...)
+    return unpack(M.show_each({ path }, { ... })[1], 1, select("#", ...))
 end
 
--- The files of a diff --numstat -z with the lines they added and removed.
 local function numstat(output)
     local files = {}
     for added, removed, path in output:gmatch("(%S+)\t(%S+)\t([^%z]+)%z") do
-        -- Binary files count as "-", which leaves them without counts.
-        table.insert(files, { path = path, added = tonumber(added), removed = tonumber(removed) })
+        -- Binary files count as "-".
+        table.insert(files, { path = path, lines_added = tonumber(added), lines_removed = tonumber(removed) })
     end
     return files
 end
 
--- Files changed since the merge base with the ref, relative to the cwd, with the lines they changed, committed or
--- not, as their changes. Nil when the diff fails.
+-- Changed since the merge base, committed or not, under the cwd.
 function M.changed_files(ref)
-    local all = start({ "diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames" }, numstat)
-    return function()
-        local files, reason = all()
-        if not files then
-            return nil, reason
-        end
-        for _, file in ipairs(files) do
-            -- Binary files have no lines, but are some of the review too.
-            file.changes = math.max((file.added or 0) + (file.removed or 0), 1)
-            -- The diff is against the working tree, so a deleted file is one not on disk. Only those adding no lines
-            -- can be, binary ones adding none either.
-            file.deleted = (file.added or 0) == 0 and vim.uv.fs_stat(file.path) == nil
-        end
-        return files
-    end
+    return spawn({ "diff", "--merge-base", ref, "--numstat", "--relative", "-z", "--no-renames" }, numstat)
 end
 
--- Blob of the files in HEAD, by path from the repo root, from their paths relative to the cwd. Waited for once
--- like the others, then kept.
-function M.head_blobs(paths)
-    local blobs
+-- Waits for the HEAD blob hash of each file, by repo path, then caches them.
+function M.head_hashes(paths)
+    local hashes
     -- Without paths, the whole tree.
-    local wait = #paths > 0 and start({ "ls-tree", "-r", "-z", "--full-name", "HEAD", "--", unpack(paths) }, function(tree)
-        return tree
-    end)
+    local wait_for_tree = #paths > 0
+        and spawn({ "ls-tree", "-r", "-z", "--full-name", "HEAD", "--", unpack(paths) }, function(tree)
+            return tree
+        end)
     return function()
-        if not blobs then
-            blobs = {}
-            for sha, path in (wait and wait() or ""):gmatch("%S+ blob (%S+)\t([^%z]+)%z") do
-                blobs[path] = sha
+        if not hashes then
+            hashes = {}
+            for hash, repo_path in (wait_for_tree and wait_for_tree() or ""):gmatch("%S+ blob (%S+)\t([^%z]+)%z") do
+                hashes[repo_path] = hash
             end
         end
-        return blobs
+        return hashes
     end
 end
 

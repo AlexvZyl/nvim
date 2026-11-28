@@ -1,149 +1,144 @@
--- Keeps the screen in place while the deleted lines drawn above and below the lines come and go with the edits.
+-- Keeps the screen still while deleted lines appear and disappear with edits.
 local M = {}
 
-local function view(win)
+local function saved_view(win)
     return vim.api.nvim_win_call(win, vim.fn.winsaveview)
 end
 
-local function restore(win, saved)
+local function restore_view(win, view)
     vim.api.nvim_win_call(win, function()
-        vim.fn.winrestview(saved)
+        vim.fn.winrestview(view)
     end)
 end
 
--- Screen rows of the lines, starting at the text of the first one when vcol is given.
-local function height(win, first, last, vcol)
-    return vim.api.nvim_win_text_height(win, { start_row = first - 1, end_row = last - 1, start_vcol = vcol }).all
+-- Screen rows of the lines. With start_vcol, from the first line's text, so without the virtual lines above it.
+local function screen_rows(win, first_line, last_line, start_vcol)
+    return vim.api.nvim_win_text_height(win, { start_row = first_line - 1, end_row = last_line - 1, start_vcol = start_vcol }).all
 end
 
--- Rows of text in the window, without the winbar the window's height counts.
+-- Without the winbar.
 local function text_rows(win)
     return vim.fn.winheight(win)
 end
 
--- Virtual lines above the line.
-local function fill(win, line)
-    return height(win, line, line) - height(win, line, line, 0)
+local function virtual_lines_above(win, line)
+    return screen_rows(win, line, line) - screen_rows(win, line, line, 0)
 end
 
--- Screen rows between the top of the window and the line's text, negative above the window.
-local function line_row(win, line)
-    local top = view(win)
-    if line < top.topline then
-        return -height(win, line, top.topline - 1, 0)
+-- Screen rows from the window's top to the line's text. Negative above the window.
+local function row_of(win, line)
+    local view = saved_view(win)
+    if line < view.topline then
+        return -screen_rows(win, line, view.topline - 1, 0)
     end
-    -- topfill is stale until the next redraw when the virtual lines above the top line go away.
-    local hidden = math.max(fill(win, top.topline) - top.topfill, 0)
-    return height(win, top.topline, line) - height(win, line, line, 0) - hidden
+    -- topfill is stale until the redraw when virtual lines above the top line go away.
+    local hidden = math.max(virtual_lines_above(win, view.topline) - view.topfill, 0)
+    return screen_rows(win, view.topline, line) - screen_rows(win, line, line, 0) - hidden
 end
 
--- Scrolls so the line's text is the given number of screen rows below the top of the window.
+-- Scrolls so the line's text is the given screen rows from the top.
 local function scroll_to(win, line, rows)
     while true do
-        local above = fill(win, line)
+        local above = virtual_lines_above(win, line)
         if rows <= above or line == 1 then
-            return restore(win, { topline = line, topfill = math.min(rows, above) })
+            return restore_view(win, { topline = line, topfill = math.min(rows, above) })
         end
         line = line - 1
-        rows = rows - above - height(win, line, line, 0)
-        -- Short of the whole of a wrapped line, the line ends up a little lower.
+        rows = rows - above - screen_rows(win, line, line, 0)
+        -- Within a wrapped line, the line ends up a little lower.
         if rows <= 0 then
-            return restore(win, { topline = line, topfill = 0 })
+            return restore_view(win, { topline = line, topfill = 0 })
         end
     end
 end
 
--- By window, the screen row of the cursor line as last seen with the hunks rendered, and the lines they were rendered
--- for. Measured once an edit is made, the stale virtual lines have already moved.
+-- By window, where the cursor line was on screen when last rendered, and the lines then. Measured after an edit,
+-- the stale virtual lines have already moved.
 local settled = {}
 
--- Once the screen shows the window's buffer rendered for the lines, so cursor moves and scrolls are kept by the next
--- render.
+-- Called once the screen shows the window rendered for the lines.
 function M.settle(win, lines)
-    local line, top = vim.api.nvim_win_get_cursor(win)[1], view(win)
+    local cursor_line, view = vim.api.nvim_win_get_cursor(win)[1], saved_view(win)
     settled[win] = {
         lines = lines,
-        line = line,
-        row = line_row(win, line),
-        topline = top.topline,
-        topfill = top.topfill,
-        fill = fill(win, top.topline),
+        cursor_line = cursor_line,
+        cursor_row = row_of(win, cursor_line),
+        topline = view.topline,
+        topfill = view.topfill,
+        top_virtual_lines = virtual_lines_above(win, view.topline),
     }
 end
 
--- How many lines at the start and at the end the edit from the old lines to the new ones left as they were.
-local function unchanged(old, new)
-    local before, after = 0, 0
-    while before < #old and old[before + 1] == new[before + 1] do
-        before = before + 1
+-- How many lines at the start and end the edit left unchanged.
+local function unchanged_ends(old_lines, new_lines)
+    local at_start, at_end = 0, 0
+    while at_start < #old_lines and old_lines[at_start + 1] == new_lines[at_start + 1] do
+        at_start = at_start + 1
     end
-    while after < math.min(#old, #new) and old[#old - after] == new[#new - after] do
-        after = after + 1
+    while at_end < math.min(#old_lines, #new_lines) and old_lines[#old_lines - at_end] == new_lines[#new_lines - at_end] do
+        at_end = at_end + 1
     end
-    return before, after
+    return at_start, at_end
 end
 
--- Through an edit within the line the cursor was on, like typing or commenting it, the line stays on its row, like
--- without the deleted line that comes or goes above it. Through an edit that adds or deletes lines, like deleting
--- it, scrolling is jarring, so the screen stays and the lines move instead.
-function M.keep(buf, old, new)
-    local before_lines, after_lines = unchanged(old, new)
+-- An edit within the cursor line, like typing, keeps that line on its row. An edit adding or deleting lines keeps
+-- the screen still instead, as scrolling then is jarring.
+function M.keep(buf, old_lines, new_lines)
+    local unchanged_start, unchanged_end = unchanged_ends(old_lines, new_lines)
     for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-        local before = settled[win]
-        -- Not when last seen with other lines, like those of the file before it was read again.
-        if before and before.lines == old then
-            local line, cursor, added = before.line, vim.api.nvim_win_get_cursor(win)[1], #new - #old
-            -- As many lines, as before above and below it.
-            local within = added == 0 and before_lines >= line - 1 and after_lines >= #old - line
-            if within then
-                -- Off screen when it was, which is left to Vim.
-                local shown = before.row >= 0 and before.row < text_rows(win)
-                if shown and line_row(win, line) ~= before.row then
-                    scroll_to(win, line, before.row)
+        local last = settled[win]
+        -- Only when last settled with these lines.
+        if last and last.lines == old_lines then
+            local line, cursor_line, line_delta = last.cursor_line, vim.api.nvim_win_get_cursor(win)[1], #new_lines - #old_lines
+            local edited_in_place = line_delta == 0 and unchanged_start >= line - 1 and unchanged_end >= #old_lines - line
+            if edited_in_place then
+                -- Left to Vim when it was off screen.
+                local on_screen = last.cursor_row >= 0 and last.cursor_row < text_rows(win)
+                if on_screen and row_of(win, line) ~= last.cursor_row then
+                    scroll_to(win, line, last.cursor_row)
                 end
             else
-                -- Shows the deleted lines that came above the top line, like when the lines at the top are deleted,
-                -- and hides them again once they go, like when that is undone.
-                local top = view(win)
-                local above = fill(win, top.topline)
-                if top.topline == before.topline and above ~= before.fill then
-                    restore(win, { topline = top.topline, topfill = math.max(math.min(before.topfill + above - before.fill, above), 0) })
+                -- Shows deleted lines that appeared above the top line, and hides them when they go.
+                local view = saved_view(win)
+                local top_virtual_lines = virtual_lines_above(win, view.topline)
+                if view.topline == last.topline and top_virtual_lines ~= last.top_virtual_lines then
+                    local topfill = last.topfill + top_virtual_lines - last.top_virtual_lines
+                    restore_view(win, { topline = view.topline, topfill = math.max(math.min(topfill, top_virtual_lines), 0) })
                 end
-                -- Deleting up, from the last of the deleted lines like `dk` or a selection up, goes on the line above
-                -- them so the cursor stays at the top. Deleting down leaves it below them.
-                local removed = -added
-                if removed > 1 and (before.visual or line) == cursor + removed - 1 and cursor > 1 then
-                    local text = vim.api.nvim_buf_get_lines(buf, cursor - 2, cursor - 1, true)[1]
-                    vim.api.nvim_win_set_cursor(win, { cursor - 1, #text:match("^%s*") })
+                -- Deleting upwards, like `dk`, leaves the cursor above the deleted lines.
+                local lines_removed = -line_delta
+                local deleted_upwards = (last.visual_start or line) == cursor_line + lines_removed - 1
+                if lines_removed > 1 and deleted_upwards and cursor_line > 1 then
+                    local text = vim.api.nvim_buf_get_lines(buf, cursor_line - 2, cursor_line - 1, true)[1]
+                    vim.api.nvim_win_set_cursor(win, { cursor_line - 1, #text:match("^%s*") })
                 end
-                -- Kept on the bottom row once the deleted lines above push it below, like holding dd or . there. Left
-                -- below the window, the screen scrolls only with the redraw, which draws the cursor above them.
-                cursor = vim.api.nvim_win_get_cursor(win)[1]
-                local rows, shown_rows = height(win, cursor, cursor, 0), text_rows(win)
-                if before.row >= 0 and before.row < shown_rows and line_row(win, cursor) + rows > shown_rows then
-                    scroll_to(win, cursor, shown_rows - rows)
+                -- Keeps the cursor on screen when deleted lines above push it below, like holding dd on the last row.
+                cursor_line = vim.api.nvim_win_get_cursor(win)[1]
+                local cursor_rows, window_rows = screen_rows(win, cursor_line, cursor_line, 0), text_rows(win)
+                local was_on_screen = last.cursor_row >= 0 and last.cursor_row < window_rows
+                if was_on_screen and row_of(win, cursor_line) + cursor_rows > window_rows then
+                    scroll_to(win, cursor_line, window_rows - cursor_rows)
                 end
             end
         end
-        M.settle(win, new)
+        M.settle(win, new_lines)
     end
 end
 
--- Before every key in visual mode, where the selection started, so once an operator deletes it whether it went
--- up or down is known. Once visual mode ends that is gone.
+-- Before each key in visual mode, records where the selection started, to tell later which way it deleted.
 function M.key()
-    local current = settled[vim.api.nvim_get_current_win()]
-    if current and vim.api.nvim_get_mode().mode:match("^[vV\22]") then
-        current.visual = vim.fn.line("v")
+    local last = settled[vim.api.nvim_get_current_win()]
+    if last and vim.api.nvim_get_mode().mode:match("^[vV\22]") then
+        last.visual_start = vim.fn.line("v")
     end
 end
 
--- Shows the deleted lines above the first line when the buffer is opened at the top, like for a deleted file.
+-- Shows deleted lines above the first line when the buffer opens at the top.
 function M.reveal(buf)
     for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-        local top = view(win)
-        if top.topline == 1 and top.topfill == 0 then
-            restore(win, { topline = 1, topfill = fill(win, 1) })
+        local view = saved_view(win)
+        if view.topline == 1 and view.topfill == 0 then
+            restore_view(win, { topline = 1, topfill = virtual_lines_above(win, 1) })
         end
     end
 end

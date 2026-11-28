@@ -26,12 +26,11 @@ local groups = {
 
 function M.set()
     require("shared.plugin").link(groups)
-    -- Only the background of deleted lines, put over the syntax of their text, which can have its own, like markdown
-    -- code blocks.
+    -- Background only, to put over syntax highlights.
     for _, group in ipairs({ "ReviewDelete", "ReviewLocalDelete" }) do
         vim.api.nvim_set_hl(0, group .. "Background", { bg = vim.api.nvim_get_hl(0, { name = group, link = false }).bg })
     end
-    -- The number of the cursor line on a changed line, which takes the changed line's number highlight otherwise.
+    -- CursorLineNr on changed lines, with their background.
     local cursor = vim.api.nvim_get_hl(0, { name = "CursorLineNr", link = false })
     for _, group in ipairs({ "ReviewAddNr", "ReviewLocalAddNr", "ReviewDeleteNr", "ReviewLocalDeleteNr" }) do
         local bg = vim.api.nvim_get_hl(0, { name = group, link = false }).bg

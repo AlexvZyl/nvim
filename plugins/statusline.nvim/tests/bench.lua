@@ -1,8 +1,7 @@
 -- nvim --clean --headless -c "luafile tests/bench.lua", rendering with N diagnostics in the buffer, with FILTER=text
--- to run the benchmarks with it in their name. PLUGIN_ROOT runs them against the plugin there instead, like another
--- revision of it.
+-- to run the benchmarks with it in their name.
 local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
-vim.opt.rtp:prepend(os.getenv("PLUGIN_ROOT") or root)
+vim.opt.rtp:prepend(root)
 vim.opt.rtp:prepend(root .. "/../shared.nvim")
 package.path = root .. "/?.lua;" .. package.path
 local toggles = {}

@@ -157,6 +157,8 @@ bench("publish", 10, function()
     vim.diagnostic.set(diagnostic_namespace, buf, diagnostics, { virtual_text = true })
 end)
 require("review.diagnostics").stop()
+-- Lua memory with the one large file attached and drawn.
+require("shared.bench").memory("memory one file")
 
 -- A review of FILES files spread over directories, a few lines each: a quarter added, modified, deleted and left
 -- as they are. With a file rewritten from scratch and a large one deleted.
@@ -250,6 +252,7 @@ for i = 1, 50 do
     vim.fn.bufload(vim.fn.bufadd(require("review.session").files[i].path))
 end
 bench("attach all", 10, render.attach_all)
+require("shared.bench").memory("memory 50 files")
 vim.api.nvim_set_current_win(panel)
 -- Diffed against as reviewed, marking a file reviewed attaches its buffer again. One of those opened.
 review.view("since_review")
@@ -273,5 +276,6 @@ bench("panel redraw", 50, function()
         vim.cmd("redraw!")
     end)
 end)
+require("shared.bench").memory("memory at end")
 review.stop()
 require("shared.bench").finish()

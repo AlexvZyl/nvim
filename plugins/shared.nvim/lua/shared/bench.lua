@@ -40,6 +40,16 @@ function M.run(name, count, fn, unit)
     record(name, times, unit)
 end
 
+-- Records the Lua memory in use, in KB, once garbage is collected.
+function M.memory(name)
+    if filter and not name:find(filter, 1, true) then
+        return
+    end
+    collectgarbage()
+    collectgarbage()
+    record(name, { collectgarbage("count") }, "KB")
+end
+
 local cold = os.getenv("BENCH_COLD")
 
 -- Times the function once in each of as many new processes, after prepare when given, as the first thing they do

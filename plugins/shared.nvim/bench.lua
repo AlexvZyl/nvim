@@ -1,10 +1,11 @@
 -- nvim -l plugins/shared.nvim/bench.lua [--runs N] [--base REV] [plugin.nvim ...]
 --
--- Runs the benchmarks of the plugins, all by default, against the base revision (main by default), checked out in a
--- worktree. Both run N times each, in turn, in new processes, so they see the machine the same. Each side runs its
--- own benchmarks, and only benchmarks both have are compared, by the Mann-Whitney U test on the medians of the runs.
--- The p-values are adjusted for testing every benchmark at once, which takes 10 runs or so to show anything.
--- The calibrate benchmark does the same work on both sides, so a change in it is the machine, not the code.
+-- Benchmarks the plugins, all by default, as they are on disk against the base revision (main by default), and
+-- writes the comparison as JSON to data/bench/ at the repo root. A commit's results are kept there by its hash, so a
+-- commit benchmarked before on this machine is not run again. Uncommitted changes are always run.
+-- Medians of the runs are compared by the Mann-Whitney U test, adjusted for testing every benchmark at once, which
+-- takes 10 runs or so to show anything. The calibrate benchmark does the same work every time, so a change in it is
+-- the machine, not the code.
 local shared = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h")
 vim.opt.rtp:prepend(shared)
 local stats = require("shared.stats")
@@ -27,6 +28,8 @@ if #options.plugins == 0 then
         table.insert(options.plugins, vim.fn.fnamemodify(bench, ":h:h:t"))
     end
 end
+-- Only some benchmarks run, in another state than all of them, so their results are not kept.
+local filter = os.getenv("FILTER")
 
 local function git(...)
     local result = vim.system({ "git", "-C", plugins_dir, ... }, { text = true }):wait()
@@ -34,26 +37,57 @@ local function git(...)
     return vim.trim(result.stdout)
 end
 
+local repo_root = git("rev-parse", "--show-toplevel")
+local data_dir = repo_root .. "/data/bench"
+
+local cpus = vim.uv.cpu_info()
+local machine = { cpu = vim.trim(cpus[1].model), cores = #cpus, nvim = tostring(vim.version()) }
 -- On CPUs with performance and efficiency cores, only the performance ones, as runs take longer on the others.
-local pinned
 local performance = io.open("/sys/devices/cpu_core/cpus")
 if performance then
-    pinned = vim.fn.executable("taskset") == 1 and vim.trim(performance:read("a")) or nil
+    machine.pinned = vim.fn.executable("taskset") == 1 and vim.trim(performance:read("a")) or nil
     performance:close()
+end
+
+local function read_json(path)
+    local file = io.open(path)
+    if not file then
+        return nil
+    end
+    local decoded = vim.json.decode(file:read("a"))
+    file:close()
+    return decoded
+end
+
+local function write_json(path, data)
+    vim.fn.mkdir(vim.fs.dirname(path), "p")
+    local file = assert(io.open(path, "w"))
+    file:write(vim.json.encode(data, { indent = "  ", sort_keys = true }) .. "\n")
+    file:close()
+end
+
+local function results_path(plugin, hash)
+    return ("%s/%s/%s.json"):format(data_dir, plugin, hash)
+end
+
+-- A commit's kept results, when from this machine with as many runs.
+local function kept(plugin, hash)
+    local kept_results = not filter and hash and read_json(results_path(plugin, hash))
+    if kept_results and vim.deep_equal(kept_results.machine, machine) and kept_results.runs >= options.runs then
+        return kept_results.benchmarks
+    end
 end
 
 -- The benchmarks in the plugin directory, by name, in a new process.
 local function run(plugin_dir)
     local out = vim.fn.tempname()
     local command = { vim.v.progpath, "--clean", "--headless", "-c", "luafile tests/bench.lua", "-c", "cq" }
-    if pinned then
-        command = vim.list_extend({ "taskset", "-c", pinned }, command)
+    if machine.pinned then
+        command = vim.list_extend({ "taskset", "-c", machine.pinned }, command)
     end
     local result = vim.system(command, { cwd = plugin_dir, env = { BENCH_OUT = out }, text = true }):wait()
     assert(result.code == 0, plugin_dir .. " benchmarks failed:\n" .. result.stdout .. result.stderr)
-    local file = assert(io.open(out))
-    local results = vim.json.decode(file:read("a"))
-    file:close()
+    local results = assert(read_json(out))
     os.remove(out)
     return results
 end
@@ -67,9 +101,8 @@ local function add(into, results)
     end
 end
 
-local function report(plugin, current, base)
-    io.stdout:write(("\n%s, %d runs against %s\n"):format(plugin, options.runs, options.base))
-    io.stdout:write(("%-20s %10s %7s %10s %8s %8s\n"):format("", "median", "spread", "base", "change", "p"))
+-- Each benchmark of the current side against the base, in the order they ran.
+local function compare(current, base)
     local names = vim.tbl_keys(current)
     table.sort(names, function(a, b)
         return current[a].order < current[b].order
@@ -83,63 +116,106 @@ local function report(plugin, current, base)
         end
     end
     local adjusted = stats.holm(ps)
+    local benchmarks = {}
+    for _, name in ipairs(names) do
+        local now = current[name]
+        local entry = { name = name, unit = now.unit, median = stats.median(now.medians), spread = stats.spread(now.medians) }
+        if compared[name] then
+            compared[name].p = table.remove(adjusted, 1)
+            entry.base_median = stats.median(base[name].medians)
+            entry.change = compared[name].ratio - 1
+            entry.p = compared[name].p
+            entry.verdict = stats.verdict(compared[name])
+        elseif not base[name] then
+            entry.verdict = "new"
+        end
+        table.insert(benchmarks, entry)
+    end
+    local removed = {}
+    for name in pairs(base) do
+        if not current[name] then
+            table.insert(removed, name)
+        end
+    end
+    table.sort(removed)
     -- The smallest p-value the runs can give, adjusted like the largest.
     local fewest = vim.fn.range(1, options.runs)
     local farthest_apart = vim.tbl_map(function(x)
         return x + options.runs
     end, fewest)
-    if #ps > 0 and stats.mann_whitney(fewest, farthest_apart) * #ps >= 0.05 then
-        io.stdout:write(("Too few runs for %d benchmarks to ever differ significantly, take more with --runs.\n"):format(#ps))
-    end
-    for _, name in ipairs(names) do
-        local now = current[name]
-        local line = ("%-20s %7.2f %-2s %6.1f%%"):format(name, stats.median(now.medians), now.unit, stats.spread(now.medians) * 100)
-        if compared[name] then
-            compared[name].p = table.remove(adjusted, 1)
-            local verdict = stats.verdict(compared[name])
-            local change = (compared[name].ratio - 1) * 100
-            line = line .. ("%10.2f %+7.1f%% %8.4f  %s"):format(stats.median(base[name].medians), change, compared[name].p, verdict ~= "same" and verdict or "")
-        elseif not base[name] then
-            line = line .. "       new"
-        end
-        io.stdout:write(line .. "\n")
-    end
-    for name in pairs(base) do
-        if not current[name] then
-            io.stdout:write(("%-20s removed\n"):format(name))
-        end
-    end
-    local calibration = base.calibrate and stats.compare(base.calibrate.medians, current.calibrate.medians)
-    if calibration and stats.verdict(calibration, 0.05) ~= "same" then
-        io.stdout:write(("Calibration is %+.1f%%: the machine changed during the runs, so the changes may not be the code's.\n"):format((calibration.ratio - 1) * 100))
-    end
+    local calibration = base.calibrate and current.calibrate and stats.compare(base.calibrate.medians, current.calibrate.medians)
+    return {
+        benchmarks = benchmarks,
+        removed = removed,
+        too_few_runs = #ps > 0 and stats.mann_whitney(fewest, farthest_apart) * #ps >= 0.05,
+        calibration_change = calibration and calibration.ratio - 1,
+        machine_changed = calibration and stats.verdict(calibration, 0.05) ~= "same",
+    }
 end
 
-local worktree = vim.fn.tempname()
-git("worktree", "add", "--quiet", "--detach", worktree, options.base)
+local head = git("rev-parse", "HEAD")
+local base_hash = git("rev-parse", options.base .. "^{commit}")
+local comparison = {
+    date = os.date("%Y-%m-%dT%H:%M:%S"),
+    machine = machine,
+    runs = options.runs,
+    filter = filter,
+    base = { revision = options.base, hash = base_hash },
+    current = { head = head },
+    plugins = {},
+}
+
+local worktree
 local ok, err = pcall(function()
-    local base_plugins = worktree .. "/" .. vim.fs.relpath(git("rev-parse", "--show-toplevel"), plugins_dir)
     for _, plugin in ipairs(options.plugins) do
-        local base_dir = base_plugins .. "/" .. plugin
-        if vim.uv.fs_stat(base_dir .. "/tests/bench.lua") then
-            local current, base = {}, {}
-            for r = 1, options.runs do
+        local current_dir = plugins_dir .. "/" .. plugin
+        -- Uncommitted changes to the plugin or what it shares have no hash to keep results by.
+        local dirty = git("status", "--porcelain", "--", current_dir, shared) ~= ""
+        local current_hash = not dirty and head or nil
+        local current, base = kept(plugin, current_hash), kept(plugin, base_hash)
+        local base_dir
+        if not base then
+            if not worktree then
+                worktree = vim.fn.tempname()
+                git("worktree", "add", "--quiet", "--detach", worktree, base_hash)
+            end
+            base_dir = worktree .. "/" .. vim.fs.relpath(repo_root, current_dir)
+        end
+        if base_dir and not vim.uv.fs_stat(base_dir .. "/tests/bench.lua") then
+            comparison.plugins[plugin] = { error = "no benchmarks at " .. options.base }
+        else
+            local runs = { current = not current and {} or nil, base = not base and {} or nil }
+            for r = 1, (runs.current or runs.base) and options.runs or 0 do
                 io.stderr:write(("\r\27[K%s %d/%d"):format(plugin, r, options.runs))
-                -- Alternates which goes first.
-                if r % 2 == 0 then
-                    add(base, run(base_dir))
+                -- Alternates which goes first, when both run.
+                if runs.base and r % 2 == 0 then
+                    add(runs.base, run(base_dir))
                 end
-                add(current, run(plugins_dir .. "/" .. plugin))
-                if r % 2 == 1 then
-                    add(base, run(base_dir))
+                if runs.current then
+                    add(runs.current, run(current_dir))
+                end
+                if runs.base and r % 2 == 1 then
+                    add(runs.base, run(base_dir))
                 end
             end
             io.stderr:write("\r\27[K")
-            report(plugin, current, base)
-        else
-            io.stdout:write(("\n%s has no benchmarks at %s\n"):format(plugin, options.base))
+            for side, hash in pairs({ current = current_hash, base = base_hash }) do
+                if runs[side] and hash and not filter then
+                    write_json(results_path(plugin, hash), { hash = hash, machine = machine, runs = options.runs, benchmarks = runs[side] })
+                end
+            end
+            current, base = current or runs.current, base or runs.base
+            comparison.plugins[plugin] = compare(current, base)
+            comparison.plugins[plugin].dirty = dirty
+            comparison.plugins[plugin].reused = { current = runs.current == nil, base = runs.base == nil }
         end
     end
 end)
-git("worktree", "remove", "--force", worktree)
+if worktree then
+    git("worktree", "remove", "--force", worktree)
+end
 assert(ok, err)
+
+local path = ("%s/%s-%s-vs-%s.json"):format(data_dir, os.date("%Y-%m-%dT%H%M%S"), head:sub(1, 7), base_hash:sub(1, 7))
+write_json(path, comparison)
+io.stdout:write(path .. "\n")

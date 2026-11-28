@@ -9,9 +9,8 @@ local function lazy(name)
     })
 end
 
-local highlights = lazy("review.highlights")
 local session = lazy("review.session")
-local watch = lazy("review.watch")
+local git = lazy("review.git")
 
 local M = {}
 
@@ -59,8 +58,8 @@ M.files = when_active(function(opts)
 end)
 
 M.reset = when_active(function()
-    if session.load() then
-        require("review.state").reset()
+    if session.reload() then
+        session.reset_progress()
         require("review.panel").refresh()
     end
 end)
@@ -78,6 +77,25 @@ local function safely(fn)
     end
 end
 
+-- Reloads from git after HEAD moved, a save or focus returning.
+function M.refresh()
+    local branch, merge_base, head_commit = session.branch, session.merge_base, session.head_commit
+    if not session.reload() then
+        return
+    end
+    if session.branch ~= branch then
+        session.load_progress()
+        vim.notify("Reviewing " .. session.branch .. " against " .. session.base_ref)
+    end
+    -- Moving HEAD changes which changes are uncommitted.
+    local moved = session.merge_base ~= merge_base or session.head_commit ~= head_commit
+    if moved then
+        require("review.render").attach_all()
+    end
+    require("review.deleted").refresh(moved)
+    require("review.panel").refresh()
+end
+
 local function autocmd(event, callback)
     vim.api.nvim_create_autocmd(event, { group = augroup, callback = safely(callback) })
 end
@@ -92,7 +110,7 @@ local function create_autocmds()
     local panel = require("review.panel")
     local render = require("review.render")
     autocmd("ColorScheme", function()
-        highlights.set()
+        config.set_highlights()
         require("review.diagnostics").recolor()
     end)
     autocmd("BufEnter", with_buf(panel.follow))
@@ -107,7 +125,7 @@ local function create_autocmds()
     -- BufNewFile for deleted files.
     autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, with_buf(render.attach))
     -- Saves and outside tools change the diff without moving HEAD.
-    autocmd({ "BufWritePost", "FocusGained" }, watch.schedule)
+    autocmd({ "BufWritePost", "FocusGained" }, git.schedule_change)
     -- Unloaded buffers have no lines to draw on.
     autocmd("BufUnload", with_buf(render.detach))
     -- TextChangedP while the completion menu is open.
@@ -116,7 +134,7 @@ local function create_autocmds()
 end
 
 local function teardown()
-    watch.stop()
+    git.unwatch()
     require("review.panel").close()
     vim.api.nvim_clear_autocmds({ group = augroup })
     vim.on_key(nil, key_namespace)
@@ -137,12 +155,12 @@ function M.start(base_ref)
             return
         end
         teardown()
-        highlights.set()
+        config.set_highlights()
         create_autocmds()
         require("review.diagnostics").start()
-        watch.start(safely)
+        git.watch(session.git_dir, safely(M.refresh))
         -- Before attaching, as the since_review view diffs against reviewed versions.
-        require("review.state").load()
+        session.load_progress()
         require("review.render").attach_all()
         if not switching then
             vim.api.nvim_exec_autocmds("User", { pattern = "ReviewStart" })
@@ -171,7 +189,7 @@ function M.setup(opts)
         complete = function(lead)
             return vim.tbl_filter(function(ref)
                 return vim.startswith(ref, lead)
-            end, require("review.git").refs())
+            end, git.refs())
         end,
     })
     vim.api.nvim_create_user_command("ReviewStop", M.stop, {})

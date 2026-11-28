@@ -5,7 +5,6 @@ local cursor = require("review.cursor")
 local git = require("review.git")
 local scroll = require("review.scroll")
 local session = require("review.session")
-local state = require("review.state")
 
 local M = {}
 
@@ -19,7 +18,7 @@ end
 local function revisions()
     local reviewed_version = config.options.view == "since_review"
         and function(path)
-            local hash = state.reviewed_hash(session.cwd_prefix .. path)
+            local hash = session.reviewed_hash(session.cwd_prefix .. path)
             -- Empty when not in HEAD when reviewed.
             return hash ~= "" and hash or nil
         end
@@ -71,7 +70,7 @@ function M.review_changed(repo_paths)
     end
     for buf, buffer in Buffer.each() do
         local repo_path = session.cwd_prefix .. vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":.")
-        local reviewed_hash = state.reviewed_hash(repo_path)
+        local reviewed_hash = session.reviewed_hash(repo_path)
         if changed[repo_path] and reviewed_hash and reviewed_hash == session.head_hashes()[repo_path] then
             -- Reviewed as in HEAD, which is already read.
             M.attach(buf, { buffer.head_text.content, nil, buffer.head_text.content })

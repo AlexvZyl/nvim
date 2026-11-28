@@ -1,6 +1,6 @@
 -- Builds the panel's rows: pending files grouped by directory, or a done message.
 local config = require("review.config")
-local File = require("review.file")
+local session = require("review.session")
 
 local M = {}
 
@@ -96,7 +96,7 @@ function M.build(files)
         rows[#rows].ends_group = true
     end
     if config.options.view == "since_review" then
-        File.count_lines_since_review(vim.tbl_map(function(row)
+        session.count_lines_since_review(vim.tbl_map(function(row)
             return row.file
         end, rows))
     end

@@ -4,7 +4,6 @@ local deleted = require("review.deleted")
 local render = require("review.render")
 local panel_rows = require("review.panel.rows")
 local session = require("review.session")
-local state = require("review.state")
 
 local M = {}
 
@@ -109,7 +108,7 @@ local function mark_reviewed(first, last)
         return row.file.repo_path
     end, vim.list_slice(rows, first, last))
     if #repo_paths > 0 then
-        state.review(repo_paths, first)
+        session.review(repo_paths, first)
         render.review_changed(repo_paths)
         draw(first)
     end
@@ -160,7 +159,7 @@ local function open_selected_row()
     -- Opening it clears its dot.
     local has_dot = file:changed_after_review() or file:is_unseen()
     if has_dot then
-        state.mark_opened(file.repo_path)
+        session.mark_opened(file.repo_path)
     end
     local target = target_window()
     if deleted.path(vim.api.nvim_win_get_buf(target)) == vim.fn.fnamemodify(file.path, ":.") then
@@ -210,10 +209,10 @@ local function create_buffer()
         mark_reviewed(math.min(first, last), math.max(first, last))
     end)
     map("n", keymaps.undo, function()
-        undo_or_redo(state.undo)
+        undo_or_redo(session.undo)
     end)
     map("n", keymaps.redo, function()
-        undo_or_redo(state.redo)
+        undo_or_redo(session.redo)
     end)
 end
 
@@ -231,9 +230,9 @@ function M.toggle(just_loaded)
         return M.close()
     end
     if not just_loaded then
-        require("review.watch").schedule()
+        require("review.git").schedule_change()
     end
-    state.load()
+    session.load_progress()
     -- Selects the current file.
     local repo_path = session.cwd_prefix .. deleted.path(vim.api.nvim_get_current_buf())
     if session.by_repo_path[repo_path] then

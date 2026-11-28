@@ -193,11 +193,11 @@ end)
 -- With the blobs of the files, which the review reads once needed.
 bench("load", 10, function()
     local session = require("review.session")
-    session.load()
-    require("review.state").needs_review(session.files[1].repo_path)
+    session.reload()
+    require("review.session").needs_review(session.files[1].repo_path)
 end)
 -- What the watcher does once git moved HEAD.
-bench("refresh", 10, require("review.watch").refresh)
+bench("refresh", 10, require("review").refresh)
 bench("panel", 20, require("review.panel").refresh)
 bench("toggle", 10, function()
     review.panel()
@@ -263,11 +263,11 @@ local session = require("review.session")
 local changed = {}
 for i = 1, 50 do
     local file = session.by_repo_path[session.cwd_prefix .. "dir" .. (i * 4 - 3) % 20 .. "/sub" .. (i * 4 - 3) % 3 .. "/" .. modified[i]]
-    require("review.state").review({ file.repo_path }, 1)
+    require("review.session").review({ file.repo_path }, 1)
     changed[file.path] = h.edit(h.lines((i * 4 - 3) % 30 + 10), { [3] = "changed", [5] = false, [7] = "since" })
 end
 h.commit(changed)
-bench("refresh since review", 10, require("review.watch").refresh)
+bench("refresh since review", 10, require("review").refresh)
 review.view("all")
 bench("panel redraw", 50, function()
     vim.api.nvim_buf_call(panel_buf, function()

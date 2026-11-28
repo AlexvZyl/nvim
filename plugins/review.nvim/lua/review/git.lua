@@ -116,4 +116,45 @@ function M.head_hashes(paths)
     end
 end
 
+-- Watching HEAD
+
+local timer, watcher, on_change
+
+-- Debounced, as a rebase moves HEAD for every commit.
+function M.schedule_change()
+    if timer then
+        timer:stop()
+        timer:start(200, 0, vim.schedule_wrap(on_change))
+    end
+end
+
+-- Calls back when HEAD moves, which git appends to the HEAD reflog for.
+function M.watch(git_dir, callback)
+    on_change = callback
+    timer = vim.uv.new_timer()
+    watcher = vim.uv.new_fs_event()
+    local reflog_path = git_dir .. "/logs/HEAD"
+    local function start()
+        watcher:start(reflog_path, {}, function(watch_error)
+            if watch_error then
+                return
+            end
+            -- Git may have replaced the file.
+            watcher:stop()
+            start()
+            M.schedule_change()
+        end)
+    end
+    start()
+end
+
+function M.unwatch()
+    for _, handle in ipairs({ timer, watcher }) do
+        if not handle:is_closing() then
+            handle:close()
+        end
+    end
+    timer, watcher = nil, nil
+end
+
 return M

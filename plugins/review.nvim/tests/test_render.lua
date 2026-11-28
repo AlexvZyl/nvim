@@ -500,7 +500,7 @@ function T.the_cursor_line_number_shows_only_in_its_window()
     vim.wo.cursorline, vim.wo.cursorlineopt, vim.wo.number = false, "both", false
     vim.o.termguicolors = false
     vim.cmd.highlight("clear")
-    require("review.highlights").set()
+    require("review.config").set_highlights()
     assert(seen[1] == plain and seen[4] == plain, "the other window's cursor line number shows: " .. vim.inspect(seen))
     assert(seen[2] ~= plain and seen[3] ~= plain, "the cursor line number does not show: " .. vim.inspect(seen))
 end

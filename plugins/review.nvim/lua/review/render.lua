@@ -1,12 +1,81 @@
 -- Attaches buffers to Buffer objects and passes editor events on to them.
 local Buffer = require("review.buffer")
 local config = require("review.config")
-local cursor = require("review.cursor")
 local git = require("review.git")
 local scroll = require("review.scroll")
 local session = require("review.session")
 
 local M = {}
+
+-- Cursor line numbers
+
+-- Puts CursorLineNr back on the cursor line's number where a changed line's highlight hides it. One namespace per
+-- window, as a buffer can show in several.
+-- By window.
+local cursor_marks = {}
+-- From closed windows, for new ones.
+local spare_namespaces = {}
+
+-- The changed line's number group, nil when not changed or cursorline does not show numbers.
+local function number_group(win, buf, row)
+    local cursorlineopt = vim.wo[win].cursorlineopt
+    if vim.wo[win].cursorline and (cursorlineopt:find("number") or cursorlineopt:find("both")) then
+        local sign = vim.api.nvim_buf_get_extmarks(buf, Buffer.namespace, { row, 0 }, { row, 0 }, { details = true, overlap = true })[1]
+        return sign and sign[4].number_hl_group
+    end
+end
+
+local function mark_cursor(win)
+    local buf = vim.api.nvim_win_get_buf(win)
+    local row = vim.api.nvim_win_get_cursor(win)[1] - 1
+    local group, tick, mark = number_group(win, buf, row), vim.b[buf].changedtick, cursor_marks[win]
+    if mark and mark.buf == buf and mark.row == row and mark.group == group and mark.tick == tick then
+        return
+    end
+    if mark and mark.id and vim.api.nvim_buf_is_valid(mark.buf) then
+        vim.api.nvim_buf_del_extmark(mark.buf, mark.ns, mark.id)
+    end
+    local ns = mark and mark.ns
+    if not ns then
+        ns = table.remove(spare_namespaces) or vim.api.nvim_create_namespace("")
+        vim.api.nvim__ns_set(ns, { wins = { win } })
+    end
+    cursor_marks[win] = {
+        ns = ns,
+        buf = buf,
+        row = row,
+        group = group,
+        tick = tick,
+        id = group and vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
+            number_hl_group = group:gsub("Nr$", "CursorNr"),
+            priority = config.options.sign_priority + 1,
+        }),
+    }
+end
+
+-- Clears marks of closed windows, keeping their namespaces.
+local function prune_cursor_marks()
+    for win, mark in pairs(cursor_marks) do
+        if not vim.api.nvim_win_is_valid(win) then
+            if vim.api.nvim_buf_is_valid(mark.buf) then
+                vim.api.nvim_buf_clear_namespace(mark.buf, mark.ns, 0, -1)
+            end
+            table.insert(spare_namespaces, mark.ns)
+            cursor_marks[win] = nil
+        end
+    end
+end
+
+local function clear_cursor_marks(buf)
+    if not vim.api.nvim_buf_is_valid(buf) then
+        return
+    end
+    for _, mark in pairs(cursor_marks) do
+        vim.api.nvim_buf_clear_namespace(buf, mark.ns, 0, -1)
+    end
+end
+
+-- Buffers
 
 -- Includes files that do not exist, to show deleted files.
 local function attachable(buf)
@@ -85,12 +154,14 @@ function M.detach(buf)
     local buffer = Buffer.get(buf)
     if buffer then
         buffer:detach()
+        clear_cursor_marks(buf)
     end
 end
 
 function M.detach_all()
-    for _, buffer in Buffer.each() do
+    for buf, buffer in Buffer.each() do
         buffer:detach()
+        clear_cursor_marks(buf)
     end
 end
 
@@ -128,9 +199,9 @@ vim.api.nvim_set_decoration_provider(vim.api.nvim_create_namespace("review_delet
 
 -- On SafeState: records the screen for scroll.keep and refreshes stale drawing.
 function M.settled()
-    cursor.prune()
+    prune_cursor_marks()
     for _, win in ipairs(vim.api.nvim_list_wins()) do
-        cursor.mark(win)
+        mark_cursor(win)
         local buffer = Buffer.get(vim.api.nvim_win_get_buf(win))
         if buffer and buffer.rendered_hunks == buffer.hunks_from_base then
             buffer:refresh()

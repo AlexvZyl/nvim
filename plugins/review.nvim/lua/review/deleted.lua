@@ -1,6 +1,6 @@
 -- Read-only buffers showing deleted files as at the merge base.
 local git = require("review.git")
-local draw = require("review.draw")
+local Buffer = require("review.buffer")
 local session = require("review.session")
 
 local M = {}
@@ -34,9 +34,9 @@ local function load_lines(buf, path)
     vim.bo[buf].modifiable = true
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modifiable = false
-    vim.api.nvim_buf_clear_namespace(buf, draw.namespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(buf, Buffer.namespace, 0, -1)
     -- In HEAD when only deleted locally.
-    draw.sign(buf, 1, #lines, head_content ~= nil, "Delete")
+    Buffer.sign(buf, 1, #lines, head_content ~= nil, "Delete")
 end
 
 function M.open(path)

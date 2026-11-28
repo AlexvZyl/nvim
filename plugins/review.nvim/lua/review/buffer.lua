@@ -1,7 +1,5 @@
 -- Buffer is an attached buffer of a reviewed file: its diffs against HEAD and the base, and the marks drawing them.
 local config = require("review.config")
-local cursor = require("review.cursor")
-local draw = require("review.draw")
 local scroll = require("review.scroll")
 local Text = require("review.text")
 
@@ -9,6 +7,92 @@ local Buffer = {}
 Buffer.__index = Buffer
 
 local deleted_namespace = vim.api.nvim_create_namespace("review_deleted")
+
+-- Drawing
+
+Buffer.namespace = vim.api.nvim_create_namespace("review")
+
+-- By group name. Marks take ids faster than names.
+local hl_ids = setmetatable({}, {
+    __index = function(ids, name)
+        ids[name] = vim.api.nvim_get_hl_id_by_name(name)
+        return ids[name]
+    end,
+})
+
+local function sign_text(uncommitted)
+    return config.options.signs[uncommitted and "uncommitted" or "committed"]
+end
+
+-- Kind is Add or Delete.
+function Buffer.sign(buf, first_line, last_line, uncommitted, kind)
+    local group = "Review" .. (uncommitted and "Local" or "") .. kind
+    vim.api.nvim_buf_set_extmark(buf, Buffer.namespace, first_line - 1, 0, {
+        end_row = last_line - 1,
+        line_hl_group = group,
+        number_hl_group = group .. "Nr",
+        sign_text = sign_text(uncommitted),
+        sign_hl_group = "ReviewSign" .. group:sub(7),
+        priority = config.options.sign_priority,
+    })
+end
+
+-- The number and sign columns as chunks, for virtual lines.
+local function gutter_chunks(gutter_width, uncommitted, kind)
+    local text = sign_text(uncommitted)
+    local sign = text .. string.rep(" ", gutter_width - 1 - vim.fn.strdisplaywidth(text))
+    return { { " ", hl_ids.LineNr }, { sign, hl_ids["ReviewSign" .. (uncommitted and "Local" or "") .. kind] } }
+end
+
+-- A deleted line as chunks: highlighted by byte, scrolled by leftcol and padded to the window's edge.
+local function deleted_text_chunks(text, highlights, uncommitted, leftcol, tabstop)
+    local group = uncommitted and "ReviewLocalDelete" or "ReviewDelete"
+    local line_id, background_id = hl_ids[group], hl_ids[group .. "Background"]
+    local chunks, width, last_group = {}, 0, nil
+    -- Merges neighbours with the same highlight.
+    local function add(part, part_group)
+        if chunks[1] and part_group == last_group then
+            chunks[#chunks][1] = chunks[#chunks][1] .. part
+        else
+            table.insert(chunks, { part, part_group and { line_id, hl_ids[part_group], background_id } or line_id })
+        end
+        last_group = part_group
+    end
+    -- Start of the current run of visible bytes. A byte loop, as the JIT does not compile gmatch.
+    local run_start, byte = nil, 1
+    while byte <= #text do
+        local byte_group, code = highlights[byte], text:byte(byte)
+        -- Skips UTF-8 continuation bytes.
+        local next_char = byte + 1
+        while (text:byte(next_char) or 0) >= 128 and text:byte(next_char) < 192 do
+            next_char = next_char + 1
+        end
+        local cells = code == 9 and tabstop - width % tabstop
+            or code < 128 and 1
+            or vim.api.nvim_strwidth(text:sub(byte, next_char - 1))
+        width = width + cells
+        local visible_cells = math.min(cells, width - leftcol)
+        -- Tabs, and wide characters cut by the window edge (as <), are drawn as blanks.
+        local blank = visible_cells > 0 and (code == 9 or visible_cells < cells)
+        if run_start and (blank or byte_group ~= highlights[run_start]) then
+            add(text:sub(run_start, byte - 1), highlights[run_start])
+            run_start = nil
+        end
+        if blank then
+            add(code == 9 and string.rep(" ", visible_cells) or "<" .. string.rep(" ", visible_cells - 1), byte_group)
+        elseif visible_cells > 0 then
+            run_start = run_start or byte
+        end
+        byte = next_char
+    end
+    if run_start then
+        add(text:sub(run_start), highlights[run_start])
+    end
+    table.insert(chunks, { string.rep(" ", math.max(vim.o.columns - width + leftcol, 0)), line_id })
+    return chunks
+end
+
+-- Buffers
 
 -- By buffer number.
 local attached = {}
@@ -60,10 +144,9 @@ end
 function Buffer:detach()
     attached[self.buf] = nil
     if vim.api.nvim_buf_is_valid(self.buf) then
-        for _, ns in ipairs({ draw.namespace, deleted_namespace }) do
+        for _, ns in ipairs({ Buffer.namespace, deleted_namespace }) do
             vim.api.nvim_buf_clear_namespace(self.buf, ns, 0, -1)
         end
-        cursor.clear(self.buf)
         for _, lhs in ipairs({ config.options.keymaps.next_hunk, config.options.keymaps.prev_hunk }) do
             pcall(vim.keymap.del, "n", lhs, { buffer = self.buf })
         end
@@ -135,11 +218,11 @@ end
 -- Keeps marks already on the right lines.
 function Buffer:sign_added_lines()
     local buf, existing = self.buf, {}
-    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, draw.namespace, 0, -1, { details = true })) do
+    for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, Buffer.namespace, 0, -1, { details = true })) do
         local mark_key = mark[2] .. " " .. mark[4].end_row .. " " .. mark[4].line_hl_group
         -- Edits can move marks onto the same lines.
         if existing[mark_key] then
-            vim.api.nvim_buf_del_extmark(buf, draw.namespace, mark[1])
+            vim.api.nvim_buf_del_extmark(buf, Buffer.namespace, mark[1])
         else
             existing[mark_key] = mark[1]
         end
@@ -158,14 +241,14 @@ function Buffer:sign_added_lines()
             if existing[mark_key] then
                 existing[mark_key] = nil
             else
-                draw.sign(buf, run_start, line - 1, changed_lines[run_start] == "ReviewLocalAdd", "Add")
+                Buffer.sign(buf, run_start, line - 1, changed_lines[run_start] == "ReviewLocalAdd", "Add")
             end
             run_start = nil
         end
         run_start = run_start or changed_lines[line] and line
     end
     for _, id in pairs(existing) do
-        vim.api.nvim_buf_del_extmark(buf, draw.namespace, id)
+        vim.api.nvim_buf_del_extmark(buf, Buffer.namespace, id)
     end
     self.changed_lines = changed_lines
 end
@@ -175,7 +258,7 @@ function Buffer:display_window()
 end
 
 function Buffer:gutter(uncommitted, kind)
-    return draw.gutter(self.gutter_width, uncommitted, kind)
+    return gutter_chunks(self.gutter_width, uncommitted, kind)
 end
 
 -- Multi-line injected languages, like markdown code blocks: { first_row, last_row, lang }, inner ones last.
@@ -277,7 +360,7 @@ function Buffer:deleted_line_chunks(line, style, lang, lines_above, lines_below)
     -- Committed deletions are lines of the base, the others of HEAD.
     local text = line.uncommitted and self.head_text or self.base_text
     local highlights = lang and text:highlight(lang, hunk.old_start + line.index - 1, lines_above, lines_below) or {}
-    local chunks = draw.deleted_line(hunk.deleted_lines[line.index], highlights, line.uncommitted, style.leftcol, style.tabstop)
+    local chunks = deleted_text_chunks(hunk.deleted_lines[line.index], highlights, line.uncommitted, style.leftcol, style.tabstop)
     return vim.list_extend(self:gutter(line.uncommitted, "Delete"), chunks)
 end
 
